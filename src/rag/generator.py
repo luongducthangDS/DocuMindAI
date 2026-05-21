@@ -1,0 +1,197 @@
+"""
+LLM generation with mandatory citations.
+Primary: Groq Llama-3.1-70B | Fallback: Gemini 1.5 Flash
+Retry logic via tenacity; fallback logic on timeout/rate-limit.
+"""
+
+from __future__ import annotations
+
+import asyncio
+from typing import AsyncIterator
+
+from loguru import logger
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
+
+from src.config import get_settings
+from src.rag.retriever import RetrievedChunk
+
+_SYSTEM_PROMPT = """Bạn là trợ lý pháp lý chuyên về luật Việt Nam.
+Chỉ trả lời dựa trên các đoạn văn bản pháp luật được cung cấp.
+Quy tắc bắt buộc:
+1. Mỗi câu trả lời PHẢI trích dẫn điều khoản cụ thể [số thứ tự nguồn].
+2. Nếu không có thông tin trong văn bản, nói rõ: "Tôi không tìm thấy quy định này trong tài liệu hiện có."
+3. KHÔNG bịa đặt hoặc suy luận ngoài văn bản được cung cấp.
+4. Ngôn ngữ: tiếng Việt, rõ ràng, chính xác.
+5. Cuối câu trả lời, liệt kê đầy đủ nguồn trích dẫn."""
+
+_CITATION_SUFFIX = "\n\n**Nguồn trích dẫn:**\n{citations}"
+
+_GROQ_ERRORS = (
+    "groq.RateLimitError",
+    "groq.APITimeoutError",
+    "groq.APIConnectionError",
+)
+
+
+def _build_context(chunks: list[RetrievedChunk]) -> tuple[str, str]:
+    """Returns (context_block, citation_list)."""
+    context_parts = []
+    citations = []
+
+    for i, chunk in enumerate(chunks, 1):
+        context_parts.append(f"[{i}] {chunk.text}")
+        citations.append(f"[{i}] {chunk.citation_label}")
+
+    return "\n\n---\n\n".join(context_parts), "\n".join(citations)
+
+
+def _get_groq_client():
+    from groq import Groq
+
+    settings = get_settings()
+    if not settings.groq_api_key:
+        raise RuntimeError("GROQ_API_KEY not set")
+    return Groq(api_key=settings.groq_api_key)
+
+
+def _get_gemini_client():
+    import google.generativeai as genai
+
+    settings = get_settings()
+    if not settings.google_api_key:
+        raise RuntimeError("GOOGLE_API_KEY not set")
+    genai.configure(api_key=settings.google_api_key)
+    return genai.GenerativeModel("gemini-1.5-flash")
+
+
+@retry(
+    stop=stop_after_attempt(2),
+    wait=wait_exponential(min=1, max=5),
+    retry=retry_if_exception_type(Exception),
+    reraise=False,
+)
+def _call_groq(prompt: str, context: str) -> str | None:
+    client = _get_groq_client()
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {"role": "system", "content": _SYSTEM_PROMPT},
+            {"role": "user", "content": f"**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {prompt}"},
+        ],
+        temperature=0.1,   # low temp for factual legal answers
+        max_tokens=1024,
+    )
+    return response.choices[0].message.content
+
+
+def _call_gemini(prompt: str, context: str) -> str | None:
+    model = _get_gemini_client()
+    full_prompt = (
+        f"{_SYSTEM_PROMPT}\n\n**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {prompt}"
+    )
+    response = model.generate_content(full_prompt)
+    return response.text
+
+
+def generate_answer(
+    query: str,
+    chunks: list[RetrievedChunk],
+    use_fallback: bool = False,
+) -> dict:
+    """
+    Generate answer with citations.
+    Returns: {answer, sources, used_llm, chunk_count}
+    """
+    if not chunks:
+        return {
+            "answer": "Tôi không tìm thấy văn bản pháp luật liên quan đến câu hỏi này.",
+            "sources": [],
+            "used_llm": "none",
+            "chunk_count": 0,
+        }
+
+    context, citation_list = _build_context(chunks)
+    used_llm = "groq"
+    answer = None
+
+    if not use_fallback:
+        try:
+            answer = _call_groq(query, context)
+            logger.info("Groq answered query ({} chars)", len(answer or ""))
+        except Exception as exc:
+            logger.warning("Groq failed, switching to Gemini: {}", exc)
+            used_llm = "gemini_fallback"
+
+    if answer is None:
+        try:
+            answer = _call_gemini(query, context)
+            used_llm = "gemini"
+            logger.info("Gemini answered query ({} chars)", len(answer or ""))
+        except Exception as exc:
+            logger.error("Both LLMs failed: {}", exc)
+            answer = "Xin lỗi, hệ thống đang gặp sự cố. Vui lòng thử lại."
+            used_llm = "error"
+
+    # Append citation list to answer
+    full_answer = answer + _CITATION_SUFFIX.format(citations=citation_list)
+
+    return {
+        "answer": full_answer,
+        "sources": [{"index": i + 1, **c.metadata, "score": c.score} for i, c in enumerate(chunks)],
+        "used_llm": used_llm,
+        "chunk_count": len(chunks),
+    }
+
+
+async def stream_answer(
+    query: str,
+    chunks: list[RetrievedChunk],
+) -> AsyncIterator[str]:
+    """
+    Stream tokens from Groq (primary) with Gemini fallback.
+    Yields text chunks for WebSocket/SSE streaming.
+    """
+    if not chunks:
+        yield "Tôi không tìm thấy văn bản pháp luật liên quan đến câu hỏi này."
+        return
+
+    context, citation_list = _build_context(chunks)
+    settings = get_settings()
+
+    if not settings.groq_api_key:
+        yield "⚠️ GROQ_API_KEY chưa được cấu hình."
+        return
+
+    try:
+        from groq import Groq
+
+        client = Groq(api_key=settings.groq_api_key)
+        stream = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "system", "content": _SYSTEM_PROMPT},
+                {"role": "user", "content": f"**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {query}"},
+            ],
+            temperature=0.1,
+            max_tokens=1024,
+            stream=True,
+        )
+
+        for chunk in stream:
+            delta = chunk.choices[0].delta.content
+            if delta:
+                yield delta
+                await asyncio.sleep(0)  # yield control to event loop
+
+        yield _CITATION_SUFFIX.format(citations=citation_list)
+
+    except Exception as exc:
+        logger.error("Streaming failed: {}", exc)
+        # Fallback to non-streaming Gemini
+        result = generate_answer(query, chunks, use_fallback=True)
+        yield result["answer"]

@@ -1,0 +1,28 @@
+# Secrets — NEVER commit
+.env
+.env.*
+!.env.example
+
+# Raw / processed data
+data/raw/
+data/processed/
+data/eval/
+
+# Runtime artifacts
+logs/
+reports/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+.coverage
+
+# IDE
+.idea/
+.vscode/
+*.swp
