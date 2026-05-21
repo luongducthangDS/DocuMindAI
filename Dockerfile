@@ -38,13 +38,22 @@ COPY ingest.py ./
 # Pre-loaded corpus (ChromaDB local persistent data)
 COPY data/chroma_db/ ./data/chroma_db/
 
-# HuggingFace cache — appuser has no home dir, point to writable /app path
+# appuser is a system user with no home dir — redirect everything to /app
+ENV HOME=/app
 ENV HF_HOME=/app/.cache/huggingface
 ENV TRANSFORMERS_CACHE=/app/.cache/huggingface
 
-# Create runtime directories with correct ownership
-RUN mkdir -p data/raw data/processed data/eval logs reports .cache/huggingface && \
-    chown -R appuser:appgroup /app
+# Create runtime directories
+RUN mkdir -p data/raw data/processed data/eval logs reports .cache/huggingface
+
+# Pre-download embedding model as root (avoids runtime download + permission issues)
+# Must match EMBEDDING_MODEL env var used at runtime
+RUN python -c "\
+from sentence_transformers import SentenceTransformer; \
+SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')"
+
+# Hand ownership to appuser
+RUN chown -R appuser:appgroup /app
 
 # Drop to non-root
 USER appuser
