@@ -40,7 +40,7 @@ if "messages" not in st.session_state:
 def _is_online() -> bool:
     """Kiểm tra backend có hoạt động không."""
     try:
-        r = httpx.get(f"{API_BASE}/api/v1/health", timeout=3)
+        r = httpx.get(f"{API_BASE}/api/v1/health", timeout=10)
         data = r.json()
         # Coi là online nếu ít nhất LLM hoặc ChromaDB hoạt động
         services = {s["name"]: s["healthy"] for s in data.get("services", [])}

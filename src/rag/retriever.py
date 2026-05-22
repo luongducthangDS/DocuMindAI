@@ -127,9 +127,10 @@ class _RerankedRetriever:
 def nodes_to_chunks(nodes: list["NodeWithScore"]) -> list[RetrievedChunk]:
     return [
         RetrievedChunk(
-            text=n.node.get_content(),
+            text=n.node.text or n.node.get_content(),
             score=float(n.score or 0),
-            metadata=n.node.metadata or {},
+            metadata={k: v for k, v in (n.node.metadata or {}).items()
+                      if not k.startswith("_")},
         )
         for n in nodes
     ]

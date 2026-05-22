@@ -38,14 +38,25 @@ _GROQ_ERRORS = (
 )
 
 
+_MAX_CHUNK_CHARS = 3_000   # ~750 tokens per chunk
+_MAX_TOTAL_CHARS = 12_000  # ~3000 tokens total context
+
+
 def _build_context(chunks: list[RetrievedChunk]) -> tuple[str, str]:
-    """Returns (context_block, citation_list)."""
+    """Returns (context_block, citation_list). Truncates to stay within LLM limits."""
     context_parts = []
     citations = []
+    total_chars = 0
 
     for i, chunk in enumerate(chunks, 1):
-        context_parts.append(f"[{i}] {chunk.text}")
+        text = chunk.text
+        if len(text) > _MAX_CHUNK_CHARS:
+            text = text[:_MAX_CHUNK_CHARS] + "…"
+        if total_chars + len(text) > _MAX_TOTAL_CHARS:
+            break
+        context_parts.append(f"[{i}] {text}")
         citations.append(f"[{i}] {chunk.citation_label}")
+        total_chars += len(text)
 
     return "\n\n---\n\n".join(context_parts), "\n".join(citations)
 
@@ -66,27 +77,25 @@ def _get_gemini_client():
     if not settings.google_api_key:
         raise RuntimeError("GOOGLE_API_KEY not set")
     genai.configure(api_key=settings.google_api_key)
-    return genai.GenerativeModel("gemini-1.5-flash")
+    return genai.GenerativeModel("gemini-2.0-flash-lite")
 
 
-@retry(
-    stop=stop_after_attempt(2),
-    wait=wait_exponential(min=1, max=5),
-    retry=retry_if_exception_type(Exception),
-    reraise=False,
-)
 def _call_groq(prompt: str, context: str) -> str | None:
     client = _get_groq_client()
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[
-            {"role": "system", "content": _SYSTEM_PROMPT},
-            {"role": "user", "content": f"**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {prompt}"},
-        ],
-        temperature=0.1,   # low temp for factual legal answers
-        max_tokens=1024,
-    )
-    return response.choices[0].message.content
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "system", "content": _SYSTEM_PROMPT},
+                {"role": "user", "content": f"**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {prompt}"},
+            ],
+            temperature=0.1,
+            max_tokens=1024,
+        )
+        return response.choices[0].message.content
+    except Exception as exc:
+        logger.error("Groq API error (type={}, detail={})", type(exc).__name__, str(exc)[:300])
+        raise
 
 
 def _call_gemini(prompt: str, context: str) -> str | None:

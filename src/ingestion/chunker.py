@@ -45,9 +45,17 @@ def chunk_by_dieu(text: str, doc_meta: dict) -> list[LegalChunk]:
         )
         return _fallback_chunks(text, doc_meta)
 
+    _MAX_DIEU_CHARS = 4_000  # articles longer than this are split further
+
     for match in matches:
         chunk_text = match.group(1).strip()
         if len(chunk_text) < 50:
+            continue
+
+        # Split oversized articles by khoản boundary
+        if len(chunk_text) > _MAX_DIEU_CHARS:
+            sub_chunks = _split_large_dieu(chunk_text, doc_meta, _MAX_DIEU_CHARS)
+            chunks.extend(sub_chunks)
             continue
 
         first_line = chunk_text.split("\n")[0][:120]
@@ -124,3 +132,46 @@ def _fallback_chunks(
         )
 
     return chunks
+
+
+def _split_large_dieu(
+    dieu_text: str,
+    doc_meta: dict,
+    max_chars: int,
+) -> list[LegalChunk]:
+    """Split an oversized Điều into sub-chunks at khoản boundaries."""
+    first_line = dieu_text.split("\n")[0][:120]
+    base_meta = {
+        "source_url": doc_meta.get("url", ""),
+        "title": doc_meta.get("title", ""),
+        "doc_type": doc_meta.get("doc_type", "unknown"),
+        "so_hieu": doc_meta.get("so_hieu", ""),
+        "ngay_ban_hanh": doc_meta.get("ngay_ban_hanh", ""),
+        "dieu_header": first_line,
+        "source": doc_meta.get("source", ""),
+    }
+    parts = re.split(r"(?=\n\d+\.\s)", dieu_text)
+    chunks: list[LegalChunk] = []
+    buffer = ""
+
+    for part in parts:
+        if len(buffer) + len(part) <= max_chars:
+            buffer = buffer + part
+        else:
+            if buffer.strip():
+                chunks.append(LegalChunk(
+                    text=buffer.strip()[:max_chars],
+                    metadata={**base_meta, "char_count": len(buffer), "khoan_count": 0},
+                ))
+            buffer = part
+
+    if buffer.strip():
+        chunks.append(LegalChunk(
+            text=buffer.strip()[:max_chars],
+            metadata={**base_meta, "char_count": len(buffer), "khoan_count": 0},
+        ))
+
+    return chunks if chunks else [LegalChunk(
+        text=dieu_text[:max_chars] + "…",
+        metadata={**base_meta, "char_count": max_chars, "khoan_count": 0},
+    )]

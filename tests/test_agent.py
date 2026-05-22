@@ -128,10 +128,12 @@ class TestRouter:
     def test_route_by_intent_mapping(self):
         from src.agent.graph import route_by_intent
 
-        assert route_by_intent({"intent": "compare"}) == "compare"
-        assert route_by_intent({"intent": "simple_qa"}) == "retrieve"
-        assert route_by_intent({"intent": "unknown"}) == "retrieve"
-        assert route_by_intent({"intent": "invalid"}) == "retrieve"
+        assert route_by_intent({"intent": "compare"}) == "do_compare"
+        assert route_by_intent({"intent": "summarize"}) == "do_summarize"
+        assert route_by_intent({"intent": "report"}) == "do_report"
+        assert route_by_intent({"intent": "simple_qa"}) == "do_retrieve"
+        assert route_by_intent({"intent": "unknown"}) == "do_retrieve"
+        assert route_by_intent({"intent": "invalid"}) == "do_retrieve"
 
 
 # ── Schema Tests ───────────────────────────────────────────────────────────────

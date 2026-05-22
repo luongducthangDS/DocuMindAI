@@ -116,6 +116,7 @@ class TestGenerator:
 class TestNodesConversion:
     def test_nodes_to_chunks_converts_correctly(self):
         mock_node = MagicMock()
+        mock_node.node.text = "Legal text content"  # nodes_to_chunks reads .text first
         mock_node.node.get_content.return_value = "Legal text content"
         mock_node.node.metadata = {"title": "Test Law", "dieu_header": "Điều 1"}
         mock_node.score = 0.85

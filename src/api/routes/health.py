@@ -20,20 +20,14 @@ router = APIRouter(prefix="/api/v1", tags=["observability"])
 
 @router.get("/health", response_model=HealthResponse)
 async def health_check() -> HealthResponse:
-    """Check status of all downstream services."""
-    services = []
+    """Check status of all downstream services — runs checks in parallel."""
+    import asyncio
 
-    # ChromaDB
-    services.append(await _check_chroma())
-
-    # Redis
-    services.append(await _check_redis())
-
-    # LLM (Groq)
-    services.append(_check_llm())
-
-    # SQLite
-    services.append(_check_sqlite())
+    chroma, redis = await asyncio.gather(
+        _check_chroma(),
+        _check_redis(),
+    )
+    services = [chroma, redis, _check_llm(), _check_sqlite()]
 
     all_healthy = all(s.healthy for s in services)
     any_healthy = any(s.healthy for s in services)
@@ -74,7 +68,7 @@ async def _check_redis() -> ServiceStatus:
         import redis.asyncio as aioredis
 
         settings = get_settings()
-        client = aioredis.from_url(settings.redis_url, socket_connect_timeout=2)
+        client = aioredis.from_url(settings.redis_url, socket_connect_timeout=1)
         await client.ping()
         await client.aclose()
         return ServiceStatus(name="redis", healthy=True, detail="PONG received")
