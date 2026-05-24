@@ -28,5 +28,11 @@ ENABLE_RERANKER = "false"
 LANGCHAIN_TRACING_V2 = "false"
 LANGCHAIN_API_KEY = ""
 REDIS_URL = ""
+# ALLOWED_ORIGINS: set to Railway public URL (e.g. https://your-service.up.railway.app)
+# Streamlit and FastAPI share the same Railway container, so Streamlit calls FastAPI
+# on the loopback (127.0.0.1:9000). CORS only matters for external browser clients
+# that hit the /api/* endpoints directly. Leave empty to allow all origins in production,
+# or set to the Railway public URL.
+ALLOWED_ORIGINS = "*"
 # CHROMA_HOST not set → falls back to local PersistentClient (bundled in Docker image)
 # REDIS_URL not set → sessions use in-process dict (add Railway Redis plugin for persistence)

@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     groq_api_key: str = ""
     google_api_key: str = ""
     primary_llm: str = "groq/llama-3.3-70b-versatile"
-    fallback_llm: str = "gemini/gemini-1.5-flash"
+    fallback_llm: str = "gemini/gemini-2.0-flash-lite"
     embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 
     # LangSmith

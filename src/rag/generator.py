@@ -1,6 +1,6 @@
 ﻿"""
 LLM generation with mandatory citations.
-Primary: Groq Llama-3.1-70B | Fallback: Gemini 1.5 Flash
+Primary: Groq Llama-3.3-70B | Fallback: Gemini 2.0 Flash Lite
 Retry logic via tenacity; fallback logic on timeout/rate-limit.
 """
 
