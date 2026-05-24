@@ -8,7 +8,10 @@ WEB_PORT="${PORT:-8080}"
 export API_HOST
 export API_PORT
 export WEB_PORT
-export API_BASE_URL="${API_BASE_URL:-http://${API_HOST}:${API_PORT}}"
+# Streamlit and FastAPI run inside the same Railway container. Always use the
+# internal loopback URL here so stale Railway variables cannot point the UI at
+# the public service port or an old backend port.
+export API_BASE_URL="http://${API_HOST}:${API_PORT}"
 
 uvicorn src.api.main:app \
   --host "${API_HOST}" \

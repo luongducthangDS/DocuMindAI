@@ -15,7 +15,10 @@ import streamlit as st
 import websockets
 
 # ── Config ─────────────────────────────────────────────────────────────────────
-API_BASE = os.getenv("API_BASE_URL", "http://localhost:8081")
+API_BASE = os.getenv(
+    "API_BASE_URL",
+    f"http://{os.getenv('API_HOST', '127.0.0.1')}:{os.getenv('API_PORT', '9000')}",
+)
 WS_BASE  = API_BASE.replace("http", "ws").replace("https", "wss")
 
 # ── Page Config ────────────────────────────────────────────────────────────────
