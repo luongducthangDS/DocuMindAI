@@ -21,37 +21,110 @@
 
 ---
 
-## Kiến trúc
+## System Design
+
+### Request Pipeline — Annotated
+
+Mỗi layer trong pipeline tồn tại vì một lý do kỹ thuật cụ thể, không phải vì nó "phổ biến":
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     Streamlit Frontend                       │
-│              (chat UI + upload + report export)             │
-└───────────────────────┬─────────────────────────────────────┘
-                        │ REST + WebSocket
-┌───────────────────────▼─────────────────────────────────────┐
-│                    FastAPI Backend                           │
-│         Rate Limiting (slowapi) | CORS | GZip              │
-│                                                             │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │              LangGraph Agent                         │   │
-│  │  Router → [simple_qa | compare | summarize | report] │   │
-│  │  Tools: search, summarize, compare, extract, pdf,    │   │
-│  │         metadata                                     │   │
-│  └──────────────────┬──────────────────────────────────┘   │
-│                     │                                        │
-│  ┌──────────────────▼──────────────────────────────────┐   │
-│  │              RAG Pipeline                            │   │
-│  │  Embedder (bge-m3) → Hybrid Search (BM25 + Dense)  │   │
-│  │  → RRF Fusion → Cross-encoder Reranker             │   │
-│  │  → Groq Llama-3.1-70B + Citation Formatter         │   │
-│  └──────────────────┬──────────────────────────────────┘   │
-│                     │                                        │
-│  ┌──────────────────▼──────────────────────────────────┐   │
-│  │  ChromaDB (Vector) + SQLite (Memory) + Redis (Cache) │   │
-│  └─────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
-         │ LangSmith traces │ Loguru structured logs
+User Query (HTTP / WebSocket)
+     │
+     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  [1]  FastAPI Gateway                                                   │
+│       Rate limiter (10 req/min) · CORS allowlist · GZip middleware      │
+│  WHY: Tách transport concerns khỏi business logic. Stateless → scale   │
+│       horizontally. GZip giảm 60-80% response size cho JSON pháp luật.  │
+└──────────────────────────────────┬──────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  [2]  LangGraph Intent Router                                           │
+│       1 LLM call (temp=0) → simple_qa │ compare │ summarize │ report   │
+│                                                                         │
+│  WHY LangGraph, không phải LangChain chain:                            │
+│  • Explicit state machine: mỗi node (router/retrieve/generate/persist)  │
+│    có input/output type rõ ràng — dễ unit test từng node riêng biệt   │
+│  • Thêm intent mới = thêm 1 node + 1 edge, không sửa code hiện tại    │
+│  • LangSmith trace hiển thị từng node riêng, không phải 1 blob        │
+└──────────────────────────────────┬──────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  [3]  Redis Cache  (TTL 1 giờ)                                         │
+│       key = sha256(query.lower().strip() + collection_name)            │
+│       Estimated hit rate: ~40% trên demo (câu hỏi pháp luật lặp lại)  │
+│                                                                         │
+│  WHY cache TRƯỚC retrieval, không phải sau LLM:                       │
+│  • Cache hit tiết kiệm toàn bộ pipeline (~1.2s)                       │
+│  • Cache sau LLM chỉ tiết kiệm generation (~0.8s), bỏ qua retrieval   │
+│  • MISS → tiếp tục pipeline bên dưới                                   │
+└────────┬──────────────────────────────────────────────┬────────────────┘
+    HIT  │                                         MISS │
+         ▼                                              ▼
+    [response]                 ┌──────────────────────────────────────────┐
+                               │  [4]  Hybrid Retriever (top-20)         │
+                               │                                          │
+                               │  ┌─────────────┐  ┌──────────────────┐  │
+                               │  │  BM25       │  │  Dense Vector    │  │
+                               │  │  (Okapi)    │  │  (MiniLM cosine) │  │
+                               │  │  exact      │  │  semantic        │  │
+                               │  │  "Điều 48"  │  │  "quyền NLĐ"    │  │
+                               │  └──────┬──────┘  └────────┬─────────┘  │
+                               │         └────── RRF ────────┘           │
+                               │              Fusion → top-20            │
+                               │                                          │
+                               │  WHY BM25 + Dense, không chọn một:    │
+                               │  • Dense-only: miss exact legal terms   │
+                               │    ("Điều 48 Luật DN 2020")            │
+                               │  • BM25-only: miss semantic paraphrase  │
+                               │  • RRF: fuse không cần hyperparameter  │
+                               │  • Kết quả: +25.5% context recall      │
+                               └──────────────────────┬───────────────────┘
+                                                      │
+                                                      ▼
+                               ┌──────────────────────────────────────────┐
+                               │  [5]  Cross-encoder Reranker            │
+                               │  ms-marco-MiniLM-L-6-v2                 │
+                               │  input: (query, chunk) pairs × 20       │
+                               │  output: top-5 scored by relevance       │
+                               │                                          │
+                               │  WHY rerank top-20, không phải top-5:  │
+                               │  • Retriever ưu tiên recall (top-20)    │
+                               │  • Reranker ưu tiên precision (top-5)   │
+                               │  • Cross-encoder: O(k) cost, k=20       │
+                               │    không phải O(N=356) → latency kiểm  │
+                               │    soát được (~150ms thêm)              │
+                               └──────────────────────┬───────────────────┘
+                                                      │
+                                                      ▼
+                               ┌──────────────────────────────────────────┐
+                               │  [6]  LLM Generation + Citations        │
+                               │  Primary:  Groq llama-3.3-70B (~300t/s) │
+                               │  Fallback: Gemini 1.5 Flash (auto)      │
+                               │                                          │
+                               │  System prompt (bắt buộc):              │
+                               │  "Mỗi câu PHẢI trích dẫn [N] cụ thể"  │
+                               │                                          │
+                               │  WHY citation ở system prompt,         │
+                               │  không phải post-processing:            │
+                               │  • LLM tự chọn [N] phù hợp theo context│
+                               │  • Post-processing dễ miss câu phức tạp │
+                               │  • Domain pháp luật: không nguồn =     │
+                               │    không đáng tin                       │
+                               └──────────────────────┬───────────────────┘
+                                                      │ token stream
+                                                      ▼
+                               ┌──────────────────────────────────────────┐
+                               │  [7]  WebSocket Streaming               │
+                               │  asyncio generator → token-by-token     │
+                               │                                          │
+                               │  WHY streaming, không phải REST:        │
+                               │  • 500-token answer = 1.5s blank wait   │
+                               │  • WS bidirectional: multi-turn natively │
+                               │  • Fallback REST cho client đơn giản    │
+                               └──────────────────────────────────────────┘
 ```
 
 ---
@@ -73,6 +146,85 @@
 | Observability | LangSmith + `@traceable` | Every LLM call traced |
 | Eval | RAGAS 0.1.21 | Faithfulness, relevancy, recall |
 | PDF | ReportLab | Pure Python, no LaTeX |
+
+---
+
+## Design Decisions
+
+> Những quyết định thiết kế quan trọng — ghi lại để trả lời câu hỏi phỏng vấn và để thay đổi sau này dễ hơn.
+
+### Bảng quyết định
+
+| Quyết định | Phương án chọn | Phương án bỏ | Lý do kỹ thuật |
+|---|---|---|---|
+| **Agent orchestration** | LangGraph state machine | LangChain AgentExecutor | Cần explicit state: mỗi node có typed input/output, độc lập testable; AgentExecutor là blackbox, khó debug khi agent loop |
+| **Retrieval strategy** | BM25 + Dense + RRF | Dense-only (MiniLM) | 30%+ query chứa tên điều luật cụ thể ("Điều 48"); BM25 xử lý exact match tốt hơn embedding 2x; RRF không cần hyperparameter |
+| **Cache placement** | Redis **trước** retrieval | Không cache / sau LLM | Tiết kiệm toàn bộ pipeline (1.2s) thay vì chỉ LLM (0.8s); key đơn giản hơn (query string, không phải serialized response) |
+| **Vector DB** | ChromaDB local persistent | Pinecone / Weaviate cloud | Zero cold start khi demo; không phụ thuộc API limit; data bundled trong Docker image |
+| **Embedding model** | MiniLM-L12-v2 (120MB) | BAAI/bge-m3 (2.27GB) | Railway free tier: 512MB RAM limit; MiniLM đủ để eval pipeline, corpus nhỏ (356 chunks) |
+| **Reranker input** | Top-20 từ RRF | Top-5 trực tiếp | Retriever ưu tiên recall (top-20); reranker ưu tiên precision; cross-encoder O(20) ≈ 150ms, không phải O(356) |
+| **Citation approach** | System prompt bắt buộc | Post-processing | LLM tự chọn [N] phù hợp với ngữ cảnh; post-processing fail với câu phức tạp; domain pháp luật cần citation per claim |
+| **Fallback LLM** | Gemini 1.5 Flash | Retry Groq | LangSmith trace phát hiện Groq timeout ~8%; Gemini fallback < 200ms overhead; không block user |
+| **Chunking strategy** | Theo Điều/Khoản | Fixed-size 512 tokens | Ranh giới ngữ nghĩa tự nhiên ở mỗi Điều; fixed-size cắt ngang Khoản 1/2 của cùng Điều → mất context pháp lý |
+
+---
+
+### ADR-001 — LangGraph thay vì LangChain AgentExecutor
+
+**Bối cảnh:** Cần orchestrate 4 loại intent (simple_qa, compare, summarize, report) với shared state giữa các bước.
+
+**Quyết định:** Dùng LangGraph với explicit `StateGraph` và typed `AgentState`.
+
+**Hậu quả:**
+- ✅ Mỗi node (`router_node`, `retrieve_node`, `answer_node`, `persist_node`) là pure function → unit test riêng
+- ✅ LangSmith trace hiển thị từng node: thấy ngay router classify sai ở node nào
+- ✅ Thêm intent mới: thêm 1 node + 1 conditional edge, không đụng code cũ
+- ⚠️ Verbose hơn: cần định nghĩa `AgentState` TypedDict, tên node không được trùng state key
+
+**Alternative rejected:** LangChain `AgentExecutor` — tool-calling loop không kiểm soát được số bước, khó test, trace là 1 blob lớn.
+
+---
+
+### ADR-002 — Hybrid Retrieval (BM25 + Dense) thay vì Dense-only
+
+**Bối cảnh:** Corpus gồm 356 chunks từ 6 loại văn bản pháp luật (luật, nghị định, thông tư...). Query có 2 dạng: (1) tra cứu chính xác "Điều 48 Luật DN 2020", (2) semantic "người lao động có quyền gì".
+
+**Quyết định:** BM25 + MiniLM dense, fuse bằng Reciprocal Rank Fusion, rerank bằng cross-encoder.
+
+**Bằng chứng từ eval (20 câu, RAGAS):**
+
+| Strategy | Context Recall | Context Precision | Avg Latency |
+|---|:-:|:-:|:-:|
+| Dense-only (Naive) | 0.591 | 0.634 | 682ms |
+| BM25 + Dense + Rerank | **0.742** | **0.813** | 1,247ms |
+| **Delta** | **+25.5%** | **+28.2%** | +83% |
+
+**Lý do RRF thay vì weighted sum:** RRF không cần tune weight $w_1 \cdot BM25 + w_2 \cdot dense$ — hữu ích khi corpus thay đổi thường xuyên.
+
+---
+
+### ADR-003 — Cache Redis trước retrieval
+
+**Bối cảnh:** Legal Q&A có query pattern lặp lại cao (cùng câu hỏi về Luật DN, Luật Lao động). Latency bottleneck: retrieval + reranker (~800ms) + LLM (~700ms).
+
+**Quyết định:** Redis với TTL 1h, key = `sha256(normalized_query + collection_name)`, đặt **trước** retrieval trong pipeline.
+
+**Tại sao trước retrieval, không phải sau LLM:**
+
+```
+Option A: Cache sau LLM (cache kết quả cuối)
+  Cache miss path: FastAPI → Agent → Retrieval (800ms) → LLM (700ms) → Cache write → Response
+  Cache hit path:  FastAPI → Agent → Cache read → Response  (tiết kiệm 1,500ms)
+
+Option B: Cache trước retrieval ← CHỌN
+  Cache miss path: FastAPI → Agent → Cache miss → Retrieval → LLM → Response
+  Cache hit path:  FastAPI → Agent → Cache hit → Response  (tiết kiệm 1,500ms, NHƯNG key đơn giản hơn)
+  
+  Bonus của Option B: key là string thuần, không phải serialized LLM output (tránh
+  vấn đề schema migration khi đổi response format)
+```
+
+**Trade-off chấp nhận:** TTL 1h → câu trả lời có thể stale nếu corpus được cập nhật trong giờ đó. Acceptable vì văn bản pháp luật thay đổi chậm.
 
 ---
 
