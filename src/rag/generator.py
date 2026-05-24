@@ -1,4 +1,4 @@
-"""
+﻿"""
 LLM generation with mandatory citations.
 Primary: Groq Llama-3.1-70B | Fallback: Gemini 1.5 Flash
 Retry logic via tenacity; fallback logic on timeout/rate-limit.
@@ -49,6 +49,7 @@ _GROQ_ERRORS = (
 
 _MAX_CHUNK_CHARS = 3_000   # ~750 tokens per chunk
 _MAX_TOTAL_CHARS = 12_000  # ~3000 tokens total context
+_EXTRACTIVE_CHARS_PER_SOURCE = 700
 
 
 def _build_context(chunks: list[RetrievedChunk]) -> tuple[str, str]:
@@ -68,6 +69,33 @@ def _build_context(chunks: list[RetrievedChunk]) -> tuple[str, str]:
         total_chars += len(text)
 
     return "\n\n---\n\n".join(context_parts), "\n".join(citations)
+
+
+def _build_extractive_answer(query: str, chunks: list[RetrievedChunk]) -> str:
+    """Return a useful answer from retrieved sources when LLM providers fail."""
+    if not chunks:
+        return "Tôi không tìm thấy văn bản pháp luật liên quan đến câu hỏi này."
+
+    lines = [
+        "Tôi đã tìm thấy các quy định liên quan trong dữ liệu hiện có, nhưng dịch vụ LLM đang tạm thời không phản hồi. Dưới đây là phần trích xuất trực tiếp từ nguồn để bạn vẫn có thể tham khảo:",
+        "",
+    ]
+
+    for i, chunk in enumerate(chunks[:5], 1):
+        title = chunk.metadata.get("title") or "Văn bản pháp luật"
+        dieu = chunk.metadata.get("dieu_header") or ""
+        text = " ".join((chunk.text or "").split())
+        if len(text) > _EXTRACTIVE_CHARS_PER_SOURCE:
+            text = text[:_EXTRACTIVE_CHARS_PER_SOURCE].rstrip() + "..."
+
+        heading = f"**[{i}] {title}**"
+        if dieu:
+            heading += f" - {dieu}"
+        lines.append(heading)
+        lines.append(text or "Không có nội dung trích xuất.")
+        lines.append("")
+
+    return "\n".join(lines).strip()
 
 
 def _get_groq_client():
@@ -161,8 +189,8 @@ def generate_answer(
             logger.info("Gemini answered query ({} chars)", len(answer or ""))
         except Exception as exc:
             logger.error("Both LLMs failed: {}", exc)
-            answer = "Xin lỗi, hệ thống đang gặp sự cố. Vui lòng thử lại."
-            used_llm = "error"
+            answer = _build_extractive_answer(query, chunks)
+            used_llm = "extractive_fallback"
 
     # Append citation list to answer
     full_answer = answer + _CITATION_SUFFIX.format(citations=citation_list)
@@ -191,7 +219,8 @@ async def stream_answer(
     settings = get_settings()
 
     if not settings.groq_api_key:
-        yield "⚠️ GROQ_API_KEY chưa được cấu hình."
+        yield _build_extractive_answer(query, chunks)
+        yield _CITATION_SUFFIX.format(citations=citation_list)
         return
 
     try:

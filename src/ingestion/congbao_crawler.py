@@ -22,6 +22,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 import requests
+from bs4 import BeautifulSoup
 from loguru import logger
 
 warnings.filterwarnings("ignore", message="Unverified HTTPS request")
@@ -261,6 +262,98 @@ class CongbaoCrawler:
         except Exception as exc:
             logger.warning("DOCX download failed: {}", str(exc)[:80])
             return None
+
+    def fetch_download_page(self, url: str, metadata: dict | None = None) -> dict | None:
+        """
+        Fetch a specific Congbao download/detail page and extract full text from
+        all attached PDFs. This is more reliable for old laws whose public pages
+        are split across multiple gazette PDF attachments.
+        """
+        parsed = urlparse(url)
+        if parsed.netloc != "congbao.chinhphu.vn":
+            logger.error("Refusing non-congbao URL: {}", url)
+            return None
+
+        try:
+            resp = self._session.get(url, timeout=30, verify=False)
+            resp.raise_for_status()
+        except Exception as exc:
+            logger.warning("Failed to fetch Congbao download page {}: {}", url, exc)
+            return None
+
+        soup = BeautifulSoup(resp.text, "lxml")
+        page_title = soup.find("h1")
+        title = (
+            (metadata or {}).get("title")
+            or (page_title.get_text(" ", strip=True) if page_title else "")
+            or (soup.title.get_text(" ", strip=True) if soup.title else "congbao_document")
+        )
+
+        pdf_links = []
+        for a in soup.select("a[href]"):
+            href = a.get("href", "")
+            text = a.get_text(" ", strip=True).lower()
+            if ".pdf" in href.lower() or ".pdf" in text:
+                pdf_links.append(href)
+
+        # Preserve order while deduplicating.
+        seen = set()
+        pdf_links = [x for x in pdf_links if not (x in seen or seen.add(x))]
+
+        if not pdf_links:
+            logger.warning("No PDF attachments found at {}", url)
+            return None
+
+        parts = []
+        for pdf_url in pdf_links:
+            text = self._download_pdf_text(pdf_url)
+            if text:
+                parts.append(text)
+            time.sleep(REQUEST_DELAY)
+
+        full_text = "\n\n".join(parts)
+        if len(full_text) < 1000:
+            logger.warning("Extracted text too short from {} ({} chars)", url, len(full_text))
+            return None
+
+        from src.ingestion.cleaner import clean_legal_text
+
+        meta = metadata or {}
+        return {
+            "title": title,
+            "content": clean_legal_text(full_text, doc_title=title),
+            "url": url,
+            "source": "congbao.chinhphu.vn",
+            "doc_type": meta.get("doc_type", _detect_doc_type(url)),
+            "so_hieu": meta.get("so_hieu", ""),
+            "ngay_ban_hanh": meta.get("ngay_ban_hanh", ""),
+        }
+
+    def _download_pdf_text(self, pdf_url: str) -> str:
+        """Download an attached PDF and extract all page text."""
+        try:
+            resp = self._session.get(
+                pdf_url,
+                timeout=60,
+                verify=False,
+                headers={"User-Agent": "Mozilla/5.0"},
+            )
+            resp.raise_for_status()
+            content = resp.content
+            if not content.startswith(b"%PDF"):
+                logger.warning("Attachment is not a PDF: {}", pdf_url[:100])
+                return ""
+
+            import pdfplumber
+
+            with pdfplumber.open(io.BytesIO(content)) as pdf:
+                pages = [page.extract_text(x_tolerance=1, y_tolerance=3) or "" for page in pdf.pages]
+            text = "\n".join(pages)
+            logger.info("Extracted {} chars from PDF attachment", len(text))
+            return text
+        except Exception as exc:
+            logger.warning("PDF extraction failed: {}", str(exc)[:120])
+            return ""
 
     def _docx_to_text(self, docx_bytes: bytes) -> str:
         """Extract plain text from DOCX bytes using python-docx."""
