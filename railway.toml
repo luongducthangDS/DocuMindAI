@@ -22,7 +22,11 @@ API_PORT = "9000"
 API_BASE_URL = "http://127.0.0.1:9000"
 EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 CHROMA_COLLECTION = "documind_legal"
+CHROMA_HOST = ""
 INITIALIZE_RAG_ON_STARTUP = "false"
 ENABLE_RERANKER = "false"
+LANGCHAIN_TRACING_V2 = "false"
+LANGCHAIN_API_KEY = ""
+REDIS_URL = ""
 # CHROMA_HOST not set → falls back to local PersistentClient (bundled in Docker image)
 # REDIS_URL not set → sessions use in-process dict (add Railway Redis plugin for persistence)

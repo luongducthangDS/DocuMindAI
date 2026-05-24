@@ -47,6 +47,9 @@ ENV TRANSFORMERS_CACHE=/app/.cache/huggingface
 # Create runtime directories
 RUN mkdir -p data/raw data/processed data/eval logs reports .cache/huggingface
 
+# Ensure shell scripts copied from Windows work in Linux containers.
+RUN sed -i 's/\r$//' scripts/start_railway.sh
+
 # Pre-download embedding model at build time.
 # IMPORTANT: embedding model MUST match what was used to index data/chroma_db/.
 # The corpus was indexed with paraphrase-multilingual-MiniLM-L12-v2.

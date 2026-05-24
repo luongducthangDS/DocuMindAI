@@ -55,12 +55,16 @@ if (-not $SkipVars) {
     $modelVars = @{
         "EMBEDDING_MODEL"   = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
         "CHROMA_COLLECTION" = "documind_legal"
+        "CHROMA_HOST"       = ""
         "ENVIRONMENT"       = "production"
         "API_HOST"          = "127.0.0.1"
         "API_PORT"          = "9000"
         "API_BASE_URL"      = "http://127.0.0.1:9000"
         "INITIALIZE_RAG_ON_STARTUP" = "false"
         "ENABLE_RERANKER"   = "false"
+        "LANGCHAIN_TRACING_V2" = "false"
+        "LANGCHAIN_API_KEY" = ""
+        "REDIS_URL"         = ""
         "PRIMARY_LLM"       = "groq/llama-3.3-70b-versatile"
         "FALLBACK_LLM"      = "gemini/gemini-1.5-flash"
     }
@@ -70,14 +74,7 @@ if (-not $SkipVars) {
         Write-Host " OK" -ForegroundColor Green
     }
 
-    # Optional: LangSmith tracing
-    if ($envVars.ContainsKey("LANGCHAIN_API_KEY") -and $envVars["LANGCHAIN_API_KEY"] -notmatch "ls__xxx") {
-        Write-Host "  Setting LangSmith vars..." -NoNewline
-        railway variables set "LANGCHAIN_TRACING_V2=true" 2>&1 | Out-Null
-        railway variables set "LANGCHAIN_API_KEY=$($envVars['LANGCHAIN_API_KEY'])" 2>&1 | Out-Null
-        railway variables set "LANGCHAIN_PROJECT=documind-ai" 2>&1 | Out-Null
-        Write-Host " OK" -ForegroundColor Green
-    }
+    Write-Host "  LangSmith tracing disabled for production by default." -ForegroundColor DarkYellow
 
     # Optional: CORS origins (set your Railway domain here after first deploy)
     if ($envVars.ContainsKey("ALLOWED_ORIGINS") -and $envVars["ALLOWED_ORIGINS"] -ne "") {
