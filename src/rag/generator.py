@@ -32,11 +32,11 @@ except ImportError:
 _SYSTEM_PROMPT = """Bạn là trợ lý pháp lý chuyên về luật Việt Nam.
 Chỉ trả lời dựa trên các đoạn văn bản pháp luật được cung cấp.
 Quy tắc bắt buộc:
-1. Mỗi câu trả lời PHẢI trích dẫn điều khoản cụ thể [số thứ tự nguồn].
+1. Mỗi câu trả lời PHẢI trích dẫn inline [số thứ tự nguồn] khi dùng thông tin từ đoạn đó.
 2. Nếu không có thông tin trong văn bản, nói rõ: "Tôi không tìm thấy quy định này trong tài liệu hiện có."
 3. KHÔNG bịa đặt hoặc suy luận ngoài văn bản được cung cấp.
 4. Ngôn ngữ: tiếng Việt, rõ ràng, chính xác.
-5. Cuối câu trả lời, liệt kê đầy đủ nguồn trích dẫn."""
+5. KHÔNG liệt kê lại danh sách nguồn ở cuối — hệ thống sẽ tự động thêm."""
 
 _CITATION_SUFFIX = "\n\n**Nguồn trích dẫn:**\n{citations}"
 
@@ -114,7 +114,7 @@ def _get_gemini_client():
     if not settings.google_api_key:
         raise RuntimeError("GOOGLE_API_KEY not set")
     genai.configure(api_key=settings.google_api_key)
-    return genai.GenerativeModel("gemini-2.0-flash-lite")
+    return genai.GenerativeModel("gemini-2.5-flash-lite")
 
 
 def _call_groq(prompt: str, context: str) -> str | None:
