@@ -46,11 +46,20 @@ ENV TRANSFORMERS_CACHE=/app/.cache/huggingface
 # Create runtime directories
 RUN mkdir -p data/raw data/processed data/eval logs reports .cache/huggingface
 
-# Pre-download embedding model as root (avoids runtime download + permission issues)
-# Must match EMBEDDING_MODEL env var used at runtime
+# Pre-download all ML models at build time (avoids runtime download + permission issues)
+# IMPORTANT: embedding model must match EMBEDDING_MODEL env var and what was used to ingest ChromaDB data.
+# The corpus in data/chroma_db/ was indexed with paraphrase-multilingual-MiniLM-L12-v2 — do NOT change this
+# without re-ingesting all documents.
+ARG EMBEDDING_MODEL=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+ARG RERANKER_MODEL=cross-encoder/ms-marco-MiniLM-L-6-v2
+
 RUN python -c "\
-from sentence_transformers import SentenceTransformer; \
-SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')"
+from sentence_transformers import SentenceTransformer, CrossEncoder; \
+print('Downloading embedding model...'); \
+SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'); \
+print('Downloading cross-encoder reranker...'); \
+CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2'); \
+print('All models cached successfully.')"
 
 # Hand ownership to appuser
 RUN chown -R appuser:appgroup /app

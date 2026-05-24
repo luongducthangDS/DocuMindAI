@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     google_api_key: str = ""
     primary_llm: str = "groq/llama-3.3-70b-versatile"
     fallback_llm: str = "gemini/gemini-1.5-flash"
-    embedding_model: str = "BAAI/bge-m3"
+    embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 
     # LangSmith
     langchain_tracing_v2: bool = False
