@@ -24,6 +24,19 @@ from src.config import get_settings
 from src.rag.generator import generate_answer, stream_answer
 from src.rag.retriever import nodes_to_chunks
 
+# LangSmith tracing — optional; no-ops gracefully if langsmith not installed
+# or LANGCHAIN_TRACING_V2 is not set.
+try:
+    from langsmith import traceable as _traceable  # type: ignore
+    _LANGSMITH_AVAILABLE = True
+except ImportError:
+    # Fallback: identity decorator when langsmith is not installed
+    def _traceable(**kwargs):
+        def decorator(fn):
+            return fn
+        return decorator
+    _LANGSMITH_AVAILABLE = False
+
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
@@ -326,12 +339,22 @@ def get_graph():
     return _graph
 
 
+@_traceable(
+    name="documind-agent",
+    run_type="chain",
+    tags=["rag", "langgraph", "legal-qa"],
+)
 async def run_agent(
     query: str,
     session_id: str = "default",
     history: list[dict] | None = None,
 ) -> AgentState:
-    """Main entry point for agent invocation."""
+    """Main entry point for agent invocation.
+
+    Decorated with @traceable so every invocation is visible in LangSmith as
+    a top-level run named 'documind-agent', containing all child LLM calls
+    (router classification, answer generation) and tool invocations.
+    """
     graph = get_graph()
 
     messages = [HumanMessage(content=query)]

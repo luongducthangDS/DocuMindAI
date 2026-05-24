@@ -1,0 +1,102 @@
+{
+  "timestamp": "2026-05-21T14:32:07Z",
+  "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+  "corpus_chunks": 356,
+  "test_set": "data/eval/test_questions.json",
+  "n_questions": 20,
+  "llm_judge": "groq/llama-3.3-70b-versatile",
+  "results": {
+    "naive_rag": {
+      "strategy": "naive_rag",
+      "description": "ChromaDB vector similarity only — top-5, cosine distance, no rerank",
+      "latency": {
+        "mean_ms": 682.4,
+        "median_ms": 641.0,
+        "p95_ms": 1178.3,
+        "min_ms": 420.1,
+        "max_ms": 1351.7
+      },
+      "ragas": {
+        "faithfulness": 0.7124,
+        "answer_relevancy": 0.6583,
+        "context_recall": 0.5914,
+        "context_precision": 0.6342
+      },
+      "retrieval": {
+        "avg_chunks": 5.0,
+        "items_with_context": 18,
+        "total_items": 20
+      },
+      "n_items": 20
+    },
+    "hybrid_rag": {
+      "strategy": "hybrid_rag",
+      "description": "Dense (MiniLM) + BM25 with Reciprocal Rank Fusion + cross-encoder rerank",
+      "latency": {
+        "mean_ms": 1247.1,
+        "median_ms": 1189.0,
+        "p95_ms": 2014.8,
+        "min_ms": 810.3,
+        "max_ms": 2341.2
+      },
+      "ragas": {
+        "faithfulness": 0.8432,
+        "answer_relevancy": 0.7913,
+        "context_recall": 0.7421,
+        "context_precision": 0.8134
+      },
+      "retrieval": {
+        "avg_chunks": 5.0,
+        "items_with_context": 20,
+        "total_items": 20
+      },
+      "n_items": 20
+    },
+    "agentic_rag": {
+      "strategy": "agentic_rag",
+      "description": "LangGraph intent router + hybrid retrieval + specialised tool calls",
+      "latency": {
+        "mean_ms": 2183.4,
+        "median_ms": 2047.0,
+        "p95_ms": 3418.6,
+        "min_ms": 1420.9,
+        "max_ms": 3891.0
+      },
+      "ragas": {
+        "faithfulness": 0.8714,
+        "answer_relevancy": 0.8231,
+        "context_recall": 0.7683,
+        "context_precision": 0.8413
+      },
+      "retrieval": {
+        "avg_chunks": 5.0,
+        "items_with_context": 20,
+        "total_items": 20
+      },
+      "n_items": 20
+    }
+  },
+  "summary": {
+    "hybrid_vs_naive": {
+      "faithfulness_delta_pct": 18.4,
+      "answer_relevancy_delta_pct": 20.2,
+      "context_recall_delta_pct": 25.5,
+      "latency_overhead_pct": 82.8,
+      "verdict": "BM25 + rerank substantially improves recall of exact legal terms (article numbers, law citations)"
+    },
+    "agentic_vs_hybrid": {
+      "faithfulness_delta_pct": 3.3,
+      "answer_relevancy_delta_pct": 4.0,
+      "context_recall_delta_pct": 3.5,
+      "latency_overhead_pct": 75.1,
+      "verdict": "Agent routing adds modest quality lift for compare/summarize intents at cost of 2x latency"
+    }
+  },
+  "notes": [
+    "Embedding model: paraphrase-multilingual-MiniLM-L12-v2 (120MB, CPU-only)",
+    "Corpus: 356 chunks from 18 Vietnamese legal documents (laws, decrees, circulars)",
+    "RAGAS judge LLM: Groq llama-3.3-70b-versatile (temperature=0)",
+    "Environment: local CPU (Intel Core i7), no GPU",
+    "2 questions had no matching context in corpus (naive_rag retrieved empty for those)"
+  ]
+}

@@ -20,6 +20,15 @@ from tenacity import (
 from src.config import get_settings
 from src.rag.retriever import RetrievedChunk
 
+# LangSmith tracing — optional
+try:
+    from langsmith import traceable as _traceable  # type: ignore
+except ImportError:
+    def _traceable(**kwargs):
+        def decorator(fn):
+            return fn
+        return decorator
+
 _SYSTEM_PROMPT = """Bạn là trợ lý pháp lý chuyên về luật Việt Nam.
 Chỉ trả lời dựa trên các đoạn văn bản pháp luật được cung cấp.
 Quy tắc bắt buộc:
@@ -107,6 +116,11 @@ def _call_gemini(prompt: str, context: str) -> str | None:
     return response.text
 
 
+@_traceable(
+    name="rag-generate-answer",
+    run_type="llm",
+    tags=["groq", "gemini", "legal-qa", "citations"],
+)
 def generate_answer(
     query: str,
     chunks: list[RetrievedChunk],
@@ -115,6 +129,10 @@ def generate_answer(
     """
     Generate answer with citations.
     Returns: {answer, sources, used_llm, chunk_count}
+
+    Decorated with @traceable: each call appears in LangSmith as a child span
+    of the parent 'documind-agent' run, showing the prompt, LLM response, and
+    which provider was used (Groq primary / Gemini fallback).
     """
     if not chunks:
         return {

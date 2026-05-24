@@ -3,14 +3,16 @@
 .env.*
 !.env.example
 
-# Raw / processed data
+# Raw / processed data (large files, not needed for deployment)
 data/raw/
 data/processed/
-data/eval/
 
-# Runtime artifacts
+# Eval questions and benchmark results ARE committed (portfolio evidence)
+# data/eval/   ← intentionally NOT ignored
+# reports/     ← intentionally NOT ignored
+
+# Runtime artifacts (generated at runtime, not source)
 logs/
-reports/
 __pycache__/
 *.pyc
 *.pyo

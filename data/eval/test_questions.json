@@ -1,0 +1,122 @@
+[
+  {
+    "id": "q01",
+    "category": "company_law",
+    "question": "Điều kiện để thành lập công ty trách nhiệm hữu hạn hai thành viên trở lên là gì?",
+    "ground_truth": "Công ty TNHH hai thành viên trở lên có từ 2 đến 50 thành viên. Thành viên chịu trách nhiệm về các khoản nợ và nghĩa vụ tài sản của công ty trong phạm vi số vốn đã góp vào công ty. Vốn điều lệ không được chia thành cổ phần."
+  },
+  {
+    "id": "q02",
+    "category": "company_law",
+    "question": "Công ty cổ phần cần bao nhiêu cổ đông tối thiểu và cổ đông sáng lập phải đáp ứng điều kiện gì?",
+    "ground_truth": "Công ty cổ phần phải có tối thiểu 3 cổ đông và không hạn chế số lượng tối đa. Các cổ đông sáng lập phải cùng nhau đăng ký mua ít nhất 20% tổng số cổ phần phổ thông được quyền chào bán tại thời điểm đăng ký thành lập doanh nghiệp."
+  },
+  {
+    "id": "q03",
+    "category": "company_law",
+    "question": "Doanh nghiệp nhà nước là gì và được phân loại như thế nào theo Luật Doanh nghiệp 2020?",
+    "ground_truth": "Doanh nghiệp nhà nước bao gồm các doanh nghiệp do Nhà nước nắm giữ trên 50% vốn điều lệ hoặc tổng số cổ phần có quyền biểu quyết, bao gồm doanh nghiệp do Nhà nước nắm giữ 100% vốn điều lệ và doanh nghiệp do Nhà nước nắm giữ trên 50% vốn điều lệ hoặc tổng số cổ phần có quyền biểu quyết."
+  },
+  {
+    "id": "q04",
+    "category": "company_law",
+    "question": "Doanh nghiệp có bao nhiêu loại hình theo Luật Doanh nghiệp 2020?",
+    "ground_truth": "Theo Luật Doanh nghiệp 2020, có các loại hình doanh nghiệp: Công ty TNHH một thành viên, Công ty TNHH hai thành viên trở lên, Công ty cổ phần, Công ty hợp danh và Doanh nghiệp tư nhân."
+  },
+  {
+    "id": "q05",
+    "category": "company_law",
+    "question": "Hội đồng quản trị công ty cổ phần có bao nhiêu thành viên và nhiệm kỳ là bao nhiêu năm?",
+    "ground_truth": "Hội đồng quản trị có từ 3 đến 11 thành viên. Nhiệm kỳ của thành viên Hội đồng quản trị không quá 5 năm và có thể được bầu lại với số nhiệm kỳ không hạn chế."
+  },
+  {
+    "id": "q06",
+    "category": "labor_law",
+    "question": "Người lao động có được quyền đơn phương chấm dứt hợp đồng lao động không? Phải báo trước bao lâu?",
+    "ground_truth": "Có, người lao động có quyền đơn phương chấm dứt hợp đồng lao động. Phải báo trước: ít nhất 45 ngày với hợp đồng không xác định thời hạn; ít nhất 30 ngày với hợp đồng xác định thời hạn từ 12 đến 36 tháng; ít nhất 03 ngày làm việc với hợp đồng xác định thời hạn dưới 12 tháng."
+  },
+  {
+    "id": "q07",
+    "category": "labor_law",
+    "question": "Hợp đồng lao động phải có những nội dung bắt buộc nào?",
+    "ground_truth": "Hợp đồng lao động phải có các nội dung: tên, địa chỉ của người sử dụng lao động; họ tên, ngày sinh, giới tính, nơi cư trú của người lao động; công việc và địa điểm làm việc; thời hạn của hợp đồng; mức lương, hình thức trả lương, thời hạn trả lương; chế độ nâng lương; thời giờ làm việc, thời giờ nghỉ ngơi; trang bị bảo hộ lao động; bảo hiểm xã hội; đào tạo, bồi dưỡng nâng cao trình độ."
+  },
+  {
+    "id": "q08",
+    "category": "labor_law",
+    "question": "Thời gian thử việc tối đa theo Bộ luật Lao động là bao nhiêu ngày?",
+    "ground_truth": "Thời gian thử việc không quá 180 ngày đối với công việc của người quản lý doanh nghiệp; không quá 60 ngày đối với công việc có chức danh nghề nghiệp cần trình độ chuyên môn kỹ thuật từ cao đẳng trở lên; không quá 30 ngày đối với công việc có chức danh nghề nghiệp cần trình độ chuyên môn kỹ thuật trung cấp, công nhân kỹ thuật, nhân viên nghiệp vụ; không quá 6 ngày làm việc đối với công việc khác."
+  },
+  {
+    "id": "q09",
+    "category": "labor_law",
+    "question": "Quyền tham gia quản lý của người lao động trong doanh nghiệp được thực hiện như thế nào?",
+    "ground_truth": "Người lao động có quyền tham gia quản lý doanh nghiệp thông qua tổ chức đại diện người lao động tại cơ sở, thực hiện quyền dân chủ ở cơ sở theo quy định của pháp luật. Đối thoại tại nơi làm việc phải được thực hiện theo quy định của Bộ luật Lao động."
+  },
+  {
+    "id": "q10",
+    "category": "labor_law",
+    "question": "Người sử dụng lao động có được phép sa thải người lao động đang trong thời gian điều trị bệnh không?",
+    "ground_truth": "Người sử dụng lao động không được xử lý kỷ luật sa thải đối với người lao động trong thời gian người lao động đang điều trị bệnh tật, điều dưỡng, phục hồi chức năng theo quyết định của cơ sở khám bệnh, chữa bệnh có thẩm quyền."
+  },
+  {
+    "id": "q11",
+    "category": "tax_law",
+    "question": "Thuế suất thuế thu nhập doanh nghiệp phổ thông hiện nay là bao nhiêu?",
+    "ground_truth": "Thuế suất thuế thu nhập doanh nghiệp phổ thông là 20% áp dụng cho tất cả các doanh nghiệp không thuộc trường hợp được hưởng thuế suất ưu đãi theo quy định của Luật Thuế TNDN."
+  },
+  {
+    "id": "q12",
+    "category": "tax_law",
+    "question": "Thu nhập được miễn thuế thu nhập doanh nghiệp bao gồm những khoản nào?",
+    "ground_truth": "Thu nhập được miễn thuế TNDN bao gồm: thu nhập từ hoạt động trồng trọt, chăn nuôi, nuôi trồng thủy sản của hợp tác xã và của doanh nghiệp ở địa bàn có điều kiện kinh tế - xã hội đặc biệt khó khăn; thu nhập từ việc thực hiện hợp đồng nghiên cứu khoa học và phát triển công nghệ; thu nhập từ hoạt động sản xuất, kinh doanh hàng hóa, dịch vụ của doanh nghiệp có từ 30% số lao động là người khuyết tật, người sau cai nghiện, người nhiễm HIV."
+  },
+  {
+    "id": "q13",
+    "category": "tax_law",
+    "question": "Doanh nghiệp được khấu trừ những khoản chi phí nào khi tính thuế thu nhập doanh nghiệp?",
+    "ground_truth": "Các khoản chi được trừ khi xác định thu nhập chịu thuế bao gồm: khoản chi thực tế phát sinh liên quan đến hoạt động sản xuất kinh doanh; khoản chi có đủ hóa đơn chứng từ hợp pháp; khoản chi không vượt quá mức quy định của pháp luật. Các khoản chi không được trừ bao gồm chi phí không phục vụ sản xuất kinh doanh, chi phạt, chi không có hóa đơn chứng từ."
+  },
+  {
+    "id": "q14",
+    "category": "penalties",
+    "question": "Mức phạt vi phạm hành chính khi không đăng ký kinh doanh là bao nhiêu?",
+    "ground_truth": "Theo các nghị định về xử phạt vi phạm hành chính, doanh nghiệp không đăng ký kinh doanh có thể bị phạt tiền từ 10 triệu đến 50 triệu đồng tùy mức độ vi phạm, và có thể bị đình chỉ hoạt động kinh doanh."
+  },
+  {
+    "id": "q15",
+    "category": "data_protection",
+    "question": "Bảo vệ dữ liệu cá nhân tại Việt Nam được quy định bởi văn bản pháp luật nào?",
+    "ground_truth": "Bảo vệ dữ liệu cá nhân tại Việt Nam được quy định chủ yếu bởi Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân, có hiệu lực từ ngày 01/07/2023. Nghị định này quy định về quyền và nghĩa vụ của chủ thể dữ liệu, bên kiểm soát dữ liệu, bên xử lý dữ liệu."
+  },
+  {
+    "id": "q16",
+    "category": "company_law",
+    "question": "Doanh nghiệp nhỏ và vừa được định nghĩa như thế nào theo pháp luật Việt Nam?",
+    "ground_truth": "Doanh nghiệp nhỏ và vừa là doanh nghiệp có số lao động tham gia bảo hiểm xã hội bình quân năm không quá 200 người và đáp ứng tiêu chí về tổng nguồn vốn hoặc doanh thu theo ngành nghề, lĩnh vực."
+  },
+  {
+    "id": "q17",
+    "category": "labor_law",
+    "question": "Người lao động được nghỉ phép năm bao nhiêu ngày theo Bộ luật Lao động?",
+    "ground_truth": "Người lao động làm việc đủ 12 tháng cho người sử dụng lao động thì được nghỉ phép năm hưởng nguyên lương: 12 ngày làm việc với điều kiện làm việc bình thường; 14 ngày với người làm nghề, công việc nặng nhọc, độc hại, nguy hiểm hoặc người làm việc ở nơi có điều kiện sinh sống khắc nghiệt; 16 ngày với người làm nghề, công việc đặc biệt nặng nhọc, độc hại, nguy hiểm."
+  },
+  {
+    "id": "q18",
+    "category": "company_law",
+    "question": "Cổ phần ưu đãi trong công ty cổ phần gồm những loại nào?",
+    "ground_truth": "Công ty cổ phần có thể có các loại cổ phần ưu đãi: cổ phần ưu đãi biểu quyết (chỉ có tổ chức được Chính phủ ủy quyền và cổ đông sáng lập được quyền nắm giữ); cổ phần ưu đãi cổ tức; cổ phần ưu đãi hoàn lại; cổ phần ưu đãi khác do Điều lệ công ty quy định."
+  },
+  {
+    "id": "q19",
+    "category": "labor_law",
+    "question": "Điều kiện để người lao động được hưởng trợ cấp thôi việc là gì?",
+    "ground_truth": "Người sử dụng lao động có trách nhiệm trả trợ cấp thôi việc cho người lao động đã làm việc thường xuyên từ đủ 12 tháng trở lên khi chấm dứt hợp đồng lao động, mỗi năm làm việc tương đương nửa tháng tiền lương."
+  },
+  {
+    "id": "q20",
+    "category": "tax_law",
+    "question": "Thời hạn nộp thuế thu nhập doanh nghiệp tạm tính theo quý là khi nào?",
+    "ground_truth": "Doanh nghiệp phải tạm nộp thuế thu nhập doanh nghiệp theo quý, thời hạn nộp thuế chậm nhất là ngày 30 của tháng đầu quý tiếp theo. Hàng năm, doanh nghiệp phải quyết toán thuế và nộp số thuế còn thiếu chậm nhất vào ngày cuối cùng của tháng thứ ba kể từ ngày kết thúc năm dương lịch hoặc năm tài chính."
+  }
+]

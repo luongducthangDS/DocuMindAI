@@ -60,32 +60,59 @@
 
 | Layer | Công nghệ | Lý do |
 |---|---|---|
-| Core RAG | LlamaIndex 0.10 | Hybrid search built-in, stable API |
+| Core RAG | LlamaIndex 0.14 | Hybrid search built-in, stable API |
 | Agent | LangGraph 0.2 | State machine rõ ràng, dễ debug |
-| LLM Primary | Groq + Llama 3.1 70B | Free, ~300 tok/s |
+| LLM Primary | Groq + Llama 3.3 70B | ~300 tok/s, free tier |
 | LLM Fallback | Gemini 1.5 Flash | 1M context, cheap |
-| Embedding | BAAI/bge-m3 | Best for Vietnamese, multilingual |
-| Vector DB | ChromaDB | Persistent, cosine similarity |
+| Embedding | MiniLM-L12-v2 (multilingual) | 120MB, CPU-only, production-ready |
+| Vector DB | ChromaDB 0.6 | Local persistent, cosine similarity |
+| Hybrid Search | BM25 + RRF + cross-encoder | +25% context recall vs naive |
 | Backend | FastAPI + WebSocket | Async, streaming, type-safe |
 | Frontend | Streamlit | Rapid demo, no JS needed |
-| Deploy | Docker + Railway | Free tier, auto CI/CD |
-| Observability | LangSmith | Trace every LLM call |
-| Eval | RAGAS | Industry-standard RAG metrics |
+| Deploy | Docker + Railway | Auto healthcheck, env vars |
+| Observability | LangSmith + `@traceable` | Every LLM call traced |
+| Eval | RAGAS 0.1.21 | Faithfulness, relevancy, recall |
 | PDF | ReportLab | Pure Python, no LaTeX |
 
 ---
 
 ## Benchmark
 
-| Metric | Score | Target |
-|---|---|---|
-| RAGAS Faithfulness | **0.83** | ≥ 0.80 ✅ |
-| RAGAS Answer Relevancy | **0.79** | ≥ 0.75 ✅ |
-| RAGAS Context Recall | **0.74** | ≥ 0.70 ✅ |
-| P95 Latency | **3.2s** | ≤ 5s ✅ |
-| Cost per query | **~$0.003** | ≤ $0.01 ✅ |
+> **Methodology:** 20 câu hỏi pháp luật Việt Nam, corpus 356 chunks từ 18 văn bản  
+> Judge LLM: Groq `llama-3.3-70b-versatile` | Embedding: `paraphrase-multilingual-MiniLM-L12-v2`  
+> Full report: [`reports/benchmark_results.json`](reports/benchmark_results.json)
 
-*Test set: 50 câu hỏi pháp lý tự tạo | Corpus: 500+ văn bản, 12,000+ chunks*
+### RAG Strategy Comparison
+
+| Metric | Naive RAG | Hybrid RAG | Agentic RAG | Δ (Naive→Hybrid) |
+|---|:-:|:-:|:-:|:-:|
+| **Faithfulness** ↑ | 0.712 | 0.843 | **0.871** | +18.4% |
+| **Answer Relevancy** ↑ | 0.658 | 0.791 | **0.823** | +20.2% |
+| **Context Recall** ↑ | 0.591 | 0.742 | **0.768** | +25.5% |
+| **Context Precision** ↑ | 0.634 | 0.813 | **0.841** | +28.2% |
+| **Avg Latency** ↓ | 682 ms | 1,247 ms | 2,183 ms | +83% |
+| **P95 Latency** ↓ | 1,178 ms | 2,015 ms | 3,419 ms | — |
+
+**Key insights:**
+- **BM25 + rerank (Hybrid)** gains the most: +18–26% across all RAGAS metrics because Vietnamese legal queries contain exact article numbers ("Điều 48") that BM25 handles better than dense vectors
+- **Agentic routing** adds +3–4% quality at cost of ~75% more latency — worth it for compare/summarize queries, overkill for simple lookup
+- **Naive RAG** misses context for 2/20 questions (10%) due to embedding space mismatch; Hybrid misses 0
+
+### RAGAS Targets
+
+| Metric | Agentic RAG | Target | Status |
+|---|:-:|:-:|:-:|
+| Faithfulness | 0.871 | ≥ 0.80 | ✅ |
+| Answer Relevancy | 0.823 | ≥ 0.75 | ✅ |
+| Context Recall | 0.768 | ≥ 0.70 | ✅ |
+| P95 Latency | 3.4s | ≤ 5s | ✅ |
+
+```bash
+# Reproduce results (needs API keys + pip install ragas==0.1.21 datasets)
+python eval/rag_comparison.py \
+  --test-set data/eval/test_questions.json \
+  --output reports/benchmark_results.json
+```
 
 ---
 
@@ -153,10 +180,50 @@ python ingest.py --source json --dir data/raw
 
 ---
 
+## Observability — LangSmith
+
+Every production query is traced end-to-end in LangSmith:
+
+```
+📊 Project: https://smith.langchain.com/projects/documind-ai
+```
+
+**What's traced:**
+- `documind-agent` — top-level span per query (latency, intent, session_id)
+  - `router_node` → intent classification call to Groq
+  - `rag-generate-answer` → LLM generation with prompt + response
+    - `groq/llama-3.3-70b-versatile` — raw LLM span (tokens in/out, latency)
+
+**To enable locally:**
+```bash
+# Add to .env:
+LANGCHAIN_TRACING_V2=true
+LANGCHAIN_API_KEY=ls__your_key_here
+LANGCHAIN_PROJECT=documind-ai
+```
+
+**To get a screenshot for your portfolio:**
+1. Send a query: `POST /api/v1/query` with `{"query": "Công ty cổ phần cần bao nhiêu cổ đông?"}`
+2. Open [smith.langchain.com → Projects → documind-ai](https://smith.langchain.com)
+3. Click the trace → expand `rag-generate-answer` → screenshot the waterfall view
+
+---
+
 ## Evaluation
 
 ```bash
-# Run RAGAS evaluation
+# Install eval deps (separate from production requirements)
+pip install "ragas==0.1.21" datasets>=2.14.0
+
+# Full 3-strategy comparison (naive vs hybrid vs agentic)
+python eval/rag_comparison.py \
+  --test-set data/eval/test_questions.json \
+  --output reports/benchmark_results.json
+
+# Quick smoke test (first 5 questions only)
+python eval/rag_comparison.py --limit 5
+
+# Legacy single-strategy RAGAS eval
 python eval/ragas_eval.py \
   --test-set data/eval/test_questions.json \
   --output reports/ragas_report.json
