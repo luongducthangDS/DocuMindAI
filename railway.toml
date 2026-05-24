@@ -3,20 +3,21 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-# Railway injects $PORT automatically — no need to set it here.
-# Increase timeout: model loading (MiniLM ~120MB + cross-encoder ~85MB) + ChromaDB init takes ~90-150s.
+# Railway injects $PORT automatically.
+# Increase timeout: MiniLM (120MB) + cross-encoder (85MB) load + ChromaDB init ≈ 90-150s.
 healthcheckPath = "/api/v1/health"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
 
-# ── Default environment variables ──────────────────────────────────────────────
-# IMPORTANT: GROQ_API_KEY and GOOGLE_API_KEY must be set via Railway dashboard
-# or via deploy_railway.ps1 — they are NOT stored here for security reasons.
-[deploy.environmentVariables]
+# ── Static environment variables ───────────────────────────────────────────────
+# These are baked into the Railway service config on deploy.
+# GROQ_API_KEY and GOOGLE_API_KEY must be set separately via:
+#   • Railway dashboard → Variables tab, OR
+#   • run: .\deploy_railway.ps1  (reads from local .env)
+[variables]
 ENVIRONMENT = "production"
 EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 CHROMA_COLLECTION = "documind_legal"
-# CHROMA_HOST is not set → app falls back to local PersistentClient (bundled in image)
-# REDIS_URL is not set → sessions use in-process dict (no persistence across restarts)
-# Add a Redis service in Railway dashboard and paste its URL here if persistence is needed.
+# CHROMA_HOST not set → falls back to local PersistentClient (bundled in Docker image)
+# REDIS_URL not set → sessions use in-process dict (add Railway Redis plugin for persistence)

@@ -3,7 +3,7 @@
 > **RAG + Agentic AI cho văn bản pháp luật Việt Nam**  
 > Portfolio project production-grade — AI Engineer position
 
-[![CI/CD](https://github.com/yourusername/documind-ai/actions/workflows/deploy.yml/badge.svg)](https://github.com/yourusername/documind-ai/actions)
+[![CI/CD](https://github.com/luongducthangDS/documind-ai/actions/workflows/deploy.yml/badge.svg)](https://github.com/luongducthangDS/documind-ai/actions)
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-blue.svg)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -14,7 +14,7 @@
 ```
 🔗 Live: https://documind.up.railway.app
 📊 LangSmith: https://smith.langchain.com/projects/documind-ai
-🤗 HF Space: https://huggingface.co/spaces/yourusername/documind-ai
+🤗 HF Space: https://huggingface.co/spaces/luongducthangDS/documind-ai
 ```
 
 **Hỏi bất kỳ điều gì về pháp luật Việt Nam — nhận câu trả lời trong vài giây, có nguồn, có điều khoản cụ thể.**
@@ -273,7 +273,7 @@ python eval/rag_comparison.py \
 ### Option 1: Docker (recommended)
 
 ```bash
-git clone https://github.com/yourusername/documind-ai
+git clone https://github.com/luongducthangDS/documind-ai
 cd documind-ai
 cp .env.example .env  # fill in API keys
 docker-compose up -d
