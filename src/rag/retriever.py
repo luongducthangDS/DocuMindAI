@@ -134,3 +134,43 @@ def nodes_to_chunks(nodes: list["NodeWithScore"]) -> list[RetrievedChunk]:
         )
         for n in nodes
     ]
+
+
+def retrieve_direct_chroma(query: str, top_k: int = 5) -> list[RetrievedChunk]:
+    """Fallback retrieval path that queries the bundled Chroma collection directly."""
+    try:
+        from src.rag.embedder import get_chroma_collection, get_embedder
+
+        _, collection = get_chroma_collection()
+        count = collection.count()
+        if count == 0:
+            logger.error("Direct Chroma fallback found empty collection")
+            return []
+
+        embedder = get_embedder()
+        query_embedding = embedder.get_query_embedding(query)
+        results = collection.query(
+            query_embeddings=[query_embedding],
+            n_results=top_k,
+            include=["documents", "metadatas", "distances"],
+        )
+
+        docs = (results.get("documents") or [[]])[0]
+        metas = (results.get("metadatas") or [[]])[0]
+        distances = (results.get("distances") or [[]])[0]
+        chunks = []
+        for doc, metadata, distance in zip(docs, metas, distances):
+            if not doc:
+                continue
+            chunks.append(
+                RetrievedChunk(
+                    text=doc,
+                    score=1.0 / (1.0 + float(distance or 0)),
+                    metadata=metadata or {},
+                )
+            )
+        logger.info("Direct Chroma fallback returned {} chunks", len(chunks))
+        return chunks
+    except Exception as exc:
+        logger.error("Direct Chroma fallback failed: {}", exc)
+        return []

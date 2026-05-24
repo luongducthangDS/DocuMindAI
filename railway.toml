@@ -17,8 +17,9 @@ restartPolicyMaxRetries = 3
 #   • run: .\deploy_railway.ps1  (reads from local .env)
 [variables]
 ENVIRONMENT = "production"
-API_PORT = "8081"
-API_BASE_URL = "http://127.0.0.1:8081"
+API_HOST = "127.0.0.1"
+API_PORT = "9000"
+API_BASE_URL = "http://127.0.0.1:9000"
 EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 CHROMA_COLLECTION = "documind_legal"
 INITIALIZE_RAG_ON_STARTUP = "false"

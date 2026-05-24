@@ -112,6 +112,7 @@ def _init_rag_sync() -> None:
     LlamaSettings.llm = None  # We call LLM directly via Groq SDK
 
     chroma_client, collection = get_chroma_collection()
+    logger.info("ChromaDB collection '{}' has {} chunks", collection.name, collection.count())
 
     vector_store = ChromaVectorStore(chroma_collection=collection)
     storage_ctx = StorageContext.from_defaults(vector_store=vector_store)

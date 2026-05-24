@@ -15,6 +15,8 @@ from src.config import get_settings
 if TYPE_CHECKING:
     from llama_index.core.embeddings import BaseEmbedding
 
+_INDEXED_EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+
 
 @lru_cache(maxsize=1)
 def get_embedder() -> "BaseEmbedding":
@@ -23,7 +25,15 @@ def get_embedder() -> "BaseEmbedding":
     Uses HuggingFace local model — no API call, no cost, runs offline.
     """
     settings = get_settings()
-    model_name = settings.embedding_model  # default: BAAI/bge-m3
+    # The bundled Chroma corpus is indexed with this 384-dim model. A Railway
+    # variable from an older deploy can otherwise silently break retrieval.
+    model_name = _INDEXED_EMBEDDING_MODEL
+    if settings.embedding_model and settings.embedding_model != model_name:
+        logger.warning(
+            "Ignoring EMBEDDING_MODEL={} because bundled ChromaDB was indexed with {}",
+            settings.embedding_model,
+            model_name,
+        )
 
     logger.info("Loading embedding model: {}", model_name)
 

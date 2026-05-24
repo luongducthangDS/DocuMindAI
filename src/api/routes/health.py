@@ -51,7 +51,21 @@ async def _check_chroma() -> ServiceStatus:
         if not settings.chroma_host:
             local_path = settings.data_dir / "chroma_db"
             if local_path.exists():
-                return ServiceStatus(name="chromadb", healthy=True, detail="Local persistent mode")
+                try:
+                    from src.rag.embedder import get_chroma_collection
+
+                    _, col = get_chroma_collection()
+                    return ServiceStatus(
+                        name="chromadb",
+                        healthy=col.count() > 0,
+                        detail=f"Local persistent mode, chunks={col.count()}",
+                    )
+                except Exception as exc:
+                    return ServiceStatus(
+                        name="chromadb",
+                        healthy=False,
+                        detail=f"Local ChromaDB unreadable: {str(exc)[:60]}",
+                    )
             return ServiceStatus(name="chromadb", healthy=False, detail="Local ChromaDB missing")
 
         client = chromadb.HttpClient(

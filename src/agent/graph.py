@@ -22,7 +22,7 @@ from src.agent.memory import LongTermMemory, ShortTermMemory
 from src.agent.tools import ALL_TOOLS
 from src.config import get_settings
 from src.rag.generator import generate_answer, stream_answer
-from src.rag.retriever import nodes_to_chunks
+from src.rag.retriever import nodes_to_chunks, retrieve_direct_chroma
 
 # LangSmith tracing — optional; no-ops gracefully if langsmith not installed
 # or LANGCHAIN_TRACING_V2 is not set.
@@ -163,11 +163,15 @@ def retrieve_node(state: AgentState) -> dict:
             nodes = retriever.retrieve(query)
 
         chunks = nodes_to_chunks(nodes)
+        if not chunks:
+            logger.warning("Retriever returned no chunks, trying direct Chroma fallback")
+            chunks = retrieve_direct_chroma(query)
         return {"retrieved_chunks": chunks}
 
     except Exception as exc:
         logger.error("retrieve_node failed: {}", exc)
-        return {"retrieved_chunks": [], "error": str(exc)}
+        chunks = retrieve_direct_chroma(query)
+        return {"retrieved_chunks": chunks, "error": str(exc) if not chunks else None}
 
 
 def answer_node(state: AgentState) -> dict:

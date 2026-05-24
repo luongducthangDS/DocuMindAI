@@ -2,7 +2,7 @@
 set -eu
 
 API_HOST="${API_HOST:-127.0.0.1}"
-API_PORT="${API_PORT:-8081}"
+API_PORT="${API_PORT:-9000}"
 WEB_PORT="${PORT:-8080}"
 
 export API_HOST
@@ -32,7 +32,7 @@ import os
 import time
 import httpx
 
-url = f"http://{os.environ.get('API_HOST', '127.0.0.1')}:{os.environ.get('API_PORT', '8081')}/api/v1/health"
+url = f"http://{os.environ.get('API_HOST', '127.0.0.1')}:{os.environ.get('API_PORT', '9000')}/api/v1/health"
 deadline = time.time() + 60
 last_error = None
 

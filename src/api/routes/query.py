@@ -126,9 +126,15 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
                     chunks = nodes_to_chunks(nodes)
                 else:
                     chunks = []
+                if not chunks:
+                    from src.rag.retriever import retrieve_direct_chroma
+
+                    chunks = retrieve_direct_chroma(query)
             except Exception as exc:
                 logger.warning("Retrieval failed in WS handler: {}", exc)
-                chunks = []
+                from src.rag.retriever import retrieve_direct_chroma
+
+                chunks = retrieve_direct_chroma(query)
 
             async for token in stream_answer(query, chunks):
                 await websocket.send_text(token)
