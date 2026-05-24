@@ -31,9 +31,11 @@ async def create_report(
     Trigger report generation. Heavy work runs in background thread.
     Returns download URL immediately after enqueuing.
     """
+    from src.api.main import ensure_rag_initialized
     from src.agent.tools import generate_pdf_report
 
     try:
+        await ensure_rag_initialized()
         result_msg = await generate_pdf_report.ainvoke({
             "title": body.title,
             "query": body.query,

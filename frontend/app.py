@@ -1,4 +1,4 @@
-"""
+﻿"""
 DocuMind AI — Streamlit frontend
 Hỏi đáp văn bản pháp luật Việt Nam với trích dẫn nguồn.
 """
@@ -121,7 +121,7 @@ def _upload_pdf(file) -> str | None:
         return None
 
 
-def _create_report(title: str, query: str) -> str | None:
+def _create_report(title: str, query: str) -> tuple[str, bytes] | None:
     """Tạo báo cáo PDF, trả về URL tải về."""
     try:
         with httpx.Client(timeout=120) as client:
@@ -130,7 +130,15 @@ def _create_report(title: str, query: str) -> str | None:
                 json={"title": title, "query": query, "filename": "bao_cao"},
             )
             resp.raise_for_status()
-            return resp.json().get("download_url")
+            data = resp.json()
+            download_url = data.get("download_url")
+            filename = data.get("filename", "bao_cao.pdf")
+            if not download_url:
+                return None
+
+            file_resp = client.get(f"{API_BASE}{download_url}")
+            file_resp.raise_for_status()
+            return filename, file_resp.content
     except Exception:
         return None
 
@@ -198,13 +206,14 @@ with st.sidebar:
         )
         if st.button("📥 Tạo báo cáo", disabled=not report_query, use_container_width=True):
             with st.spinner("Đang tổng hợp nội dung…"):
-                url = _create_report(
+                report = _create_report(
                     report_title or f"Báo cáo: {report_query}",
                     report_query,
                 )
-            if url:
+            if report:
+                filename, content = report
                 st.success("Báo cáo đã sẵn sàng!")
-                st.markdown(f"[📥 Tải về báo cáo]({API_BASE}{url})")
+                st.download_button("Tải về báo cáo", data=content, file_name=filename, mime="application/pdf", use_container_width=True)
             else:
                 st.error("Không thể tạo báo cáo. Vui lòng thử lại.")
 

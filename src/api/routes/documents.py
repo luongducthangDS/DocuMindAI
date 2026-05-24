@@ -29,6 +29,9 @@ async def upload_document(file: UploadFile = File(...)) -> IngestResponse:
     Security checks: file size, MIME type, PDF magic bytes.
     """
     settings = get_settings()
+    from src.api.main import ensure_rag_initialized
+
+    await ensure_rag_initialized()
 
     # Validate MIME type before reading body
     allowed_types = {"application/pdf", "application/x-pdf"}
@@ -106,6 +109,9 @@ async def reload_retriever() -> dict:
     """
     import asyncio
     import src.rag.retriever as r_module
+    from src.api.main import ensure_rag_initialized
+
+    await ensure_rag_initialized()
 
     if r_module._active_index is None:
         raise HTTPException(
@@ -154,11 +160,12 @@ def _rebuild_retriever(r_module) -> None:
         from src.rag.embedder import get_chroma_collection
         from src.rag.retriever import build_hybrid_retriever
         from src.api.main import _load_nodes_from_collection
+        from src.config import get_settings
 
         _, collection = get_chroma_collection()
         nodes = _load_nodes_from_collection(collection)
         r_module._active_retriever = build_hybrid_retriever(
-            r_module._active_index, nodes=nodes, rerank=True
+            r_module._active_index, nodes=nodes, rerank=get_settings().enable_reranker
         )
         logger.info("Retriever rebuilt with {} nodes after upload", len(nodes))
     except Exception as exc:

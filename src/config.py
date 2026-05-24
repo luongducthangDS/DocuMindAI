@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     hf_token: str = ""
 
     # ChromaDB
-    chroma_host: str = "localhost"
+    chroma_host: str = ""
     chroma_port: int = 8000
     chroma_collection: str = "documind_legal"
 
@@ -45,6 +45,10 @@ class Settings(BaseSettings):
 
     # Rate limiting
     rate_limit_per_minute: int = 10
+
+    # Runtime resource controls
+    initialize_rag_on_startup: bool = False
+    enable_reranker: bool = False
 
     # Storage
     data_dir: Path = Path("./data")

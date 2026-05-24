@@ -56,6 +56,10 @@ if (-not $SkipVars) {
         "EMBEDDING_MODEL"   = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
         "CHROMA_COLLECTION" = "documind_legal"
         "ENVIRONMENT"       = "production"
+        "API_PORT"          = "8081"
+        "API_BASE_URL"      = "http://127.0.0.1:8081"
+        "INITIALIZE_RAG_ON_STARTUP" = "false"
+        "ENABLE_RERANKER"   = "false"
         "PRIMARY_LLM"       = "groq/llama-3.3-70b-versatile"
         "FALLBACK_LLM"      = "gemini/gemini-1.5-flash"
     }

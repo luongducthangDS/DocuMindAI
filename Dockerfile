@@ -33,6 +33,7 @@ COPY --from=builder /install /usr/local
 # Copy application code
 COPY src/ ./src/
 COPY frontend/ ./frontend/
+COPY scripts/ ./scripts/
 COPY ingest.py ./
 
 # Pre-loaded corpus (ChromaDB local persistent data)
@@ -46,17 +47,15 @@ ENV TRANSFORMERS_CACHE=/app/.cache/huggingface
 # Create runtime directories
 RUN mkdir -p data/raw data/processed data/eval logs reports .cache/huggingface
 
-# Pre-download all ML models at build time.
+# Pre-download embedding model at build time.
 # IMPORTANT: embedding model MUST match what was used to index data/chroma_db/.
 # The corpus was indexed with paraphrase-multilingual-MiniLM-L12-v2.
 # Do NOT change without re-running: python ingest.py --source json --dir data/raw
 RUN python -c "\
-from sentence_transformers import SentenceTransformer, CrossEncoder; \
+from sentence_transformers import SentenceTransformer; \
 print('Downloading embedding model (~120MB)...'); \
 SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'); \
-print('Downloading cross-encoder reranker (~85MB)...'); \
-CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2'); \
-print('All models cached to /app/.cache/huggingface')"
+print('Model cached to /app/.cache/huggingface')"
 
 # Hand ownership to appuser
 RUN chown -R appuser:appgroup /app
@@ -66,9 +65,9 @@ USER appuser
 
 # Health check (Railway uses $PORT, default 8080)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=3 \
-    CMD python -c "import httpx,os; httpx.get(f'http://localhost:{os.getenv(\"PORT\",\"8080\")}/api/v1/health', timeout=5).raise_for_status()"
+    CMD python -c "import httpx,os; httpx.get(f'http://localhost:{os.getenv(\"PORT\",\"8080\")}/_stcore/health', timeout=5).raise_for_status()"
 
 EXPOSE 8080
 
-# Railway injects $PORT; fall back to 8080 for local docker run
-CMD ["sh", "-c", "uvicorn src.api.main:app --host 0.0.0.0 --port ${PORT:-8080} --workers 1 --log-level info"]
+# Railway injects $PORT; Streamlit is public, FastAPI runs on 127.0.0.1:8081.
+CMD ["sh", "scripts/start_railway.sh"]

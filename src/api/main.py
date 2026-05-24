@@ -6,6 +6,7 @@ Configures: CORS, rate limiting, startup/shutdown lifespan, routers.
 from __future__ import annotations
 
 import os
+import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, status
@@ -40,25 +41,40 @@ async def lifespan(app: FastAPI):
         os.environ["LANGCHAIN_PROJECT"] = settings.langchain_project
         logger.info("LangSmith tracing enabled for project: {}", settings.langchain_project)
 
-    # Initialize embedding + vector index
-    await _init_rag()
+    if settings.initialize_rag_on_startup:
+        await ensure_rag_initialized()
+    else:
+        logger.info("RAG startup initialization skipped; it will load on first query")
 
-    logger.info("DocuMind AI ready on {}:{}", settings.api_host, settings.api_port)
+    port = os.getenv("PORT", str(settings.api_port))
+    logger.info("DocuMind AI ready on {}:{}", settings.api_host, port)
     yield
 
     logger.info("DocuMind AI shutting down")
 
 
-async def _init_rag() -> None:
-    """Load embedder and connect to ChromaDB. Non-fatal on failure."""
-    import asyncio
+_rag_init_lock = asyncio.Lock()
+_rag_initialized = False
 
-    try:
-        # Run all blocking I/O (model load, chromadb init) in a thread pool
-        # to avoid blocking the asyncio event loop.
-        await asyncio.to_thread(_init_rag_sync)
-    except Exception as exc:
-        logger.error("RAG init failed (system will run in degraded mode): {}", exc)
+
+async def ensure_rag_initialized() -> None:
+    """Load embedder and connect to ChromaDB once. Non-fatal on failure."""
+    global _rag_initialized
+
+    if _rag_initialized:
+        return
+
+    async with _rag_init_lock:
+        if _rag_initialized:
+            return
+
+        try:
+            # Run all blocking I/O (model load, chromadb init) in a thread pool
+            # to avoid blocking the asyncio event loop.
+            await asyncio.to_thread(_init_rag_sync)
+            _rag_initialized = True
+        except Exception as exc:
+            logger.error("RAG init failed (system will run in degraded mode): {}", exc)
 
 
 def _load_nodes_from_collection(collection) -> list:
@@ -89,6 +105,7 @@ def _init_rag_sync() -> None:
 
     from src.rag.embedder import get_embedder, get_chroma_collection
     from src.rag.retriever import build_hybrid_retriever
+    settings = get_settings()
 
     embedder = get_embedder()
     LlamaSettings.embed_model = embedder
@@ -111,7 +128,11 @@ def _init_rag_sync() -> None:
 
     # Expose to other modules
     r_module._active_index = index
-    r_module._active_retriever = build_hybrid_retriever(index, nodes=existing_nodes, rerank=True)
+    r_module._active_retriever = build_hybrid_retriever(
+        index,
+        nodes=existing_nodes,
+        rerank=settings.enable_reranker,
+    )
 
     # Configure agent tools
     from src.agent.tools import configure_tools

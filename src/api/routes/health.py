@@ -48,6 +48,12 @@ async def _check_chroma() -> ServiceStatus:
         from chromadb.config import Settings as ChromaSettings
 
         settings = get_settings()
+        if not settings.chroma_host:
+            local_path = settings.data_dir / "chroma_db"
+            if local_path.exists():
+                return ServiceStatus(name="chromadb", healthy=True, detail="Local persistent mode")
+            return ServiceStatus(name="chromadb", healthy=False, detail="Local ChromaDB missing")
+
         client = chromadb.HttpClient(
             host=settings.chroma_host,
             port=settings.chroma_port,

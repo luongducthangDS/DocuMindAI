@@ -62,22 +62,26 @@ def get_chroma_collection():
     settings = get_settings()
     chroma_settings = ChromaSettings(anonymized_telemetry=False)
 
-    # Try HTTP server first
-    try:
-        client = chromadb.HttpClient(
-            host=settings.chroma_host,
-            port=settings.chroma_port,
-            settings=chroma_settings,
-        )
-        client.heartbeat()  # fast connectivity check before heavy ops
-        collection = client.get_or_create_collection(
-            name=settings.chroma_collection,
-            metadata={"hnsw:space": "cosine"},
-        )
-        logger.info("ChromaDB HTTP server ready: {}", settings.chroma_collection)
-        return client, collection
-    except Exception as exc:
-        logger.warning("HTTP ChromaDB unavailable ({}), using local PersistentClient", str(exc)[:60])
+    # Try HTTP server only when explicitly configured.
+    if settings.chroma_host:
+        try:
+            client = chromadb.HttpClient(
+                host=settings.chroma_host,
+                port=settings.chroma_port,
+                settings=chroma_settings,
+            )
+            client.heartbeat()  # fast connectivity check before heavy ops
+            collection = client.get_or_create_collection(
+                name=settings.chroma_collection,
+                metadata={"hnsw:space": "cosine"},
+            )
+            logger.info("ChromaDB HTTP server ready: {}", settings.chroma_collection)
+            return client, collection
+        except Exception as exc:
+            logger.warning(
+                "HTTP ChromaDB unavailable ({}), using local PersistentClient",
+                str(exc)[:60],
+            )
 
     # Fallback: local persistent (no server needed).
     # Do NOT pass Settings here — let chromadb use its own defaults for local mode.

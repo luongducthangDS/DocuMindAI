@@ -36,6 +36,9 @@ async def query_endpoint(body: QueryRequest) -> QueryResponse:
     session = _get_session(body.session_id)
 
     try:
+        from src.api.main import ensure_rag_initialized
+
+        await ensure_rag_initialized()
         result = await run_agent(
             query=body.query,
             session_id=body.session_id,
@@ -107,6 +110,9 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
 
             # Import retriever to get chunks
             try:
+                from src.api.main import ensure_rag_initialized
+
+                await ensure_rag_initialized()
                 import src.rag.retriever as r_module
 
                 retriever = getattr(r_module, "_active_retriever", None)
