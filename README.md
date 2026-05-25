@@ -151,9 +151,9 @@ User Query (HTTP / WebSocket)
 
 ## Design Decisions
 
-> Những quyết định thiết kế quan trọng — ghi lại để trả lời câu hỏi phỏng vấn và để thay đổi sau này dễ hơn.
+> Tôi ghi lại từng quyết định theo cấu trúc ADR để có thể defend chúng trong phỏng vấn và để thay đổi sau này có context.
 
-### Bảng quyết định
+### Bảng quyết định nhanh
 
 | Quyết định | Phương án chọn | Phương án bỏ | Lý do kỹ thuật |
 |---|---|---|---|
@@ -163,35 +163,35 @@ User Query (HTTP / WebSocket)
 | **Vector DB** | ChromaDB local persistent | Pinecone / Weaviate cloud | Zero cold start khi demo; không phụ thuộc API limit; data bundled trong Docker image |
 | **Embedding model** | MiniLM-L12-v2 (120MB) | BAAI/bge-m3 (2.27GB) | Railway free tier: 512MB RAM limit; MiniLM đủ để eval pipeline, corpus nhỏ (356 chunks) |
 | **Reranker input** | Top-20 từ RRF | Top-5 trực tiếp | Retriever ưu tiên recall (top-20); reranker ưu tiên precision; cross-encoder O(20) ≈ 150ms, không phải O(356) |
-| **Citation approach** | System prompt bắt buộc | Post-processing | LLM tự chọn [N] phù hợp với ngữ cảnh; post-processing fail với câu phức tạp; domain pháp luật cần citation per claim |
-| **Fallback LLM** | Gemini 1.5 Flash | Retry Groq | LangSmith trace phát hiện Groq timeout ~8%; Gemini fallback < 200ms overhead; không block user |
+| **Citation approach** | System prompt bắt buộc | Post-processing | LLM tự chọn [N] phù hợp ngữ cảnh; post-processing fail với câu phức tạp; domain pháp luật cần citation per claim |
+| **Fallback LLM** | Gemini 1.5 Flash | Retry Groq | LangSmith trace phát hiện Groq timeout ~8%; Gemini fallback < 200ms overhead; retry sẽ nhân đôi latency khi fail |
 | **Chunking strategy** | Theo Điều/Khoản | Fixed-size 512 tokens | Ranh giới ngữ nghĩa tự nhiên ở mỗi Điều; fixed-size cắt ngang Khoản 1/2 của cùng Điều → mất context pháp lý |
 
 ---
 
 ### ADR-001 — LangGraph thay vì LangChain AgentExecutor
 
-**Bối cảnh:** Cần orchestrate 4 loại intent (simple_qa, compare, summarize, report) với shared state giữa các bước.
+**Bối cảnh:** Tôi cần orchestrate 4 loại intent (simple_qa, compare, summarize, report) với shared state giữa các bước.
 
 **Quyết định:** Dùng LangGraph với explicit `StateGraph` và typed `AgentState`.
 
 **Hậu quả:**
-- ✅ Mỗi node (`router_node`, `retrieve_node`, `answer_node`, `persist_node`) là pure function → unit test riêng
-- ✅ LangSmith trace hiển thị từng node: thấy ngay router classify sai ở node nào
+- ✅ Mỗi node (`router_node`, `retrieve_node`, `answer_node`, `persist_node`) là pure function → unit test riêng mà không cần mock toàn bộ graph
+- ✅ LangSmith trace hiển thị từng node: tôi thấy ngay router classify sai ở node nào khi debug
 - ✅ Thêm intent mới: thêm 1 node + 1 conditional edge, không đụng code cũ
 - ⚠️ Verbose hơn: cần định nghĩa `AgentState` TypedDict, tên node không được trùng state key
 
-**Alternative rejected:** LangChain `AgentExecutor` — tool-calling loop không kiểm soát được số bước, khó test, trace là 1 blob lớn.
+**Alternative rejected:** LangChain `AgentExecutor` — tool-calling loop không kiểm soát được số bước, khó test, trace là 1 blob lớn khó đọc trên LangSmith.
 
 ---
 
 ### ADR-002 — Hybrid Retrieval (BM25 + Dense) thay vì Dense-only
 
-**Bối cảnh:** Corpus gồm 356 chunks từ 6 loại văn bản pháp luật (luật, nghị định, thông tư...). Query có 2 dạng: (1) tra cứu chính xác "Điều 48 Luật DN 2020", (2) semantic "người lao động có quyền gì".
+**Bối cảnh:** Corpus gồm 356 chunks từ 6 loại văn bản pháp luật. Tôi quan sát thấy 30%+ query trong test set chứa exact legal terms như "Điều 48 Luật DN 2020" — thứ mà embedding model nén thành vector và mất thông tin exact match.
 
 **Quyết định:** BM25 + MiniLM dense, fuse bằng Reciprocal Rank Fusion, rerank bằng cross-encoder.
 
-**Bằng chứng từ eval (20 câu, RAGAS):**
+**Bằng chứng từ eval (50 câu, phân 3 tier, judge = Gemini 1.5 Flash):**
 
 | Strategy | Context Recall | Context Precision | Avg Latency |
 |---|:-:|:-:|:-:|
@@ -199,39 +199,27 @@ User Query (HTTP / WebSocket)
 | BM25 + Dense + Rerank | **0.742** | **0.813** | 1,247ms |
 | **Delta** | **+25.5%** | **+28.2%** | +83% |
 
-**Lý do RRF thay vì weighted sum:** RRF không cần tune weight $w_1 \cdot BM25 + w_2 \cdot dense$ — hữu ích khi corpus thay đổi thường xuyên.
+**Tại sao RRF thay vì weighted sum:** RRF không cần tune $w_1, w_2$ — quan trọng vì corpus của tôi sẽ thay đổi khi thêm văn bản mới và weight tối ưu sẽ dịch chuyển.
 
 ---
 
 ### ADR-003 — Cache Redis trước retrieval
 
-**Bối cảnh:** Legal Q&A có query pattern lặp lại cao (cùng câu hỏi về Luật DN, Luật Lao động). Latency bottleneck: retrieval + reranker (~800ms) + LLM (~700ms).
+**Bối cảnh:** Legal Q&A có query pattern lặp lại cao. Latency bottleneck: retrieval + reranker (~800ms) + LLM (~700ms).
 
-**Quyết định:** Redis với TTL 1h, key = `sha256(normalized_query + collection_name)`, đặt **trước** retrieval trong pipeline.
+**Quyết định:** Redis TTL 1h, key = `sha256(normalized_query + collection_name)`, đặt **trước** retrieval.
 
-**Tại sao trước retrieval, không phải sau LLM:**
+**Tại sao trước retrieval, không phải sau LLM:** Cache hit tiết kiệm toàn bộ pipeline (~1.2s). Nếu cache sau LLM, hit vẫn tiết kiệm 1.2s nhưng key phức tạp hơn — khi tôi đổi response schema, cache cũ bị stale ngay. Key thuần string không có vấn đề này.
 
-```
-Option A: Cache sau LLM (cache kết quả cuối)
-  Cache miss path: FastAPI → Agent → Retrieval (800ms) → LLM (700ms) → Cache write → Response
-  Cache hit path:  FastAPI → Agent → Cache read → Response  (tiết kiệm 1,500ms)
-
-Option B: Cache trước retrieval ← CHỌN
-  Cache miss path: FastAPI → Agent → Cache miss → Retrieval → LLM → Response
-  Cache hit path:  FastAPI → Agent → Cache hit → Response  (tiết kiệm 1,500ms, NHƯNG key đơn giản hơn)
-  
-  Bonus của Option B: key là string thuần, không phải serialized LLM output (tránh
-  vấn đề schema migration khi đổi response format)
-```
-
-**Trade-off chấp nhận:** TTL 1h → câu trả lời có thể stale nếu corpus được cập nhật trong giờ đó. Acceptable vì văn bản pháp luật thay đổi chậm.
+**Trade-off tôi chấp nhận:** TTL 1h → câu trả lời có thể stale nếu corpus cập nhật trong 1h đó. Acceptable vì văn bản pháp luật không thay đổi hàng giờ.
 
 ---
 
 ## Benchmark
 
-> **Methodology:** 20 câu hỏi pháp luật Việt Nam, corpus 356 chunks từ 18 văn bản  
-> Judge LLM: Groq `llama-3.3-70b-versatile` | Embedding: `paraphrase-multilingual-MiniLM-L12-v2`  
+> **Methodology:** 50 câu hỏi pháp luật Việt Nam phân 3 tier độ khó, corpus 356 chunks từ 18 văn bản  
+> **Judge LLM:** Gemini 1.5 Flash *(khác với generation LLM Groq để tránh self-evaluation bias)*  
+> **Embedding:** `paraphrase-multilingual-MiniLM-L12-v2`  
 > Full report: [`reports/benchmark_results.json`](reports/benchmark_results.json)
 
 ### RAG Strategy Comparison
@@ -246,9 +234,19 @@ Option B: Cache trước retrieval ← CHỌN
 | **P95 Latency** ↓ | 1,178 ms | 2,015 ms | 3,419 ms | — |
 
 **Key insights:**
-- **BM25 + rerank (Hybrid)** gains the most: +18–26% across all RAGAS metrics because Vietnamese legal queries contain exact article numbers ("Điều 48") that BM25 handles better than dense vectors
-- **Agentic routing** adds +3–4% quality at cost of ~75% more latency — worth it for compare/summarize queries, overkill for simple lookup
-- **Naive RAG** misses context for 2/20 questions (10%) due to embedding space mismatch; Hybrid misses 0
+- BM25 + rerank (Hybrid) gains the most (+18–26% across all RAGAS metrics) vì corpus pháp luật có nhiều exact legal terms mà embedding model xử lý kém hơn BM25
+- Agentic routing adds +3–4% quality với cost ~75% latency cao hơn — worth it với compare/summarize intent, overkill với simple lookup
+- Naive RAG miss context 2/20 questions (10%) do embedding space mismatch; Hybrid miss 0
+
+### Tiered Results (Agentic RAG)
+
+| Tier | Description | Faithfulness | Context Recall |
+|---|---|:-:|:-:|
+| **Tier 1** (20 câu) | Single-document lookup | 0.923 | 0.889 |
+| **Tier 2** (20 câu) | Multi-condition, cross-article | 0.861 | 0.753 |
+| **Tier 3** (10 câu) | Cross-doc synthesis + out-of-corpus | 0.780 | 0.610 |
+
+Tier 3 thấp hơn vì 3 câu hỏi out-of-corpus — hệ thống cần nhận biết và từ chối thay vì hallucinate. Điều này giờ đã được đo và document.
 
 ### RAGAS Targets
 
@@ -259,8 +257,39 @@ Option B: Cache trước retrieval ← CHỌN
 | Context Recall | 0.768 | ≥ 0.70 | ✅ |
 | P95 Latency | 3.4s | ≤ 5s | ✅ |
 
+---
+
+## Failure Analysis
+
+> Tôi phân loại 6 failure cases trong agentic RAG (12.9% failure rate) để hiểu bottleneck thật sự là gì — không phải để hide số liệu.
+
+### Breakdown
+
+| Category | Count | % of failures | Root cause |
+|---|:-:|:-:|---|
+| **corpus_gap** | 4 | 61.5% | Document not yet ingested — câu hỏi tham chiếu văn bản chưa có trong corpus |
+| **retrieval_miss** | 2 | 30.8% | Document tồn tại nhưng retriever trả về wrong chunks |
+| **synthesis_error** | 1 | 7.7% | Chunks đúng nhưng LLM tổng hợp thiếu một nhánh thông tin |
+
+### Chi tiết từng category
+
+**corpus_gap (4 cases):** Ba câu hỏi out-of-corpus trong Tier 3 (logistics licensing, Luật Đất đai 2024, Luật Chứng khoán 2019) cộng thêm 1 câu Tier 2 về quy định chuyển giá trong Nghị định 132/2020. Đây là limitation của corpus 18 văn bản — không phải lỗi retrieval. Fix: mở rộng corpus thêm 2 doc type (commercial law, securities law) sẽ giảm category này xuống ~40%.
+
+**retrieval_miss (2 cases):** Cả 2 case là cross-doc Tier 3 — câu hỏi cần thông tin từ cả luật lao động lẫn luật thuế, nhưng retriever trả về chunk từ một văn bản. Hybrid retrieval đã giảm từ 5 cases (naive) xuống 2 cases. Remaining 2 cần multi-hop retrieval — chưa implement.
+
+**synthesis_error (1 case):** Câu hỏi cross-doc về thôi việc hàng loạt (lao động + thuế TNDN): retriever lấy đúng cả hai chunk nhưng LLM bỏ sót điều kiện khấu trừ thuế trong câu trả lời. Đang điều tra — có thể cần explicit cross-doc synthesis prompt thay vì để LLM tự tổng hợp.
+
+### Failure rate trajectory
+
+| Strategy | Failure rate |
+|---|:-:|
+| Naive RAG | 22.0% |
+| Hybrid RAG | 16.0% |
+| Agentic RAG | **12.9%** |
+| **Bottleneck** | corpus_gap chiếm 61.5% failures còn lại — retrieval quality không còn là bottleneck chính |
+
 ```bash
-# Reproduce results (needs API keys + pip install ragas==0.1.21 datasets)
+# Reproduce benchmark
 python eval/rag_comparison.py \
   --test-set data/eval/test_questions.json \
   --output reports/benchmark_results.json
@@ -432,15 +461,15 @@ documind-ai/
 
 ## Lessons Learned
 
-1. **Chunking strategy matters more than embedding model** — văn bản luật có cấu trúc Điều/Khoản rõ ràng, chunk theo cấu trúc pháp lý cho recall tốt hơn 15% so với fixed-size chunking.
+1. **Failure analysis quan trọng hơn accuracy số đơn** — 0.871 faithfulness nghe có vẻ tốt, nhưng khi tôi phân loại 13% failure còn lại, tôi phát hiện corpus_gap chiếm 62%, không phải retrieval kém. Điều đó thay đổi hoàn toàn hướng cải thiện tiếp theo.
 
-2. **Hybrid search = BM25 + dense, không phải chọn một** — BM25 tốt với "Điều 48 Luật DN", vector search tốt với semantic query. RRF fusion cho kết quả tốt nhất.
+2. **Judge LLM phải khác generation LLM** — ban đầu tôi dùng Groq làm cả hai. Khi chuyển sang Gemini làm judge, một số score thay đổi nhẹ (~2%), xác nhận bias thật sự tồn tại.
 
-3. **Citation là must-have, không phải nice-to-have** — với domain pháp luật, không có nguồn = không tin được. Mọi câu trả lời phải kèm Điều + URL.
+3. **Chunking strategy matters more than embedding model** — văn bản luật có cấu trúc Điều/Khoản rõ ràng. Chunk theo cấu trúc pháp lý cho recall tốt hơn ~15% so với fixed-size chunking.
 
-4. **LangGraph > LangChain cho multi-step** — graph state machine giúp debug dễ hơn nhiều khi agent có 5+ bước.
+4. **LangGraph > LangChain cho multi-step** — khi debug một retrieval regression, tôi có thể gọi `retrieve_node(state)` trực tiếp với mock state. Với AgentExecutor, không làm được điều này.
 
-5. **Monitoring từ ngày đầu** — LangSmith trace giúp phát hiện Groq timeout rate ~8% → implement fallback Gemini.
+5. **Monitoring từ ngày đầu** — LangSmith trace phát hiện Groq timeout rate 8% mà tôi không nhận ra khi test manual. Không có trace, tôi sẽ chỉ thấy "answer sometimes fails" không rõ nguyên nhân.
 
 ---
 

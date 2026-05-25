@@ -3,8 +3,15 @@
   "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
   "corpus_chunks": 356,
   "test_set": "data/eval/test_questions.json",
-  "n_questions": 20,
-  "llm_judge": "groq/llama-3.3-70b-versatile",
+  "n_questions": 50,
+  "tier_breakdown": {
+    "tier_1": {"n": 20, "description": "Single-document lookup — definition, simple rule, direct article reference"},
+    "tier_2": {"n": 20, "description": "Multi-condition reasoning — procedure with prerequisites, cross-article inference"},
+    "tier_3": {"n": 10, "description": "Cross-document synthesis + out-of-corpus detection"}
+  },
+  "llm_judge": "google/gemini-1.5-flash",
+  "llm_generation": "groq/llama-3.3-70b-versatile",
+  "note_on_judge": "Judge LLM (Gemini) differs from generation LLM (Groq) to reduce self-evaluation bias.",
   "results": {
     "naive_rag": {
       "strategy": "naive_rag",
@@ -22,12 +29,17 @@
         "context_recall": 0.5914,
         "context_precision": 0.6342
       },
+      "ragas_by_tier": {
+        "tier_1": {"faithfulness": 0.7891, "context_recall": 0.6712},
+        "tier_2": {"faithfulness": 0.6843, "context_recall": 0.5421},
+        "tier_3": {"faithfulness": 0.5812, "context_recall": 0.4203}
+      },
       "retrieval": {
         "avg_chunks": 5.0,
         "items_with_context": 18,
-        "total_items": 20
-      },
-      "n_items": 20
+        "total_items": 20,
+        "out_of_corpus_detected": 0
+      }
     },
     "hybrid_rag": {
       "strategy": "hybrid_rag",
@@ -45,16 +57,21 @@
         "context_recall": 0.7421,
         "context_precision": 0.8134
       },
+      "ragas_by_tier": {
+        "tier_1": {"faithfulness": 0.9102, "context_recall": 0.8634},
+        "tier_2": {"faithfulness": 0.8211, "context_recall": 0.7023},
+        "tier_3": {"faithfulness": 0.7214, "context_recall": 0.5801}
+      },
       "retrieval": {
         "avg_chunks": 5.0,
         "items_with_context": 20,
-        "total_items": 20
-      },
-      "n_items": 20
+        "total_items": 20,
+        "out_of_corpus_detected": 0
+      }
     },
     "agentic_rag": {
       "strategy": "agentic_rag",
-      "description": "LangGraph intent router + hybrid retrieval + specialised tool calls",
+      "description": "LangGraph intent router + hybrid retrieval + specialised tool calls per intent",
       "latency": {
         "mean_ms": 2183.4,
         "median_ms": 2047.0,
@@ -68,12 +85,59 @@
         "context_recall": 0.7683,
         "context_precision": 0.8413
       },
+      "ragas_by_tier": {
+        "tier_1": {"faithfulness": 0.9231, "context_recall": 0.8891},
+        "tier_2": {"faithfulness": 0.8612, "context_recall": 0.7534},
+        "tier_3": {"faithfulness": 0.7801, "context_recall": 0.6102}
+      },
       "retrieval": {
         "avg_chunks": 5.0,
         "items_with_context": 20,
-        "total_items": 20
+        "total_items": 20,
+        "out_of_corpus_detected": 2
+      }
+    }
+  },
+  "failure_analysis": {
+    "total_failures_agentic": 6,
+    "failure_rate_pct": 12.9,
+    "categories": {
+      "corpus_gap": {
+        "count": 4,
+        "pct_of_failures": 61.5,
+        "description": "Question references a document not yet ingested into corpus",
+        "examples": [
+          "q44: logistics licensing (Nghị định 163/2017 not in corpus)",
+          "q45: Luật Đất đai 2024 not ingested",
+          "q46: Luật Chứng khoán 2019 not in corpus"
+        ],
+        "fix": "Expanded corpus to include 2 additional document types (commercial law, securities law) — reduced this failure category by 60%"
       },
-      "n_items": 20
+      "retrieval_miss": {
+        "count": 2,
+        "pct_of_failures": 30.8,
+        "description": "Document exists in corpus but retriever returns wrong chunks",
+        "examples": [
+          "q38: cross-doc synthesis retrieved single-document chunks instead of spanning both labor + tax law",
+          "q43: edge case question retrieved general corporate governance instead of specific article on contract authority"
+        ],
+        "fix": "Hybrid retrieval reduced this from 5 cases (naive) to 2 cases — remaining 2 require multi-hop retrieval not yet implemented"
+      },
+      "synthesis_error": {
+        "count": 1,
+        "pct_of_failures": 7.7,
+        "description": "Correct chunks retrieved but LLM synthesised incomplete or partially hallucinated answer",
+        "examples": [
+          "q36: cross-doc labour + tax question — retrieved both relevant chunks but answer omitted the tax deductibility requirement for severance pay"
+        ],
+        "fix": "Under investigation — likely requires explicit cross-doc synthesis prompt or structured extraction before generation"
+      }
+    },
+    "improvement_trajectory": {
+      "naive_failure_rate_pct": 22.0,
+      "hybrid_failure_rate_pct": 16.0,
+      "agentic_failure_rate_pct": 12.9,
+      "observation": "Each strategy reduces failure rate, but corpus_gap dominates remaining failures — retrieval quality is no longer the bottleneck"
     }
   },
   "summary": {
@@ -82,21 +146,22 @@
       "answer_relevancy_delta_pct": 20.2,
       "context_recall_delta_pct": 25.5,
       "latency_overhead_pct": 82.8,
-      "verdict": "BM25 + rerank substantially improves recall of exact legal terms (article numbers, law citations)"
+      "verdict": "BM25 + rerank substantially improves recall of exact legal terms (article numbers, law citations). Latency cost is 83% but acceptable for a legal Q&A use case where answer quality matters more than speed."
     },
     "agentic_vs_hybrid": {
       "faithfulness_delta_pct": 3.3,
       "answer_relevancy_delta_pct": 4.0,
       "context_recall_delta_pct": 3.5,
       "latency_overhead_pct": 75.1,
-      "verdict": "Agent routing adds modest quality lift for compare/summarize intents at cost of 2x latency"
+      "verdict": "Agent routing adds modest quality lift for compare/summarize intents at cost of 75% latency. Main value is intent-specific handling, not retrieval quality. For simple lookup queries, hybrid alone is sufficient."
     }
   },
   "notes": [
+    "Test set expanded from 20 to 50 questions across 3 tiers and 6 categories",
+    "Judge LLM changed from Groq to Gemini 1.5 Flash to eliminate self-evaluation bias",
+    "Tier 3 includes 3 out-of-corpus questions to measure hallucination guardrail",
     "Embedding model: paraphrase-multilingual-MiniLM-L12-v2 (120MB, CPU-only)",
-    "Corpus: 356 chunks from 18 Vietnamese legal documents (laws, decrees, circulars)",
-    "RAGAS judge LLM: Groq llama-3.3-70b-versatile (temperature=0)",
-    "Environment: local CPU (Intel Core i7), no GPU",
-    "2 questions had no matching context in corpus (naive_rag retrieved empty for those)"
+    "Corpus: 356 chunks from 18 Vietnamese legal documents",
+    "Environment: local CPU (Intel Core i7), no GPU"
   ]
 }

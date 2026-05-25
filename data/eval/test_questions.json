@@ -1,122 +1,52 @@
 [
-  {
-    "id": "q01",
-    "category": "company_law",
-    "question": "Điều kiện để thành lập công ty trách nhiệm hữu hạn hai thành viên trở lên là gì?",
-    "ground_truth": "Công ty TNHH hai thành viên trở lên có từ 2 đến 50 thành viên. Thành viên chịu trách nhiệm về các khoản nợ và nghĩa vụ tài sản của công ty trong phạm vi số vốn đã góp vào công ty. Vốn điều lệ không được chia thành cổ phần."
-  },
-  {
-    "id": "q02",
-    "category": "company_law",
-    "question": "Công ty cổ phần cần bao nhiêu cổ đông tối thiểu và cổ đông sáng lập phải đáp ứng điều kiện gì?",
-    "ground_truth": "Công ty cổ phần phải có tối thiểu 3 cổ đông và không hạn chế số lượng tối đa. Các cổ đông sáng lập phải cùng nhau đăng ký mua ít nhất 20% tổng số cổ phần phổ thông được quyền chào bán tại thời điểm đăng ký thành lập doanh nghiệp."
-  },
-  {
-    "id": "q03",
-    "category": "company_law",
-    "question": "Doanh nghiệp nhà nước là gì và được phân loại như thế nào theo Luật Doanh nghiệp 2020?",
-    "ground_truth": "Doanh nghiệp nhà nước bao gồm các doanh nghiệp do Nhà nước nắm giữ trên 50% vốn điều lệ hoặc tổng số cổ phần có quyền biểu quyết, bao gồm doanh nghiệp do Nhà nước nắm giữ 100% vốn điều lệ và doanh nghiệp do Nhà nước nắm giữ trên 50% vốn điều lệ hoặc tổng số cổ phần có quyền biểu quyết."
-  },
-  {
-    "id": "q04",
-    "category": "company_law",
-    "question": "Doanh nghiệp có bao nhiêu loại hình theo Luật Doanh nghiệp 2020?",
-    "ground_truth": "Theo Luật Doanh nghiệp 2020, có các loại hình doanh nghiệp: Công ty TNHH một thành viên, Công ty TNHH hai thành viên trở lên, Công ty cổ phần, Công ty hợp danh và Doanh nghiệp tư nhân."
-  },
-  {
-    "id": "q05",
-    "category": "company_law",
-    "question": "Hội đồng quản trị công ty cổ phần có bao nhiêu thành viên và nhiệm kỳ là bao nhiêu năm?",
-    "ground_truth": "Hội đồng quản trị có từ 3 đến 11 thành viên. Nhiệm kỳ của thành viên Hội đồng quản trị không quá 5 năm và có thể được bầu lại với số nhiệm kỳ không hạn chế."
-  },
-  {
-    "id": "q06",
-    "category": "labor_law",
-    "question": "Người lao động có được quyền đơn phương chấm dứt hợp đồng lao động không? Phải báo trước bao lâu?",
-    "ground_truth": "Có, người lao động có quyền đơn phương chấm dứt hợp đồng lao động. Phải báo trước: ít nhất 45 ngày với hợp đồng không xác định thời hạn; ít nhất 30 ngày với hợp đồng xác định thời hạn từ 12 đến 36 tháng; ít nhất 03 ngày làm việc với hợp đồng xác định thời hạn dưới 12 tháng."
-  },
-  {
-    "id": "q07",
-    "category": "labor_law",
-    "question": "Hợp đồng lao động phải có những nội dung bắt buộc nào?",
-    "ground_truth": "Hợp đồng lao động phải có các nội dung: tên, địa chỉ của người sử dụng lao động; họ tên, ngày sinh, giới tính, nơi cư trú của người lao động; công việc và địa điểm làm việc; thời hạn của hợp đồng; mức lương, hình thức trả lương, thời hạn trả lương; chế độ nâng lương; thời giờ làm việc, thời giờ nghỉ ngơi; trang bị bảo hộ lao động; bảo hiểm xã hội; đào tạo, bồi dưỡng nâng cao trình độ."
-  },
-  {
-    "id": "q08",
-    "category": "labor_law",
-    "question": "Thời gian thử việc tối đa theo Bộ luật Lao động là bao nhiêu ngày?",
-    "ground_truth": "Thời gian thử việc không quá 180 ngày đối với công việc của người quản lý doanh nghiệp; không quá 60 ngày đối với công việc có chức danh nghề nghiệp cần trình độ chuyên môn kỹ thuật từ cao đẳng trở lên; không quá 30 ngày đối với công việc có chức danh nghề nghiệp cần trình độ chuyên môn kỹ thuật trung cấp, công nhân kỹ thuật, nhân viên nghiệp vụ; không quá 6 ngày làm việc đối với công việc khác."
-  },
-  {
-    "id": "q09",
-    "category": "labor_law",
-    "question": "Quyền tham gia quản lý của người lao động trong doanh nghiệp được thực hiện như thế nào?",
-    "ground_truth": "Người lao động có quyền tham gia quản lý doanh nghiệp thông qua tổ chức đại diện người lao động tại cơ sở, thực hiện quyền dân chủ ở cơ sở theo quy định của pháp luật. Đối thoại tại nơi làm việc phải được thực hiện theo quy định của Bộ luật Lao động."
-  },
-  {
-    "id": "q10",
-    "category": "labor_law",
-    "question": "Người sử dụng lao động có được phép sa thải người lao động đang trong thời gian điều trị bệnh không?",
-    "ground_truth": "Người sử dụng lao động không được xử lý kỷ luật sa thải đối với người lao động trong thời gian người lao động đang điều trị bệnh tật, điều dưỡng, phục hồi chức năng theo quyết định của cơ sở khám bệnh, chữa bệnh có thẩm quyền."
-  },
-  {
-    "id": "q11",
-    "category": "tax_law",
-    "question": "Thuế suất thuế thu nhập doanh nghiệp phổ thông hiện nay là bao nhiêu?",
-    "ground_truth": "Thuế suất thuế thu nhập doanh nghiệp phổ thông là 20% áp dụng cho tất cả các doanh nghiệp không thuộc trường hợp được hưởng thuế suất ưu đãi theo quy định của Luật Thuế TNDN."
-  },
-  {
-    "id": "q12",
-    "category": "tax_law",
-    "question": "Thu nhập được miễn thuế thu nhập doanh nghiệp bao gồm những khoản nào?",
-    "ground_truth": "Thu nhập được miễn thuế TNDN bao gồm: thu nhập từ hoạt động trồng trọt, chăn nuôi, nuôi trồng thủy sản của hợp tác xã và của doanh nghiệp ở địa bàn có điều kiện kinh tế - xã hội đặc biệt khó khăn; thu nhập từ việc thực hiện hợp đồng nghiên cứu khoa học và phát triển công nghệ; thu nhập từ hoạt động sản xuất, kinh doanh hàng hóa, dịch vụ của doanh nghiệp có từ 30% số lao động là người khuyết tật, người sau cai nghiện, người nhiễm HIV."
-  },
-  {
-    "id": "q13",
-    "category": "tax_law",
-    "question": "Doanh nghiệp được khấu trừ những khoản chi phí nào khi tính thuế thu nhập doanh nghiệp?",
-    "ground_truth": "Các khoản chi được trừ khi xác định thu nhập chịu thuế bao gồm: khoản chi thực tế phát sinh liên quan đến hoạt động sản xuất kinh doanh; khoản chi có đủ hóa đơn chứng từ hợp pháp; khoản chi không vượt quá mức quy định của pháp luật. Các khoản chi không được trừ bao gồm chi phí không phục vụ sản xuất kinh doanh, chi phạt, chi không có hóa đơn chứng từ."
-  },
-  {
-    "id": "q14",
-    "category": "penalties",
-    "question": "Mức phạt vi phạm hành chính khi không đăng ký kinh doanh là bao nhiêu?",
-    "ground_truth": "Theo các nghị định về xử phạt vi phạm hành chính, doanh nghiệp không đăng ký kinh doanh có thể bị phạt tiền từ 10 triệu đến 50 triệu đồng tùy mức độ vi phạm, và có thể bị đình chỉ hoạt động kinh doanh."
-  },
-  {
-    "id": "q15",
-    "category": "data_protection",
-    "question": "Bảo vệ dữ liệu cá nhân tại Việt Nam được quy định bởi văn bản pháp luật nào?",
-    "ground_truth": "Bảo vệ dữ liệu cá nhân tại Việt Nam được quy định chủ yếu bởi Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân, có hiệu lực từ ngày 01/07/2023. Nghị định này quy định về quyền và nghĩa vụ của chủ thể dữ liệu, bên kiểm soát dữ liệu, bên xử lý dữ liệu."
-  },
-  {
-    "id": "q16",
-    "category": "company_law",
-    "question": "Doanh nghiệp nhỏ và vừa được định nghĩa như thế nào theo pháp luật Việt Nam?",
-    "ground_truth": "Doanh nghiệp nhỏ và vừa là doanh nghiệp có số lao động tham gia bảo hiểm xã hội bình quân năm không quá 200 người và đáp ứng tiêu chí về tổng nguồn vốn hoặc doanh thu theo ngành nghề, lĩnh vực."
-  },
-  {
-    "id": "q17",
-    "category": "labor_law",
-    "question": "Người lao động được nghỉ phép năm bao nhiêu ngày theo Bộ luật Lao động?",
-    "ground_truth": "Người lao động làm việc đủ 12 tháng cho người sử dụng lao động thì được nghỉ phép năm hưởng nguyên lương: 12 ngày làm việc với điều kiện làm việc bình thường; 14 ngày với người làm nghề, công việc nặng nhọc, độc hại, nguy hiểm hoặc người làm việc ở nơi có điều kiện sinh sống khắc nghiệt; 16 ngày với người làm nghề, công việc đặc biệt nặng nhọc, độc hại, nguy hiểm."
-  },
-  {
-    "id": "q18",
-    "category": "company_law",
-    "question": "Cổ phần ưu đãi trong công ty cổ phần gồm những loại nào?",
-    "ground_truth": "Công ty cổ phần có thể có các loại cổ phần ưu đãi: cổ phần ưu đãi biểu quyết (chỉ có tổ chức được Chính phủ ủy quyền và cổ đông sáng lập được quyền nắm giữ); cổ phần ưu đãi cổ tức; cổ phần ưu đãi hoàn lại; cổ phần ưu đãi khác do Điều lệ công ty quy định."
-  },
-  {
-    "id": "q19",
-    "category": "labor_law",
-    "question": "Điều kiện để người lao động được hưởng trợ cấp thôi việc là gì?",
-    "ground_truth": "Người sử dụng lao động có trách nhiệm trả trợ cấp thôi việc cho người lao động đã làm việc thường xuyên từ đủ 12 tháng trở lên khi chấm dứt hợp đồng lao động, mỗi năm làm việc tương đương nửa tháng tiền lương."
-  },
-  {
-    "id": "q20",
-    "category": "tax_law",
-    "question": "Thời hạn nộp thuế thu nhập doanh nghiệp tạm tính theo quý là khi nào?",
-    "ground_truth": "Doanh nghiệp phải tạm nộp thuế thu nhập doanh nghiệp theo quý, thời hạn nộp thuế chậm nhất là ngày 30 của tháng đầu quý tiếp theo. Hàng năm, doanh nghiệp phải quyết toán thuế và nộp số thuế còn thiếu chậm nhất vào ngày cuối cùng của tháng thứ ba kể từ ngày kết thúc năm dương lịch hoặc năm tài chính."
-  }
+  {"id":"q01","tier":1,"category":"company_law","question":"Điều kiện để thành lập công ty trách nhiệm hữu hạn hai thành viên trở lên là gì?","ground_truth":"Công ty TNHH hai thành viên trở lên có từ 2 đến 50 thành viên. Thành viên chịu trách nhiệm về các khoản nợ và nghĩa vụ tài sản của công ty trong phạm vi số vốn đã góp vào công ty. Vốn điều lệ không được chia thành cổ phần."},
+  {"id":"q02","tier":1,"category":"company_law","question":"Công ty cổ phần cần bao nhiêu cổ đông tối thiểu và cổ đông sáng lập phải đáp ứng điều kiện gì?","ground_truth":"Công ty cổ phần phải có tối thiểu 3 cổ đông và không hạn chế số lượng tối đa. Các cổ đông sáng lập phải cùng nhau đăng ký mua ít nhất 20% tổng số cổ phần phổ thông được quyền chào bán tại thời điểm đăng ký thành lập doanh nghiệp."},
+  {"id":"q03","tier":1,"category":"company_law","question":"Doanh nghiệp nhà nước là gì và được phân loại như thế nào theo Luật Doanh nghiệp 2020?","ground_truth":"Doanh nghiệp nhà nước bao gồm các doanh nghiệp do Nhà nước nắm giữ trên 50% vốn điều lệ hoặc tổng số cổ phần có quyền biểu quyết."},
+  {"id":"q04","tier":1,"category":"company_law","question":"Doanh nghiệp có bao nhiêu loại hình theo Luật Doanh nghiệp 2020?","ground_truth":"Theo Luật Doanh nghiệp 2020, có các loại hình: Công ty TNHH một thành viên, Công ty TNHH hai thành viên trở lên, Công ty cổ phần, Công ty hợp danh và Doanh nghiệp tư nhân."},
+  {"id":"q05","tier":1,"category":"company_law","question":"Hội đồng quản trị công ty cổ phần có bao nhiêu thành viên và nhiệm kỳ là bao nhiêu năm?","ground_truth":"Hội đồng quản trị có từ 3 đến 11 thành viên. Nhiệm kỳ không quá 5 năm và có thể được bầu lại với số nhiệm kỳ không hạn chế."},
+  {"id":"q06","tier":1,"category":"labor_law","question":"Người lao động có được quyền đơn phương chấm dứt hợp đồng lao động không? Phải báo trước bao lâu?","ground_truth":"Có. Báo trước ít nhất 45 ngày với hợp đồng không xác định thời hạn; 30 ngày với hợp đồng từ 12 đến 36 tháng; 3 ngày làm việc với hợp đồng dưới 12 tháng."},
+  {"id":"q07","tier":1,"category":"labor_law","question":"Hợp đồng lao động phải có những nội dung bắt buộc nào?","ground_truth":"Công việc và địa điểm làm việc; thời hạn hợp đồng; mức lương và hình thức trả lương; thời giờ làm việc và nghỉ ngơi; trang bị bảo hộ lao động; bảo hiểm xã hội."},
+  {"id":"q08","tier":1,"category":"labor_law","question":"Thời gian thử việc tối đa theo Bộ luật Lao động là bao nhiêu ngày?","ground_truth":"Tối đa 180 ngày với người quản lý doanh nghiệp; 60 ngày với trình độ từ cao đẳng trở lên; 30 ngày với trình độ trung cấp, công nhân kỹ thuật; 6 ngày với công việc khác."},
+  {"id":"q09","tier":1,"category":"labor_law","question":"Người sử dụng lao động có được phép sa thải người lao động đang trong thời gian điều trị bệnh không?","ground_truth":"Không. Người sử dụng lao động không được xử lý kỷ luật sa thải trong thời gian người lao động đang điều trị bệnh tật, điều dưỡng, phục hồi chức năng theo quyết định của cơ sở y tế có thẩm quyền."},
+  {"id":"q10","tier":1,"category":"labor_law","question":"Người lao động được nghỉ phép năm bao nhiêu ngày theo Bộ luật Lao động?","ground_truth":"12 ngày với điều kiện bình thường; 14 ngày với công việc nặng nhọc, độc hại; 16 ngày với công việc đặc biệt nặng nhọc, độc hại."},
+  {"id":"q11","tier":1,"category":"tax_law","question":"Thuế suất thuế thu nhập doanh nghiệp phổ thông hiện nay là bao nhiêu?","ground_truth":"20%."},
+  {"id":"q12","tier":1,"category":"tax_law","question":"Thu nhập được miễn thuế thu nhập doanh nghiệp bao gồm những khoản nào?","ground_truth":"Thu nhập từ trồng trọt, chăn nuôi, nuôi trồng thủy sản tại vùng kinh tế xã hội đặc biệt khó khăn; thu nhập từ hợp đồng nghiên cứu khoa học; thu nhập từ doanh nghiệp có từ 30% lao động là người khuyết tật."},
+  {"id":"q13","tier":1,"category":"tax_law","question":"Thời hạn nộp thuế thu nhập doanh nghiệp tạm tính theo quý là khi nào?","ground_truth":"Chậm nhất ngày 30 của tháng đầu quý tiếp theo. Quyết toán năm chậm nhất cuối tháng thứ ba từ ngày kết thúc năm tài chính."},
+  {"id":"q14","tier":1,"category":"data_protection","question":"Bảo vệ dữ liệu cá nhân tại Việt Nam được quy định bởi văn bản pháp luật nào?","ground_truth":"Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân, có hiệu lực từ 01/07/2023."},
+  {"id":"q15","tier":1,"category":"company_law","question":"Doanh nghiệp nhỏ và vừa được định nghĩa như thế nào?","ground_truth":"Doanh nghiệp có số lao động tham gia bảo hiểm xã hội bình quân năm không quá 200 người và đáp ứng tiêu chí về tổng nguồn vốn hoặc doanh thu theo ngành nghề."},
+  {"id":"q16","tier":1,"category":"company_law","question":"Cổ phần ưu đãi trong công ty cổ phần gồm những loại nào?","ground_truth":"Cổ phần ưu đãi biểu quyết; cổ phần ưu đãi cổ tức; cổ phần ưu đãi hoàn lại; cổ phần ưu đãi khác do Điều lệ quy định."},
+  {"id":"q17","tier":1,"category":"labor_law","question":"Điều kiện để người lao động được hưởng trợ cấp thôi việc là gì?","ground_truth":"Làm việc thường xuyên từ đủ 12 tháng trở lên khi chấm dứt hợp đồng lao động. Mức trợ cấp: mỗi năm làm việc tương đương nửa tháng tiền lương."},
+  {"id":"q18","tier":1,"category":"labor_law","question":"Người sử dụng lao động có bắt buộc phải đóng bảo hiểm xã hội không? Mức đóng là bao nhiêu?","ground_truth":"Bắt buộc với hợp đồng lao động từ 1 tháng trở lên. Người sử dụng lao động đóng 17,5%; người lao động đóng 10,5%."},
+  {"id":"q19","tier":1,"category":"company_law","question":"Điều lệ công ty phải có những nội dung bắt buộc nào theo Luật Doanh nghiệp 2020?","ground_truth":"Tên, địa chỉ trụ sở; ngành nghề kinh doanh; vốn điều lệ; quyền và nghĩa vụ thành viên/cổ đông; cơ cấu tổ chức quản lý; số người đại diện theo pháp luật; căn cứ giải thể và trình tự thanh lý tài sản."},
+  {"id":"q20","tier":1,"category":"tax_law","question":"Thuế thu nhập cá nhân từ tiền lương được tính như thế nào và mức giảm trừ gia cảnh hiện tại là bao nhiêu?","ground_truth":"Biểu thuế lũy tiến 7 bậc từ 5% đến 35%. Giảm trừ bản thân 11 triệu đồng/tháng; mỗi người phụ thuộc 4,4 triệu đồng/tháng."},
+  {"id":"q21","tier":2,"category":"company_law","question":"Nếu một thành viên công ty TNHH muốn chuyển nhượng phần vốn góp, quy trình thực hiện như thế nào và ai có quyền ưu tiên mua?","ground_truth":"Phải chào bán cho các thành viên còn lại theo tỷ lệ vốn góp với cùng điều kiện. Chỉ khi các thành viên không mua hoặc mua không hết trong 30 ngày mới được chuyển nhượng cho người ngoài."},
+  {"id":"q22","tier":2,"category":"company_law","question":"Khi nào nghị quyết Đại hội đồng cổ đông có thể bị tòa án tuyên bố vô hiệu?","ground_truth":"Khi trình tự triệu tập họp và ra quyết định không đúng quy định, hoặc nội dung nghị quyết vi phạm pháp luật hay Điều lệ. Thời hiệu yêu cầu là 90 ngày kể từ ngày nhận được hoặc có thể tiếp cận nghị quyết."},
+  {"id":"q23","tier":2,"category":"labor_law","question":"Điều kiện và trình tự để người sử dụng lao động được sa thải người lao động vì lý do kỷ luật là gì?","ground_truth":"Phải có vi phạm kỷ luật được quy định trong nội quy lao động. Quy trình: thông báo bằng văn bản cho tổ chức đại diện người lao động; lấy ý kiến của tổ chức này; họp xử lý kỷ luật có người lao động tham dự. Không được sa thải khi người lao động đang điều trị bệnh, nghỉ thai sản, nghỉ phép năm."},
+  {"id":"q24","tier":2,"category":"tax_law","question":"Doanh nghiệp khởi nghiệp sáng tạo được hưởng ưu đãi thuế thu nhập doanh nghiệp như thế nào?","ground_truth":"Doanh nghiệp nhỏ và vừa chuyển đổi từ hộ kinh doanh được miễn thuế TNDN 2 năm và giảm 50% trong 4 năm tiếp theo. Đầu tư vào lĩnh vực ưu đãi đặc biệt có thể được thuế suất 10% trong 15 năm, miễn 4 năm, giảm 50% trong 9 năm tiếp theo."},
+  {"id":"q25","tier":2,"category":"data_protection","question":"Doanh nghiệp xử lý dữ liệu cá nhân nhạy cảm phải đáp ứng những yêu cầu gì theo Nghị định 13/2023?","ground_truth":"Phải có sự đồng ý rõ ràng của chủ thể dữ liệu, áp dụng biện pháp bảo vệ đặc biệt, thông báo cho Bộ Công an khi xử lý quy mô lớn, và phải có Đánh giá tác động xử lý dữ liệu cá nhân. Dữ liệu nhạy cảm bao gồm: quan điểm chính trị, sức khỏe, đời sống tình dục, dữ liệu tài chính, tội phạm."},
+  {"id":"q26","tier":2,"category":"labor_law","question":"Thỏa ước lao động tập thể khác hợp đồng lao động cá nhân như thế nào và khi nào thỏa ước được ưu tiên áp dụng?","ground_truth":"Thỏa ước là thỏa thuận giữa tập thể lao động và người sử dụng lao động thông qua thương lượng tập thể. Khi thỏa ước có lợi hơn cho người lao động so với pháp luật thì áp dụng theo thỏa ước. Hợp đồng lao động không được thỏa thuận thấp hơn thỏa ước."},
+  {"id":"q27","tier":2,"category":"company_law","question":"Trách nhiệm của người quản lý doanh nghiệp khi gây thiệt hại cho công ty là gì?","ground_truth":"Phải bồi thường thiệt hại cho công ty. Cổ đông hoặc nhóm cổ đông sở hữu từ 1% cổ phần trở lên có quyền tự mình hoặc nhân danh công ty khởi kiện người quản lý."},
+  {"id":"q28","tier":2,"category":"tax_law","question":"Quy định về giao dịch liên kết tại Việt Nam là gì? Doanh nghiệp phải tuân thủ những nghĩa vụ gì?","ground_truth":"Theo Nghị định 132/2020/NĐ-CP: phải kê khai giao dịch liên kết, lập hồ sơ quản lý giá chuyển nhượng nộp cùng quyết toán thuế TNDN. Áp dụng nguyên tắc giá thị trường. Tổng chi phí lãi vay được trừ không vượt quá 30% EBITDA."},
+  {"id":"q29","tier":2,"category":"labor_law","question":"Quyền đình công của người lao động được thực hiện như thế nào và những hạn chế gì áp dụng?","ground_truth":"Đình công chỉ được tổ chức sau khi hòa giải không thành. Tổ chức đại diện người lao động phải ra quyết định bằng văn bản và thông báo trước 5 ngày làm việc. Không được đình công tại doanh nghiệp phục vụ công ích, quốc phòng, an ninh."},
+  {"id":"q30","tier":2,"category":"company_law","question":"Doanh nghiệp FDI khác doanh nghiệp trong nước như thế nào về thủ tục thành lập?","ground_truth":"Nhà đầu tư nước ngoài lần đầu phải xin Giấy chứng nhận đăng ký đầu tư trước khi thành lập. Một số ngành có hạn chế tỷ lệ sở hữu vốn nước ngoài. Phải đáp ứng điều kiện tiếp cận thị trường theo WTO và các FTA."},
+  {"id":"q31","tier":2,"category":"data_protection","question":"Khi xảy ra sự cố rò rỉ dữ liệu cá nhân, doanh nghiệp phải thực hiện những nghĩa vụ gì?","ground_truth":"Thông báo cho Bộ Công an trong vòng 72 giờ kể từ khi phát hiện. Thông báo phải bao gồm: mô tả vi phạm, loại và số lượng dữ liệu bị ảnh hưởng, biện pháp khắc phục đã và đang thực hiện."},
+  {"id":"q32","tier":2,"category":"tax_law","question":"Điều kiện để được hoàn thuế VAT đối với hàng hóa xuất khẩu là gì?","ground_truth":"Hàng hóa thực xuất khẩu có chứng từ xác nhận; có hợp đồng bán hàng với bên nước ngoài; có chứng từ thanh toán qua ngân hàng. Thời hạn giải quyết hoàn thuế: 6 ngày làm việc với hồ sơ hoàn trước kiểm tra sau."},
+  {"id":"q33","tier":2,"category":"labor_law","question":"Người lao động nước ngoài làm việc tại Việt Nam phải đáp ứng điều kiện gì và thủ tục cấp phép ra sao?","ground_truth":"Phải có năng lực hành vi dân sự đầy đủ, trình độ chuyên môn hoặc kinh nghiệm phù hợp, đủ sức khỏe. Người sử dụng lao động xác nhận nhu cầu và đề nghị cấp giấy phép lao động. Giấy phép có hiệu lực tối đa 2 năm."},
+  {"id":"q34","tier":2,"category":"company_law","question":"Thủ tục và điều kiện để giải thể doanh nghiệp tự nguyện là gì? Ai chịu trách nhiệm thanh toán nợ?","ground_truth":"Điều kiện: thanh toán hết nợ và nghĩa vụ tài sản, không trong quá trình giải quyết tranh chấp tại tòa. Trình tự: thông qua quyết định giải thể, thanh toán nợ, hoàn thành nghĩa vụ thuế, nộp hồ sơ giải thể tại Sở Kế hoạch Đầu tư."},
+  {"id":"q35","tier":2,"category":"company_law","question":"Ban kiểm soát trong công ty cổ phần có quyền và nghĩa vụ gì? Khi nào không bắt buộc phải có?","ground_truth":"Giám sát Hội đồng quản trị và Ban giám đốc trong quản lý và điều hành. Không bắt buộc nếu: dưới 11 cổ đông và cổ đông tổ chức sở hữu dưới 50% cổ phần; hoặc áp dụng mô hình có ít nhất 20% thành viên HĐQT độc lập và có Ủy ban kiểm toán trực thuộc HĐQT."},
+  {"id":"q36","tier":3,"category":"cross_doc","question":"Khi doanh nghiệp cho nghỉ việc hàng loạt vì lý do kinh tế, nghĩa vụ về trợ cấp thôi việc và nghĩa vụ thuế TNDN đối với khoản chi trả này được xử lý như thế nào?","ground_truth":"Về lao động: thông báo 30 ngày trước, xây dựng phương án sử dụng lao động, báo cáo Sở LĐTBXH, chi trả trợ cấp mất việc làm. Về thuế TNDN: khoản trợ cấp đúng quy định pháp luật lao động được tính vào chi phí hợp lý, cần có hợp đồng lao động, quyết định thôi việc và chứng từ chi trả."},
+  {"id":"q37","tier":3,"category":"cross_doc","question":"So sánh trách nhiệm pháp lý của Giám đốc điều hành trong công ty TNHH và công ty cổ phần khi ký hợp đồng vượt quá thẩm quyền.","ground_truth":"TNHH: thẩm quyền do Điều lệ và nghị quyết Hội đồng thành viên quy định; hợp đồng vượt thẩm quyền có thể bị tuyên vô hiệu; Giám đốc phải bồi thường thiệt hại. Cổ phần: HĐQT quyết định hợp đồng trên 35% tổng tài sản; Giám đốc ký vượt thẩm quyền chịu trách nhiệm cá nhân; cổ đông nhóm 1% có thể khởi kiện."},
+  {"id":"q38","tier":3,"category":"cross_doc","question":"Một startup fintech thu thập dữ liệu tài chính người dùng và có nhân viên ký hợp đồng lao động. Liệt kê các văn bản pháp luật áp dụng và nghĩa vụ chính từ mỗi văn bản.","ground_truth":"Nghị định 13/2023: dữ liệu tài chính là nhạy cảm, cần đồng ý rõ ràng và đánh giá tác động. Bộ luật Lao động 2019: ký hợp đồng đúng loại, đóng BHXH, tuân thủ lương và thời giờ làm việc. Luật Doanh nghiệp 2020: đăng ký đúng ngành nghề. Nếu cấp tín dụng: cần giấy phép Ngân hàng Nhà nước."},
+  {"id":"q39","tier":3,"category":"cross_doc","question":"Một công ty cổ phần phát hành thêm cổ phiếu và thu thập thông tin nhà đầu tư. Những nghĩa vụ pháp lý nào phát sinh từ Luật Doanh nghiệp và Nghị định 13/2023?","ground_truth":"Về phát hành: phải được Đại hội đồng cổ đông thông qua; đăng ký với UBCKNN nếu chào bán ra công chúng; chào bán riêng lẻ chỉ cho dưới 100 nhà đầu tư không chuyên nghiệp. Về dữ liệu: thông tin nhà đầu tư là dữ liệu cá nhân, phải có đồng ý, mục đích rõ ràng, bảo mật và không dùng ngoài mục đích đã công bố."},
+  {"id":"q40","tier":3,"category":"cross_doc","question":"Khi nào doanh nghiệp được xử lý dữ liệu cá nhân của người lao động mà không cần sự đồng ý, và giới hạn nào áp dụng?","ground_truth":"Được xử lý mà không cần đồng ý khi: thực hiện nghĩa vụ hợp đồng lao động (lương, bảo hiểm); tuân thủ nghĩa vụ pháp lý (kê khai thuế TNCN, báo cáo BHXH); bảo vệ tính mạng sức khỏe. Giới hạn: chỉ đúng mục đích đã xác định; không xử lý dữ liệu nhạy cảm nếu không cần thiết; không tiết lộ cho bên thứ ba khi chưa được phép."},
+  {"id":"q41","tier":3,"category":"edge_case","question":"Điều 48 Luật Doanh nghiệp 2020 quy định gì về góp vốn bằng tài sản?","ground_truth":"Tài sản góp vốn không phải VND, ngoại tệ, vàng thì phải được các thành viên/cổ đông sáng lập hoặc tổ chức thẩm định giá chuyên nghiệp định giá và thể hiện thành VND."},
+  {"id":"q42","tier":3,"category":"edge_case","question":"Người lao động làm việc theo hợp đồng thời vụ 3 tháng, tái ký 4 lần liên tiếp. Hợp đồng lần thứ 5 phải ký loại nào?","ground_truth":"Hợp đồng xác định thời hạn chỉ được ký tối đa 2 lần; lần thứ 3 trở đi phải ký hợp đồng không xác định thời hạn. Trong tình huống này, sau 2 lần ký xác định thời hạn hợp lệ, lần thứ 3 đã phải là không xác định thời hạn."},
+  {"id":"q43","tier":3,"category":"edge_case","question":"Công ty A ký hợp đồng thuê văn phòng 5 năm trị giá 5 tỷ đồng nhưng không thông qua HĐQT dù Điều lệ yêu cầu với hợp đồng trên 2 tỷ. Hợp đồng có hiệu lực không?","ground_truth":"Hợp đồng ký với bên thứ ba ngay tình thường được bảo vệ hiệu lực để đảm bảo an toàn giao dịch. Tuy nhiên người ký (Giám đốc) phải chịu trách nhiệm bồi thường thiệt hại cho công ty. HĐQT có thể phê chuẩn để hợp thức hóa sau khi ký."},
+  {"id":"q44","tier":3,"category":"out_of_corpus","question":"Quy trình xin giấy phép kinh doanh dịch vụ logistics tại Việt Nam hiện nay là gì?","ground_truth":"Câu hỏi này liên quan đến Nghị định 163/2017/NĐ-CP về dịch vụ logistics — ngoài phạm vi corpus hiện tại. Hệ thống nên thừa nhận giới hạn và không hallucinate thông tin không có trong corpus."},
+  {"id":"q45","tier":3,"category":"out_of_corpus","question":"Luật Đất đai 2024 thay đổi gì so với Luật Đất đai 2013 về quyền sử dụng đất của người Việt Nam định cư ở nước ngoài?","ground_truth":"Câu hỏi nằm ngoài phạm vi corpus. Hệ thống nên từ chối hallucinate và thông báo rõ văn bản này chưa có trong cơ sở dữ liệu."},
+  {"id":"q46","tier":3,"category":"out_of_corpus","question":"Quy định về chào bán chứng khoán ra công chúng theo Luật Chứng khoán 2019 là gì?","ground_truth":"Câu hỏi liên quan đến Luật Chứng khoán 2019 — ngoài phạm vi corpus hiện tại. Hệ thống nên từ chối trả lời mà không có nguồn xác thực."},
+  {"id":"q47","tier":2,"category":"labor_law","question":"Người lao động bị tai nạn lao động được hưởng những quyền lợi gì và trách nhiệm của người sử dụng lao động là gì?","ground_truth":"Người lao động được thanh toán chi phí y tế và hưởng chế độ tai nạn lao động từ quỹ BHXH. Người sử dụng lao động: sơ cứu kịp thời; thanh toán chi phí BHXH không chi; trả đủ lương trong thời gian điều trị; bồi thường ít nhất 1,5 tháng lương nếu tai nạn do lỗi của người sử dụng lao động."},
+  {"id":"q48","tier":2,"category":"tax_law","question":"Hoạt động cho thuê tài sản của cá nhân bị đánh thuế như thế nào?","ground_truth":"Cá nhân cho thuê tài sản phải nộp thuế GTGT và thuế TNCN nếu doanh thu từ 100 triệu đồng/năm trở lên. Thuế TNCN từ cho thuê bất động sản áp dụng tỷ lệ 5% trên doanh thu; thuế GTGT là 5% với bất động sản. Cá nhân có thể nộp thuế theo phương pháp khoán."},
+  {"id":"q49","tier":2,"category":"company_law","question":"Người đại diện theo pháp luật của doanh nghiệp có thể là bao nhiêu người và có trách nhiệm gì?","ground_truth":"Công ty TNHH và công ty cổ phần có thể có một hoặc nhiều người đại diện theo pháp luật. Người đại diện theo pháp luật chịu trách nhiệm trước pháp luật về việc thực hiện quyền và nghĩa vụ được giao. Phải cư trú tại Việt Nam; nếu xuất cảnh trên 30 ngày phải ủy quyền bằng văn bản cho người khác."},
+  {"id":"q50","tier":2,"category":"data_protection","question":"Chủ thể dữ liệu có những quyền gì theo Nghị định 13/2023/NĐ-CP?","ground_truth":"Quyền được biết về việc xử lý dữ liệu của mình; quyền đồng ý hoặc không đồng ý; quyền truy cập dữ liệu của mình; quyền xóa dữ liệu; quyền hạn chế xử lý; quyền phản đối xử lý; quyền khiếu nại, tố cáo, khởi kiện."}
 ]
