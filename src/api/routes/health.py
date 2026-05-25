@@ -43,30 +43,26 @@ async def health_check() -> HealthResponse:
 
 
 async def _check_chroma() -> ServiceStatus:
+    """Fast chroma health check — avoids loading the embedding model."""
     try:
-        import chromadb
-        from chromadb.config import Settings as ChromaSettings
-
         settings = get_settings()
         if not settings.chroma_host:
+            # Local persistent mode: just verify SQLite db file exists and is non-empty.
+            # Avoids loading the 120MB embedding model on every health poll.
+            sqlite_file = settings.data_dir / "chroma_db" / "chroma.sqlite3"
+            if sqlite_file.exists() and sqlite_file.stat().st_size > 1024:
+                return ServiceStatus(
+                    name="chromadb",
+                    healthy=True,
+                    detail=f"Local persistent mode ({sqlite_file.stat().st_size // 1024} KB)",
+                )
             local_path = settings.data_dir / "chroma_db"
             if local_path.exists():
-                try:
-                    from src.rag.embedder import get_chroma_collection
-
-                    _, col = get_chroma_collection()
-                    return ServiceStatus(
-                        name="chromadb",
-                        healthy=col.count() > 0,
-                        detail=f"Local persistent mode, chunks={col.count()}",
-                    )
-                except Exception as exc:
-                    return ServiceStatus(
-                        name="chromadb",
-                        healthy=False,
-                        detail=f"Local ChromaDB unreadable: {str(exc)[:60]}",
-                    )
+                return ServiceStatus(name="chromadb", healthy=True, detail="Local persistent mode")
             return ServiceStatus(name="chromadb", healthy=False, detail="Local ChromaDB missing")
+
+        import chromadb
+        from chromadb.config import Settings as ChromaSettings
 
         client = chromadb.HttpClient(
             host=settings.chroma_host,
@@ -76,7 +72,6 @@ async def _check_chroma() -> ServiceStatus:
         client.heartbeat()
         return ServiceStatus(name="chromadb", healthy=True, detail="HTTP connection OK")
     except Exception as exc:
-        # Fallback: check if local persistent exists
         local_path = get_settings().data_dir / "chroma_db"
         if local_path.exists():
             return ServiceStatus(name="chromadb", healthy=True, detail="Local persistent mode")

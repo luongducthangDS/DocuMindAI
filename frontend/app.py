@@ -43,11 +43,14 @@ if "messages" not in st.session_state:
 def _is_online() -> bool:
     """Kiểm tra backend có hoạt động không."""
     try:
-        r = httpx.get(f"{API_BASE}/api/v1/health", timeout=10)
+        r = httpx.get(f"{API_BASE}/api/v1/health", timeout=30)
+        if r.status_code >= 500:
+            return False
         data = r.json()
-        # Coi là online nếu ít nhất LLM hoặc ChromaDB hoạt động
         services = {s["name"]: s["healthy"] for s in data.get("services", [])}
-        return services.get("llm_groq", False) or services.get("chromadb", False)
+        # Accept any configured LLM (Groq primary or Gemini fallback) + ChromaDB
+        llm_ok = services.get("llm_groq", False) or services.get("llm_gemini", False)
+        return llm_ok or services.get("chromadb", False)
     except Exception:
         return False
 
