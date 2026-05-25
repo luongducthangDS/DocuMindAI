@@ -154,11 +154,13 @@ def retrieve_node(state: AgentState) -> dict:
 
         # retrieve_node runs in a thread (via LangGraph's run_in_executor),
         # so we use the synchronous retrieve() method to avoid nested event loops.
+        # If only aretrieve() exists, use asyncio.run() which creates a fresh loop
+        # in the worker thread (safe because threads don't have a running loop).
         if hasattr(retriever, "retrieve"):
             nodes = retriever.retrieve(query)
         elif hasattr(retriever, "aretrieve"):
             import asyncio
-            nodes = asyncio.get_event_loop().run_until_complete(retriever.aretrieve(query))
+            nodes = asyncio.run(retriever.aretrieve(query))
         else:
             nodes = retriever.retrieve(query)
 
@@ -207,70 +209,60 @@ async def answer_node_async(state: AgentState) -> dict:
     }
 
 
-def compare_node(state: AgentState) -> dict:
+async def compare_node(state: AgentState) -> dict:
     """Retrieve extra context for compare intent."""
-    import asyncio
     from src.agent.tools import compare_documents
 
     query = state["query"]
     try:
-        # Reuse retrieve_node results, then call compare tool
-        result = asyncio.get_event_loop().run_until_complete(
-            compare_documents.ainvoke({
-                "doc_a": query,
-                "doc_b": query,
-                "aspect": query,
-            })
-        )
+        result = await compare_documents.ainvoke({
+            "doc_a": query,
+            "doc_b": query,
+            "aspect": query,
+        })
         return {
             "answer": result,
             "messages": [AIMessage(content=result)],
         }
     except Exception as exc:
         logger.error("compare_node failed: {}", exc)
-        return answer_node(state)
+        return await answer_node_async(state)
 
 
-def summarize_node(state: AgentState) -> dict:
+async def summarize_node(state: AgentState) -> dict:
     """Summarize document."""
-    import asyncio
     from src.agent.tools import summarize_document
 
     query = state["query"]
     try:
-        result = asyncio.get_event_loop().run_until_complete(
-            summarize_document.ainvoke({"doc_title": query, "focus": ""})
-        )
+        result = await summarize_document.ainvoke({"doc_title": query, "focus": ""})
         return {
             "answer": result,
             "messages": [AIMessage(content=result)],
         }
     except Exception as exc:
         logger.error("summarize_node failed: {}", exc)
-        return answer_node(state)
+        return await answer_node_async(state)
 
 
-def report_node(state: AgentState) -> dict:
+async def report_node(state: AgentState) -> dict:
     """Generate PDF report."""
-    import asyncio
     from src.agent.tools import generate_pdf_report
 
     query = state["query"]
     try:
-        result = asyncio.get_event_loop().run_until_complete(
-            generate_pdf_report.ainvoke({
-                "title": f"Báo cáo: {query[:60]}",
-                "query": query,
-                "output_filename": "auto_report",
-            })
-        )
+        result = await generate_pdf_report.ainvoke({
+            "title": f"Báo cáo: {query[:60]}",
+            "query": query,
+            "output_filename": "auto_report",
+        })
         return {
             "answer": result,
             "messages": [AIMessage(content=result)],
         }
     except Exception as exc:
         logger.error("report_node failed: {}", exc)
-        return answer_node(state)
+        return await answer_node_async(state)
 
 
 def persist_node(state: AgentState) -> dict:
