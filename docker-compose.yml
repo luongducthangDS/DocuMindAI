@@ -33,7 +33,7 @@ services:
       retries: 5
     restart: unless-stopped
 
-  # ── FastAPI Backend ─────────────────────────────────────────────────────────
+  # ── FastAPI + React app ─────────────────────────────────────────────────────
   api:
     build:
       context: .
@@ -63,29 +63,6 @@ services:
       timeout: 10s
       start_period: 90s
       retries: 3
-    restart: unless-stopped
-
-  # ── Streamlit Frontend ──────────────────────────────────────────────────────
-  frontend:
-    image: python:3.11-slim
-    working_dir: /app
-    ports:
-      - "8501:8501"
-    environment:
-      - API_BASE_URL=http://api:8080
-    volumes:
-      - ./frontend:/app/frontend
-      - ./requirements.txt:/app/requirements.txt
-    command: >
-      sh -c "pip install --quiet streamlit httpx websockets &&
-             streamlit run frontend/app.py
-             --server.port=8501
-             --server.address=0.0.0.0
-             --server.headless=true
-             --browser.gatherUsageStats=false"
-    depends_on:
-      api:
-        condition: service_healthy
     restart: unless-stopped
 
 volumes:

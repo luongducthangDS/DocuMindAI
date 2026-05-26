@@ -43,7 +43,6 @@ Do not use the local development values below in Railway:
 ```text
 ENVIRONMENT=development
 API_HOST=0.0.0.0
-API_PORT=8081
 EMBEDDING_MODEL=BAAI/bge-m3
 CHROMA_HOST=localhost
 REDIS_URL=redis://localhost:6379/0

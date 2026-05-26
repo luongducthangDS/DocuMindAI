@@ -449,7 +449,7 @@ documind-ai/
 │   ├── agent/           # LangGraph graph, tools, memory
 │   ├── report/          # ReportLab PDF generator
 │   └── api/             # FastAPI + routes + schemas
-├── frontend/            # React + Vite UI (Streamlit app.py is legacy)
+├── frontend/            # React + Vite UI
 ├── tests/               # pytest (ingestion, rag, agent)
 ├── eval/                # RAGAS evaluation harness
 ├── data/
