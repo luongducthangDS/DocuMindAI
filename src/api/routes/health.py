@@ -27,14 +27,20 @@ async def health_check() -> HealthResponse:
         _check_chroma(),
         _check_redis(),
     )
-    services = [chroma, redis, _check_llm(), _check_sqlite()]
+    llm = _check_llm()
+    sqlite = _check_sqlite()
+    services = [chroma, redis, llm, sqlite]
 
-    all_healthy = all(s.healthy for s in services)
-    any_healthy = any(s.healthy for s in services)
+    # Core serving path needs corpus retrieval + an LLM provider.
+    # Redis and SQLite are optional in Railway: Redis is only cache/session
+    # acceleration, and SQLite backs metrics/history best-effort persistence.
+    required = [chroma, llm]
+    all_required_healthy = all(s.healthy for s in required)
+    any_required_healthy = any(s.healthy for s in required)
 
-    if all_healthy:
+    if all_required_healthy:
         overall = "ok"
-    elif any_healthy:
+    elif any_required_healthy:
         overall = "degraded"
     else:
         overall = "error"
