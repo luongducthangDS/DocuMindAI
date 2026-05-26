@@ -141,7 +141,7 @@ User Query (HTTP / WebSocket)
 | Vector DB | ChromaDB 0.6 | Local persistent, cosine similarity |
 | Hybrid Search | BM25 + RRF + cross-encoder | +25% context recall vs naive |
 | Backend | FastAPI + WebSocket | Async, streaming, type-safe |
-| Frontend | Streamlit | Rapid demo, no JS needed |
+| Frontend | React + Vite | Production UI served as static assets by FastAPI |
 | Deploy | Docker + Railway | Auto healthcheck, env vars |
 | Observability | LangSmith + `@traceable` | Every LLM call traced |
 | Eval | RAGAS 0.1.21 | Faithfulness, relevancy, recall |
@@ -325,8 +325,12 @@ python ingest.py --source hf --max-docs 100
 # Start API
 uvicorn src.api.main:app --reload --port 8080
 
-# Start frontend (new terminal)
-streamlit run frontend/app.py
+# Start React frontend in dev mode (new terminal)
+cd frontend
+npm install
+npm run dev
+
+# Production/Railway builds React and serves dist/ from FastAPI
 ```
 
 ---
@@ -445,7 +449,7 @@ documind-ai/
 │   ├── agent/           # LangGraph graph, tools, memory
 │   ├── report/          # ReportLab PDF generator
 │   └── api/             # FastAPI + routes + schemas
-├── frontend/            # Streamlit UI
+├── frontend/            # React + Vite UI (Streamlit app.py is legacy)
 ├── tests/               # pytest (ingestion, rag, agent)
 ├── eval/                # RAGAS evaluation harness
 ├── data/

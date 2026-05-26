@@ -8,11 +8,13 @@ from __future__ import annotations
 import os
 import asyncio
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from loguru import logger
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -21,6 +23,9 @@ from slowapi.util import get_remote_address
 import src.logger  # noqa: F401 — initializes loguru
 from src.api.routes import documents, health, query, reports
 from src.config import get_settings
+
+# React build output (frontend/vite.config.ts → outDir: "../dist")
+DIST_DIR = Path(__file__).resolve().parents[2] / "dist"
 
 
 # ── Startup / Shutdown ────────────────────────────────────────────────────────
@@ -77,12 +82,27 @@ async def ensure_rag_initialized() -> None:
             logger.error("RAG init failed (system will run in degraded mode): {}", exc)
 
 
+_BM25_NODE_CAP = 10_000  # cap BM25 corpus to avoid memory blowup on large collections
+
+
 def _load_nodes_from_collection(collection) -> list:
-    """Convert all ChromaDB documents into LlamaIndex TextNodes for BM25."""
+    """Convert ChromaDB documents into LlamaIndex TextNodes for BM25.
+
+    Caps at _BM25_NODE_CAP nodes — BM25 memory scales linearly with corpus size,
+    and beyond ~10k nodes the index itself exceeds typical Railway free-tier RAM.
+    For very large corpora, consider a dedicated BM25 service (Elasticsearch/Typesense).
+    """
     try:
         from llama_index.core.schema import TextNode
 
-        result = collection.get(include=["documents", "metadatas"])
+        count = collection.count()
+        if count > _BM25_NODE_CAP:
+            logger.warning(
+                "Collection has {} docs; capping BM25 corpus at {} to avoid OOM",
+                count, _BM25_NODE_CAP,
+            )
+
+        result = collection.get(include=["documents", "metadatas"], limit=_BM25_NODE_CAP)
         docs = result.get("documents") or []
         metas = result.get("metadatas") or []
         nodes = [
@@ -90,6 +110,7 @@ def _load_nodes_from_collection(collection) -> list:
             for d, m in zip(docs, metas)
             if d  # skip empty docs
         ]
+        logger.info("Loaded {} BM25 nodes from ChromaDB (collection size: {})", len(nodes), count)
         return nodes
     except Exception as exc:
         logger.warning("Could not load nodes from ChromaDB: {}", exc)
@@ -179,7 +200,14 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    logger.error("Unhandled exception: {} {}", request.url, exc)
+    # Log exc type to distinguish LLM failures, DB errors, validation bugs
+    logger.error(
+        "Unhandled exception [{}] on {} {}: {}",
+        type(exc).__name__,
+        request.method,
+        request.url.path,
+        str(exc)[:500],
+    )
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={"detail": "Internal server error. Please retry."},
@@ -194,6 +222,17 @@ app.include_router(reports.router)
 app.include_router(health.router)
 
 
-@app.get("/", include_in_schema=False)
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def root():
-    return {"service": "DocuMind AI", "version": "1.0.0", "docs": "/docs"}
+    index = DIST_DIR / "index.html"
+    if index.exists():
+        return HTMLResponse(index.read_text())
+    return HTMLResponse(
+        "<h2>Frontend not built. Run: cd frontend && npm run build</h2>",
+        status_code=503,
+    )
+
+
+# Serve React static assets — must be after all API routes
+if DIST_DIR.exists():
+    app.mount("/assets", StaticFiles(directory=str(DIST_DIR / "assets")), name="assets")

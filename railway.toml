@@ -4,35 +4,20 @@ dockerfilePath = "Dockerfile"
 
 [deploy]
 # Railway injects $PORT automatically.
-# Increase timeout: MiniLM (120MB) + cross-encoder (85MB) load + ChromaDB init ≈ 90-150s.
-healthcheckPath = "/_stcore/health"
+# MiniLM (120MB) + cross-encoder (85MB) + ChromaDB init ~90-150s.
+healthcheckPath = "/api/v1/health"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
 
-# ── Static environment variables ───────────────────────────────────────────────
-# These are baked into the Railway service config on deploy.
-# GROQ_API_KEY and GOOGLE_API_KEY must be set separately via:
-#   • Railway dashboard → Variables tab, OR
-#   • run: .\deploy_railway.ps1  (reads from local .env)
 [variables]
 ENVIRONMENT = "production"
-API_HOST = "127.0.0.1"
-API_PORT = "9000"
-API_BASE_URL = "http://127.0.0.1:9000"
 EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 CHROMA_COLLECTION = "documind_legal"
 CHROMA_HOST = ""
-INITIALIZE_RAG_ON_STARTUP = "false"
-ENABLE_RERANKER = "false"
+INITIALIZE_RAG_ON_STARTUP = "true"
+ENABLE_RERANKER = "true"
 LANGCHAIN_TRACING_V2 = "false"
 LANGCHAIN_API_KEY = ""
 REDIS_URL = ""
-# ALLOWED_ORIGINS: set to Railway public URL (e.g. https://your-service.up.railway.app)
-# Streamlit and FastAPI share the same Railway container, so Streamlit calls FastAPI
-# on the loopback (127.0.0.1:9000). CORS only matters for external browser clients
-# that hit the /api/* endpoints directly. Leave empty to allow all origins in production,
-# or set to the Railway public URL.
 ALLOWED_ORIGINS = "*"
-# CHROMA_HOST not set → falls back to local PersistentClient (bundled in Docker image)
-# REDIS_URL not set → sessions use in-process dict (add Railway Redis plugin for persistence)

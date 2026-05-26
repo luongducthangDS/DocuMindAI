@@ -1,19 +1,19 @@
 # Railway Production Checklist
 
-This project runs one Railway service with two processes:
+This project runs one Railway service:
 
-- Streamlit UI: public, listens on Railway `$PORT`
-- FastAPI backend: internal only, listens on `127.0.0.1:9000`
+- FastAPI listens on Railway `$PORT`
+- React + Vite is built during Docker build and served from `dist/` by FastAPI
 
 ## Required Railway Settings
 
-In `Settings -> Networking`, the public domain must target the Streamlit port:
+In `Settings -> Networking`, the public domain must target the FastAPI service port:
 
 ```text
 Port 8080
 ```
 
-If the public domain points to `8081` or `9000`, users will hit the FastAPI backend instead of the UI.
+FastAPI serves the React app at `/` and the API under `/api/v1/*`.
 
 In `Settings -> Deploy`, leave Start Command empty so Dockerfile `CMD` is used. If a command is required, use:
 
@@ -28,13 +28,12 @@ Use `railway.production.env.example` as the source of truth. The most important 
 ```text
 ENVIRONMENT=production
 API_HOST=127.0.0.1
-API_PORT=9000
-API_BASE_URL=http://127.0.0.1:9000
+API_PORT=8080
 EMBEDDING_MODEL=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
 CHROMA_COLLECTION=documind_legal
 CHROMA_HOST=
-INITIALIZE_RAG_ON_STARTUP=false
-ENABLE_RERANKER=false
+INITIALIZE_RAG_ON_STARTUP=true
+ENABLE_RERANKER=true
 LANGCHAIN_TRACING_V2=false
 REDIS_URL=
 ```
@@ -57,9 +56,8 @@ After deploy, logs should include:
 
 ```text
 Starting DocuMind AI - environment: production
-Uvicorn running on http://127.0.0.1:9000
-You can now view your Streamlit app
-URL: http://0.0.0.0:8080
+DocuMind AI ready on 127.0.0.1:8080
+Uvicorn running on http://0.0.0.0:8080
 ```
 
 After the first user query, logs should include:

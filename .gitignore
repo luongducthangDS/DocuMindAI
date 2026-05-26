@@ -40,3 +40,6 @@ data/*.json
 data/*.docx
 data/*.html
 data/*.js
+
+node_modules/
+frontend/node_modules/
