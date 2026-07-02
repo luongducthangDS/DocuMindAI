@@ -43,8 +43,11 @@ services:
         value: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
       - key: INITIALIZE_RAG_ON_STARTUP
         value: "true"
+      # Free tier = 512MB RAM. Reranker mặc định (BAAI/bge-reranker-v2-m3) nặng
+      # ~2.2GB, cộng embedding model gây OOM ngay lúc startup. Tắt reranker để
+      # chạy được trên free tier; bật lại nếu nâng plan có nhiều RAM hơn.
       - key: ENABLE_RERANKER
-        value: "true"
+        value: "false"
       # Bỏ comment 4 dòng dưới sau khi chạy scripts/migrate_chroma_to_qdrant.py
       # để chuyển từ ChromaDB local (ephemeral disk) sang Qdrant Cloud (persistent):
       # - key: VECTOR_STORE_PROVIDER
