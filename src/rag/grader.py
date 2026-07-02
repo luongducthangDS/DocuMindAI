@@ -113,14 +113,14 @@ def grade_chunks(query: str, chunks: list[RetrievedChunk]) -> dict:
     threshold = _effective_min_score()
     best_score = max(c.score for c in chunks)
 
-    if best_score >= threshold * _CONFIDENT_SCORE_MULTIPLIER:
+    # threshold == 0 means the reranker is disabled (e.g. Render free tier) and
+    # the score scale is unreliable — see generator._effective_min_score's own
+    # calibration warning. `best_score >= 0 * multiplier` would then be true for
+    # ANY positive score, short-circuiting every query as "relevant" and making
+    # this whole grading step a no-op. Only take the cheap shortcut when the
+    # threshold is actually meaningful; otherwise always defer to the LLM judge.
+    if threshold > 0 and best_score >= threshold * _CONFIDENT_SCORE_MULTIPLIER:
         return {"relevant": True, "reason": f"Điểm liên quan cao ({best_score:.3f})"}
-
-    if best_score < threshold:
-        # Same chunks the generator would abstain on anyway — still worth one
-        # LLM opinion in case the score scale is off (e.g. reranker disabled),
-        # but if the judge is unavailable, fail open per policy below.
-        pass
 
     judged = _call_judge_llm(query, chunks)
     if judged is None:
