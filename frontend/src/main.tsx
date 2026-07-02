@@ -100,16 +100,59 @@ const SUGGESTED = [
   "Chuẩn đầu ra tin học yêu cầu những gì?",
 ];
 
+// ── Citation helpers ──────────────────────────────────────────────────────────
+function sourceDomId(msgIndex: number, citationN: number) {
+  return `source-${msgIndex}-${citationN}`;
+}
+
+function scrollToSource(msgIndex: number, citationN: number) {
+  const el = document.getElementById(sourceDomId(msgIndex, citationN));
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  el.classList.add("source-card-flash");
+  setTimeout(() => el.classList.remove("source-card-flash"), 1200);
+}
+
+// Splits text on "[N]" citation markers, turning each into a clickable button
+// that scrolls to (and briefly highlights) the matching source card below.
+// The LLM isn't consistent about combined citations ("[1, 2]") vs separate
+// ("[1], [2]") — handle both by splitting each bracket group's numbers into
+// individual clickable buttons.
+function renderWithCitations(text: string, msgIndex: number): React.ReactNode[] {
+  const parts = text.split(/(\[[\d,\s]+\])/g);
+  return parts.flatMap<React.ReactNode>((part, j) => {
+    const m = part.match(/^\[([\d,\s]+)\]$/);
+    if (!m) return [part];
+    const numbers = m[1].split(",").map((s) => s.trim()).filter((s) => /^\d+$/.test(s));
+    if (numbers.length === 0) return [part];
+    return numbers.map((numStr, k) => {
+      const n = Number(numStr);
+      return (
+        <React.Fragment key={`${j}-${k}`}>
+          {k > 0 && ", "}
+          <button
+            className="citation-link"
+            onClick={() => scrollToSource(msgIndex, n)}
+            title={`Xem nguồn [${n}]`}
+          >
+            [{n}]
+          </button>
+        </React.Fragment>
+      );
+    });
+  });
+}
+
 // ── Markdown renderer (lightweight) ───────────────────────────────────────────
-function MdText({ text }: { text: string }) {
+function MdText({ text, msgIndex }: { text: string; msgIndex: number }) {
   return (
     <div className="md">
       {text.split("\n").map((line, i) => {
         if (line.startsWith("### ")) return <h3 key={i}>{line.slice(4)}</h3>;
         if (line.startsWith("## ")) return <h2 key={i}>{line.slice(3)}</h2>;
         if (line.startsWith("# ")) return <h1 key={i}>{line.slice(2)}</h1>;
-        if (/^[\*\-]\s/.test(line)) return <p key={i} className="li">• {line.slice(2)}</p>;
-        if (/^\d+\.\s/.test(line)) return <p key={i} className="li">{line}</p>;
+        if (/^[\*\-]\s/.test(line)) return <p key={i} className="li">• {renderWithCitations(line.slice(2), msgIndex)}</p>;
+        if (/^\d+\.\s/.test(line)) return <p key={i} className="li">{renderWithCitations(line, msgIndex)}</p>;
         if (line.trim() === "---") return <hr key={i} />;
         if (line.trim() === "") return <div key={i} className="br" />;
         // Bold inline
@@ -117,11 +160,11 @@ function MdText({ text }: { text: string }) {
         if (parts.length > 1) {
           return (
             <p key={i}>
-              {parts.map((p, j) => (j % 2 === 1 ? <strong key={j}>{p}</strong> : p))}
+              {parts.map((p, j) => (j % 2 === 1 ? <strong key={j}>{p}</strong> : renderWithCitations(p, msgIndex)))}
             </p>
           );
         }
-        return <p key={i}>{line}</p>;
+        return <p key={i}>{renderWithCitations(line, msgIndex)}</p>;
       })}
     </div>
   );
@@ -163,9 +206,9 @@ function ThinkingPanel({ steps }: { steps: ThinkingStep[] }) {
 }
 
 // ── Source card ────────────────────────────────────────────────────────────────
-function SourceCard({ src }: { src: Source }) {
+function SourceCard({ src, msgIndex }: { src: Source; msgIndex: number }) {
   return (
-    <div className="source-card">
+    <div className="source-card" id={sourceDomId(msgIndex, src.index)}>
       <div className="source-header">
         <span className="source-index">[{src.index}]</span>
       </div>
@@ -401,13 +444,13 @@ function App() {
                         {msg.steps && msg.steps.length > 0 && (
                           <ThinkingPanel steps={msg.steps} />
                         )}
-                        <MdText text={msg.content} />
+                        <MdText text={msg.content} msgIndex={i} />
                         {msg.sources && msg.sources.length > 0 && (
                           <div className="sources-section">
                             <div className="sources-label">Nguồn trích dẫn</div>
                             <div className="sources-list">
                               {msg.sources.map((src) => (
-                                <SourceCard key={src.index} src={src} />
+                                <SourceCard key={src.index} src={src} msgIndex={i} />
                               ))}
                             </div>
                           </div>

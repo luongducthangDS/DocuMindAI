@@ -75,7 +75,9 @@ def _effective_min_score() -> float:
     return _MIN_RELEVANCE_SCORE if get_settings().enable_reranker else 0.0
 
 
-_CITATION_MARKER_RE = re.compile(r"\[(\d+)\]")
+# Matches both "[1]" and combined "[1, 2]" / "[1,2,3]" citation styles —
+# the LLM isn't consistent about which format it uses.
+_CITATION_BRACKET_RE = re.compile(r"\[([\d,\s]+)\]")
 
 
 def _cited_sources(answer: str, chunks: list[RetrievedChunk]) -> list[dict]:
@@ -86,7 +88,12 @@ def _cited_sources(answer: str, chunks: list[RetrievedChunk]) -> list[dict]:
     message — still had all retrieved chunks attached as "sources", making
     an uncited refusal look like a grounded, cited answer.
     """
-    cited_indices = {int(m) for m in _CITATION_MARKER_RE.findall(answer or "")}
+    cited_indices: set[int] = set()
+    for bracket in _CITATION_BRACKET_RE.findall(answer or ""):
+        for piece in bracket.split(","):
+            piece = piece.strip()
+            if piece.isdigit():
+                cited_indices.add(int(piece))
     return [
         {"index": i + 1, **c.metadata, "score": c.score}
         for i, c in enumerate(chunks)

@@ -227,7 +227,25 @@ nav { display: flex; flex-direction: column; gap: 2px; }
   display: flex;
   flex-direction: column;
   gap: 4px;
+  transition: background .3s, border-color .3s;
+  scroll-margin-block: 16px;
 }
+.source-card.source-card-flash {
+  background: rgba(14,165,233,.18);
+  border-color: var(--accent);
+}
+.citation-link {
+  display: inline;
+  background: rgba(14,165,233,.15);
+  color: var(--accent-hover);
+  border: none;
+  border-radius: 4px;
+  padding: 0 3px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.citation-link:hover { background: rgba(14,165,233,.3); text-decoration: underline; }
 .source-header { display: flex; align-items: center; }
 .source-index { font-size: 11px; font-weight: 700; color: var(--accent); }
 .source-dieu { font-size: 12px; font-weight: 600; color: var(--text1); }
