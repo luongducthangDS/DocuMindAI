@@ -91,6 +91,8 @@ nav { display: flex; flex-direction: column; gap: 2px; }
 }
 .nav-item:hover { background: var(--surface2); color: var(--text1); }
 .nav-item.active { background: var(--surface2); color: var(--accent-hover); font-weight: 600; }
+.nav-item:disabled { opacity: .4; cursor: not-allowed; }
+.nav-item:disabled:hover { background: transparent; color: var(--text2); }
 
 .divider { height: 1px; background: var(--border); flex-shrink: 0; }
 

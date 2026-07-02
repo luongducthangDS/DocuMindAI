@@ -72,6 +72,26 @@ function genSessionId() {
   return "s-" + Math.random().toString(36).slice(2, 10);
 }
 
+const LS_SESSION_KEY = "documind_session_id";
+const LS_MESSAGES_KEY = "documind_messages";
+
+function loadStoredSessionId(): string {
+  try {
+    return localStorage.getItem(LS_SESSION_KEY) || genSessionId();
+  } catch {
+    return genSessionId();
+  }
+}
+
+function loadStoredMessages(): Message[] {
+  try {
+    const raw = localStorage.getItem(LS_MESSAGES_KEY);
+    return raw ? (JSON.parse(raw) as Message[]) : [];
+  } catch {
+    return [];
+  }
+}
+
 const SUGGESTED = [
   "Điều kiện để được xét học bổng khuyến khích học tập là gì?",
   "Cách tính điểm rèn luyện của sinh viên như thế nào?",
@@ -162,8 +182,8 @@ function SourceCard({ src }: { src: Source }) {
 
 // ── App ────────────────────────────────────────────────────────────────────────
 function App() {
-  const [sessionId] = useState(genSessionId);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [sessionId, setSessionId] = useState(loadStoredSessionId);
+  const [messages, setMessages] = useState<Message[]>(loadStoredMessages);
   const [question, setQuestion] = useState("");
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState<"chat" | "docs" | "upload">("chat");
@@ -177,6 +197,23 @@ function App() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Persist conversation so a page refresh doesn't wipe it — the backend's
+  // ShortTermMemory is keyed by sessionId, but only the frontend can survive reload.
+  useEffect(() => {
+    try {
+      localStorage.setItem(LS_SESSION_KEY, sessionId);
+      localStorage.setItem(LS_MESSAGES_KEY, JSON.stringify(messages));
+    } catch {
+      // localStorage unavailable (private mode, quota) — conversation just won't persist
+    }
+  }, [sessionId, messages]);
+
+  function newConversation() {
+    const id = genSessionId();
+    setSessionId(id);
+    setMessages([]);
+  }
 
   useEffect(() => {
     api.health().then((d) => setHealth(d.status ?? "unknown")).catch(() => setHealth("error"));
@@ -302,6 +339,14 @@ function App() {
             </button>
           ))}
         </div>
+
+        <button
+          className="nav-item"
+          onClick={newConversation}
+          disabled={messages.length === 0}
+        >
+          🗑️ Cuộc trò chuyện mới
+        </button>
 
         <div className="session-info">
           <span className="session-label">Phiên:</span>
