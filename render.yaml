@@ -44,10 +44,18 @@ services:
       - key: INITIALIZE_RAG_ON_STARTUP
         value: "true"
       # Free tier = 512MB RAM. Reranker mặc định (BAAI/bge-reranker-v2-m3) nặng
-      # ~2.2GB, cộng embedding model gây OOM ngay lúc startup. Tắt reranker để
-      # chạy được trên free tier; bật lại nếu nâng plan có nhiều RAM hơn.
+      # ~2.2GB — bắt buộc phải tắt trên free tier; bật lại nếu nâng plan có nhiều RAM hơn.
       - key: ENABLE_RERANKER
         value: "false"
+      # Model embedding local (paraphrase-multilingual-MiniLM-L12-v2, 458MB trên đĩa)
+      # cộng baseline torch+transformers+llama_index tự nó đã vượt 512MB — tắt reranker
+      # thôi KHÔNG đủ. EMBEDDING_PROVIDER=hf_api gọi HuggingFace Inference API thay vì
+      # load model vào RAM (đã verify: cùng model, vector giống hệt local, không cần
+      # re-index corpus). Cần HF_TOKEN (free, tạo tại huggingface.co/settings/tokens).
+      - key: EMBEDDING_PROVIDER
+        value: hf_api
+      - key: HF_TOKEN
+        sync: false
       # Bỏ comment 4 dòng dưới sau khi chạy scripts/migrate_chroma_to_qdrant.py
       # để chuyển từ ChromaDB local (ephemeral disk) sang Qdrant Cloud (persistent):
       # - key: VECTOR_STORE_PROVIDER

@@ -27,6 +27,11 @@ class Settings(BaseSettings):
     # Generation sẽ xoay vòng 3 key × các model này. Ưu tiên model RPD cao (3.1-flash-lite=500/ngày).
     gemini_generation_models: str = "gemini-2.5-flash-lite,gemini-3.1-flash-lite,gemini-2.5-flash"
     embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    # embedding_provider: "local" (mặc định, load model vào RAM qua sentence-transformers/
+    # torch, ~700MB) hoặc "hf_api" (gọi HuggingFace Inference API, không load model —
+    # dùng cho host RAM thấp như Render free 512MB). Cùng model, cùng vector 384-dim,
+    # corpus ChromaDB không cần re-index. Cần HF_TOKEN khi dùng "hf_api".
+    embedding_provider: str = "local"
 
     # LangSmith
     langchain_tracing_v2: bool = False

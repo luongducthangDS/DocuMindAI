@@ -66,6 +66,14 @@ _EXTRACTIVE_CHARS_PER_SOURCE = 700
 _MIN_RELEVANCE_SCORE = 0.05
 
 
+def _effective_min_score() -> float:
+    """0.05 when the cross-encoder reranker is active (scores are on that scale);
+    0.0 when it's disabled (e.g. Render free tier), per the calibration warning
+    above — raw RRF/BM25 scores never clear 0.05, which would abstain on every
+    query."""
+    return _MIN_RELEVANCE_SCORE if get_settings().enable_reranker else 0.0
+
+
 def _build_context(chunks: list[RetrievedChunk]) -> tuple[str, str]:
     """Returns (context_block, citation_list). Truncates to stay within LLM limits."""
     context_parts = []
@@ -214,7 +222,7 @@ def generate_answer(
     chunks: list[RetrievedChunk],
     use_fallback: bool = False,
     history: list[dict] | None = None,
-    min_score: float = _MIN_RELEVANCE_SCORE,
+    min_score: float | None = None,
 ) -> dict:
     """
     Generate answer with citations.
@@ -235,6 +243,8 @@ def generate_answer(
     # Filter out chunks the reranker scored as irrelevant before calling LLM.
     # Without this, a "hoàn thuế GTGT" query returns forest/labour law chunks
     # (score≈0.01) and the LLM correctly abstains — but we still showed 8 wrong sources.
+    if min_score is None:
+        min_score = _effective_min_score()
     relevant_chunks = [c for c in chunks if c.score >= min_score]
     if not relevant_chunks:
         logger.info(
@@ -298,11 +308,12 @@ async def stream_answer(
         return
 
     # Mirror generate_answer: filter irrelevant chunks before calling LLM
-    relevant_chunks = [c for c in chunks if c.score >= _MIN_RELEVANCE_SCORE]
+    min_score = _effective_min_score()
+    relevant_chunks = [c for c in chunks if c.score >= min_score]
     if not relevant_chunks:
         logger.info(
             "stream_answer: all {} chunks below threshold ({:.2f}) — abstaining",
-            len(chunks), _MIN_RELEVANCE_SCORE,
+            len(chunks), min_score,
         )
         yield (
             "Tôi không tìm thấy văn bản pháp luật liên quan đến câu hỏi này trong cơ sở dữ liệu hiện có.\n\n"

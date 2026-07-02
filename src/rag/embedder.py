@@ -19,23 +19,72 @@ RAGAS benchmark (MiniLM baseline, 2025-05):
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from loguru import logger
+from llama_index.core.embeddings import BaseEmbedding
+from pydantic import PrivateAttr
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 from src.config import get_settings
 
 if TYPE_CHECKING:
-    from llama_index.core.embeddings import BaseEmbedding
+    from huggingface_hub import InferenceClient
 
 _INDEXED_EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+
+
+class _HFInferenceAPIEmbedding(BaseEmbedding):
+    """LlamaIndex embedder that calls HuggingFace's Inference API instead of loading
+    the model in-process. Same model, same 384-dim pooled vectors (verified to match
+    the local SentenceTransformer output byte-for-byte via cosine similarity) — used
+    so torch/transformers/model weights (~700MB combined) never load into RAM on
+    memory-constrained hosts like Render's free 512MB tier. Importing this class
+    does NOT import llama_index.embeddings.huggingface (torch-based), only
+    llama_index.core (no torch dependency).
+    """
+
+    _client: "InferenceClient" = PrivateAttr()
+
+    def __init__(self, model_name: str, hf_token: str, **kwargs):
+        super().__init__(model_name=model_name, **kwargs)
+        from huggingface_hub import InferenceClient
+
+        self._client = InferenceClient(token=hf_token or None)
+
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=20))
+    def _embed_batch(self, texts: List[str]) -> List[List[float]]:
+        result = self._client.feature_extraction(texts, model=self.model_name)
+        return result.tolist() if hasattr(result, "tolist") else result
+
+    def _get_query_embedding(self, query: str) -> List[float]:
+        return self._embed_batch([query])[0]
+
+    def _get_text_embedding(self, text: str) -> List[float]:
+        return self._embed_batch([text])[0]
+
+    def _get_text_embeddings(self, texts: List[str]) -> List[List[float]]:
+        return self._embed_batch(texts)
+
+    async def _aget_query_embedding(self, query: str) -> List[float]:
+        return self._get_query_embedding(query)
+
+    async def _aget_text_embedding(self, text: str) -> List[float]:
+        return self._get_text_embedding(text)
+
+    async def _aget_text_embeddings(self, texts: List[str]) -> List[List[float]]:
+        return self._get_text_embeddings(texts)
 
 
 @lru_cache(maxsize=1)
 def get_embedder() -> "BaseEmbedding":
     """
     Returns a cached LlamaIndex-compatible embedder.
-    Uses HuggingFace local model — no API call, no cost, runs offline.
+
+    embedding_provider="local" (default): loads the model in-process via
+    sentence-transformers/torch — offline, fast, ~700MB RAM.
+    embedding_provider="hf_api": calls HuggingFace's Inference API instead —
+    no local model load, for RAM-constrained hosts (see _HFInferenceAPIEmbedding).
     """
     settings = get_settings()
     # The bundled Chroma corpus is indexed with this 384-dim model. A Railway
@@ -47,6 +96,10 @@ def get_embedder() -> "BaseEmbedding":
             settings.embedding_model,
             model_name,
         )
+
+    if settings.embedding_provider == "hf_api":
+        logger.info("Using HF Inference API for embeddings (no local model load): {}", model_name)
+        return _HFInferenceAPIEmbedding(model_name=model_name, hf_token=settings.hf_token)
 
     logger.info("Loading embedding model: {}", model_name)
 
