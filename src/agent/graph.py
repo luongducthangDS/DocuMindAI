@@ -108,6 +108,85 @@ Chỉ trả về một từ duy nhất (không giải thích)."""
 
 # ── Nodes ──────────────────────────────────────────────────────────────────────
 
+_CONTEXTUALIZE_PROMPT = """Dựa vào lịch sử hội thoại dưới đây, viết lại câu hỏi cuối cùng của \
+người dùng thành một câu hỏi đầy đủ, độc lập, hiểu được mà KHÔNG cần xem lịch sử. Giữ nguyên ý \
+định người dùng, không thêm thông tin bịa. Nếu câu hỏi cuối đã tự đầy đủ ý nghĩa (không phụ \
+thuộc ngữ cảnh trước), giữ nguyên câu hỏi đó.
+
+Lịch sử hội thoại:
+{history_block}
+
+Câu hỏi cuối cùng: {query}
+
+Chỉ trả về câu hỏi đã viết lại (hoặc giữ nguyên), không giải thích."""
+
+
+def _build_history_from_messages(state: AgentState) -> list[dict]:
+    """Same extraction logic as answer_node: LangGraph messages minus the
+    current turn (last HumanMessage), capped to the last 3 turns."""
+    raw_messages = state.get("messages", [])
+    history: list[dict] = []
+    for msg in raw_messages[:-1]:
+        role = "user" if getattr(msg, "type", "") == "human" else "assistant"
+        content = getattr(msg, "content", "")
+        if content:
+            history.append({"role": role, "content": str(content)[:800]})
+    return history[-6:]
+
+
+def _contextualize_query(query: str, history: list[dict]) -> str:
+    """Rewrite a context-dependent follow-up into a standalone question using
+    one cheap LLM call. Falls back to the original query unchanged on any
+    LLM failure — never blocks the turn on this step."""
+    settings = get_settings()
+    if not settings.groq_api_key:
+        return query
+    history_block = "\n".join(
+        f"{'Người dùng' if m['role'] == 'user' else 'Trợ lý'}: {m['content'][:300]}" for m in history
+    )
+    prompt = _CONTEXTUALIZE_PROMPT.format(history_block=history_block, query=query)
+    try:
+        from groq import Groq
+        client = Groq(api_key=settings.groq_api_key)
+        resp = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.0,
+            max_tokens=150,
+        )
+        rewritten = (resp.choices[0].message.content or "").strip().strip('"')
+        return rewritten or query
+    except Exception as exc:
+        logger.warning("contextualize_node LLM failed, using original query: {}", exc)
+        return query
+
+
+def contextualize_node(state: AgentState) -> dict:
+    """Resolve context-dependent follow-ups (e.g. 'các trường hợp khác là gì?')
+    into standalone questions before intent routing/retrieval, using prior
+    conversation turns. No-op — skips the LLM call entirely — when there is
+    no history (first turn), which is the common case."""
+    t0 = time.time()
+    history = _build_history_from_messages(state)
+    query = state["query"]
+
+    if not history:
+        return {"tried_queries": [query]}
+
+    rewritten = _contextualize_query(query, history)
+    if rewritten == query:
+        return {"tried_queries": [query]}
+
+    ms = int((time.time() - t0) * 1000)
+    steps = state.get("steps") or []
+    logger.info("Contextualized follow-up: '{}' -> '{}'", query[:60], rewritten[:60])
+    return {
+        "query": rewritten,
+        "tried_queries": [rewritten],
+        "steps": steps + [{"label": "Diễn giải câu hỏi theo ngữ cảnh", "detail": rewritten, "ms": ms}],
+    }
+
+
 def router_node(state: AgentState) -> dict:
     """Classify query intent."""
     t0 = time.time()
@@ -569,6 +648,7 @@ def build_graph() -> StateGraph:
 
     # Node names must not conflict with AgentState keys.
     # "answer", "sources", "query" etc. are state keys — use prefixed names.
+    g.add_node("do_contextualize", contextualize_node)
     g.add_node("router", router_node)
     g.add_node("do_retrieve", retrieve_node)
     g.add_node("do_grade", grade_node)
@@ -580,7 +660,8 @@ def build_graph() -> StateGraph:
     g.add_node("do_compliance", compliance_check_node)
     g.add_node("do_persist", persist_node)
 
-    g.add_edge(START, "router")
+    g.add_edge(START, "do_contextualize")
+    g.add_edge("do_contextualize", "router")
     g.add_conditional_edges("router", route_by_intent)
     g.add_edge("do_retrieve", "do_grade")
     g.add_conditional_edges(

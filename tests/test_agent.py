@@ -136,6 +136,68 @@ class TestRouter:
         assert route_by_intent({"intent": "invalid"}) == "do_retrieve"
 
 
+# ── Conversation-history-aware query rewriting ──────────────────────────────────
+
+class TestContextualizeNode:
+    def test_no_history_skips_llm_call(self):
+        from langchain_core.messages import HumanMessage
+
+        from src.agent.graph import contextualize_node
+
+        state = {"messages": [HumanMessage(content="Chuẩn đầu ra tin học yêu cầu gì?")],
+                 "query": "Chuẩn đầu ra tin học yêu cầu gì?", "steps": []}
+        with patch("src.agent.graph._contextualize_query") as mock_rewrite:
+            result = contextualize_node(state)
+        mock_rewrite.assert_not_called()
+        assert result["tried_queries"] == [state["query"]]
+        assert "query" not in result  # unchanged, no need to overwrite
+
+    def test_history_present_rewrites_follow_up(self):
+        from langchain_core.messages import AIMessage, HumanMessage
+
+        from src.agent.graph import contextualize_node
+
+        state = {
+            "messages": [
+                HumanMessage(content="Chuẩn đầu ra tin học yêu cầu gì?"),
+                AIMessage(content="Cần UDCNTTCB, IC3/MOS/ICDL, hoặc các trường hợp khác do Hiệu trưởng quyết định."),
+                HumanMessage(content="các trường hợp khác mà bạn nói đến là gì"),
+            ],
+            "query": "các trường hợp khác mà bạn nói đến là gì",
+            "steps": [],
+        }
+        with patch(
+            "src.agent.graph._contextualize_query",
+            return_value="Các trường hợp khác được Hiệu trưởng quyết định miễn chuẩn đầu ra tin học là gì?",
+        ) as mock_rewrite:
+            result = contextualize_node(state)
+
+        mock_rewrite.assert_called_once()
+        assert result["query"] == "Các trường hợp khác được Hiệu trưởng quyết định miễn chuẩn đầu ra tin học là gì?"
+        assert result["tried_queries"] == [result["query"]]
+        assert result["steps"][-1]["label"] == "Diễn giải câu hỏi theo ngữ cảnh"
+
+    def test_rewrite_llm_failure_falls_back_to_original(self, monkeypatch):
+        from src.config import get_settings
+        monkeypatch.setenv("GROQ_API_KEY", "")
+        get_settings.cache_clear()
+
+        from src.agent.graph import _contextualize_query
+
+        result = _contextualize_query("câu hỏi gốc", [{"role": "user", "content": "gì đó"}])
+        assert result == "câu hỏi gốc"
+        get_settings.cache_clear()
+
+    def test_contextualize_wired_before_router_in_compiled_graph(self):
+        """Ensures the node is actually reachable from START, not just defined."""
+        from src.agent.graph import build_graph
+
+        graph = build_graph()
+        # LangGraph compiled graphs expose their node names via get_graph().nodes
+        node_names = set(graph.get_graph().nodes.keys())
+        assert "do_contextualize" in node_names
+
+
 # ── Self-correction retry loop ──────────────────────────────────────────────────
 
 class TestGradingRetryRouting:
