@@ -144,12 +144,10 @@ function ThinkingPanel({ steps }: { steps: ThinkingStep[] }) {
 
 // ── Source card ────────────────────────────────────────────────────────────────
 function SourceCard({ src }: { src: Source }) {
-  const score = Math.round(src.score * 100);
   return (
     <div className="source-card">
       <div className="source-header">
         <span className="source-index">[{src.index}]</span>
-        <span className="source-score">{score}%</span>
       </div>
       {src.dieu_header && <div className="source-dieu">{src.dieu_header}</div>}
       <div className="source-title">{src.title || "Văn bản pháp luật"}</div>
