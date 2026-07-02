@@ -172,6 +172,20 @@ nav { display: flex; flex-direction: column; gap: 2px; }
   border-bottom-left-radius: 4px;
   max-width: 85%;
 }
+.msg-row.assistant .bubble.bubble-noanswer {
+  background: rgba(245, 158, 11, .07);
+  border: 1px solid rgba(245, 158, 11, .35);
+}
+.noanswer-flag {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--yellow);
+  margin-bottom: 8px;
+}
+.noanswer-icon { font-size: 14px; }
 
 /* Typing */
 .typing { display: flex; align-items: center; gap: 4px; padding: 14px 18px; }

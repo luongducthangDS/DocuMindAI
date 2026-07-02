@@ -325,11 +325,20 @@ function App() {
                 </div>
               )}
 
-              {messages.map((msg, i) => (
+              {messages.map((msg, i) => {
+                const noAnswer =
+                  msg.role === "assistant" && (!msg.sources || msg.sources.length === 0);
+                return (
                 <div key={i} className={`msg-row ${msg.role}`}>
-                  <div className="bubble">
+                  <div className={`bubble ${noAnswer ? "bubble-noanswer" : ""}`}>
                     {msg.role === "assistant" ? (
                       <>
+                        {noAnswer && (
+                          <div className="noanswer-flag">
+                            <span className="noanswer-icon">🔍</span>
+                            <span>Không tìm thấy trong dữ liệu hiện có</span>
+                          </div>
+                        )}
                         {msg.steps && msg.steps.length > 0 && (
                           <ThinkingPanel steps={msg.steps} />
                         )}
@@ -360,7 +369,8 @@ function App() {
                     )}
                   </div>
                 </div>
-              ))}
+                );
+              })}
 
               {busy && tab === "chat" && (
                 <div className="msg-row assistant">

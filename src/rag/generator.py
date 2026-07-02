@@ -7,6 +7,7 @@ Retry logic via tenacity; fallback logic on timeout/rate-limit.
 from __future__ import annotations
 
 import asyncio
+import re
 from typing import AsyncIterator
 
 from loguru import logger
@@ -72,6 +73,25 @@ def _effective_min_score() -> float:
     above — raw RRF/BM25 scores never clear 0.05, which would abstain on every
     query."""
     return _MIN_RELEVANCE_SCORE if get_settings().enable_reranker else 0.0
+
+
+_CITATION_MARKER_RE = re.compile(r"\[(\d+)\]")
+
+
+def _cited_sources(answer: str, chunks: list[RetrievedChunk]) -> list[dict]:
+    """Only return sources the answer actually cites via [N] markers.
+
+    Without this, an LLM that correctly declines ("không tìm thấy quy định
+    này...") in its own words — rather than via the hardcoded abstain
+    message — still had all retrieved chunks attached as "sources", making
+    an uncited refusal look like a grounded, cited answer.
+    """
+    cited_indices = {int(m) for m in _CITATION_MARKER_RE.findall(answer or "")}
+    return [
+        {"index": i + 1, **c.metadata, "score": c.score}
+        for i, c in enumerate(chunks)
+        if (i + 1) in cited_indices
+    ]
 
 
 def _build_context(chunks: list[RetrievedChunk]) -> tuple[str, str]:
@@ -289,7 +309,7 @@ def generate_answer(
 
     return {
         "answer": answer,
-        "sources": [{"index": i + 1, **c.metadata, "score": c.score} for i, c in enumerate(chunks)],
+        "sources": _cited_sources(answer, chunks),
         "used_llm": used_llm,
         "chunk_count": len(chunks),
     }
