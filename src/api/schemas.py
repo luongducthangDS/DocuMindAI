@@ -46,6 +46,12 @@ class SourceItem(BaseModel):
     score: float = 0.0
 
 
+class ThinkingStep(BaseModel):
+    label: str
+    detail: str = ""
+    ms: int = 0
+
+
 class QueryResponse(BaseModel):
     answer: str
     sources: list[SourceItem] = []
@@ -53,6 +59,7 @@ class QueryResponse(BaseModel):
     chunk_count: int
     latency_ms: int
     session_id: str
+    steps: list[ThinkingStep] = []
 
 
 # ── Documents ──────────────────────────────────────────────────────────────────

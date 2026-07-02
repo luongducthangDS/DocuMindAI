@@ -11,11 +11,19 @@ interface Source {
   score: number;
 }
 
+interface ThinkingStep {
+  label: string;
+  detail: string;
+  ms: number;
+}
+
 interface Message {
   role: "user" | "assistant";
   content: string;
   sources?: Source[];
   latency_ms?: number;
+  used_llm?: string;
+  steps?: ThinkingStep[];
 }
 
 interface Document {
@@ -28,7 +36,9 @@ interface Document {
 }
 
 // ── API ────────────────────────────────────────────────────────────────────────
-const BASE = "/api/v1";
+// VITE_API_URL: set khi frontend và backend deploy tách domain (vd. Vercel + Render).
+// Không set -> mặc định "/api/v1" (dev local qua Vite proxy, hoặc same-origin).
+const BASE = `${import.meta.env.VITE_API_URL ?? ""}/api/v1`;
 const api = {
   async query(query: string, session_id: string) {
     const r = await fetch(`${BASE}/query`, {
@@ -63,11 +73,11 @@ function genSessionId() {
 }
 
 const SUGGESTED = [
-  "Điều kiện để được hoàn thuế GTGT là gì?",
-  "Mức phạt vi phạm hành chính trong lĩnh vực thuế?",
-  "Thủ tục đăng ký kinh doanh hộ cá thể?",
-  "Quy định về hợp đồng lao động theo thời vụ?",
-  "Điều kiện thành lập công ty TNHH một thành viên?",
+  "Điều kiện để được xét học bổng khuyến khích học tập là gì?",
+  "Cách tính điểm rèn luyện của sinh viên như thế nào?",
+  "Chuẩn đầu ra ngoại ngữ yêu cầu mức độ nào?",
+  "Sinh viên bị trừ điểm rèn luyện trong trường hợp nào?",
+  "Chuẩn đầu ra tin học yêu cầu những gì?",
 ];
 
 // ── Markdown renderer (lightweight) ───────────────────────────────────────────
@@ -93,6 +103,41 @@ function MdText({ text }: { text: string }) {
         }
         return <p key={i}>{line}</p>;
       })}
+    </div>
+  );
+}
+
+// ── Thinking panel ────────────────────────────────────────────────────────────
+const STEP_ICONS: Record<string, string> = {
+  "Phân loại câu hỏi": "🔍",
+  "Tìm kiếm tài liệu": "📚",
+  "Tổng hợp câu trả lời": "🤖",
+};
+
+function ThinkingPanel({ steps }: { steps: ThinkingStep[] }) {
+  const [open, setOpen] = React.useState(false);
+  if (!steps || steps.length === 0) return null;
+  return (
+    <div className="thinking-panel">
+      <button className="thinking-toggle" onClick={() => setOpen(!open)}>
+        <span className="thinking-icon">{open ? "▾" : "▸"}</span>
+        <span>Quá trình xử lý</span>
+        <span className="thinking-count">{steps.length} bước</span>
+      </button>
+      {open && (
+        <div className="thinking-steps">
+          {steps.map((s, i) => (
+            <div key={i} className="thinking-step">
+              <span className="step-icon">{STEP_ICONS[s.label] ?? "⚙️"}</span>
+              <div className="step-body">
+                <span className="step-label">{s.label}</span>
+                {s.detail && <span className="step-detail">{s.detail}</span>}
+              </div>
+              <span className="step-ms">{s.ms}ms</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -164,6 +209,8 @@ function App() {
           content: d.answer ?? "",
           sources: d.sources ?? [],
           latency_ms: d.latency_ms,
+          used_llm: d.used_llm,
+          steps: d.steps ?? [],
         },
       ]);
     } catch (e: unknown) {
@@ -211,7 +258,7 @@ function App() {
           </svg>
           <div>
             <div className="brand-name">DocuMind AI</div>
-            <div className="brand-sub">Pháp luật Việt Nam</div>
+            <div className="brand-sub">Hỗ trợ sinh viên UNETI</div>
           </div>
         </div>
 
@@ -227,7 +274,7 @@ function App() {
             className={`nav-item${tab === "chat" ? " active" : ""}`}
             onClick={() => setTab("chat")}
           >
-            💬 Hỏi đáp pháp luật
+            💬 Hỏi đáp nội quy trường
           </button>
           <button
             className={`nav-item${tab === "docs" ? " active" : ""}`}
@@ -272,10 +319,10 @@ function App() {
             <div className="messages">
               {messages.length === 0 && (
                 <div className="empty">
-                  <div className="empty-icon">⚖️</div>
-                  <div className="empty-title">Tra cứu văn bản pháp luật</div>
+                  <div className="empty-icon">🎓</div>
+                  <div className="empty-title">Hỏi đáp nội quy UNETI</div>
                   <div className="empty-sub">
-                    Đặt câu hỏi bằng tiếng Việt — trả lời kèm trích dẫn điều khoản
+                    Đặt câu hỏi về học bổng, điểm rèn luyện, chuẩn đầu ra — trả lời kèm trích dẫn quy định
                   </div>
                 </div>
               )}
@@ -285,10 +332,13 @@ function App() {
                   <div className="bubble">
                     {msg.role === "assistant" ? (
                       <>
+                        {msg.steps && msg.steps.length > 0 && (
+                          <ThinkingPanel steps={msg.steps} />
+                        )}
                         <MdText text={msg.content} />
                         {msg.sources && msg.sources.length > 0 && (
                           <div className="sources-section">
-                            <div className="sources-label">Nguồn tham khảo</div>
+                            <div className="sources-label">Nguồn trích dẫn</div>
                             <div className="sources-list">
                               {msg.sources.map((src) => (
                                 <SourceCard key={src.index} src={src} />
@@ -296,9 +346,16 @@ function App() {
                             </div>
                           </div>
                         )}
-                        {msg.latency_ms && (
-                          <div className="latency">{msg.latency_ms}ms</div>
-                        )}
+                        <div className="msg-meta">
+                          {msg.used_llm && msg.used_llm !== "none" && (
+                            <span className={`llm-badge ${msg.used_llm.startsWith("groq") ? "badge-groq" : msg.used_llm.startsWith("gemini") ? "badge-gemini" : "badge-fallback"}`}>
+                              {msg.used_llm === "groq" ? "Llama 3.3 70B" : msg.used_llm === "gemini" ? "Gemini" : msg.used_llm === "extractive_fallback" ? "Trích xuất trực tiếp" : msg.used_llm}
+                            </span>
+                          )}
+                          {msg.latency_ms && (
+                            <span className="latency">{msg.latency_ms}ms</span>
+                          )}
+                        </div>
                       </>
                     ) : (
                       msg.content

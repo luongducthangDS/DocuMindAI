@@ -8,7 +8,7 @@ import sqlite3
 import uuid
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from loguru import logger
@@ -58,7 +58,7 @@ class LongTermMemory:
 
     @contextmanager
     def _connect(self):
-        conn = sqlite3.connect(str(self._db))
+        conn = sqlite3.connect(str(self._db), check_same_thread=False)
         conn.row_factory = sqlite3.Row
         try:
             yield conn
@@ -93,6 +93,29 @@ class LongTermMemory:
 
                 CREATE INDEX IF NOT EXISTS idx_query_log_session
                     ON query_log(session_id);
+
+                CREATE TABLE IF NOT EXISTS upload_log (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    filename TEXT NOT NULL,
+                    file_size_bytes INTEGER,
+                    indexed_chunks INTEGER,
+                    status TEXT NOT NULL,
+                    error_detail TEXT,
+                    ip_address TEXT,
+                    user_agent TEXT,
+                    created_at TEXT NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS error_log (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    endpoint TEXT NOT NULL,
+                    error_type TEXT NOT NULL,
+                    session_id TEXT,
+                    created_at TEXT NOT NULL
+                );
+
+                CREATE INDEX IF NOT EXISTS idx_error_log_created
+                    ON error_log(created_at);
             """)
         logger.debug("LongTermMemory DB initialized: {}", self._db)
 
@@ -156,3 +179,62 @@ class LongTermMemory:
                 (session_id, limit),
             ).fetchall()
         return [dict(r) for r in rows]
+
+    def log_upload(
+        self,
+        filename: str,
+        file_size_bytes: int,
+        indexed_chunks: int,
+        status: str,
+        error_detail: str | None = None,
+        ip_address: str | None = None,
+        user_agent: str | None = None,
+    ) -> None:
+        now = datetime.utcnow().isoformat()
+        with self._connect() as conn:
+            conn.execute(
+                """INSERT INTO upload_log
+                   (filename, file_size_bytes, indexed_chunks, status, error_detail,
+                    ip_address, user_agent, created_at)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                (filename[:260], file_size_bytes, indexed_chunks, status,
+                 error_detail, ip_address, user_agent, now),
+            )
+
+    def log_error(
+        self,
+        endpoint: str,
+        error_type: str,
+        session_id: str | None = None,
+    ) -> None:
+        now = datetime.utcnow().isoformat()
+        with self._connect() as conn:
+            conn.execute(
+                """INSERT INTO error_log (endpoint, error_type, session_id, created_at)
+                   VALUES (?, ?, ?, ?)""",
+                (endpoint, error_type, session_id, now),
+            )
+
+    def get_error_rate(self, window_minutes: int = 60) -> float:
+        since = (datetime.utcnow() - timedelta(minutes=window_minutes)).isoformat()
+        with self._connect() as conn:
+            errors = conn.execute(
+                "SELECT COUNT(*) FROM error_log WHERE created_at >= ?", (since,)
+            ).fetchone()[0]
+            queries = conn.execute(
+                "SELECT COUNT(*) FROM query_log WHERE created_at >= ?", (since,)
+            ).fetchone()[0]
+        if queries == 0:
+            return 0.0
+        return round(errors / queries, 4)
+
+
+# Process-level singleton — one instance per worker process
+_ltm: LongTermMemory | None = None
+
+
+def get_long_term_memory() -> LongTermMemory:
+    global _ltm
+    if _ltm is None:
+        _ltm = LongTermMemory()
+    return _ltm

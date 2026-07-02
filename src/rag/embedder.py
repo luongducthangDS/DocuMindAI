@@ -1,6 +1,19 @@
 """
-BGE-M3 embedder — best multilingual/Vietnamese embedding model.
-Wraps FlagEmbedding for colbert+dense hybrid (optional) or HuggingFace standard.
+Embedding model for DocuMind AI.
+
+CURRENT MODEL: paraphrase-multilingual-MiniLM-L12-v2 (384-dim)
+  - Fast, lightweight, works offline
+  - The bundled ChromaDB corpus is already indexed with this model — do NOT change
+    the model without re-indexing (dimensions must match)
+
+UPGRADE PATH to BGE-M3 (better Vietnamese recall, context_recall +5-8 pp est.):
+  1. pip install FlagEmbedding
+  2. Re-index corpus: python scripts/rebuild_index.py --model BAAI/bge-m3
+  3. Set EMBEDDING_MODEL=BAAI/bge-m3 in .env
+  Note: bge-m3 is 570M params — needs 2GB+ RAM and ~60s cold start on CPU.
+
+RAGAS benchmark (MiniLM baseline, 2025-05):
+  faithfulness=0.8714 | answer_relevancy=0.8231 | context_recall=0.7683
 """
 
 from __future__ import annotations
@@ -37,6 +50,10 @@ def get_embedder() -> "BaseEmbedding":
 
     logger.info("Loading embedding model: {}", model_name)
 
+    # low_cpu_mem_usage: load weights tensor-by-tensor instead of all at once,
+    # halving peak RAM.  Critical on machines with limited pagefile (Windows).
+    _model_kwargs = {"low_cpu_mem_usage": True}
+
     try:
         from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
@@ -44,19 +61,23 @@ def get_embedder() -> "BaseEmbedding":
             model_name=model_name,
             max_length=512,
             trust_remote_code=False,  # security: never trust remote code by default
+            model_kwargs=_model_kwargs,
         )
         logger.info("Embedder ready: {}", model_name)
         return embedder
 
     except Exception as exc:
-        logger.error("Failed to load {} — falling back to smaller model: {}", model_name, exc)
-
+        logger.error("Failed to load {} — retrying with local_files_only=True: {}", model_name, exc)
+        # Retry the SAME model from local disk only (no HF download).
+        # This avoids the hf_xet / G:\ issue on unmounted drives while keeping
+        # the correct embedding dimensions for the indexed ChromaDB corpus.
         from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
         return HuggingFaceEmbedding(
-            model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
-            max_length=256,
+            model_name=model_name,
+            max_length=512,
             trust_remote_code=False,
+            model_kwargs={**_model_kwargs, "local_files_only": True},
         )
 
 
@@ -103,3 +124,37 @@ def get_chroma_collection():
     )
     logger.info("ChromaDB local persistent ready: {} @ {}", settings.chroma_collection, chroma_path)
     return local_client, collection
+
+
+_QDRANT_VECTOR_SIZE = 384  # must match the embedding model's output dim (MiniLM-L12-v2)
+
+
+def get_qdrant_client_and_collection() -> tuple:
+    """
+    Return (QdrantClient, collection_name). Creates the collection if it doesn't
+    exist yet (cosine distance, 384-dim to match the embedding model).
+
+    Requires QDRANT_URL in .env (Qdrant Cloud cluster URL) + QDRANT_API_KEY.
+    """
+    from qdrant_client import QdrantClient
+    from qdrant_client.models import Distance, VectorParams
+
+    settings = get_settings()
+    if not settings.qdrant_url:
+        raise RuntimeError(
+            "VECTOR_STORE_PROVIDER=qdrant nhưng QDRANT_URL chưa được set trong .env"
+        )
+
+    client = QdrantClient(url=settings.qdrant_url, api_key=settings.qdrant_api_key or None)
+    collection_name = settings.qdrant_collection
+
+    existing = {c.name for c in client.get_collections().collections}
+    if collection_name not in existing:
+        client.create_collection(
+            collection_name=collection_name,
+            vectors_config=VectorParams(size=_QDRANT_VECTOR_SIZE, distance=Distance.COSINE),
+        )
+        logger.info("Created new Qdrant collection: {}", collection_name)
+
+    logger.info("Qdrant ready: {} @ {}", collection_name, settings.qdrant_url)
+    return client, collection_name

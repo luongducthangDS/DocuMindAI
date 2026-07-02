@@ -1,0 +1,81 @@
+{
+  "timestamp": "2026-06-19T00:43:47Z",
+  "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+  "corpus_chunks": 843,
+  "results": {
+    "dense_only": {
+      "strategy": "dense_only",
+      "n_items": 50,
+      "latency": {
+        "mean_ms": 1419.7,
+        "median_ms": 1312.8,
+        "p95_ms": 3174.4,
+        "min_ms": 450.7,
+        "max_ms": 4271.6
+      },
+      "ragas": {},
+      "retrieval_local": {
+        "hit_rate": 0.9149,
+        "mrr": 0.8387,
+        "avg_chunks": 5,
+        "items_with_context": 50
+      },
+      "generation_local": {
+        "answer_correctness_semantic": 0.2799,
+        "answer_correctness_f1": 0.2333
+      },
+      "domain": {
+        "citation_rate": 1.0,
+        "ooc_refusal_rate": 0.0
+      }
+    },
+    "hybrid": {
+      "strategy": "hybrid",
+      "n_items": 50,
+      "latency": {
+        "mean_ms": 1651.2,
+        "median_ms": 1604.5,
+        "p95_ms": 3040.5,
+        "min_ms": 829.1,
+        "max_ms": 4513.8
+      },
+      "ragas": {},
+      "retrieval_local": {
+        "hit_rate": 0.9362,
+        "mrr": 0.8652,
+        "avg_chunks": 20,
+        "items_with_context": 50
+      },
+      "generation_local": {
+        "answer_correctness_semantic": 0.263,
+        "answer_correctness_f1": 0.2019
+      },
+      "domain": {
+        "citation_rate": 1.0,
+        "ooc_refusal_rate": 1.0
+      }
+    }
+  },
+  "summary": {
+    "dense_vs_bm25": {
+      "faithfulness_delta_pct": null,
+      "context_recall_delta_pct": null
+    },
+    "hybrid_vs_dense": {
+      "faithfulness_delta_pct": null,
+      "answer_relevancy_delta_pct": null,
+      "context_recall_delta_pct": null,
+      "latency_overhead_pct": 16.3
+    },
+    "rerank_vs_hybrid": {
+      "faithfulness_delta_pct": null,
+      "answer_relevancy_delta_pct": null,
+      "context_recall_delta_pct": null,
+      "latency_overhead_pct": null
+    },
+    "rerank_vs_dense": {
+      "faithfulness_delta_pct": null,
+      "context_recall_delta_pct": null
+    }
+  }
+}

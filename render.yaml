@@ -1,0 +1,55 @@
+# Render Blueprint — DocuMind AI backend (FastAPI + ChromaDB local, Docker).
+# Dùng: Render dashboard → New → Blueprint → point vào repo này.
+# Dùng chung Dockerfile hiện có (multi-stage, đã build sẵn React vào /app/dist —
+# phần static đó không dùng tới khi frontend deploy riêng ở Vercel, vô hại nếu để lại).
+#
+# LƯU Ý QUAN TRỌNG: Render free/starter web service có disk ephemeral — tài liệu
+# người dùng upload qua /api/v1/upload sẽ MẤT khi service restart/redeploy vì
+# ChromaDB ghi vào ./data (không persist). Corpus gốc (91 chunks, baked vào image
+# lúc build) thì không sao vì nó nằm trong image, không phải ở data volume.
+# Muốn upload bền vững -> cần persistent disk (Render add-on trả phí) hoặc
+# migrate sang Qdrant Cloud (xem task migration riêng).
+
+services:
+  - type: web
+    name: documind-ai-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: starter
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: GOOGLE_API_KEY_2
+        sync: false
+      - key: GOOGLE_API_KEY_3
+        sync: false
+      - key: API_SECRET_KEY
+        generateValue: true
+      - key: ENVIRONMENT
+        value: production
+      # Điền domain Vercel thật sau khi deploy frontend, vd:
+      # https://documind-ai.vercel.app
+      - key: ALLOWED_ORIGINS
+        value: https://your-frontend.vercel.app
+      - key: PRIMARY_LLM
+        value: groq/llama-3.3-70b-versatile
+      - key: FALLBACK_LLM
+        value: gemini/gemini-2.5-flash-lite
+      - key: EMBEDDING_MODEL
+        value: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+      - key: INITIALIZE_RAG_ON_STARTUP
+        value: "true"
+      - key: ENABLE_RERANKER
+        value: "true"
+      # Bỏ comment 4 dòng dưới sau khi chạy scripts/migrate_chroma_to_qdrant.py
+      # để chuyển từ ChromaDB local (ephemeral disk) sang Qdrant Cloud (persistent):
+      # - key: VECTOR_STORE_PROVIDER
+      #   value: qdrant
+      # - key: QDRANT_URL
+      #   sync: false
+      # - key: QDRANT_API_KEY
+      #   sync: false

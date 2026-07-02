@@ -36,7 +36,9 @@ async def lifespan(app: FastAPI):
     settings = get_settings()
     settings.ensure_dirs()
 
-    logger.info("Starting DocuMind AI — environment: {}", settings.environment)
+    logger.info("=" * 60)
+    logger.info("SESSION START — DocuMind AI environment: {}", settings.environment)
+    logger.info("=" * 60)
 
     # Set LangSmith env vars
     if settings.langchain_api_key:
@@ -55,7 +57,8 @@ async def lifespan(app: FastAPI):
     logger.info("DocuMind AI ready on {}:{}", settings.api_host, port)
     yield
 
-    logger.info("DocuMind AI shutting down")
+    logger.info("SESSION END — DocuMind AI shutting down")
+    logger.info("=" * 60)
 
 
 _rag_init_lock = asyncio.Lock()
@@ -85,46 +88,44 @@ async def ensure_rag_initialized() -> None:
 _BM25_NODE_CAP = 10_000  # cap BM25 corpus to avoid memory blowup on large collections
 
 
-def _load_nodes_from_collection(collection) -> list:
-    """Convert ChromaDB documents into LlamaIndex TextNodes for BM25.
+def _load_nodes_from_backend(backend) -> list:
+    """Convert vector store documents into LlamaIndex TextNodes for BM25.
 
-    Caps at _BM25_NODE_CAP nodes — BM25 memory scales linearly with corpus size,
-    and beyond ~10k nodes the index itself exceeds typical Railway free-tier RAM.
-    For very large corpora, consider a dedicated BM25 service (Elasticsearch/Typesense).
+    Provider-agnostic (works for both Chroma and Qdrant backends). Caps at
+    _BM25_NODE_CAP nodes — BM25 memory scales linearly with corpus size,
+    and beyond ~10k nodes the index itself exceeds typical Railway/Render
+    free-tier RAM. For very large corpora, consider a dedicated BM25 service
+    (Elasticsearch/Typesense).
     """
     try:
         from llama_index.core.schema import TextNode
+        from src.rag.vector_backend import fetch_all_chunks, count_chunks
 
-        count = collection.count()
+        count = count_chunks(backend)
         if count > _BM25_NODE_CAP:
             logger.warning(
                 "Collection has {} docs; capping BM25 corpus at {} to avoid OOM",
                 count, _BM25_NODE_CAP,
             )
 
-        result = collection.get(include=["documents", "metadatas"], limit=_BM25_NODE_CAP)
-        docs = result.get("documents") or []
-        metas = result.get("metadatas") or []
-        nodes = [
-            TextNode(text=d, metadata=m or {})
-            for d, m in zip(docs, metas)
-            if d  # skip empty docs
-        ]
-        logger.info("Loaded {} BM25 nodes from ChromaDB (collection size: {})", len(nodes), count)
+        chunks = fetch_all_chunks(backend, limit=_BM25_NODE_CAP)
+        nodes = [TextNode(text=text, metadata=metadata) for text, metadata in chunks]
+        logger.info("Loaded {} BM25 nodes from {} (collection size: {})",
+                     len(nodes), backend.provider, count)
         return nodes
     except Exception as exc:
-        logger.warning("Could not load nodes from ChromaDB: {}", exc)
+        logger.warning("Could not load nodes from {}: {}", getattr(backend, "provider", "?"), exc)
         return []
 
 
 def _init_rag_sync() -> None:
     """Synchronous RAG initialization — called from thread pool."""
     from llama_index.core import Settings as LlamaSettings, VectorStoreIndex
-    from llama_index.vector_stores.chroma import ChromaVectorStore
     from llama_index.core import StorageContext
     import src.rag.retriever as r_module
 
-    from src.rag.embedder import get_embedder, get_chroma_collection
+    from src.rag.embedder import get_embedder
+    from src.rag.vector_backend import get_backend, make_llamaindex_vector_store, count_chunks
     from src.rag.retriever import build_hybrid_retriever
     settings = get_settings()
 
@@ -132,10 +133,12 @@ def _init_rag_sync() -> None:
     LlamaSettings.embed_model = embedder
     LlamaSettings.llm = None  # We call LLM directly via Groq SDK
 
-    chroma_client, collection = get_chroma_collection()
-    logger.info("ChromaDB collection '{}' has {} chunks", collection.name, collection.count())
+    backend = get_backend()
+    collection_name = backend.collection.name if backend.provider == "chroma" else backend.collection
+    logger.info("Vector store '{}' ({}) has {} chunks",
+                collection_name, backend.provider, count_chunks(backend))
 
-    vector_store = ChromaVectorStore(chroma_collection=collection)
+    vector_store = make_llamaindex_vector_store(backend)
     storage_ctx = StorageContext.from_defaults(vector_store=vector_store)
 
     index = VectorStoreIndex.from_vector_store(
@@ -144,9 +147,9 @@ def _init_rag_sync() -> None:
         embed_model=embedder,
     )
 
-    # Load existing nodes from ChromaDB for BM25 corpus
-    existing_nodes = _load_nodes_from_collection(collection)
-    logger.info("Loaded {} nodes from ChromaDB for BM25 index", len(existing_nodes))
+    # Load existing nodes from the vector store for the BM25 corpus
+    existing_nodes = _load_nodes_from_backend(backend)
+    logger.info("Loaded {} nodes from {} for BM25 index", len(existing_nodes), backend.provider)
 
     # Expose to other modules
     r_module._active_index = index
@@ -191,6 +194,19 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization"],
 )
 app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    import time
+    t0 = time.time()
+    response = await call_next(request)
+    ms = int((time.time() - t0) * 1000)
+    path = request.url.path
+    if not path.startswith("/assets"):  # skip static file noise
+        logger.info("{} {} → {} ({}ms)", request.method, path, response.status_code, ms)
+    return response
+
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)

@@ -5,6 +5,13 @@ from loguru import logger
 
 from src.config import get_settings
 
+# Windows console defaults to cp1252 which cannot encode Vietnamese or emoji.
+# Reconfigure before loguru sets up its stderr sink so all log output is UTF-8.
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 
 def setup_logger() -> None:
     settings = get_settings()

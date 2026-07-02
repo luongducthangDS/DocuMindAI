@@ -15,8 +15,17 @@ class Settings(BaseSettings):
     # LLM
     groq_api_key: str = ""
     google_api_key: str = ""
+    google_api_key_2: str = ""
+    google_api_key_3: str = ""
+    gemini_judge_models: str = "gemini-3.1-flash-lite"
     primary_llm: str = "groq/llama-3.3-70b-versatile"
     fallback_llm: str = "gemini/gemini-2.5-flash-lite"
+    # generator_provider: nhà cung cấp sinh câu trả lời. "groq" (mặc định, llama-3.3-70b)
+    # hoặc "gemini" (bỏ qua Groq, dùng thẳng Gemini — hữu ích khi Groq cạn TPD/ngày).
+    generator_provider: str = "groq"
+    # gemini_generation_models: danh sách model Gemini cho generation, phân cách dấu phẩy.
+    # Generation sẽ xoay vòng 3 key × các model này. Ưu tiên model RPD cao (3.1-flash-lite=500/ngày).
+    gemini_generation_models: str = "gemini-2.5-flash-lite,gemini-3.1-flash-lite,gemini-2.5-flash"
     embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 
     # LangSmith
@@ -28,17 +37,27 @@ class Settings(BaseSettings):
     # HuggingFace
     hf_token: str = ""
 
+    # Vector store — "chroma" (mặc định, local/self-hosted) hoặc "qdrant" (Qdrant Cloud,
+    # xem default-tech-stack: production nên dùng Qdrant Cloud). Đổi provider chỉ cần
+    # đổi biến này + set QDRANT_URL/QDRANT_API_KEY, không cần sửa code retrieval.
+    vector_store_provider: str = "chroma"
+
     # ChromaDB
     chroma_host: str = ""
     chroma_port: int = 8000
     chroma_collection: str = "documind_legal"
+
+    # Qdrant Cloud
+    qdrant_url: str = ""
+    qdrant_api_key: str = ""
+    qdrant_collection: str = "documind_legal"
 
     # Redis
     redis_url: str = "redis://localhost:6379/0"
 
     # FastAPI
     api_host: str = "0.0.0.0"
-    api_port: int = 8080
+    api_port: int = 8081
     api_secret_key: str = "change-me"
     environment: str = "development"
     allowed_origins: str = "http://localhost:8501"
@@ -47,8 +66,17 @@ class Settings(BaseSettings):
     rate_limit_per_minute: int = 10
 
     # Runtime resource controls
-    initialize_rag_on_startup: bool = False
-    enable_reranker: bool = False
+    # initialize_rag_on_startup=True: pre-warms embedder + ChromaDB during lifespan startup,
+    # avoiding cold-start on first user query (~8-12s penalty). Set False for dev/local.
+    initialize_rag_on_startup: bool = True
+    # enable_reranker=True: cross-encoder reranker runs locally (no API), adds ~150ms,
+    # improves context_precision measurably. Set False to reduce memory on constrained hosts.
+    enable_reranker: bool = True
+    # reranker_model: cross-encoder for reranking. Default is the multilingual
+    # BGE reranker (handles Vietnamese natively). For low-RAM hosts you can fall
+    # back to the smaller English "cross-encoder/ms-marco-MiniLM-L-6-v2" via .env,
+    # but it scores Vietnamese pairs poorly. bge-reranker-v2-m3 ≈ 2.2GB on first download.
+    reranker_model: str = "BAAI/bge-reranker-v2-m3"
 
     # Storage
     data_dir: Path = Path("./data")

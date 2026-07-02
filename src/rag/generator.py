@@ -1,4 +1,4 @@
-﻿"""
+"""
 LLM generation with mandatory citations.
 Primary: Groq Llama-3.3-70B | Fallback: Gemini 2.0 Flash Lite
 Retry logic via tenacity; fallback logic on timeout/rate-limit.
@@ -29,14 +29,20 @@ except ImportError:
             return fn
         return decorator
 
-_SYSTEM_PROMPT = """Bạn là trợ lý pháp lý chuyên về luật Việt Nam.
-Chỉ trả lời dựa trên các đoạn văn bản pháp luật được cung cấp.
+_SYSTEM_PROMPT = """Bạn là trợ lý tra cứu quy định nội bộ của Trường Đại học Kinh tế - Kỹ thuật Công nghiệp (UNETI). Bạn CHỈ trả lời về quy định của UNETI, và CHỈ dựa trên các đoạn văn bản được cung cấp.
+
 Quy tắc bắt buộc:
 1. Mỗi câu trả lời PHẢI trích dẫn inline [số thứ tự nguồn] khi dùng thông tin từ đoạn đó.
-2. Nếu không có thông tin trong văn bản, nói rõ: "Tôi không tìm thấy quy định này trong tài liệu hiện có."
-3. KHÔNG bịa đặt hoặc suy luận ngoài văn bản được cung cấp.
-4. Ngôn ngữ: tiếng Việt, rõ ràng, chính xác.
-5. KHÔNG liệt kê lại danh sách nguồn ở cuối — hệ thống sẽ tự động thêm."""
+2. Nếu câu hỏi nhắc tới một văn bản của UNETI theo số/tên (ví dụ "QĐ-853", "QĐ-740"), hãy coi các đoạn được cung cấp là nội dung của văn bản đó và trả lời theo NỘI DUNG — KHÔNG từ chối chỉ vì số/tên văn bản không lặp lại nguyên văn trong đoạn.
+3. Nếu chỉ có một phần thông tin trong các đoạn, hãy trả lời phần có và nêu rõ phần nào chưa có.
+4. TỪ CHỐI (trả lời đúng câu: "Tôi không tìm thấy quy định này trong tài liệu hiện có.") trong các trường hợp:
+   - Câu hỏi về một trường/tổ chức khác, KHÔNG phải UNETI.
+   - Nội dung được hỏi (học phí, lịch thi, điểm chuẩn, tuyển sinh, ký túc xá... hoặc bất kỳ thông tin nào) KHÔNG xuất hiện trong các đoạn được cung cấp.
+   - Câu hỏi nằm ngoài phạm vi các đoạn văn bản được cung cấp.
+   Tuyệt đối KHÔNG suy đoán hay lấp bằng kiến thức bên ngoài đoạn văn bản.
+5. KHÔNG bịa đặt số liệu, điều kiện hay quy định không có trong các đoạn được cung cấp.
+6. Ngôn ngữ: tiếng Việt, rõ ràng, chính xác.
+7. KHÔNG liệt kê lại danh sách nguồn ở cuối — hệ thống sẽ tự động thêm."""
 
 _CITATION_SUFFIX = "\n\n**Nguồn trích dẫn:**\n{citations}"
 
@@ -48,8 +54,16 @@ _GROQ_ERRORS = (
 
 
 _MAX_CHUNK_CHARS = 3_000   # ~750 tokens per chunk
-_MAX_TOTAL_CHARS = 12_000  # ~3000 tokens total context
+_MAX_TOTAL_CHARS = 15_000  # ~3750 tokens — expanded to support top_k=20 candidate set
 _EXTRACTIVE_CHARS_PER_SOURCE = 700
+
+# Abstain gate calibrated for the CROSS-ENCODER reranker score (production path):
+# relevant chunks score well above 0.05, OOC chunks below.
+# WARNING: this scale does NOT match other retrievers. Raw RRF fusion scores are
+# ~1/(60+rank) ≈ 0.016 (always < 0.05 → would abstain on everything); raw BM25
+# scores are on yet another scale. Callers using a non-reranked retriever MUST
+# pass an appropriate `min_score` (e.g. 0.0 to disable the gate).
+_MIN_RELEVANCE_SCORE = 0.05
 
 
 def _build_context(chunks: list[RetrievedChunk]) -> tuple[str, str]:
@@ -107,27 +121,39 @@ def _get_groq_client():
     return Groq(api_key=settings.groq_api_key)
 
 
-def _get_gemini_client():
-    import google.generativeai as genai
-
-    settings = get_settings()
-    if not settings.google_api_key:
-        raise RuntimeError("GOOGLE_API_KEY not set")
-    genai.configure(api_key=settings.google_api_key)
-    return genai.GenerativeModel("gemini-2.5-flash-lite")
+def _gemini_keys() -> list[str]:
+    s = get_settings()
+    return [k for k in (s.google_api_key, s.google_api_key_2, s.google_api_key_3) if k]
 
 
-def _call_groq(prompt: str, context: str) -> str | None:
+def _gemini_pairs() -> list[tuple[str, str]]:
+    """(api_key, model) pairs, model-major: try all 3 keys for a model before
+    moving on. Spreads generation load across keys + models so we don't exhaust
+    one key's daily RPD (the old bug — generation only ever hit key #1)."""
+    s = get_settings()
+    models = [m.strip() for m in s.gemini_generation_models.split(",") if m.strip()]
+    keys = _gemini_keys()
+    return [(k, m) for m in models for k in keys]
+
+
+# Round-robin cursor so consecutive generations start at DIFFERENT (key, model)
+# pairs — spreads requests across pairs to stay under each pair's RPM limit,
+# instead of hammering pair[0] every call and tripping 429s.
+_GEMINI_PAIR_CURSOR = 0
+
+
+def _call_groq(prompt: str, context: str, history: list[dict] | None = None) -> str | None:
     client = _get_groq_client()
+    messages = [{"role": "system", "content": _SYSTEM_PROMPT}]
+    if history:
+        messages.extend(history)
+    messages.append({"role": "user", "content": f"**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {prompt}"})
     try:
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": _SYSTEM_PROMPT},
-                {"role": "user", "content": f"**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {prompt}"},
-            ],
-            temperature=0.1,
-            max_tokens=1024,
+            messages=messages,
+            temperature=0.0,
+            max_tokens=1536,
         )
         return response.choices[0].message.content
     except Exception as exc:
@@ -135,13 +161,47 @@ def _call_groq(prompt: str, context: str) -> str | None:
         raise
 
 
-def _call_gemini(prompt: str, context: str) -> str | None:
-    model = _get_gemini_client()
+def _call_gemini(prompt: str, context: str, history: list[dict] | None = None) -> str | None:
+    """Rotate across (key, model) pairs until one succeeds — spreads load over all
+    3 API keys and the configured models to dodge per-key/per-model daily limits."""
+    import google.generativeai as genai
+
+    history_block = ""
+    if history:
+        lines = [f"{'Người dùng' if m['role'] == 'user' else 'Trợ lý'}: {m['content'][:500]}"
+                 for m in history]
+        history_block = "\n**Lịch sử hội thoại:**\n" + "\n".join(lines) + "\n\n"
     full_prompt = (
-        f"{_SYSTEM_PROMPT}\n\n**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {prompt}"
+        f"{_SYSTEM_PROMPT}\n\n{history_block}**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {prompt}"
     )
-    response = model.generate_content(full_prompt)
-    return response.text
+
+    pairs = _gemini_pairs()
+    if not pairs:
+        raise RuntimeError("No GOOGLE_API_KEY configured for Gemini generation")
+
+    global _GEMINI_PAIR_CURSOR
+    n = len(pairs)
+    start = _GEMINI_PAIR_CURSOR
+    last_exc: Exception | None = None
+    for offset in range(n):
+        api_key, model_name = pairs[(start + offset) % n]
+        try:
+            genai.configure(api_key=api_key)
+            response = genai.GenerativeModel(model_name).generate_content(full_prompt)
+            if response.text:
+                # Advance cursor so the NEXT call starts at the following pair —
+                # round-robin keeps any single (key, model) under its RPM limit.
+                _GEMINI_PAIR_CURSOR = (start + offset + 1) % n
+                return response.text
+        except Exception as exc:
+            err = str(exc).lower()
+            if any(t in err for t in ("quota", "429", "not found", "exhaust", "rate")):
+                logger.debug("Gemini {} (key…{}) unavailable, rotating: {}",
+                             model_name, api_key[-4:], str(exc)[:100])
+                last_exc = exc
+                continue
+            raise  # non-quota error — propagate immediately
+    raise last_exc  # all pairs exhausted
 
 
 @_traceable(
@@ -153,6 +213,8 @@ def generate_answer(
     query: str,
     chunks: list[RetrievedChunk],
     use_fallback: bool = False,
+    history: list[dict] | None = None,
+    min_score: float = _MIN_RELEVANCE_SCORE,
 ) -> dict:
     """
     Generate answer with citations.
@@ -170,13 +232,36 @@ def generate_answer(
             "chunk_count": 0,
         }
 
+    # Filter out chunks the reranker scored as irrelevant before calling LLM.
+    # Without this, a "hoàn thuế GTGT" query returns forest/labour law chunks
+    # (score≈0.01) and the LLM correctly abstains — but we still showed 8 wrong sources.
+    relevant_chunks = [c for c in chunks if c.score >= min_score]
+    if not relevant_chunks:
+        logger.info(
+            "All {} chunks below relevance threshold ({:.3f}) — abstaining without LLM call",
+            len(chunks), min_score,
+        )
+        return {
+            "answer": (
+                "Tôi không tìm thấy văn bản pháp luật liên quan đến câu hỏi này trong cơ sở dữ liệu hiện có.\n\n"
+                "Gợi ý: câu hỏi của bạn có thể thuộc lĩnh vực chưa được tích hợp vào hệ thống. "
+                "Bạn có thể tải thêm văn bản pháp luật liên quan qua tab **Tải lên văn bản**."
+            ),
+            "sources": [],
+            "used_llm": "none",
+            "chunk_count": 0,
+        }
+    chunks = relevant_chunks
+
     context, citation_list = _build_context(chunks)
-    used_llm = "groq"
+    prefer_gemini = get_settings().generator_provider.lower() == "gemini"
+    used_llm = "gemini" if prefer_gemini else "groq"
     answer = None
 
-    if not use_fallback:
+    # Skip Groq entirely when provider=gemini (e.g. Groq daily TPD exhausted).
+    if not use_fallback and not prefer_gemini:
         try:
-            answer = _call_groq(query, context)
+            answer = _call_groq(query, context, history=history)
             logger.info("Groq answered query ({} chars)", len(answer or ""))
         except Exception as exc:
             logger.warning("Groq failed, switching to Gemini: {}", exc)
@@ -184,7 +269,7 @@ def generate_answer(
 
     if answer is None:
         try:
-            answer = _call_gemini(query, context)
+            answer = _call_gemini(query, context, history=history)
             used_llm = "gemini"
             logger.info("Gemini answered query ({} chars)", len(answer or ""))
         except Exception as exc:
@@ -192,11 +277,8 @@ def generate_answer(
             answer = _build_extractive_answer(query, chunks)
             used_llm = "extractive_fallback"
 
-    # Append citation list to answer
-    full_answer = answer + _CITATION_SUFFIX.format(citations=citation_list)
-
     return {
-        "answer": full_answer,
+        "answer": answer,
         "sources": [{"index": i + 1, **c.metadata, "score": c.score} for i, c in enumerate(chunks)],
         "used_llm": used_llm,
         "chunk_count": len(chunks),
@@ -215,12 +297,26 @@ async def stream_answer(
         yield "Tôi không tìm thấy văn bản pháp luật liên quan đến câu hỏi này."
         return
 
+    # Mirror generate_answer: filter irrelevant chunks before calling LLM
+    relevant_chunks = [c for c in chunks if c.score >= _MIN_RELEVANCE_SCORE]
+    if not relevant_chunks:
+        logger.info(
+            "stream_answer: all {} chunks below threshold ({:.2f}) — abstaining",
+            len(chunks), _MIN_RELEVANCE_SCORE,
+        )
+        yield (
+            "Tôi không tìm thấy văn bản pháp luật liên quan đến câu hỏi này trong cơ sở dữ liệu hiện có.\n\n"
+            "Gợi ý: câu hỏi của bạn có thể thuộc lĩnh vực chưa được tích hợp vào hệ thống. "
+            "Bạn có thể tải thêm văn bản pháp luật liên quan qua tab **Tải lên văn bản**."
+        )
+        return
+    chunks = relevant_chunks
+
     context, citation_list = _build_context(chunks)
     settings = get_settings()
 
     if not settings.groq_api_key:
         yield _build_extractive_answer(query, chunks)
-        yield _CITATION_SUFFIX.format(citations=citation_list)
         return
 
     try:
@@ -233,8 +329,8 @@ async def stream_answer(
                 {"role": "system", "content": _SYSTEM_PROMPT},
                 {"role": "user", "content": f"**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {query}"},
             ],
-            temperature=0.1,
-            max_tokens=1024,
+            temperature=0.0,  # match non-streaming path for consistent output
+            max_tokens=1536,
             stream=True,
         )
 
@@ -243,8 +339,6 @@ async def stream_answer(
             if delta:
                 yield delta
                 await asyncio.sleep(0)  # yield control to event loop
-
-        yield _CITATION_SUFFIX.format(citations=citation_list)
 
     except Exception as exc:
         logger.error("Streaming failed: {}", exc)

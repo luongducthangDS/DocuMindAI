@@ -51,6 +51,7 @@ class AgentState(TypedDict):
     session_id: str
     latency_ms: int
     error: str | None
+    steps: list  # [{label, detail, ms}] — visible reasoning steps for UI
 
 
 # ── LLM Setup ─────────────────────────────────────────────────────────────────
@@ -95,38 +96,54 @@ Chỉ trả về một từ duy nhất (không giải thích)."""
 # ── Nodes ──────────────────────────────────────────────────────────────────────
 
 def router_node(state: AgentState) -> dict:
-    """Classify query intent using LLM."""
+    """Classify query intent."""
+    t0 = time.time()
     settings = get_settings()
     query = state["query"]
 
-    try:
-        if settings.groq_api_key:
-            from groq import Groq
+    keyword_intent = _keyword_classify(query)
+    word_count = len(query.split())
+    if keyword_intent != "simple_qa" or word_count <= 6:
+        logger.info("Router (keyword fast-path): {} | '{}'", keyword_intent, query[:60])
+        intent = keyword_intent
+    else:
+        try:
+            if settings.groq_api_key:
+                from groq import Groq
+                client = Groq(api_key=settings.groq_api_key)
+                resp = client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    messages=[
+                        {"role": "system", "content": _ROUTER_PROMPT},
+                        {"role": "user", "content": query},
+                    ],
+                    temperature=0,
+                    max_tokens=10,
+                )
+                intent_raw = resp.choices[0].message.content.strip().lower()
+            else:
+                intent_raw = keyword_intent
+        except Exception as exc:
+            logger.warning("Router LLM failed, using keyword classify: {}", exc)
+            intent_raw = keyword_intent
 
-            client = Groq(api_key=settings.groq_api_key)
-            resp = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[
-                    {"role": "system", "content": _ROUTER_PROMPT},
-                    {"role": "user", "content": query},
-                ],
-                temperature=0,
-                max_tokens=10,
-            )
-            intent_raw = resp.choices[0].message.content.strip().lower()
-        else:
-            # Simple keyword-based fallback
-            intent_raw = _keyword_classify(query)
+        valid = {"simple_qa", "compare", "summarize", "report", "unknown"}
+        intent = intent_raw if intent_raw in valid else "simple_qa"
 
-    except Exception as exc:
-        logger.warning("Router LLM failed, using keyword classify: {}", exc)
-        intent_raw = _keyword_classify(query)
-
-    valid = {"simple_qa", "compare", "summarize", "report", "unknown"}
-    intent = intent_raw if intent_raw in valid else "simple_qa"
-
+    _INTENT_LABEL = {
+        "simple_qa": "Tra cứu quy định",
+        "compare": "So sánh văn bản",
+        "summarize": "Tóm tắt văn bản",
+        "report": "Tạo báo cáo",
+        "unknown": "Câu hỏi ngoài phạm vi",
+    }
+    ms = int((time.time() - t0) * 1000)
     logger.info("Query classified as: {} | '{}'", intent, query[:60])
-    return {"intent": intent}
+    steps = state.get("steps") or []
+    return {
+        "intent": intent,
+        "steps": steps + [{"label": "Phân loại câu hỏi", "detail": _INTENT_LABEL.get(intent, intent), "ms": ms}],
+    }
 
 
 def _keyword_classify(query: str) -> str:
@@ -144,6 +161,7 @@ def retrieve_node(state: AgentState) -> dict:
     """Run hybrid retrieval for any intent that needs context."""
     import src.rag.retriever as r_module
 
+    t0 = time.time()  # fix: must be defined before try/except
     query = state["query"]
 
     try:
@@ -159,8 +177,18 @@ def retrieve_node(state: AgentState) -> dict:
         if hasattr(retriever, "retrieve"):
             nodes = retriever.retrieve(query)
         elif hasattr(retriever, "aretrieve"):
+            # asyncio.run() would fail here if there's already a running loop (FastAPI/LangGraph).
+            # Use nest_asyncio if available, otherwise fall back to a new thread.
             import asyncio
-            nodes = asyncio.run(retriever.aretrieve(query))
+            try:
+                import nest_asyncio  # type: ignore
+                nest_asyncio.apply()
+                loop = asyncio.get_event_loop()
+                nodes = loop.run_until_complete(retriever.aretrieve(query))
+            except ImportError:
+                import concurrent.futures
+                with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
+                    nodes = ex.submit(asyncio.run, retriever.aretrieve(query)).result()
         else:
             nodes = retriever.retrieve(query)
 
@@ -168,27 +196,62 @@ def retrieve_node(state: AgentState) -> dict:
         if not chunks:
             logger.warning("Retriever returned no chunks, trying direct Chroma fallback")
             chunks = retrieve_direct_chroma(query)
-        return {"retrieved_chunks": chunks}
+
+        ms = int((time.time() - t0) * 1000)
+        seen: dict[str, int] = {}
+        for c in chunks:
+            key = c.metadata.get("so_hieu") or c.metadata.get("title", "?")
+            seen[key] = seen.get(key, 0) + 1
+        doc_summary = ", ".join(f"{k} ({v} đoạn)" for k, v in list(seen.items())[:3])
+        detail = f"Tìm thấy {len(chunks)} đoạn" + (f" — {doc_summary}" if doc_summary else "")
+
+        steps = state.get("steps") or []
+        return {
+            "retrieved_chunks": chunks,
+            "steps": steps + [{"label": "Tìm kiếm tài liệu", "detail": detail, "ms": ms}],
+        }
 
     except Exception as exc:
         logger.error("retrieve_node failed: {}", exc)
         chunks = retrieve_direct_chroma(query)
-        return {"retrieved_chunks": chunks, "error": str(exc) if not chunks else None}
+        ms = int((time.time() - t0) * 1000)
+        steps = state.get("steps") or []
+        return {
+            "retrieved_chunks": chunks,
+            "error": str(exc) if not chunks else None,
+            "steps": steps + [{"label": "Tìm kiếm tài liệu", "detail": f"Fallback: {len(chunks)} đoạn", "ms": ms}],
+        }
 
 
 def answer_node(state: AgentState) -> dict:
     """Generate answer with citations from retrieved chunks."""
     t0 = time.time()
     chunks = state.get("retrieved_chunks", [])
-    result = generate_answer(state["query"], chunks)
+
+    # Build conversation history from LangGraph messages (exclude current query = last HumanMessage)
+    raw_messages = state.get("messages", [])
+    history: list[dict] = []
+    for msg in raw_messages[:-1]:  # skip last = current query
+        role = "user" if getattr(msg, "type", "") == "human" else "assistant"
+        content = getattr(msg, "content", "")
+        if content:
+            history.append({"role": role, "content": str(content)[:800]})
+    history = history[-6:]  # keep last 3 turns (6 messages)
+
+    result = generate_answer(state["query"], chunks, history=history or None)
     latency = int((time.time() - t0) * 1000)
 
+    llm_label = {"groq": "Llama 3.3 70B", "gemini": "Gemini", "none": "Không cần LLM"}.get(
+        result["used_llm"], result["used_llm"]
+    )
+    steps = state.get("steps") or []
     return {
         "answer": result["answer"],
         "sources": result["sources"],
         "used_llm": result["used_llm"],
         "latency_ms": latency,
         "messages": [AIMessage(content=result["answer"])],
+        "steps": steps + [{"label": "Tổng hợp câu trả lời", "detail": llm_label, "ms": latency}],
     }
 
 
@@ -209,16 +272,45 @@ async def answer_node_async(state: AgentState) -> dict:
     }
 
 
+def _parse_compare_args(query: str) -> tuple[str, str, str]:
+    """
+    Extract (doc_a, doc_b, aspect) from a comparison query.
+    Heuristic: look for 'và'/'with'/'vs' between two document identifiers.
+    Falls back to (query, query, query) so compare_documents still gets called
+    but with the full query — better than passing identical nonsense before.
+    """
+    import re
+    # Pattern: "so sánh QĐ-740 và QĐ-747 về học bổng"
+    m = re.search(
+        r"(QĐ-\w+|QĐ\s*\d+|\d{2,4}/\w+[-/]\w+)",
+        query, re.IGNORECASE
+    )
+    parts = re.split(r"\s+(?:và|with|vs\.?)\s+", query, maxsplit=1, flags=re.IGNORECASE)
+    if len(parts) == 2:
+        doc_a = parts[0].strip()
+        # aspect is everything after the second doc token (e.g., "về học bổng")
+        right = parts[1].strip()
+        aspect_match = re.split(r"\s+(?:về|on|regarding)\s+", right, maxsplit=1, flags=re.IGNORECASE)
+        doc_b = aspect_match[0].strip()
+        aspect = aspect_match[1].strip() if len(aspect_match) > 1 else ""
+        return doc_a, doc_b, aspect or query
+    # No clear split found — use full query for both sides; compare_documents
+    # will retrieve from the same corpus but the prompt will still be coherent
+    return query, query, query
+
+
 async def compare_node(state: AgentState) -> dict:
     """Retrieve extra context for compare intent."""
     from src.agent.tools import compare_documents
 
     query = state["query"]
+    doc_a, doc_b, aspect = _parse_compare_args(query)
+    logger.info("compare_node: doc_a='{}', doc_b='{}', aspect='{}'", doc_a[:40], doc_b[:40], aspect[:40])
     try:
         result = await compare_documents.ainvoke({
-            "doc_a": query,
-            "doc_b": query,
-            "aspect": query,
+            "doc_a": doc_a,
+            "doc_b": doc_b,
+            "aspect": aspect,
         })
         return {
             "answer": result,
@@ -286,6 +378,8 @@ def persist_node(state: AgentState) -> dict:
 
 def route_by_intent(state: AgentState) -> str:
     intent = state.get("intent", "simple_qa")
+    # "unknown" still goes through retrieval — better to attempt an answer than silently fail.
+    # The generator will say "Tôi không tìm thấy quy định này" if context is irrelevant.
     mapping = {
         "simple_qa": "do_retrieve",
         "compare": "do_compare",
@@ -372,6 +466,7 @@ async def run_agent(
         "session_id": session_id,
         "latency_ms": 0,
         "error": None,
+        "steps": [],
     }
 
     result = await graph.ainvoke(initial_state)

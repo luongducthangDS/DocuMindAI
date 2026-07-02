@@ -12,6 +12,7 @@ import time
 from fastapi import APIRouter
 from loguru import logger
 
+from src.agent.memory import get_long_term_memory
 from src.api.schemas import HealthResponse, MetricsResponse, ServiceStatus
 from src.config import get_settings
 
@@ -23,18 +24,18 @@ async def health_check() -> HealthResponse:
     """Check status of all downstream services — runs checks in parallel."""
     import asyncio
 
-    chroma, redis = await asyncio.gather(
-        _check_chroma(),
+    vector_store, redis = await asyncio.gather(
+        _check_vector_store(),
         _check_redis(),
     )
     llm = _check_llm()
     sqlite = _check_sqlite()
-    services = [chroma, redis, llm, sqlite]
+    services = [vector_store, redis, llm, sqlite]
 
     # Core serving path needs corpus retrieval + an LLM provider.
-    # Redis and SQLite are optional in Railway: Redis is only cache/session
+    # Redis and SQLite are optional in Railway/Render: Redis is only cache/session
     # acceleration, and SQLite backs metrics/history best-effort persistence.
-    required = [chroma, llm]
+    required = [vector_store, llm]
     all_required_healthy = all(s.healthy for s in required)
     any_required_healthy = any(s.healthy for s in required)
 
@@ -46,6 +47,31 @@ async def health_check() -> HealthResponse:
         overall = "error"
 
     return HealthResponse(status=overall, services=services)
+
+
+async def _check_vector_store() -> ServiceStatus:
+    """Fast vector store health check — avoids loading the embedding model."""
+    settings = get_settings()
+    if (settings.vector_store_provider or "chroma").lower() == "qdrant":
+        return await _check_qdrant()
+    return await _check_chroma()
+
+
+async def _check_qdrant() -> ServiceStatus:
+    try:
+        settings = get_settings()
+        if not settings.qdrant_url:
+            return ServiceStatus(name="qdrant", healthy=False, detail="QDRANT_URL not set")
+
+        from qdrant_client import QdrantClient
+
+        client = QdrantClient(url=settings.qdrant_url, api_key=settings.qdrant_api_key or None)
+        collections = {c.name for c in client.get_collections().collections}
+        if settings.qdrant_collection in collections:
+            return ServiceStatus(name="qdrant", healthy=True, detail=f"Collection '{settings.qdrant_collection}' reachable")
+        return ServiceStatus(name="qdrant", healthy=False, detail=f"Collection '{settings.qdrant_collection}' not found")
+    except Exception as exc:
+        return ServiceStatus(name="qdrant", healthy=False, detail=str(exc)[:100])
 
 
 async def _check_chroma() -> ServiceStatus:
@@ -136,10 +162,12 @@ async def get_metrics() -> MetricsResponse:
         # Corpus chunk count from ChromaDB (best effort)
         corpus_chunks = await _count_corpus_chunks()
 
+        error_rate = get_long_term_memory().get_error_rate(window_minutes=60)
+
         return MetricsResponse(
             total_queries=total,
             avg_latency_ms=round(avg_lat, 1),
-            error_rate=0.0,  # TODO: track error count in DB
+            error_rate=error_rate,
             active_sessions=sessions,
             corpus_chunks=corpus_chunks,
         )
@@ -159,9 +187,8 @@ async def _count_corpus_chunks() -> int:
 
     def _count_sync() -> int:
         try:
-            from src.rag.embedder import get_chroma_collection
-            _, col = get_chroma_collection()
-            return col.count()
+            from src.rag.vector_backend import get_backend, count_chunks
+            return count_chunks(get_backend())
         except Exception:
             return 0
 

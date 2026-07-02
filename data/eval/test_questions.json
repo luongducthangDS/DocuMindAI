@@ -1,52 +1,872 @@
 [
-  {"id":"q01","tier":1,"category":"company_law","question":"Điều kiện để thành lập công ty trách nhiệm hữu hạn hai thành viên trở lên là gì?","ground_truth":"Công ty TNHH hai thành viên trở lên có từ 2 đến 50 thành viên. Thành viên chịu trách nhiệm về các khoản nợ và nghĩa vụ tài sản của công ty trong phạm vi số vốn đã góp vào công ty. Vốn điều lệ không được chia thành cổ phần."},
-  {"id":"q02","tier":1,"category":"company_law","question":"Công ty cổ phần cần bao nhiêu cổ đông tối thiểu và cổ đông sáng lập phải đáp ứng điều kiện gì?","ground_truth":"Công ty cổ phần phải có tối thiểu 3 cổ đông và không hạn chế số lượng tối đa. Các cổ đông sáng lập phải cùng nhau đăng ký mua ít nhất 20% tổng số cổ phần phổ thông được quyền chào bán tại thời điểm đăng ký thành lập doanh nghiệp."},
-  {"id":"q03","tier":1,"category":"company_law","question":"Doanh nghiệp nhà nước là gì và được phân loại như thế nào theo Luật Doanh nghiệp 2020?","ground_truth":"Doanh nghiệp nhà nước bao gồm các doanh nghiệp do Nhà nước nắm giữ trên 50% vốn điều lệ hoặc tổng số cổ phần có quyền biểu quyết."},
-  {"id":"q04","tier":1,"category":"company_law","question":"Doanh nghiệp có bao nhiêu loại hình theo Luật Doanh nghiệp 2020?","ground_truth":"Theo Luật Doanh nghiệp 2020, có các loại hình: Công ty TNHH một thành viên, Công ty TNHH hai thành viên trở lên, Công ty cổ phần, Công ty hợp danh và Doanh nghiệp tư nhân."},
-  {"id":"q05","tier":1,"category":"company_law","question":"Hội đồng quản trị công ty cổ phần có bao nhiêu thành viên và nhiệm kỳ là bao nhiêu năm?","ground_truth":"Hội đồng quản trị có từ 3 đến 11 thành viên. Nhiệm kỳ không quá 5 năm và có thể được bầu lại với số nhiệm kỳ không hạn chế."},
-  {"id":"q06","tier":1,"category":"labor_law","question":"Người lao động có được quyền đơn phương chấm dứt hợp đồng lao động không? Phải báo trước bao lâu?","ground_truth":"Có. Báo trước ít nhất 45 ngày với hợp đồng không xác định thời hạn; 30 ngày với hợp đồng từ 12 đến 36 tháng; 3 ngày làm việc với hợp đồng dưới 12 tháng."},
-  {"id":"q07","tier":1,"category":"labor_law","question":"Hợp đồng lao động phải có những nội dung bắt buộc nào?","ground_truth":"Công việc và địa điểm làm việc; thời hạn hợp đồng; mức lương và hình thức trả lương; thời giờ làm việc và nghỉ ngơi; trang bị bảo hộ lao động; bảo hiểm xã hội."},
-  {"id":"q08","tier":1,"category":"labor_law","question":"Thời gian thử việc tối đa theo Bộ luật Lao động là bao nhiêu ngày?","ground_truth":"Tối đa 180 ngày với người quản lý doanh nghiệp; 60 ngày với trình độ từ cao đẳng trở lên; 30 ngày với trình độ trung cấp, công nhân kỹ thuật; 6 ngày với công việc khác."},
-  {"id":"q09","tier":1,"category":"labor_law","question":"Người sử dụng lao động có được phép sa thải người lao động đang trong thời gian điều trị bệnh không?","ground_truth":"Không. Người sử dụng lao động không được xử lý kỷ luật sa thải trong thời gian người lao động đang điều trị bệnh tật, điều dưỡng, phục hồi chức năng theo quyết định của cơ sở y tế có thẩm quyền."},
-  {"id":"q10","tier":1,"category":"labor_law","question":"Người lao động được nghỉ phép năm bao nhiêu ngày theo Bộ luật Lao động?","ground_truth":"12 ngày với điều kiện bình thường; 14 ngày với công việc nặng nhọc, độc hại; 16 ngày với công việc đặc biệt nặng nhọc, độc hại."},
-  {"id":"q11","tier":1,"category":"tax_law","question":"Thuế suất thuế thu nhập doanh nghiệp phổ thông hiện nay là bao nhiêu?","ground_truth":"20%."},
-  {"id":"q12","tier":1,"category":"tax_law","question":"Thu nhập được miễn thuế thu nhập doanh nghiệp bao gồm những khoản nào?","ground_truth":"Thu nhập từ trồng trọt, chăn nuôi, nuôi trồng thủy sản tại vùng kinh tế xã hội đặc biệt khó khăn; thu nhập từ hợp đồng nghiên cứu khoa học; thu nhập từ doanh nghiệp có từ 30% lao động là người khuyết tật."},
-  {"id":"q13","tier":1,"category":"tax_law","question":"Thời hạn nộp thuế thu nhập doanh nghiệp tạm tính theo quý là khi nào?","ground_truth":"Chậm nhất ngày 30 của tháng đầu quý tiếp theo. Quyết toán năm chậm nhất cuối tháng thứ ba từ ngày kết thúc năm tài chính."},
-  {"id":"q14","tier":1,"category":"data_protection","question":"Bảo vệ dữ liệu cá nhân tại Việt Nam được quy định bởi văn bản pháp luật nào?","ground_truth":"Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân, có hiệu lực từ 01/07/2023."},
-  {"id":"q15","tier":1,"category":"company_law","question":"Doanh nghiệp nhỏ và vừa được định nghĩa như thế nào?","ground_truth":"Doanh nghiệp có số lao động tham gia bảo hiểm xã hội bình quân năm không quá 200 người và đáp ứng tiêu chí về tổng nguồn vốn hoặc doanh thu theo ngành nghề."},
-  {"id":"q16","tier":1,"category":"company_law","question":"Cổ phần ưu đãi trong công ty cổ phần gồm những loại nào?","ground_truth":"Cổ phần ưu đãi biểu quyết; cổ phần ưu đãi cổ tức; cổ phần ưu đãi hoàn lại; cổ phần ưu đãi khác do Điều lệ quy định."},
-  {"id":"q17","tier":1,"category":"labor_law","question":"Điều kiện để người lao động được hưởng trợ cấp thôi việc là gì?","ground_truth":"Làm việc thường xuyên từ đủ 12 tháng trở lên khi chấm dứt hợp đồng lao động. Mức trợ cấp: mỗi năm làm việc tương đương nửa tháng tiền lương."},
-  {"id":"q18","tier":1,"category":"labor_law","question":"Người sử dụng lao động có bắt buộc phải đóng bảo hiểm xã hội không? Mức đóng là bao nhiêu?","ground_truth":"Bắt buộc với hợp đồng lao động từ 1 tháng trở lên. Người sử dụng lao động đóng 17,5%; người lao động đóng 10,5%."},
-  {"id":"q19","tier":1,"category":"company_law","question":"Điều lệ công ty phải có những nội dung bắt buộc nào theo Luật Doanh nghiệp 2020?","ground_truth":"Tên, địa chỉ trụ sở; ngành nghề kinh doanh; vốn điều lệ; quyền và nghĩa vụ thành viên/cổ đông; cơ cấu tổ chức quản lý; số người đại diện theo pháp luật; căn cứ giải thể và trình tự thanh lý tài sản."},
-  {"id":"q20","tier":1,"category":"tax_law","question":"Thuế thu nhập cá nhân từ tiền lương được tính như thế nào và mức giảm trừ gia cảnh hiện tại là bao nhiêu?","ground_truth":"Biểu thuế lũy tiến 7 bậc từ 5% đến 35%. Giảm trừ bản thân 11 triệu đồng/tháng; mỗi người phụ thuộc 4,4 triệu đồng/tháng."},
-  {"id":"q21","tier":2,"category":"company_law","question":"Nếu một thành viên công ty TNHH muốn chuyển nhượng phần vốn góp, quy trình thực hiện như thế nào và ai có quyền ưu tiên mua?","ground_truth":"Phải chào bán cho các thành viên còn lại theo tỷ lệ vốn góp với cùng điều kiện. Chỉ khi các thành viên không mua hoặc mua không hết trong 30 ngày mới được chuyển nhượng cho người ngoài."},
-  {"id":"q22","tier":2,"category":"company_law","question":"Khi nào nghị quyết Đại hội đồng cổ đông có thể bị tòa án tuyên bố vô hiệu?","ground_truth":"Khi trình tự triệu tập họp và ra quyết định không đúng quy định, hoặc nội dung nghị quyết vi phạm pháp luật hay Điều lệ. Thời hiệu yêu cầu là 90 ngày kể từ ngày nhận được hoặc có thể tiếp cận nghị quyết."},
-  {"id":"q23","tier":2,"category":"labor_law","question":"Điều kiện và trình tự để người sử dụng lao động được sa thải người lao động vì lý do kỷ luật là gì?","ground_truth":"Phải có vi phạm kỷ luật được quy định trong nội quy lao động. Quy trình: thông báo bằng văn bản cho tổ chức đại diện người lao động; lấy ý kiến của tổ chức này; họp xử lý kỷ luật có người lao động tham dự. Không được sa thải khi người lao động đang điều trị bệnh, nghỉ thai sản, nghỉ phép năm."},
-  {"id":"q24","tier":2,"category":"tax_law","question":"Doanh nghiệp khởi nghiệp sáng tạo được hưởng ưu đãi thuế thu nhập doanh nghiệp như thế nào?","ground_truth":"Doanh nghiệp nhỏ và vừa chuyển đổi từ hộ kinh doanh được miễn thuế TNDN 2 năm và giảm 50% trong 4 năm tiếp theo. Đầu tư vào lĩnh vực ưu đãi đặc biệt có thể được thuế suất 10% trong 15 năm, miễn 4 năm, giảm 50% trong 9 năm tiếp theo."},
-  {"id":"q25","tier":2,"category":"data_protection","question":"Doanh nghiệp xử lý dữ liệu cá nhân nhạy cảm phải đáp ứng những yêu cầu gì theo Nghị định 13/2023?","ground_truth":"Phải có sự đồng ý rõ ràng của chủ thể dữ liệu, áp dụng biện pháp bảo vệ đặc biệt, thông báo cho Bộ Công an khi xử lý quy mô lớn, và phải có Đánh giá tác động xử lý dữ liệu cá nhân. Dữ liệu nhạy cảm bao gồm: quan điểm chính trị, sức khỏe, đời sống tình dục, dữ liệu tài chính, tội phạm."},
-  {"id":"q26","tier":2,"category":"labor_law","question":"Thỏa ước lao động tập thể khác hợp đồng lao động cá nhân như thế nào và khi nào thỏa ước được ưu tiên áp dụng?","ground_truth":"Thỏa ước là thỏa thuận giữa tập thể lao động và người sử dụng lao động thông qua thương lượng tập thể. Khi thỏa ước có lợi hơn cho người lao động so với pháp luật thì áp dụng theo thỏa ước. Hợp đồng lao động không được thỏa thuận thấp hơn thỏa ước."},
-  {"id":"q27","tier":2,"category":"company_law","question":"Trách nhiệm của người quản lý doanh nghiệp khi gây thiệt hại cho công ty là gì?","ground_truth":"Phải bồi thường thiệt hại cho công ty. Cổ đông hoặc nhóm cổ đông sở hữu từ 1% cổ phần trở lên có quyền tự mình hoặc nhân danh công ty khởi kiện người quản lý."},
-  {"id":"q28","tier":2,"category":"tax_law","question":"Quy định về giao dịch liên kết tại Việt Nam là gì? Doanh nghiệp phải tuân thủ những nghĩa vụ gì?","ground_truth":"Theo Nghị định 132/2020/NĐ-CP: phải kê khai giao dịch liên kết, lập hồ sơ quản lý giá chuyển nhượng nộp cùng quyết toán thuế TNDN. Áp dụng nguyên tắc giá thị trường. Tổng chi phí lãi vay được trừ không vượt quá 30% EBITDA."},
-  {"id":"q29","tier":2,"category":"labor_law","question":"Quyền đình công của người lao động được thực hiện như thế nào và những hạn chế gì áp dụng?","ground_truth":"Đình công chỉ được tổ chức sau khi hòa giải không thành. Tổ chức đại diện người lao động phải ra quyết định bằng văn bản và thông báo trước 5 ngày làm việc. Không được đình công tại doanh nghiệp phục vụ công ích, quốc phòng, an ninh."},
-  {"id":"q30","tier":2,"category":"company_law","question":"Doanh nghiệp FDI khác doanh nghiệp trong nước như thế nào về thủ tục thành lập?","ground_truth":"Nhà đầu tư nước ngoài lần đầu phải xin Giấy chứng nhận đăng ký đầu tư trước khi thành lập. Một số ngành có hạn chế tỷ lệ sở hữu vốn nước ngoài. Phải đáp ứng điều kiện tiếp cận thị trường theo WTO và các FTA."},
-  {"id":"q31","tier":2,"category":"data_protection","question":"Khi xảy ra sự cố rò rỉ dữ liệu cá nhân, doanh nghiệp phải thực hiện những nghĩa vụ gì?","ground_truth":"Thông báo cho Bộ Công an trong vòng 72 giờ kể từ khi phát hiện. Thông báo phải bao gồm: mô tả vi phạm, loại và số lượng dữ liệu bị ảnh hưởng, biện pháp khắc phục đã và đang thực hiện."},
-  {"id":"q32","tier":2,"category":"tax_law","question":"Điều kiện để được hoàn thuế VAT đối với hàng hóa xuất khẩu là gì?","ground_truth":"Hàng hóa thực xuất khẩu có chứng từ xác nhận; có hợp đồng bán hàng với bên nước ngoài; có chứng từ thanh toán qua ngân hàng. Thời hạn giải quyết hoàn thuế: 6 ngày làm việc với hồ sơ hoàn trước kiểm tra sau."},
-  {"id":"q33","tier":2,"category":"labor_law","question":"Người lao động nước ngoài làm việc tại Việt Nam phải đáp ứng điều kiện gì và thủ tục cấp phép ra sao?","ground_truth":"Phải có năng lực hành vi dân sự đầy đủ, trình độ chuyên môn hoặc kinh nghiệm phù hợp, đủ sức khỏe. Người sử dụng lao động xác nhận nhu cầu và đề nghị cấp giấy phép lao động. Giấy phép có hiệu lực tối đa 2 năm."},
-  {"id":"q34","tier":2,"category":"company_law","question":"Thủ tục và điều kiện để giải thể doanh nghiệp tự nguyện là gì? Ai chịu trách nhiệm thanh toán nợ?","ground_truth":"Điều kiện: thanh toán hết nợ và nghĩa vụ tài sản, không trong quá trình giải quyết tranh chấp tại tòa. Trình tự: thông qua quyết định giải thể, thanh toán nợ, hoàn thành nghĩa vụ thuế, nộp hồ sơ giải thể tại Sở Kế hoạch Đầu tư."},
-  {"id":"q35","tier":2,"category":"company_law","question":"Ban kiểm soát trong công ty cổ phần có quyền và nghĩa vụ gì? Khi nào không bắt buộc phải có?","ground_truth":"Giám sát Hội đồng quản trị và Ban giám đốc trong quản lý và điều hành. Không bắt buộc nếu: dưới 11 cổ đông và cổ đông tổ chức sở hữu dưới 50% cổ phần; hoặc áp dụng mô hình có ít nhất 20% thành viên HĐQT độc lập và có Ủy ban kiểm toán trực thuộc HĐQT."},
-  {"id":"q36","tier":3,"category":"cross_doc","question":"Khi doanh nghiệp cho nghỉ việc hàng loạt vì lý do kinh tế, nghĩa vụ về trợ cấp thôi việc và nghĩa vụ thuế TNDN đối với khoản chi trả này được xử lý như thế nào?","ground_truth":"Về lao động: thông báo 30 ngày trước, xây dựng phương án sử dụng lao động, báo cáo Sở LĐTBXH, chi trả trợ cấp mất việc làm. Về thuế TNDN: khoản trợ cấp đúng quy định pháp luật lao động được tính vào chi phí hợp lý, cần có hợp đồng lao động, quyết định thôi việc và chứng từ chi trả."},
-  {"id":"q37","tier":3,"category":"cross_doc","question":"So sánh trách nhiệm pháp lý của Giám đốc điều hành trong công ty TNHH và công ty cổ phần khi ký hợp đồng vượt quá thẩm quyền.","ground_truth":"TNHH: thẩm quyền do Điều lệ và nghị quyết Hội đồng thành viên quy định; hợp đồng vượt thẩm quyền có thể bị tuyên vô hiệu; Giám đốc phải bồi thường thiệt hại. Cổ phần: HĐQT quyết định hợp đồng trên 35% tổng tài sản; Giám đốc ký vượt thẩm quyền chịu trách nhiệm cá nhân; cổ đông nhóm 1% có thể khởi kiện."},
-  {"id":"q38","tier":3,"category":"cross_doc","question":"Một startup fintech thu thập dữ liệu tài chính người dùng và có nhân viên ký hợp đồng lao động. Liệt kê các văn bản pháp luật áp dụng và nghĩa vụ chính từ mỗi văn bản.","ground_truth":"Nghị định 13/2023: dữ liệu tài chính là nhạy cảm, cần đồng ý rõ ràng và đánh giá tác động. Bộ luật Lao động 2019: ký hợp đồng đúng loại, đóng BHXH, tuân thủ lương và thời giờ làm việc. Luật Doanh nghiệp 2020: đăng ký đúng ngành nghề. Nếu cấp tín dụng: cần giấy phép Ngân hàng Nhà nước."},
-  {"id":"q39","tier":3,"category":"cross_doc","question":"Một công ty cổ phần phát hành thêm cổ phiếu và thu thập thông tin nhà đầu tư. Những nghĩa vụ pháp lý nào phát sinh từ Luật Doanh nghiệp và Nghị định 13/2023?","ground_truth":"Về phát hành: phải được Đại hội đồng cổ đông thông qua; đăng ký với UBCKNN nếu chào bán ra công chúng; chào bán riêng lẻ chỉ cho dưới 100 nhà đầu tư không chuyên nghiệp. Về dữ liệu: thông tin nhà đầu tư là dữ liệu cá nhân, phải có đồng ý, mục đích rõ ràng, bảo mật và không dùng ngoài mục đích đã công bố."},
-  {"id":"q40","tier":3,"category":"cross_doc","question":"Khi nào doanh nghiệp được xử lý dữ liệu cá nhân của người lao động mà không cần sự đồng ý, và giới hạn nào áp dụng?","ground_truth":"Được xử lý mà không cần đồng ý khi: thực hiện nghĩa vụ hợp đồng lao động (lương, bảo hiểm); tuân thủ nghĩa vụ pháp lý (kê khai thuế TNCN, báo cáo BHXH); bảo vệ tính mạng sức khỏe. Giới hạn: chỉ đúng mục đích đã xác định; không xử lý dữ liệu nhạy cảm nếu không cần thiết; không tiết lộ cho bên thứ ba khi chưa được phép."},
-  {"id":"q41","tier":3,"category":"edge_case","question":"Điều 48 Luật Doanh nghiệp 2020 quy định gì về góp vốn bằng tài sản?","ground_truth":"Tài sản góp vốn không phải VND, ngoại tệ, vàng thì phải được các thành viên/cổ đông sáng lập hoặc tổ chức thẩm định giá chuyên nghiệp định giá và thể hiện thành VND."},
-  {"id":"q42","tier":3,"category":"edge_case","question":"Người lao động làm việc theo hợp đồng thời vụ 3 tháng, tái ký 4 lần liên tiếp. Hợp đồng lần thứ 5 phải ký loại nào?","ground_truth":"Hợp đồng xác định thời hạn chỉ được ký tối đa 2 lần; lần thứ 3 trở đi phải ký hợp đồng không xác định thời hạn. Trong tình huống này, sau 2 lần ký xác định thời hạn hợp lệ, lần thứ 3 đã phải là không xác định thời hạn."},
-  {"id":"q43","tier":3,"category":"edge_case","question":"Công ty A ký hợp đồng thuê văn phòng 5 năm trị giá 5 tỷ đồng nhưng không thông qua HĐQT dù Điều lệ yêu cầu với hợp đồng trên 2 tỷ. Hợp đồng có hiệu lực không?","ground_truth":"Hợp đồng ký với bên thứ ba ngay tình thường được bảo vệ hiệu lực để đảm bảo an toàn giao dịch. Tuy nhiên người ký (Giám đốc) phải chịu trách nhiệm bồi thường thiệt hại cho công ty. HĐQT có thể phê chuẩn để hợp thức hóa sau khi ký."},
-  {"id":"q44","tier":3,"category":"out_of_corpus","question":"Quy trình xin giấy phép kinh doanh dịch vụ logistics tại Việt Nam hiện nay là gì?","ground_truth":"Câu hỏi này liên quan đến Nghị định 163/2017/NĐ-CP về dịch vụ logistics — ngoài phạm vi corpus hiện tại. Hệ thống nên thừa nhận giới hạn và không hallucinate thông tin không có trong corpus."},
-  {"id":"q45","tier":3,"category":"out_of_corpus","question":"Luật Đất đai 2024 thay đổi gì so với Luật Đất đai 2013 về quyền sử dụng đất của người Việt Nam định cư ở nước ngoài?","ground_truth":"Câu hỏi nằm ngoài phạm vi corpus. Hệ thống nên từ chối hallucinate và thông báo rõ văn bản này chưa có trong cơ sở dữ liệu."},
-  {"id":"q46","tier":3,"category":"out_of_corpus","question":"Quy định về chào bán chứng khoán ra công chúng theo Luật Chứng khoán 2019 là gì?","ground_truth":"Câu hỏi liên quan đến Luật Chứng khoán 2019 — ngoài phạm vi corpus hiện tại. Hệ thống nên từ chối trả lời mà không có nguồn xác thực."},
-  {"id":"q47","tier":2,"category":"labor_law","question":"Người lao động bị tai nạn lao động được hưởng những quyền lợi gì và trách nhiệm của người sử dụng lao động là gì?","ground_truth":"Người lao động được thanh toán chi phí y tế và hưởng chế độ tai nạn lao động từ quỹ BHXH. Người sử dụng lao động: sơ cứu kịp thời; thanh toán chi phí BHXH không chi; trả đủ lương trong thời gian điều trị; bồi thường ít nhất 1,5 tháng lương nếu tai nạn do lỗi của người sử dụng lao động."},
-  {"id":"q48","tier":2,"category":"tax_law","question":"Hoạt động cho thuê tài sản của cá nhân bị đánh thuế như thế nào?","ground_truth":"Cá nhân cho thuê tài sản phải nộp thuế GTGT và thuế TNCN nếu doanh thu từ 100 triệu đồng/năm trở lên. Thuế TNCN từ cho thuê bất động sản áp dụng tỷ lệ 5% trên doanh thu; thuế GTGT là 5% với bất động sản. Cá nhân có thể nộp thuế theo phương pháp khoán."},
-  {"id":"q49","tier":2,"category":"company_law","question":"Người đại diện theo pháp luật của doanh nghiệp có thể là bao nhiêu người và có trách nhiệm gì?","ground_truth":"Công ty TNHH và công ty cổ phần có thể có một hoặc nhiều người đại diện theo pháp luật. Người đại diện theo pháp luật chịu trách nhiệm trước pháp luật về việc thực hiện quyền và nghĩa vụ được giao. Phải cư trú tại Việt Nam; nếu xuất cảnh trên 30 ngày phải ủy quyền bằng văn bản cho người khác."},
-  {"id":"q50","tier":2,"category":"data_protection","question":"Chủ thể dữ liệu có những quyền gì theo Nghị định 13/2023/NĐ-CP?","ground_truth":"Quyền được biết về việc xử lý dữ liệu của mình; quyền đồng ý hoặc không đồng ý; quyền truy cập dữ liệu của mình; quyền xóa dữ liệu; quyền hạn chế xử lý; quyền phản đối xử lý; quyền khiếu nại, tố cáo, khởi kiện."}
+  {
+    "id": "q001",
+    "tier": 2,
+    "category": "ngoại_ngữ__phạm_vi_áp_dụng",
+    "question": "Quy định về học, kiểm tra và chuẩn đầu ra ngoại ngữ này áp dụng cho những đối tượng sinh viên nào và bao gồm những hệ đào tạo nào?",
+    "ground_truth": "Áp dụng cho sinh viên hệ đại học chính quy, liên thông và cao đẳng chính quy đào tạo theo hệ thống tín chỉ tại Trường Đại học Kinh tế - Kỹ thuật Công nghiệp",
+    "source_chunk_id": "03.-Bản-chuẩn-QD-740.-20.10.2018-Quy-dinh-ve-hoc-kiem-tra-va-CĐR-ngoai-ngu_chunk_10"
+  },
+  {
+    "id": "q002",
+    "tier": 1,
+    "category": "ngoại_ngữ__điều_khoản_thi_hành",
+    "question": "Quy định ngoại ngữ QD-740 áp dụng từ khóa tuyển sinh năm nào trở về sau?",
+    "ground_truth": "Quy định áp dụng từ khóa tuyển sinh năm 2017 trở về sau",
+    "source_chunk_id": "03.-Bản-chuẩn-QD-740.-20.10.2018-Quy-dinh-ve-hoc-kiem-tra-va-CĐR-ngoai-ngu_chunk_38"
+  },
+  {
+    "id": "q003",
+    "tier": 1,
+    "category": "ngoại_ngữ__chương_trình_tiếng_anh",
+    "question": "Chương trình tiếng Anh toàn khóa hệ đại học bắt buộc bao nhiêu tín chỉ?",
+    "ground_truth": "12 tín chỉ đối với hệ đại học chính quy",
+    "source_chunk_id": "03.-Bản-chuẩn-QD-740.-20.10.2018-Quy-dinh-ve-hoc-kiem-tra-va-CĐR-ngoai-ngu_chunk_13"
+  },
+  {
+    "id": "q004",
+    "tier": 1,
+    "category": "ngoại_ngữ__kiểm_tra_đầu_vào",
+    "question": "Sinh viên cần đạt điểm bao nhiêu trong bài kiểm tra đầu vào tiếng Anh để được đăng ký học học phần Tiếng Anh cơ bản 1?",
+    "ground_truth": "Từ 5 điểm trở lên theo thang điểm 10",
+    "source_chunk_id": "03.-Bản-chuẩn-QD-740.-20.10.2018-Quy-dinh-ve-hoc-kiem-tra-va-CĐR-ngoai-ngu_chunk_23"
+  },
+  {
+    "id": "q005",
+    "tier": 2,
+    "category": "ngoại_ngữ__miễn_học_miễn_thi",
+    "question": "Sinh viên cần đáp ứng điều kiện gì để được xét miễn học, miễn thi các học phần tiếng Anh?",
+    "ground_truth": "Sinh viên cần thỏa mãn một trong các điều kiện quy định và có đơn đề nghị, kèm theo bản sao có công chứng chứng chỉ tiếng Anh hợp lệ",
+    "source_chunk_id": "03.-Bản-chuẩn-QD-740.-20.10.2018-Quy-dinh-ve-hoc-kiem-tra-va-CĐR-ngoai-ngu_chunk_25"
+  },
+  {
+    "id": "q006",
+    "tier": 2,
+    "category": "ngoại_ngữ__công_nhận_tương_đương",
+    "question": "Các chứng chỉ tiếng Anh quốc tế nào được công nhận tương đương để xét chuẩn đầu ra tiếng Anh tại trường?",
+    "ground_truth": "Các chứng chỉ quốc tế như IELTS, TOEIC, TOEFL, Cambridge và các chứng chỉ khác trong Bảng tham chiếu quy đổi tương đương theo Khung tham chiếu Châu Âu được công nhận",
+    "source_chunk_id": "03.-Bản-chuẩn-QD-740.-20.10.2018-Quy-dinh-ve-hoc-kiem-tra-va-CĐR-ngoai-ngu_chunk_31"
+  },
+  {
+    "id": "q007",
+    "tier": 2,
+    "category": "ngoại_ngữ__chuẩn_đầu_ra",
+    "question": "Sinh viên cần đạt kết quả như thế nào trong kỳ thi đánh giá chuẩn đầu ra tiếng Anh do nhà trường tổ chức để được công nhận?",
+    "ground_truth": "Sinh viên cần có kết quả xếp loại Đạt trong kỳ thi đánh giá chuẩn đầu ra tiếng Anh do Nhà trường tổ chức, tương đương bậc 3/6 đối với hệ đại học",
+    "source_chunk_id": "03.-Bản-chuẩn-QD-740.-20.10.2018-Quy-dinh-ve-hoc-kiem-tra-va-CĐR-ngoai-ngu_chunk_30"
+  },
+  {
+    "id": "q008",
+    "tier": 2,
+    "category": "ngoại_ngữ__tổ_chức_giảng_dạy",
+    "question": "Học phần Tiếng Anh tăng cường đầu vào có bắt buộc không và dành cho đối tượng sinh viên nào?",
+    "ground_truth": "Học phần Tiếng Anh tăng cường đầu vào là học phần không bắt buộc trong chương trình, dành cho sinh viên có điểm đầu vào thấp hơn ngưỡng quy định",
+    "source_chunk_id": "03.-Bản-chuẩn-QD-740.-20.10.2018-Quy-dinh-ve-hoc-kiem-tra-va-CĐR-ngoai-ngu_chunk_32"
+  },
+  {
+    "id": "q009",
+    "tier": 2,
+    "category": "ngoại_ngữ__định_dạng_thi",
+    "question": "Bài thi đánh giá năng lực tiếng Anh đầu ra do trường tổ chức gồm những kỹ năng nào?",
+    "ground_truth": "Bài thi trắc nghiệm kết hợp tự luận bao gồm 4 kỹ năng nghe, nói, đọc và viết",
+    "source_chunk_id": "03.-Bản-chuẩn-QD-740.-20.10.2018-Quy-dinh-ve-hoc-kiem-tra-va-CĐR-ngoai-ngu_chunk_34"
+  },
+  {
+    "id": "q010",
+    "tier": 2,
+    "category": "ngoại_ngữ__điều_khoản_thi_hành",
+    "question": "Đối với khóa tuyển sinh năm 2016 trở về trước, sinh viên cần đáp ứng điều kiện gì để đạt chuẩn đầu ra ngoại ngữ?",
+    "ground_truth": "Sinh viên khóa 2016 trở về trước được áp dụng theo quy định riêng về chuẩn đầu ra (không theo quy định này)",
+    "source_chunk_id": "03.-Bản-chuẩn-QD-740.-20.10.2018-Quy-dinh-ve-hoc-kiem-tra-va-CĐR-ngoai-ngu_chunk_38"
+  },
+  {
+    "id": "q011",
+    "tier": 1,
+    "category": "ngoại_ngữ_qd_853__phạm_vi_áp_dụng",
+    "question": "Quy định về ngoại ngữ tiếng Anh QD-853 áp dụng cho đối tượng sinh viên nào và từ khóa bao nhiêu?",
+    "ground_truth": "Quy định áp dụng đối với sinh viên đại học chính quy không chuyên ngữ từ khóa 14 tuyển sinh năm 2020 trở về sau",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_29"
+  },
+  {
+    "id": "q012",
+    "tier": 2,
+    "category": "ngoại_ngữ_qd_853__toeic_placement_test",
+    "question": "TOEIC Placement Test Online là gì và được tổ chức bao nhiêu lần trong một khóa học?",
+    "ground_truth": "TOEIC Placement Test Online là bài thi TOEIC trực tuyến được tổ chức 3 lần trong 1 khóa học (không có phiếu điểm), dùng để xếp lớp đầu vào và xét quy đổi điểm",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_9"
+  },
+  {
+    "id": "q013",
+    "tier": 2,
+    "category": "ngoại_ngữ_qd_853__chuẩn_đầu_ra",
+    "question": "Điều kiện để được đánh giá chuẩn đầu ra tiếng Anh theo QD-853 là gì?",
+    "ground_truth": "Sinh viên được đánh giá bằng bài thi TOEIC quốc tế do Trường phối hợp với IIG Việt Nam tổ chức từ học kỳ 6/8 của khóa học; hoặc có chứng chỉ ngoại ngữ tiếng Anh tối thiểu đạt bậc 3 trở lên theo Khung NLNN 6 bậc",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_17"
+  },
+  {
+    "id": "q014",
+    "tier": 2,
+    "category": "ngoại_ngữ_qd_853__xử_lý_vi_phạm",
+    "question": "Sinh viên bị xử lý như thế nào nếu sau học kỳ 5/8 vẫn chưa đạt chuẩn đầu vào tiếng Anh?",
+    "ground_truth": "Sinh viên chưa đạt chuẩn đầu vào tiếng Anh sau học kỳ 5/8 sẽ bị buộc tạm dừng kế hoạch học tập chuyên môn 01 học kỳ để trả nợ các học phần không đạt và hoàn thành các yêu cầu về tiếng Anh",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_28"
+  },
+  {
+    "id": "q015",
+    "tier": 2,
+    "category": "ngoại_ngữ_qd_853__chương_trình_toàn_khóa",
+    "question": "Chương trình tiếng Anh toàn khóa theo QD-853 dành cho khóa 14 đến khóa 16 khác với khóa 17 trở về sau như thế nào?",
+    "ground_truth": "Khóa 14 đến 16 áp dụng Phụ lục 1a, còn từ khóa 17 trở về sau áp dụng Phụ lục 1b với chương trình tiếng Anh khác nhau về điểm đầu vào TOEIC yêu cầu",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_35"
+  },
+  {
+    "id": "q016",
+    "tier": 1,
+    "category": "ngoại_ngữ_qd_853__xếp_lớp",
+    "question": "Sinh viên có điểm TOEIC Placement Test Online dưới 200 được xếp vào lớp học phần nào?",
+    "ground_truth": "Sinh viên có điểm dưới 200 có thể đăng ký học Tiếng Anh tăng cường đầu vào TOEIC (theo thông báo ở từng học kỳ)",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_40"
+  },
+  {
+    "id": "q017",
+    "tier": 2,
+    "category": "ngoại_ngữ_qd_853__miễn_thi_quy_đổi_điểm",
+    "question": "Điều kiện xét để sinh viên được miễn kiểm tra tiếng Anh đầu vào và quy đổi điểm 10 tất cả học phần tiếng Anh bắt buộc là gì?",
+    "ground_truth": "Sinh viên có bằng cử nhân cao đẳng, đại học ngành ngôn ngữ Anh trở lên được xét miễn kiểm tra tiếng Anh đầu vào và được quy đổi điểm 10 tất cả các học phần tiếng Anh bắt buộc",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_85"
+  },
+  {
+    "id": "q018",
+    "tier": 2,
+    "category": "ngoại_ngữ_qd_853__quy_trình_xét",
+    "question": "Quy trình xét miễn thi tiếng Anh đầu vào, đầu ra và quy đổi điểm học phần gồm những bước nào?",
+    "ground_truth": "Sinh viên làm đơn theo mẫu, nộp hồ sơ qua bộ phận một cửa, Phòng Khảo thí xác minh tính pháp lý, phê duyệt kết quả, Hiệu trưởng ra quyết định công nhận, thông báo kết quả trên cổng thông tin, và nhập điểm vào hệ thống",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_87"
+  },
+  {
+    "id": "q019",
+    "tier": 2,
+    "category": "tin_học__chuẩn_đầu_ra",
+    "question": "Chuẩn đầu ra tin học của sinh viên đại học tại trường cần đáp ứng điều kiện gì?",
+    "ground_truth": "Sinh viên được công nhận đạt chuẩn đầu ra tin học nếu có chứng chỉ UDCNTTCB, hoặc chứng chỉ tin học quốc tế IC3, MOS, ICDL (phần cơ bản), hoặc các trường hợp khác do Hiệu trưởng quyết định",
+    "source_chunk_id": "qd670-ban-hanh-quy-dinh-ve-cdr-tin-hoc-20250915082744-e_chunk_14"
+  },
+  {
+    "id": "q020",
+    "tier": 2,
+    "category": "tin_học__chứng_chỉ_mos",
+    "question": "Chứng chỉ tin học MOS áp dụng cho đối tượng sinh viên nào và cần đạt bao nhiêu chứng chỉ?",
+    "ground_truth": "Chứng chỉ MOS áp dụng với sinh viên theo học chương trình chất lượng; mỗi sinh viên cần đạt 2 trong 3 chứng chỉ (hoặc Word và Excel, hoặc Powerpoint và Excel)",
+    "source_chunk_id": "qd670-ban-hanh-quy-dinh-ve-cdr-tin-hoc-20250915082744-e_chunk_15"
+  },
+  {
+    "id": "q021",
+    "tier": 2,
+    "category": "tin_học__miễn_chuẩn_đầu_ra",
+    "question": "Sinh viên ngành nào được miễn chuẩn đầu ra tin học?",
+    "ground_truth": "Sinh viên có bằng tốt nghiệp đại học, cao đẳng hoặc trung cấp ngành Máy tính và Công nghệ thông tin trong nước hoặc nước ngoài được xét miễn chuẩn đầu ra tin học",
+    "source_chunk_id": "qd670-ban-hanh-quy-dinh-ve-cdr-tin-hoc-20250915082744-e_chunk_21"
+  },
+  {
+    "id": "q022",
+    "tier": 2,
+    "category": "tin_học__quy_đổi_điểm",
+    "question": "Quy định quy đổi điểm học phần tin học áp dụng cho chương trình nào và khóa nào?",
+    "ground_truth": "Quy đổi điểm học phần tin học được thực hiện đối với sinh viên theo học chương trình chất lượng trình độ đại học các khóa tuyển sinh từ năm 2020",
+    "source_chunk_id": "qd670-ban-hanh-quy-dinh-ve-cdr-tin-hoc-20250915082744-e_chunk_13"
+  },
+  {
+    "id": "q023",
+    "tier": 2,
+    "category": "rèn_luyện__nội_dung_đánh_giá",
+    "question": "Điểm rèn luyện của sinh viên được đánh giá dựa trên những nội dung nào?",
+    "ground_truth": "Đánh giá kết quả rèn luyện dựa trên ý thức, thái độ của người học theo các tiêu chí về học tập, chấp hành nội quy, hoạt động xã hội, ý thức công dân và các tiêu chí khác theo quy định",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_11"
+  },
+  {
+    "id": "q024",
+    "tier": 1,
+    "category": "rèn_luyện__phân_loại_kết_quả",
+    "question": "Sinh viên được xếp loại rèn luyện Xuất sắc khi đạt bao nhiêu điểm?",
+    "ground_truth": "Từ 90 đến 100 điểm được xếp loại Xuất sắc",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_30"
+  },
+  {
+    "id": "q025",
+    "tier": 2,
+    "category": "rèn_luyện__phân_loại_kết_quả",
+    "question": "Các mức phân loại kết quả rèn luyện của sinh viên là gì?",
+    "ground_truth": "Kết quả rèn luyện được phân thành: Xuất sắc, Tốt, Khá, Trung bình (TBK), Yếu và Kém",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_30"
+  },
+  {
+    "id": "q026",
+    "tier": 1,
+    "category": "rèn_luyện__kỷ_luật_và_điểm",
+    "question": "Sinh viên bị kỷ luật mức khiển trách thì điểm rèn luyện tối đa được xếp loại nào?",
+    "ground_truth": "Trong thời gian bị kỷ luật mức khiển trách, điểm rèn luyện không vượt quá loại Khá",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_32"
+  },
+  {
+    "id": "q027",
+    "tier": 2,
+    "category": "rèn_luyện__quy_trình_đánh_giá",
+    "question": "Quy trình đánh giá điểm rèn luyện diễn ra như thế nào?",
+    "ground_truth": "Sinh viên tự đánh giá theo mức điểm chi tiết; Cố vấn học tập báo cáo kết quả đến Hội đồng đánh giá cấp Khoa; Hội đồng cấp Khoa xem xét và chuyển lên cấp Trường để phê duyệt",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_35"
+  },
+  {
+    "id": "q028",
+    "tier": 2,
+    "category": "rèn_luyện__khiếu_nại",
+    "question": "Khi có khiếu nại về điểm rèn luyện, sinh viên cần làm gì và ai có trách nhiệm giải quyết?",
+    "ground_truth": "Sinh viên làm đơn khiếu nại; Trưởng phòng Công tác Sinh viên, lãnh đạo khoa chuyên môn và CVHT có trách nhiệm phối hợp giải quyết và trả lời cho sinh viên",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_37"
+  },
+  {
+    "id": "q029",
+    "tier": 1,
+    "category": "rèn_luyện__cộng_trừ_điểm",
+    "question": "Sinh viên được cộng tối đa bao nhiêu điểm rèn luyện và bị trừ tối đa bao nhiêu điểm?",
+    "ground_truth": "Sinh viên được cộng tối đa 30 điểm rèn luyện và bị trừ tối đa 40 điểm rèn luyện",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_19"
+  },
+  {
+    "id": "q030",
+    "tier": 1,
+    "category": "rèn_luyện__cộng_điểm",
+    "question": "Lớp trưởng hoàn thành xuất sắc nhiệm vụ được cộng bao nhiêu điểm rèn luyện?",
+    "ground_truth": "Lớp trưởng, Bí thư chi đoàn hoàn thành xuất sắc nhiệm vụ được cộng 3 điểm rèn luyện (mức cao nhất trong nhóm cán bộ lớp/đoàn)",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_23"
+  },
+  {
+    "id": "q031",
+    "tier": 1,
+    "category": "rèn_luyện__trừ_điểm",
+    "question": "Sinh viên không đóng học phí đúng hạn bị trừ bao nhiêu điểm rèn luyện?",
+    "ground_truth": "Sinh viên không đóng học phí đúng thời hạn quy định bị trừ tối đa 4 điểm rèn luyện",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_26"
+  },
+  {
+    "id": "q032",
+    "tier": 2,
+    "category": "rèn_luyện__hội_đồng_đánh_giá",
+    "question": "Hội đồng đánh giá kết quả rèn luyện cấp Khoa gồm những thành phần nào?",
+    "ground_truth": "Hội đồng cấp Khoa gồm Trưởng khoa hoặc Phó trưởng khoa, Lớp trưởng các lớp, Bí thư Liên chi đoàn và các thành viên liên quan",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_42"
+  },
+  {
+    "id": "q033",
+    "tier": 2,
+    "category": "rèn_luyện__học_hai_chương_trình",
+    "question": "Sinh viên học đồng thời hai chương trình đào tạo thì điểm rèn luyện được đánh giá ở đâu?",
+    "ground_truth": "Người học đồng thời học hai chương trình đào tạo sẽ được đánh giá kết quả rèn luyện tại đơn vị quản lý chương trình thứ nhất và lấy ý kiến nhận xét của đơn vị quản lý chương trình còn lại",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_34"
+  },
+  {
+    "id": "q034",
+    "tier": 2,
+    "category": "học_bổng__phạm_vi_áp_dụng",
+    "question": "Học bổng khuyến khích học tập (KKHT) dành cho đối tượng sinh viên nào?",
+    "ground_truth": "Học bổng KKHT dành cho sinh viên của Trường Đại học Kinh tế - Kỹ thuật Công nghiệp đáp ứng các tiêu chuẩn về kết quả học tập và rèn luyện",
+    "source_chunk_id": "5.QĐ-748-20.10.2018.-Quy-định-về-học-bổng-khuyến-khích-học-tập-đối-với-sinh-viên-Trường-Đại-học-Kinh-tế-Kỹ-thuật-Công-nghiệp_chunk_12"
+  },
+  {
+    "id": "q035",
+    "tier": 2,
+    "category": "học_bổng__tiêu_chuẩn_xét",
+    "question": "Tiêu chuẩn về kết quả rèn luyện để được xét học bổng KKHT là gì?",
+    "ground_truth": "Kết quả rèn luyện phải đạt loại Khá trở lên (theo Điều 2c QĐ-748); cụ thể: học bổng Khá yêu cầu RL loại Khá trở lên, học bổng Giỏi yêu cầu loại Tốt trở lên, học bổng Xuất sắc yêu cầu loại Xuất sắc",
+    "source_chunk_id": "5.QĐ-748-20.10.2018.-Quy-định-về-học-bổng-khuyến-khích-học-tập-đối-với-sinh-viên-Trường-Đại-học-Kinh-tế-Kỹ-thuật-Công-nghiệp_chunk_14"
+  },
+  {
+    "id": "q036",
+    "tier": 2,
+    "category": "học_bổng__phân_loại",
+    "question": "Học bổng KKHT được phân thành mấy loại và dựa trên cơ sở nào?",
+    "ground_truth": "Học bổng KKHT được phân loại căn cứ vào các quy định hiện hành và điều kiện xét, gồm các mức Xuất sắc, Giỏi và Khá tùy theo kết quả học tập",
+    "source_chunk_id": "5.QĐ-748-20.10.2018.-Quy-định-về-học-bổng-khuyến-khích-học-tập-đối-với-sinh-viên-Trường-Đại-học-Kinh-tế-Kỹ-thuật-Công-nghiệp_chunk_16"
+  },
+  {
+    "id": "q037",
+    "tier": 2,
+    "category": "học_bổng__mức_học_bổng",
+    "question": "Mức học bổng KKHT loại Giỏi được tính như thế nào?",
+    "ground_truth": "Học bổng loại Giỏi = mức học phí ngành/tín chỉ × số tín chỉ bình quân mỗi học kỳ × hệ số 1,2 (so với loại Khá có hệ số 1,0 và Xuất sắc có hệ số 1,4)",
+    "source_chunk_id": "5.QĐ-748-20.10.2018.-Quy-định-về-học-bổng-khuyến-khích-học-tập-đối-với-sinh-viên-Trường-Đại-học-Kinh-tế-Kỹ-thuật-Công-nghiệp_chunk_19"
+  },
+  {
+    "id": "q038",
+    "tier": 2,
+    "category": "học_bổng__điều_khoản_thi_hành",
+    "question": "Quy định về học bổng KKHT có hiệu lực từ năm học nào?",
+    "ground_truth": "Quy định học bổng KKHT (QĐ-748) có hiệu lực từ ngày ký (20/10/2018) và áp dụng từ năm học 2018-2019",
+    "source_chunk_id": "5.QĐ-748-20.10.2018.-Quy-định-về-học-bổng-khuyến-khích-học-tập-đối-với-sinh-viên-Trường-Đại-học-Kinh-tế-Kỹ-thuật-Công-nghiệp_chunk_34"
+  },
+  {
+    "id": "q039",
+    "tier": 2,
+    "category": "học_bổng__quy_trình_xét",
+    "question": "Quy trình xét học bổng KKHT gồm bao nhiêu bước và ai là đơn vị đầu mối?",
+    "ground_truth": "Quy trình gồm 7 bước: chuẩn bị dữ liệu, kiểm tra dữ liệu, CVHT công bố danh sách, tổng hợp kết quả, họp hội đồng, ra quyết định và cấp phát học bổng. Phòng Công tác Sinh viên là đơn vị đầu mối",
+    "source_chunk_id": "5.QĐ-748-20.10.2018.-Quy-định-về-học-bổng-khuyến-khích-học-tập-đối-với-sinh-viên-Trường-Đại-học-Kinh-tế-Kỹ-thuật-Công-nghiệp_chunk_26"
+  },
+  {
+    "id": "q040",
+    "tier": 2,
+    "category": "học_bổng__vai_trò_cvht",
+    "question": "Cố vấn học tập có trách nhiệm gì trong quy trình xét học bổng KKHT?",
+    "ground_truth": "Cố vấn học tập nhắc nhở sinh viên kiểm tra thông tin về điểm học tập và rèn luyện, đồng thời công bố danh sách sinh viên đạt 2 tiêu chí thuộc diện được đưa vào xét học bổng",
+    "source_chunk_id": "5.QĐ-748-20.10.2018.-Quy-định-về-học-bổng-khuyến-khích-học-tập-đối-với-sinh-viên-Trường-Đại-học-Kinh-tế-Kỹ-thuật-Công-nghiệp_chunk_22"
+  },
+  {
+    "id": "q041",
+    "tier": 2,
+    "category": "học_bổng__trách_nhiệm_đơn_vị",
+    "question": "Phòng Đào tạo có trách nhiệm gì trong việc xét học bổng KKHT?",
+    "ground_truth": "Phòng Đào tạo chịu trách nhiệm về điểm học tập của sinh viên trên hệ thống, phối hợp kiểm tra, rà soát dữ liệu điểm làm căn cứ xét học bổng",
+    "source_chunk_id": "5.QĐ-748-20.10.2018.-Quy-định-về-học-bổng-khuyến-khích-học-tập-đối-với-sinh-viên-Trường-Đại-học-Kinh-tế-Kỹ-thuật-Công-nghiệp_chunk_23"
+  },
+  {
+    "id": "q042",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__điều_kiện_làm_kltn",
+    "question": "Điều kiện để sinh viên được làm khóa luận tốt nghiệp (KLTN) là gì?",
+    "ground_truth": "Sinh viên phải đáp ứng các điều kiện theo quy định tại Điều 3 của Quy định, bao gồm đã tích lũy đủ số tín chỉ theo quy định và đáp ứng các yêu cầu khác của khoa/trường",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_9"
+  },
+  {
+    "id": "q043",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__quy_trình_giao_đề_tài",
+    "question": "Quy trình đề xuất và giao đề tài khóa luận tốt nghiệp do ai phụ trách?",
+    "ground_truth": "Do Trưởng Khoa/bộ môn chủ trì quy trình đề xuất và giao đề tài KLTN",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_13"
+  },
+  {
+    "id": "q044",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__điều_chỉnh_đề_tài",
+    "question": "Sinh viên có được phép điều chỉnh tên và nội dung khóa luận tốt nghiệp sau khi đã được giao đề tài không?",
+    "ground_truth": "Sinh viên được phép đề nghị điều chỉnh tên và nội dung KLTN theo quy trình quy định",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_15"
+  },
+  {
+    "id": "q045",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__đề_tài_không_được_duyệt",
+    "question": "Những dạng đề tài nào không được duyệt trong khóa luận tốt nghiệp?",
+    "ground_truth": "Không duyệt các dạng đề tài biên soạn giáo trình, đề cương môn học và các đề tài trùng lặp hoặc không đáp ứng điều kiện về tính mới, tính khoa học",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_16"
+  },
+  {
+    "id": "q046",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__điều_kiện_đánh_giá",
+    "question": "Điều kiện để sinh viên được tham gia đánh giá khóa luận tốt nghiệp là gì?",
+    "ground_truth": "Sinh viên phải đáp ứng các điều kiện tại Điều 5: có đủ tiến độ thực hiện, được cán bộ hướng dẫn đánh giá đạt yêu cầu và hoàn thiện hồ sơ theo quy định",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_11"
+  },
+  {
+    "id": "q047",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__đình_chỉ_kltn",
+    "question": "Khóa luận tốt nghiệp có thể bị đình chỉ trong trường hợp nào?",
+    "ground_truth": "KLTN bị đình chỉ nếu xét thấy không có khả năng hoàn thành đúng tiến độ hoặc sinh viên vi phạm các quy định trong quá trình thực hiện",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_35"
+  },
+  {
+    "id": "q048",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__hình_thức_đánh_giá",
+    "question": "Có mấy hình thức đánh giá khóa luận tốt nghiệp tại trường?",
+    "ground_truth": "Có 2 hình thức: chấm KLTN (Khoa, bộ môn lựa chọn hai giảng viên chấm độc lập) và lập hội đồng đánh giá KLTN (do Hiệu trưởng quyết định thành lập)",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_39"
+  },
+  {
+    "id": "q049",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__nội_dung_đánh_giá",
+    "question": "Nội dung đánh giá khóa luận tốt nghiệp theo hình thức chấm KLTN gồm những tiêu chí gì?",
+    "ground_truth": "Nội dung và hình thức KLTN có đáp ứng các quy định của Trường và Khoa; mức độ hoàn thành mục tiêu và các yêu cầu khoa học của đề tài",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_49"
+  },
+  {
+    "id": "q050",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__tài_liệu_tham_khảo",
+    "question": "Tài liệu tham khảo trong khóa luận tốt nghiệp cần được sắp xếp theo thứ tự như thế nào?",
+    "ground_truth": "Tài liệu tham khảo xếp riêng theo các nhóm ngôn ngữ (Việt, Anh, Pháp, Đức...), tên tác giả hoặc cơ quan phát hành (không có dấu ngăn cách), năm công bố và thông tin đầy đủ của tài liệu",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_29"
+  },
+  {
+    "id": "q051",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__yêu_cầu_nội_dung",
+    "question": "Phần nội dung chính của khóa luận tốt nghiệp có yêu cầu gì về cách trình bày kết quả?",
+    "ground_truth": "Kết quả được viết một cách trung thực, khách quan; không bịa đặt số liệu, không sao chép từ các tài liệu khác mà không có trích dẫn đầy đủ",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_25"
+  },
+  {
+    "id": "q052",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__kết_luận_và_đề_nghị",
+    "question": "Phần kết luận và đề nghị trong khóa luận tốt nghiệp cần có những nội dung gì?",
+    "ground_truth": "Kết luận nhằm đưa ra tóm tắt kết quả chính của nghiên cứu, những đóng góp và các hướng phát triển tiếp theo của đề tài",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_28"
+  },
+  {
+    "id": "q053",
+    "tier": 2,
+    "category": "chuẩn_đầu_ra_ctđt__hiệu_lực_quyết_định",
+    "question": "Phương thức đánh giá chuẩn đầu ra chương trình đào tạo (CĐR CTĐT) theo QD-1228 áp dụng từ năm học nào?",
+    "ground_truth": "Quyết định 1228 có hiệu lực kể từ ngày ký (27/12/2024) và áp dụng từ năm học 2024 - 2025",
+    "source_chunk_id": "qd-1228-phuong-thuc-danh-gia-cdr-20250106041456-e (1)_chunk_6"
+  },
+  {
+    "id": "q054",
+    "tier": 2,
+    "category": "chuẩn_đầu_ra_ctđt__phương_thức_k15",
+    "question": "Sinh viên khóa K15 (2021-2025) được đánh giá chuẩn đầu ra chuyên môn bằng phương thức nào?",
+    "ground_truth": "Sinh viên K15 được đánh giá bằng: đánh giá gián tiếp (tự đánh giá bằng khảo sát) và đánh giá trực tiếp bằng Bài đánh giá tổng hợp trong giai đoạn từ 10/4 đến 10/5/2025",
+    "source_chunk_id": "qd-1228-phuong-thuc-danh-gia-cdr-20250106041456-e (1)_chunk_7"
+  },
+  {
+    "id": "q055",
+    "tier": 2,
+    "category": "chuẩn_đầu_ra_ctđt__phương_thức_k16",
+    "question": "Sinh viên khóa K16 (2022-2026) được đánh giá chuẩn đầu ra chuyên môn bằng phương thức nào cho các học phần từ HK6 trở đi?",
+    "ground_truth": "Từ HK6 trở đi (học kỳ 2 năm học 2024-2025 đến khi tốt nghiệp), K16 sử dụng kết quả bài thi cuối kỳ của các học phần cốt lõi (HP A) theo kế hoạch",
+    "source_chunk_id": "qd-1228-phuong-thuc-danh-gia-cdr-20250106041456-e (1)_chunk_8"
+  },
+  {
+    "id": "q056",
+    "tier": 2,
+    "category": "chuẩn_đầu_ra_ctđt__phương_thức_k17_trở_đi",
+    "question": "Từ khóa K17 (2023-2027) trở đi, sinh viên được đánh giá chuẩn đầu ra chuyên môn theo phương thức nào?",
+    "ground_truth": "Từ K17 trở đi, sinh viên được đánh giá trực tiếp bằng kết quả bài thi cuối kỳ của các học phần cốt lõi (HP A) theo kế hoạch, theo Quyết định 794/QĐ-ĐHKTKTCN ngày 17/9/2024",
+    "source_chunk_id": "qd-1228-phuong-thuc-danh-gia-cdr-20250106041456-e (1)_chunk_9"
+  },
+  {
+    "id": "q057",
+    "tier": 2,
+    "category": "chuẩn_đầu_ra_ctđt__điều_kiện_công_nhận",
+    "question": "Điều kiện để sinh viên được công nhận đạt chuẩn đầu ra chuyên môn của chương trình đào tạo là gì?",
+    "ground_truth": "Sinh viên phải đáp ứng đồng thời hai điều kiện: điểm của mỗi chuẩn đầu ra thành phần lớn hơn hoặc bằng 4.0; và điểm chuẩn đầu ra CTĐT lớn hơn hoặc bằng 5.5 (theo thang điểm 10)",
+    "source_chunk_id": "qd-1228-phuong-thuc-danh-gia-cdr-20250106041456-e (1)_chunk_10"
+  },
+  {
+    "id": "q058",
+    "tier": 2,
+    "category": "chuẩn_đầu_ra_ctđt__đánh_giá_gián_tiếp",
+    "question": "Đánh giá gián tiếp CĐR CTĐT là gì và được thực hiện như thế nào?",
+    "ground_truth": "Đánh giá gián tiếp là người học tự đánh giá CĐR của CTĐT bằng công cụ khảo sát, thực hiện vào năm cuối của chương trình đào tạo",
+    "source_chunk_id": "qd-1228-phuong-thuc-danh-gia-cdr-20250106041456-e (1)_chunk_7"
+  },
+  {
+    "id": "q059",
+    "tier": 2,
+    "category": "rèn_luyện__ý_thức_học_tập",
+    "question": "Tiêu chí để xác định điểm đánh giá về ý thức học tập trong quy chế điểm rèn luyện gồm những gì?",
+    "ground_truth": "Các tiêu chí gồm: ý thức và thái độ trong học tập, ý thức và thái độ tham gia các câu lạc bộ học thuật và các hoạt động liên quan đến học tập",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_13"
+  },
+  {
+    "id": "q060",
+    "tier": 1,
+    "category": "rèn_luyện__cộng_điểm_học_tập",
+    "question": "Sinh viên tham gia thi học sinh giỏi các cấp được cộng bao nhiêu điểm rèn luyện?",
+    "ground_truth": "Tham gia thi học sinh giỏi các cấp được cộng tối đa 2 điểm rèn luyện",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_20"
+  },
+  {
+    "id": "q061",
+    "tier": 1,
+    "category": "rèn_luyện__trừ_điểm_vi_phạm",
+    "question": "Sinh viên báo cáo không trung thực hoặc bao che vi phạm bị trừ bao nhiêu điểm rèn luyện?",
+    "ground_truth": "Báo cáo không trung thực, có hành vi bao che cho vi phạm của các bạn trong lớp bị trừ tối đa 3 điểm",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_28"
+  },
+  {
+    "id": "q062",
+    "tier": 2,
+    "category": "rèn_luyện__trừ_điểm_vi_phạm_pháp_luật",
+    "question": "Điểm vi phạm chính sách, pháp luật của nhà nước bị trừ bao nhiêu điểm rèn luyện?",
+    "ground_truth": "Vi phạm chính sách, pháp luật của Nhà nước bị trừ điểm theo mục IV (ý thức công dân trong quan hệ với cộng đồng) tối đa 6 điểm",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_27"
+  },
+  {
+    "id": "q063",
+    "tier": 2,
+    "category": "rèn_luyện__nguyên_tắc_đánh_giá",
+    "question": "Nguyên tắc đánh giá kết quả rèn luyện của sinh viên là gì?",
+    "ground_truth": "Thực hiện nghiêm túc quy trình và các tiêu chí đánh giá được quy định, đảm bảo khách quan, công bằng và phản ánh đúng thực chất kết quả rèn luyện của sinh viên",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_10"
+  },
+  {
+    "id": "q064",
+    "tier": 2,
+    "category": "rèn_luyện__sinh_viên_tốt_nghiệp_chậm",
+    "question": "Sinh viên hoàn thành chương trình học chậm so với quy định của khóa học thì điểm rèn luyện được xử lý như thế nào?",
+    "ground_truth": "Sinh viên hoàn thành chương trình và tốt nghiệp chậm so với quy định của khóa học thì tiếp tục được đánh giá kết quả rèn luyện trong thời gian đang hoàn thành chương trình",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_33"
+  },
+  {
+    "id": "q065",
+    "tier": 2,
+    "category": "rèn_luyện__hội_đồng_cấp_trường",
+    "question": "Hội đồng đánh giá kết quả rèn luyện cấp Nhà trường gồm những thành phần nào?",
+    "ground_truth": "Hội đồng cấp Nhà trường gồm: Hiệu trưởng hoặc Phó Hiệu trưởng (Chủ tịch), Trưởng phòng Đào tạo, Chủ tịch Hội sinh viên và các thành viên liên quan",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_41"
+  },
+  {
+    "id": "q066",
+    "tier": 2,
+    "category": "rèn_luyện__nhiệm_vụ_hội_đồng_khoa",
+    "question": "Hội đồng đánh giá điểm rèn luyện cấp Khoa có nhiệm vụ gì?",
+    "ground_truth": "Hội đồng cấp Khoa căn cứ vào Quy định hiện hành và đề nghị của CVHT, tiến hành xem xét đánh giá kết quả rèn luyện của từng lớp và đề nghị Trưởng khoa công nhận",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_40"
+  },
+  {
+    "id": "q067",
+    "tier": 2,
+    "category": "rèn_luyện__hoạt_động_tình_nguyện",
+    "question": "Sinh viên tham gia các hoạt động tình nguyện, công tác xã hội có được cộng điểm rèn luyện không?",
+    "ground_truth": "Có, ý thức tham gia các hoạt động công ích, tình nguyện, công tác xã hội là tiêu chí để xác định điểm đánh giá về ý thức và kết quả chấp hành nội quy",
+    "source_chunk_id": "4.-QD-747-20.10.2018.-Quy-chế-đánh-giá-điểm-rèn-luyện-của-sinh-viên_chunk_15"
+  },
+  {
+    "id": "q068",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__phân_công_cbhd",
+    "question": "Cán bộ hướng dẫn (CBHD) khóa luận tốt nghiệp được phân công theo quy định nào?",
+    "ground_truth": "Việc phân công Cán bộ hướng dẫn được quy định tại Điều 4, theo đó Trưởng Khoa/bộ môn phân công dựa trên chuyên môn và năng lực của giảng viên phù hợp với đề tài",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_10"
+  },
+  {
+    "id": "q069",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__hình_thức_trình_bày",
+    "question": "Yêu cầu về trình bày trang bìa của khóa luận tốt nghiệp là gì?",
+    "ground_truth": "Trang bìa căn đều 2 bên, chữ viết hoa và theo mẫu quy định của Trường/Khoa",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_19"
+  },
+  {
+    "id": "q070",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__mục_lục",
+    "question": "Phần mục lục của khóa luận tốt nghiệp cần được trình bày như thế nào?",
+    "ground_truth": "Mục lục đánh số trang theo thứ tự và liệt kê đầy đủ các phần, chương, mục của khóa luận",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_22"
+  },
+  {
+    "id": "q071",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__danh_mục_chữ_viết_tắt",
+    "question": "Danh mục các chữ viết tắt trong khóa luận tốt nghiệp có cấu trúc như thế nào?",
+    "ground_truth": "Danh mục các chữ viết tắt gồm 2 cột: cột chữ viết tắt và cột giải thích nghĩa đầy đủ",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_23"
+  },
+  {
+    "id": "q072",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__theo_dõi_tiến_độ",
+    "question": "Trong quá trình theo dõi đánh giá KLTN, CBHD có quyền thực hiện những công việc gì?",
+    "ground_truth": "CBHD rà soát lại tiến độ thực hiện của sinh viên; có thể đình chỉ KLTN nếu xét thấy sinh viên không có khả năng hoàn thành đúng tiến độ hoặc vi phạm quy định",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_34"
+  },
+  {
+    "id": "q073",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__tài_liệu_trực_tuyến",
+    "question": "Tài liệu tham khảo khai thác trực tuyến (trên mạng) trong KLTN cần ghi những thông tin gì?",
+    "ground_truth": "Phần nguồn gốc tài liệu phải ghi đường dẫn tới tài liệu (URL) và ngày truy cập tài liệu đó",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_32"
+  },
+  {
+    "id": "q074",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__đánh_giá_sai_sót",
+    "question": "Sai sót trong bảng số liệu của KLTN bị đánh giá như thế nào?",
+    "ground_truth": "Sai sót trong các bảng số liệu là một trong những vi phạm nghiêm trọng có thể ảnh hưởng đến kết quả đánh giá và tính trung thực của khóa luận",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_26"
+  },
+  {
+    "id": "q075",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__hội_đồng_đánh_giá",
+    "question": "Hội đồng đánh giá KLTN theo hình thức lập hội đồng do ai quyết định thành lập?",
+    "ground_truth": "Hội đồng đánh giá KLTN theo hình thức lập hội đồng do Hiệu trưởng quyết định thành lập",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_40"
+  },
+  {
+    "id": "q076",
+    "tier": 2,
+    "category": "khóa_luận_tốt_nghiệp__yêu_cầu_tên_đề_tài",
+    "question": "Tên đề tài khóa luận tốt nghiệp cần đáp ứng yêu cầu gì?",
+    "ground_truth": "Tên đề tài phải nêu được đúng, rõ ràng nội dung nghiên cứu chính, không mơ hồ và đủ ngắn gọn, súc tích",
+    "source_chunk_id": "14.-QD-828-Qui-dinh-ve-viec-huong-dan-va-danh-gia-khoa-luan-tot-nghiep-doi-voi-sinh-vien-dai-hoc-chinh-quy-dao-tao-theo-he-thong-tin-chi.1-đã-chuyển-đổi_chunk_21"
+  },
+  {
+    "id": "q077",
+    "tier": 2,
+    "category": "ngoại_ngữ__miễn_học_bằng_đại_học",
+    "question": "Sinh viên có bằng cử nhân chuyên ngành tiếng Anh có được miễn học các học phần tiếng Anh trong chương trình không?",
+    "ground_truth": "Có, sinh viên có bằng tốt nghiệp đại học chuyên ngành Tiếng Anh được công nhận đạt chuẩn đầu ra và được xét miễn học các học phần tiếng Anh",
+    "source_chunk_id": "03.-Bản-chuẩn-QD-740.-20.10.2018-Quy-dinh-ve-hoc-kiem-tra-va-CĐR-ngoai-ngu_chunk_29"
+  },
+  {
+    "id": "q078",
+    "tier": 2,
+    "category": "ngoại_ngữ__giải_thích_từ_ngữ",
+    "question": "Chuẩn đầu ra ngoại ngữ trong quy định QD-740 đề cập đến loại tiếng Anh nào?",
+    "ground_truth": "Chuẩn đầu ra ngoại ngữ áp dụng trong quy định này là chuẩn đầu ra tiếng Anh theo Khung năng lực ngoại ngữ 6 bậc dùng cho Việt Nam",
+    "source_chunk_id": "03.-Bản-chuẩn-QD-740.-20.10.2018-Quy-dinh-ve-hoc-kiem-tra-va-CĐR-ngoai-ngu_chunk_11"
+  },
+  {
+    "id": "q079",
+    "tier": 1,
+    "category": "ngoại_ngữ__chương_trình_cao_đẳng",
+    "question": "Chương trình tiếng Anh toàn khóa hệ cao đẳng gồm bao nhiêu tín chỉ bắt buộc?",
+    "ground_truth": "Các học phần bắt buộc là 09 tín chỉ đối với hệ cao đẳng",
+    "source_chunk_id": "03.-Bản-chuẩn-QD-740.-20.10.2018-Quy-dinh-ve-hoc-kiem-tra-va-CĐR-ngoai-ngu_chunk_13"
+  },
+  {
+    "id": "q080",
+    "tier": 2,
+    "category": "ngoại_ngữ__tiếng_anh_tăng_cường_đầu_ra",
+    "question": "Học phần Tiếng Anh tăng cường đầu ra dành cho đối tượng sinh viên nào?",
+    "ground_truth": "Học phần Tiếng Anh tăng cường đầu ra là học phần không bắt buộc, dành cho những sinh viên chưa đạt chuẩn đầu ra tiếng Anh và cần bổ sung thêm kiến thức",
+    "source_chunk_id": "03.-Bản-chuẩn-QD-740.-20.10.2018-Quy-dinh-ve-hoc-kiem-tra-va-CĐR-ngoai-ngu_chunk_33"
+  },
+  {
+    "id": "q081",
+    "tier": 1,
+    "category": "ngoại_ngữ__định_dạng_đề_thi_a2",
+    "question": "Định dạng đề thi tiếng Anh trình độ A2 kỹ năng Đọc có đặc điểm gì?",
+    "ground_truth": "Kỹ năng Đọc trong đề thi A2: 40 phút (bao gồm cả thời gian chuyển kết quả sang phiếu trả lời)",
+    "source_chunk_id": "03.-Bản-chuẩn-QD-740.-20.10.2018-Quy-dinh-ve-hoc-kiem-tra-va-CĐR-ngoai-ngu_chunk_55"
+  },
+  {
+    "id": "q082",
+    "tier": 1,
+    "category": "ngoại_ngữ__thi_nói_a2",
+    "question": "Phần thi Nói trong đề thi tiếng Anh trình độ A2 diễn ra trong bao lâu và gồm bao nhiêu phần?",
+    "ground_truth": "Phần thi Nói có thời gian 10 phút (bao gồm 2 phút chuẩn bị) và gồm 4 phần",
+    "source_chunk_id": "03.-Bản-chuẩn-QD-740.-20.10.2018-Quy-dinh-ve-hoc-kiem-tra-va-CĐR-ngoai-ngu_chunk_57"
+  },
+  {
+    "id": "q083",
+    "tier": 1,
+    "category": "ngoại_ngữ__định_dạng_đề_thi_b1_c1",
+    "question": "Phần thi Viết trong đề thi tiếng Anh trình độ B1-C1 diễn ra trong bao lâu và gồm bao nhiêu bài?",
+    "ground_truth": "Phần thi Viết B1-C1 diễn ra trong 60 phút và gồm 2 bài viết kiểm tra kỹ năng Viết tương tác và Viết luận",
+    "source_chunk_id": "03.-Bản-chuẩn-QD-740.-20.10.2018-Quy-dinh-ve-hoc-kiem-tra-va-CĐR-ngoai-ngu_chunk_60"
+  },
+  {
+    "id": "q084",
+    "tier": 2,
+    "category": "ngoại_ngữ__thi_nói_b1_c1",
+    "question": "Phần thi Nói trong đề thi tiếng Anh B1-C1 gồm những kỹ năng nào và diễn ra trong bao lâu?",
+    "ground_truth": "Phần thi Nói B1-C1 gồm 3 phần, kiểm tra kỹ năng tương tác, thảo luận và trình bày vấn đề, thực hiện trong 12 phút với Phần 1 là tương tác xã hội (trả lời 3-6 câu hỏi)",
+    "source_chunk_id": "03.-Bản-chuẩn-QD-740.-20.10.2018-Quy-dinh-ve-hoc-kiem-tra-va-CĐR-ngoai-ngu_chunk_61"
+  },
+  {
+    "id": "q085",
+    "tier": 2,
+    "category": "ngoại_ngữ_qd_853__quy_đổi_điểm_toeic",
+    "question": "Điểm TOEIC Online lần 2 và lần 3 có thể được quy đổi thành điểm hết học phần tiếng Anh không?",
+    "ground_truth": "Có, Khoa Ngoại ngữ xây dựng bảng điểm quy đổi điểm TOEIC Placement Test Online lần 2, lần 3 sang điểm thi hết học phần theo quy định",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_21"
+  },
+  {
+    "id": "q086",
+    "tier": 2,
+    "category": "ngoại_ngữ_qd_853__quy_đổi_chứng_chỉ",
+    "question": "Sinh viên có chứng chỉ tiếng Anh bậc 3/6 trở lên theo Khung NLNN được áp dụng quy đổi điểm như thế nào?",
+    "ground_truth": "Sinh viên có chứng chỉ tiếng Anh bậc 3/6 trở lên theo Khung NLNN 6 bậc dùng cho Việt Nam được quy đổi điểm học phần tiếng Anh theo quy định và được xét miễn bài kiểm tra chuẩn đầu ra",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_86"
+  },
+  {
+    "id": "q087",
+    "tier": 2,
+    "category": "ngoại_ngữ_qd_853__bảng_quy_đổi_điểm_k14_k16",
+    "question": "Điểm TOEIC Online 450 tương ứng với điểm thi hết học phần Tiếng Anh bắt buộc thứ 2 là bao nhiêu (áp dụng cho K14-K16)?",
+    "ground_truth": "Điểm TOEIC Placement Test Online 450 tương ứng với điểm quy đổi sang học phần Tiếng Anh bắt buộc thứ 2 là 10 điểm (áp dụng cho sinh viên K14-K16)",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_54"
+  },
+  {
+    "id": "q088",
+    "tier": 1,
+    "category": "ngoại_ngữ_qd_853__bảng_quy_đổi_điểm",
+    "question": "Điểm TOEIC Online 375 tương ứng với điểm thi hết học phần Tiếng Anh bắt buộc thứ 2 là bao nhiêu (áp dụng cho K14-K16)?",
+    "ground_truth": "Điểm TOEIC Placement Test Online 375 tương ứng với điểm quy đổi sang học phần Tiếng Anh bắt buộc thứ 2 là 8.0 điểm",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_55"
+  },
+  {
+    "id": "q089",
+    "tier": 2,
+    "category": "ngoại_ngữ_qd_853__bảng_quy_đổi_k17+",
+    "question": "Điểm TOEIC Online 300 tương ứng với điểm thi hết học phần Tiếng Anh bắt buộc thứ 2 là bao nhiêu (áp dụng cho K17 trở về sau)?",
+    "ground_truth": "Điểm TOEIC Placement Test Online 300 tương ứng với điểm quy đổi sang học phần Tiếng Anh bắt buộc thứ 2 là 2.0 điểm (áp dụng cho K17 trở về sau)",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_62"
+  },
+  {
+    "id": "q090",
+    "tier": 1,
+    "category": "ngoại_ngữ_qd_853__bảng_quy_đổi_toeic_cefr",
+    "question": "Mức TOEIC quốc tế bao nhiêu tương đương với trình độ B2 theo khung CEFR?",
+    "ground_truth": "TOEIC 600-845 điểm (phần Listening & Reading) tương đương với trình độ B2 theo Khung tham chiếu chung Châu Âu (CEFR)",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_81"
+  },
+  {
+    "id": "q091",
+    "tier": 1,
+    "category": "ngoại_ngữ_qd_853__tương_đương_cambridge_toeic",
+    "question": "Chứng chỉ Cambridge B2 First tương đương với mức TOEIC bao nhiêu theo bảng quy đổi?",
+    "ground_truth": "Chứng chỉ Cambridge B2 First (điểm 160) tương đương với TOEIC 600 điểm (trình độ B2 theo CEFR)",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_66"
+  },
+  {
+    "id": "q092",
+    "tier": 1,
+    "category": "ngoại_ngữ_qd_853__xếp_lớp_theo_toeic",
+    "question": "Sinh viên có điểm TOEIC Online 275 được xếp vào học phần tiếng Anh nào?",
+    "ground_truth": "Sinh viên có điểm TOEIC Online 275-345 được xếp vào Tiếng Anh 2 và được xét miễn Tiếng Anh 1",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_42"
+  },
+  {
+    "id": "q093",
+    "tier": 2,
+    "category": "ngoại_ngữ_qd_853__xử_lý_không_đạt_học_vượt",
+    "question": "Nếu sinh viên học vượt không đạt học phần học vượt thì xử lý như thế nào?",
+    "ground_truth": "Nếu sinh viên không đạt học phần học vượt thì học lại học phần đó theo tiến độ bình thường của khóa học",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_43"
+  },
+  {
+    "id": "q094",
+    "tier": 2,
+    "category": "ngoại_ngữ_qd_853__tự_học_thi_toeic",
+    "question": "Điều kiện để sinh viên được tự học và đăng ký thi TOEIC quốc tế tại Trung tâm Ngoại ngữ và Tin học là gì?",
+    "ground_truth": "Sinh viên có thể tự học và đăng ký thi TOEIC quốc tế tại Trung tâm Ngoại ngữ và Tin học của Trường hoặc tại IIG Việt Nam theo nhu cầu cá nhân",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_19"
+  },
+  {
+    "id": "q095",
+    "tier": 2,
+    "category": "ngoại_ngữ_qd_853__vai_trò_trung_tâm",
+    "question": "Trung tâm Ngoại ngữ và Tin học có vai trò gì trong việc tổ chức kiểm tra đánh giá chuẩn đầu vào tiếng Anh?",
+    "ground_truth": "Trung tâm Ngoại ngữ và Tin học lập danh sách sinh viên dự kiểm tra, phối hợp với IIG Việt Nam và Khoa Công nghệ thông tin tổ chức kiểm tra tiếng Anh đầu vào cho sinh viên",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_16"
+  },
+  {
+    "id": "q096",
+    "tier": 2,
+    "category": "ngoại_ngữ_qd_853__học_phần_ta5",
+    "question": "Học phần Tiếng Anh 5 (TA5) trong chương trình có bao nhiêu tín chỉ và dành cho đối tượng nào?",
+    "ground_truth": "Tiếng Anh 5 (TA5) có 4 tín chỉ, là học phần bắt buộc thứ 5 dành cho sinh viên lớp chất lượng, điểm đầu vào TOEIC Online 500 và điểm đầu ra 575",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_33"
+  },
+  {
+    "id": "q097",
+    "tier": 1,
+    "category": "ngoại_ngữ_qd_853__học_phần_ta8",
+    "question": "Học phần Tiếng Anh tự chọn học vượt (TA8) có điểm đầu vào và đầu ra TOEIC Online là bao nhiêu?",
+    "ground_truth": "Tiếng Anh 8 (TA8) có 4 tín chỉ, điểm đầu vào TOEIC Online 725 và điểm đầu ra 800; là học phần tự chọn",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_34"
+  },
+  {
+    "id": "q098",
+    "tier": 1,
+    "category": "ngoại_ngữ_qd_853__toeic_chuẩn_b1",
+    "question": "Sinh viên cần đáp ứng tiêu chí gì về điểm TOEIC quốc tế để đạt chuẩn đầu ra tiếng Anh mức B1?",
+    "ground_truth": "Điểm TOEIC quốc tế 450-595 điểm (Listening & Reading) tương đương trình độ B1 theo Khung CEFR",
+    "source_chunk_id": "qd-853-2592023-20240826115209-e_chunk_82"
+  },
+  {
+    "id": "q099",
+    "tier": 2,
+    "category": "tin_học__chứng_chỉ_ic3",
+    "question": "Chứng chỉ IC3 là gì và có được công nhận là chuẩn đầu ra tin học không?",
+    "ground_truth": "IC3 (The Internet and Computing Core Certification) là chứng chỉ tin học quốc tế và được công nhận là đạt chuẩn đầu ra tin học tại Trường Đại học Kinh tế - Kỹ thuật Công nghiệp",
+    "source_chunk_id": "qd670-ban-hanh-quy-dinh-ve-cdr-tin-hoc-20250915082744-e_chunk_15"
+  },
+  {
+    "id": "q100",
+    "tier": 2,
+    "category": "tin_học__vai_trò_trung_tâm_tổ_chức_thi",
+    "question": "Trung tâm Ngoại ngữ và Tin học có vai trò gì trong việc tổ chức thi cấp chứng chỉ tin học?",
+    "ground_truth": "Trung tâm Ngoại ngữ và Tin học là đơn vị đầu mối tổ chức thi, phối hợp với Khoa CNTT tổ chức các khóa học ngắn hạn, khóa ôn thi cấp chứng chỉ UDCNTTCB và chứng chỉ MOS để đáp ứng nhu cầu của sinh viên",
+    "source_chunk_id": "qd670-ban-hanh-quy-dinh-ve-cdr-tin-hoc-20250915082744-e_chunk_18"
+  },
+  {
+    "id": "ooc01",
+    "tier": 3,
+    "category": "out_of_corpus",
+    "question": "Quy trình xin visa du học Mỹ tại UNETI là gì?",
+    "ground_truth": "Câu hỏi này nằm ngoài phạm vi tài liệu hiện có của hệ thống."
+  },
+  {
+    "id": "ooc02",
+    "tier": 3,
+    "category": "out_of_corpus",
+    "question": "Học phí trường UNETI năm học 2025-2026 là bao nhiêu?",
+    "ground_truth": "Câu hỏi này nằm ngoài phạm vi tài liệu hiện có của hệ thống."
+  },
+  {
+    "id": "ooc03",
+    "tier": 3,
+    "category": "out_of_corpus",
+    "question": "Trường có ký túc xá không và giá thuê là bao nhiêu?",
+    "ground_truth": "Câu hỏi này nằm ngoài phạm vi tài liệu hiện có của hệ thống."
+  },
+  {
+    "id": "ooc04",
+    "tier": 3,
+    "category": "out_of_corpus",
+    "question": "Lịch thi học kỳ 1 năm học 2025-2026 là khi nào?",
+    "ground_truth": "Câu hỏi này nằm ngoài phạm vi tài liệu hiện có của hệ thống."
+  },
+  {
+    "id": "ooc05",
+    "tier": 3,
+    "category": "out_of_corpus",
+    "question": "Trường UNETI có đào tạo từ xa không?",
+    "ground_truth": "Câu hỏi này nằm ngoài phạm vi tài liệu hiện có của hệ thống."
+  },
+  {
+    "id": "ooc06",
+    "tier": 3,
+    "category": "out_of_corpus",
+    "question": "Điểm chuẩn tuyển sinh ngành Kế toán năm 2024 là bao nhiêu?",
+    "ground_truth": "Câu hỏi này nằm ngoài phạm vi tài liệu hiện có của hệ thống."
+  },
+  {
+    "id": "ooc07",
+    "tier": 3,
+    "category": "out_of_corpus",
+    "question": "Quy định nghỉ phép của giảng viên tại trường như thế nào?",
+    "ground_truth": "Câu hỏi này nằm ngoài phạm vi tài liệu hiện có của hệ thống."
+  },
+  {
+    "id": "ooc08",
+    "tier": 3,
+    "category": "out_of_corpus",
+    "question": "Danh sách câu lạc bộ sinh viên hoạt động tại trường gồm những gì?",
+    "ground_truth": "Câu hỏi này nằm ngoài phạm vi tài liệu hiện có của hệ thống."
+  },
+  {
+    "id": "ooc09",
+    "tier": 3,
+    "category": "out_of_corpus",
+    "question": "Chính sách hỗ trợ sinh viên khó khăn ngoài học bổng KKHT là gì?",
+    "ground_truth": "Câu hỏi này nằm ngoài phạm vi tài liệu hiện có của hệ thống."
+  },
+  {
+    "id": "ooc10",
+    "tier": 3,
+    "category": "out_of_corpus",
+    "question": "Quy trình khiếu nại điểm thi tại trường UNETI như thế nào?",
+    "ground_truth": "Câu hỏi này nằm ngoài phạm vi tài liệu hiện có của hệ thống."
+  }
 ]

@@ -1,0 +1,122 @@
+{
+  "Quy định về học, kiểm tra và chuẩn đầu ra ngoại ngữ này áp dụng cho những đối tượng sinh viên nào và bao gồm những hệ đào tạo nào?": {
+    "faithfulness": 1.0,
+    "answer_relevancy": 0.8443,
+    "context_recall": 1.0,
+    "context_precision": 0.3321
+  },
+  "Quy định ngoại ngữ QD-740 áp dụng từ khóa tuyển sinh năm nào trở về sau?": {
+    "faithfulness": null,
+    "answer_relevancy": null,
+    "context_recall": 1.0,
+    "context_precision": null
+  },
+  "Chương trình tiếng Anh toàn khóa hệ đại học bắt buộc bao nhiêu tín chỉ?": {
+    "faithfulness": 1.0,
+    "answer_relevancy": 0.9574,
+    "context_recall": 1.0,
+    "context_precision": null
+  },
+  "Sinh viên cần đạt điểm bao nhiêu trong bài kiểm tra đầu vào tiếng Anh để được đăng ký học học phần Tiếng Anh cơ bản 1?": {
+    "faithfulness": 1.0,
+    "answer_relevancy": 0.8876,
+    "context_recall": 1.0,
+    "context_precision": null
+  },
+  "Sinh viên cần đáp ứng điều kiện gì để được xét miễn học, miễn thi các học phần tiếng Anh?": {
+    "faithfulness": 1.0,
+    "answer_relevancy": 0.9591,
+    "context_recall": 1.0,
+    "context_precision": null
+  },
+  "Các chứng chỉ tiếng Anh quốc tế nào được công nhận tương đương để xét chuẩn đầu ra tiếng Anh tại trường?": {
+    "faithfulness": 1.0,
+    "answer_relevancy": 0.9524,
+    "context_recall": 1.0,
+    "context_precision": 0.0625
+  },
+  "Sinh viên cần đạt kết quả như thế nào trong kỳ thi đánh giá chuẩn đầu ra tiếng Anh do nhà trường tổ chức để được công nhận?": {
+    "faithfulness": 1.0,
+    "answer_relevancy": 0.9899,
+    "context_recall": 1.0,
+    "context_precision": null
+  },
+  "Học phần Tiếng Anh tăng cường đầu vào có bắt buộc không và dành cho đối tượng sinh viên nào?": {
+    "faithfulness": 1.0,
+    "answer_relevancy": 0.9771,
+    "context_recall": 1.0,
+    "context_precision": null
+  },
+  "Bài thi đánh giá năng lực tiếng Anh đầu ra do trường tổ chức gồm những kỹ năng nào?": {
+    "faithfulness": 1.0,
+    "answer_relevancy": 0.8877,
+    "context_recall": 1.0,
+    "context_precision": null
+  },
+  "Đối với khóa tuyển sinh năm 2016 trở về trước, sinh viên cần đáp ứng điều kiện gì để đạt chuẩn đầu ra ngoại ngữ?": {
+    "faithfulness": 1.0,
+    "answer_relevancy": 0.7929,
+    "context_recall": 1.0,
+    "context_precision": null
+  },
+  "Quy định về ngoại ngữ tiếng Anh QD-853 áp dụng cho đối tượng sinh viên nào và từ khóa bao nhiêu?": {
+    "faithfulness": 1.0,
+    "answer_relevancy": 0.6279,
+    "context_recall": 1.0,
+    "context_precision": null
+  },
+  "TOEIC Placement Test Online là gì và được tổ chức bao nhiêu lần trong một khóa học?": {
+    "faithfulness": null,
+    "answer_relevancy": 0.9187,
+    "context_recall": 1.0,
+    "context_precision": null
+  },
+  "Điều kiện để được đánh giá chuẩn đầu ra tiếng Anh theo QD-853 là gì?": {
+    "faithfulness": 0.9167,
+    "answer_relevancy": 0.6624,
+    "context_recall": 1.0,
+    "context_precision": null
+  },
+  "Sinh viên bị xử lý như thế nào nếu sau học kỳ 5/8 vẫn chưa đạt chuẩn đầu vào tiếng Anh?": {
+    "faithfulness": 1.0,
+    "answer_relevancy": 0.9859,
+    "context_recall": 1.0,
+    "context_precision": 0.3333
+  },
+  "Chương trình tiếng Anh toàn khóa theo QD-853 dành cho khóa 14 đến khóa 16 khác với khóa 17 trở về sau như thế nào?": {
+    "faithfulness": 1.0,
+    "answer_relevancy": 0.7919,
+    "context_recall": null,
+    "context_precision": 0.1429
+  },
+  "Sinh viên có điểm TOEIC Placement Test Online dưới 200 được xếp vào lớp học phần nào?": {
+    "faithfulness": 1.0,
+    "answer_relevancy": 0.8765,
+    "context_recall": 1.0,
+    "context_precision": 0.1429
+  },
+  "Điều kiện xét để sinh viên được miễn kiểm tra tiếng Anh đầu vào và quy đổi điểm 10 tất cả học phần tiếng Anh bắt buộc là gì?": {
+    "faithfulness": 0.5,
+    "answer_relevancy": 0.9012,
+    "context_recall": 1.0,
+    "context_precision": null
+  },
+  "Quy trình xét miễn thi tiếng Anh đầu vào, đầu ra và quy đổi điểm học phần gồm những bước nào?": {
+    "faithfulness": 1.0,
+    "answer_relevancy": 0.7221,
+    "context_recall": 1.0,
+    "context_precision": 1.0
+  },
+  "Chuẩn đầu ra tin học của sinh viên đại học tại trường cần đáp ứng điều kiện gì?": {
+    "faithfulness": 1.0,
+    "answer_relevancy": 0.811,
+    "context_recall": 1.0,
+    "context_precision": null
+  },
+  "Chứng chỉ tin học MOS áp dụng cho đối tượng sinh viên nào và cần đạt bao nhiêu chứng chỉ?": {
+    "faithfulness": 1.0,
+    "answer_relevancy": 0.6811,
+    "context_recall": 1.0,
+    "context_precision": 0.8333
+  }
+}

@@ -1,6 +1,6 @@
 """
-Hybrid retriever: dense vector (bge-m3) + sparse BM25, fused via RRF.
-Optional cross-encoder reranker for precision.
+Hybrid retriever: dense vector (paraphrase-multilingual-MiniLM-L12-v2) + sparse
+BM25, fused via RRF. Optional cross-encoder reranker for precision.
 """
 
 from __future__ import annotations
@@ -44,12 +44,17 @@ class RetrievedChunk:
 def build_hybrid_retriever(
     index: "VectorStoreIndex",
     nodes: list,
-    top_k: int = 10,
+    top_k: int = 20,
     rerank: bool = True,
 ):
     """
     QueryFusionRetriever: combines dense + BM25 with Reciprocal Rank Fusion.
     Falls back to vector-only if BM25 init fails (e.g. empty corpus).
+
+    top_k=20: candidate pool before reranking. With the 91-chunk UNETI corpus,
+    pulling 20 candidates gives the cross-encoder enough material to find the best 8.
+    RRF fusion similarity_top_k must equal top_k (not top_k//2) so that both
+    the dense and sparse lists contribute their full candidate sets to fusion.
     """
     from llama_index.core.retrievers import QueryFusionRetriever
     from llama_index.retrievers.bm25 import BM25Retriever
@@ -69,39 +74,62 @@ def build_hybrid_retriever(
 
     hybrid = QueryFusionRetriever(
         retrievers=retrievers,
-        similarity_top_k=top_k // 2 or 5,
-        num_queries=1,           # no query expansion at retriever level
+        similarity_top_k=top_k,   # keep full pool — reranker will filter to top_n
+        num_queries=1,             # no query expansion at retriever level
         mode="reciprocal_rerank",
         use_async=True,
     )
 
     if rerank:
-        return _wrap_with_reranker(hybrid, top_n=5)
+        # top_n=8 balances precision vs recall; 5 was too aggressive for 20 candidates
+        return _wrap_with_reranker(hybrid, top_n=8)
     return hybrid
 
 
-def _wrap_with_reranker(base_retriever, top_n: int = 5):
+def _wrap_with_reranker(base_retriever, top_n: int = 8):
     """
     Adds cross-encoder reranker on top of fusion retriever.
     Uses small but effective MiniLM model — runs locally, no API.
     """
+    import os
+    # HF_HOME may point to an unmounted network drive (e.g. G:\).
+    # hf_xet (HuggingFace's transfer layer) reads HF_HOME for its log files and
+    # will crash if that path is inaccessible.  Force-redirect ALL HF caches to a
+    # guaranteed-local directory for the duration of the model load.
+    _hf_keys = ("HF_HOME", "HF_HUB_CACHE", "SENTENCE_TRANSFORMERS_HOME")
+    _saved = {k: os.environ.get(k) for k in _hf_keys}
+    # Use the project-local HF cache so reranker loads from data/hf_cache/
+    # regardless of whether the system HF_HOME points to an offline drive.
+    _project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    local_hf = os.path.join(_project_root, "data", "hf_cache")
+    os.environ["HF_HOME"] = local_hf
+    os.environ["HF_HUB_CACHE"] = os.path.join(local_hf, "hub")
+    os.environ["SENTENCE_TRANSFORMERS_HOME"] = local_hf
+
     try:
         from llama_index.core.postprocessor import SentenceTransformerRerank
+        from src.config import get_settings
 
+        model_name = get_settings().reranker_model
         reranker = SentenceTransformerRerank(
-            model="cross-encoder/ms-marco-MiniLM-L-6-v2",
+            model=model_name,
             top_n=top_n,
         )
-        logger.info("Cross-encoder reranker loaded (top_n={})", top_n)
-
-        # Compose: base retriever + reranker postprocessor
-        from llama_index.core.query_engine import RetrieverQueryEngine
-
+        logger.info("Cross-encoder reranker loaded: {} (top_n={})", model_name, top_n)
         return _RerankedRetriever(base_retriever, reranker)
 
     except Exception as exc:
         logger.warning("Reranker unavailable, skipping: {}", exc)
         return base_retriever
+
+    finally:
+        # Restore original HF env vars so the rest of the app still uses
+        # the user's configured cache (G:\) for non-xet operations.
+        for k, v in _saved.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
 
 
 class _RerankedRetriever:
@@ -137,40 +165,32 @@ def nodes_to_chunks(nodes: list["NodeWithScore"]) -> list[RetrievedChunk]:
 
 
 def retrieve_direct_chroma(query: str, top_k: int = 5) -> list[RetrievedChunk]:
-    """Fallback retrieval path that queries the bundled Chroma collection directly."""
-    try:
-        from src.rag.embedder import get_chroma_collection, get_embedder
+    """Fallback retrieval path that queries the vector store directly.
 
-        _, collection = get_chroma_collection()
-        count = collection.count()
+    Name kept as "_chroma" for backward compat with existing call sites
+    (query.py, agent/graph.py) — but works against whichever provider
+    VECTOR_STORE_PROVIDER points to (chroma or qdrant), via vector_backend.
+    """
+    try:
+        from src.rag.embedder import get_embedder
+        from src.rag.vector_backend import get_backend, count_chunks, direct_query
+
+        backend = get_backend()
+        count = count_chunks(backend)
         if count == 0:
-            logger.error("Direct Chroma fallback found empty collection")
+            logger.error("Direct fallback ({}) found empty collection", backend.provider)
             return []
 
         embedder = get_embedder()
         query_embedding = embedder.get_query_embedding(query)
-        results = collection.query(
-            query_embeddings=[query_embedding],
-            n_results=top_k,
-            include=["documents", "metadatas", "distances"],
-        )
+        results = direct_query(backend, query_embedding, top_k=top_k)
 
-        docs = (results.get("documents") or [[]])[0]
-        metas = (results.get("metadatas") or [[]])[0]
-        distances = (results.get("distances") or [[]])[0]
-        chunks = []
-        for doc, metadata, distance in zip(docs, metas, distances):
-            if not doc:
-                continue
-            chunks.append(
-                RetrievedChunk(
-                    text=doc,
-                    score=1.0 / (1.0 + float(distance or 0)),
-                    metadata=metadata or {},
-                )
-            )
-        logger.info("Direct Chroma fallback returned {} chunks", len(chunks))
+        chunks = [
+            RetrievedChunk(text=r["text"], score=r["score"], metadata=r["metadata"])
+            for r in results
+        ]
+        logger.info("Direct fallback ({}) returned {} chunks", backend.provider, len(chunks))
         return chunks
     except Exception as exc:
-        logger.error("Direct Chroma fallback failed: {}", exc)
+        logger.error("Direct fallback failed: {}", exc)
         return []
