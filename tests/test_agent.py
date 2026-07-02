@@ -136,6 +136,147 @@ class TestRouter:
         assert route_by_intent({"intent": "invalid"}) == "do_retrieve"
 
 
+# ── Self-correction retry loop ──────────────────────────────────────────────────
+
+class TestGradingRetryRouting:
+    def test_route_after_grade_relevant_goes_to_answer(self):
+        from src.agent.graph import route_after_grade
+
+        assert route_after_grade({"grade": "relevant", "retry_count": 0}) == "do_answer"
+
+    def test_route_after_grade_irrelevant_retries(self):
+        from src.agent.graph import route_after_grade
+
+        assert route_after_grade({"grade": "irrelevant", "retry_count": 0}) == "do_reformulate"
+        assert route_after_grade({"grade": "irrelevant", "retry_count": 1}) == "do_reformulate"
+
+    def test_route_after_grade_exhausted_retries_gives_up(self):
+        from src.agent.graph import MAX_RETRIES, route_after_grade
+
+        assert route_after_grade({"grade": "irrelevant", "retry_count": MAX_RETRIES}) == "do_answer"
+
+
+class TestGradeNode:
+    def test_grade_node_relevant(self):
+        from src.agent.graph import grade_node
+
+        with patch("src.agent.graph.grade_chunks", return_value={"relevant": True, "reason": "khớp tốt"}):
+            result = grade_node({"query": "q", "retrieved_chunks": [], "steps": []})
+        assert result["grade"] == "relevant"
+        assert result["grade_reason"] == "khớp tốt"
+        assert result["steps"][-1]["label"] == "Đánh giá độ liên quan"
+
+    def test_grade_node_irrelevant(self):
+        from src.agent.graph import grade_node
+
+        with patch("src.agent.graph.grade_chunks", return_value={"relevant": False, "reason": "không khớp"}):
+            result = grade_node({"query": "q", "retrieved_chunks": [], "steps": []})
+        assert result["grade"] == "irrelevant"
+
+
+class TestReformulateNode:
+    def test_reformulate_node_cheap_fallback_no_groq_key(self, monkeypatch):
+        from src.config import get_settings
+        monkeypatch.setenv("GROQ_API_KEY", "")
+        get_settings.cache_clear()
+
+        from src.agent.graph import reformulate_node
+
+        state = {"query": "Sinh viên nghỉ học có được thi không", "tried_queries": ["Sinh viên nghỉ học có được thi không"], "steps": []}
+        result = reformulate_node(state)
+
+        assert result["retry_count"] == 1
+        assert result["query"] != state["query"] or result["query"] == state["query"]
+        assert result["query"] in result["tried_queries"]
+        assert len(result["tried_queries"]) == 2
+        get_settings.cache_clear()
+
+    def test_reformulate_node_uses_llm_when_available(self):
+        from src.agent.graph import reformulate_node
+
+        mock_resp = MagicMock()
+        mock_resp.choices[0].message.content = "Điều kiện dự thi khi vắng mặt"
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.return_value = mock_resp
+
+        with patch("groq.Groq", return_value=mock_client):
+            state = {"query": "Sinh viên nghỉ học có được thi không", "tried_queries": ["Sinh viên nghỉ học có được thi không"], "steps": []}
+            result = reformulate_node(state)
+
+        assert result["query"] == "Điều kiện dự thi khi vắng mặt"
+        assert result["retry_count"] == 1
+
+
+class TestRetryLoopIntegration:
+    def test_graph_terminates_after_max_retries_on_persistent_irrelevance(self):
+        """Grader always says irrelevant -> loop must still terminate at MAX_RETRIES,
+        not spin forever."""
+        from src.agent.graph import MAX_RETRIES, build_graph
+        from src.rag.retriever import RetrievedChunk
+
+        weak_chunk = RetrievedChunk(text="unrelated", score=0.0, metadata={})
+
+        async def run():
+            graph = build_graph()
+            with patch("src.agent.graph.grade_chunks", return_value={"relevant": False, "reason": "irrelevant"}), \
+                 patch("src.rag.retriever._active_retriever", MagicMock(retrieve=MagicMock(return_value=[]))), \
+                 patch("src.agent.graph.nodes_to_chunks", return_value=[weak_chunk]), \
+                 patch("src.agent.graph.generate_answer", return_value={
+                     "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+                     "sources": [], "used_llm": "none", "chunk_count": 0,
+                 }), \
+                 patch("src.agent.graph.get_settings") as mock_settings, \
+                 patch("src.agent.memory.LongTermMemory.log_query"):
+                mock_settings.return_value.groq_api_key = ""
+                initial_state = {
+                    "messages": [], "query": "câu hỏi mơ hồ", "original_query": "câu hỏi mơ hồ",
+                    "intent": "simple_qa", "retrieved_chunks": [], "answer": "", "sources": [],
+                    "used_llm": "", "session_id": "s1", "latency_ms": 0, "error": None, "steps": [],
+                    "retry_count": 0, "tried_queries": ["câu hỏi mơ hồ"], "grade": "unknown", "grade_reason": "",
+                }
+                return await graph.ainvoke(initial_state)
+
+        result = asyncio.run(run())
+        assert result["retry_count"] == MAX_RETRIES
+        assert result["grade"] == "irrelevant"
+        assert result["answer"]  # generator still produced an abstain answer, no crash
+
+    def test_graph_stops_retrying_once_relevant(self):
+        """First grade fails, second succeeds -> exactly one retry, not two."""
+        from src.agent.graph import build_graph
+        from src.rag.retriever import RetrievedChunk
+
+        grade_results = iter([
+            {"relevant": False, "reason": "chưa khớp"},
+            {"relevant": True, "reason": "khớp rồi"},
+        ])
+        chunk = RetrievedChunk(text="nội dung", score=0.5, metadata={})
+
+        async def run():
+            graph = build_graph()
+            with patch("src.agent.graph.grade_chunks", side_effect=lambda q, c: next(grade_results)), \
+                 patch("src.rag.retriever._active_retriever", MagicMock(retrieve=MagicMock(return_value=[]))), \
+                 patch("src.agent.graph.nodes_to_chunks", return_value=[chunk]), \
+                 patch("src.agent.graph._cheap_reformulate", return_value="câu hỏi khác"), \
+                 patch("src.agent.graph.get_settings") as mock_settings, \
+                 patch("src.agent.graph.generate_answer", return_value={
+                     "answer": "Trả lời [1]", "sources": [{"index": 1}], "used_llm": "groq", "chunk_count": 1,
+                 }), \
+                 patch("src.agent.memory.LongTermMemory.log_query"):
+                mock_settings.return_value.groq_api_key = ""
+                initial_state = {
+                    "messages": [], "query": "câu hỏi ban đầu", "original_query": "câu hỏi ban đầu",
+                    "intent": "simple_qa", "retrieved_chunks": [], "answer": "", "sources": [],
+                    "used_llm": "", "session_id": "s1", "latency_ms": 0, "error": None, "steps": [],
+                    "retry_count": 0, "tried_queries": ["câu hỏi ban đầu"], "grade": "unknown", "grade_reason": "",
+                }
+                return await graph.ainvoke(initial_state)
+
+        result = asyncio.run(run())
+        assert result["retry_count"] == 1
+        assert result["grade"] == "relevant"
+
+
 # ── Schema Tests ───────────────────────────────────────────────────────────────
 
 class TestSchemas:

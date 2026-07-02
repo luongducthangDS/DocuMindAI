@@ -52,6 +52,13 @@ class ThinkingStep(BaseModel):
     ms: int = 0
 
 
+class ComplianceVerdict(BaseModel):
+    matched: bool
+    verdict: Literal["pass", "fail", "insufficient_info", "no_match"]
+    criterion_id: str = ""
+    extracted_value: float | None = None
+
+
 class QueryResponse(BaseModel):
     answer: str
     sources: list[SourceItem] = []
@@ -60,6 +67,9 @@ class QueryResponse(BaseModel):
     latency_ms: int
     session_id: str
     steps: list[ThinkingStep] = []
+    retry_count: int = 0
+    grade_reason: str = ""
+    compliance: ComplianceVerdict | None = None
 
 
 # ── Documents ──────────────────────────────────────────────────────────────────

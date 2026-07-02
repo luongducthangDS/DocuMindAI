@@ -1,0 +1,78 @@
+[
+  {
+    "id": "hoc_bong_kkht_dtb",
+    "topic": "điều kiện điểm trung bình chung học tập để xét học bổng khuyến khích học tập",
+    "keywords": ["học bổng", "khuyến khích học tập", "điểm trung bình chung học tập", "gpa", "xếp loại khá", "học bổng kkht"],
+    "so_hieu": "QĐ-748/ĐHKTKTCN",
+    "dieu_khoan": "Điều 2, Khoản b",
+    "source_url": "",
+    "condition": {
+      "type": "threshold",
+      "field": "gpa_scale4",
+      "operator": ">=",
+      "value": 2.5,
+      "unit": "gpa_scale_4"
+    },
+    "verdict_template": {
+      "pass": "Sinh viên đủ điều kiện về điểm trung bình chung học tập để được xét học bổng khuyến khích học tập (cần đạt từ 2,5 trở lên theo thang điểm 4, tương đương từ 7,0 trở lên theo thang điểm 10 và xếp loại học tập Khá trở lên) theo {dieu_khoan}, {so_hieu}. Lưu ý: đây chỉ là một trong các điều kiện, còn cần không bị kỷ luật từ mức khiển trách trở lên trong học kỳ xét học bổng.",
+      "fail": "Sinh viên KHÔNG đủ điều kiện về điểm trung bình chung học tập để được xét học bổng khuyến khích học tập vì điểm trung bình chung học tập kỳ chưa đạt tối thiểu 2,5 theo thang điểm 4 (tương đương 7,0 theo thang điểm 10, xếp loại Khá trở lên) theo {dieu_khoan}, {so_hieu}."
+    }
+  },
+  {
+    "id": "diem_ren_luyen_kha",
+    "topic": "xếp loại điểm rèn luyện có đạt loại khá trở lên hay không",
+    "keywords": ["điểm rèn luyện", "xếp loại rèn luyện", "khá trở lên", "loại rèn luyện", "phân loại kết quả rèn luyện"],
+    "so_hieu": "QĐ-848/ĐHKTKTCN",
+    "dieu_khoan": "Điều 12",
+    "source_url": "",
+    "condition": {
+      "type": "threshold",
+      "field": "diem_ren_luyen",
+      "operator": ">=",
+      "value": 65,
+      "unit": "diem_100"
+    },
+    "verdict_template": {
+      "pass": "Điểm rèn luyện được xếp loại Khá trở lên (từ 65 điểm trở lên theo thang 100) theo {dieu_khoan}, {so_hieu}.",
+      "fail": "Điểm rèn luyện KHÔNG đạt loại Khá trở lên vì dưới 65 điểm theo thang 100, xem chi tiết mức phân loại tại {dieu_khoan}, {so_hieu}."
+    }
+  },
+  {
+    "id": "khoa_luan_dtb_tich_luy",
+    "topic": "điều kiện điểm trung bình chung tích lũy để đăng ký làm khóa luận tốt nghiệp",
+    "keywords": ["khóa luận tốt nghiệp", "kltn", "điểm trung bình chung tích lũy", "đủ điều kiện làm khóa luận", "đăng ký khóa luận"],
+    "so_hieu": "QĐ-828/ĐHKTKTCN",
+    "dieu_khoan": "Điều 3, Khoản 2",
+    "source_url": "",
+    "condition": {
+      "type": "threshold",
+      "field": "gpa_scale4_tichluy",
+      "operator": ">=",
+      "value": 2.5,
+      "unit": "gpa_scale_4"
+    },
+    "verdict_template": {
+      "pass": "Sinh viên đủ điều kiện về điểm trung bình chung tích lũy để làm khóa luận tốt nghiệp (đạt từ 2,5 trở lên theo thang điểm 4, tính đến đầu học kỳ cuối cùng) theo {dieu_khoan}, {so_hieu}. Lưu ý: còn cần tích lũy đủ số tín chỉ các học phần theo chương trình đào tạo của ngành.",
+      "fail": "Sinh viên KHÔNG đủ điều kiện về điểm trung bình chung tích lũy để làm khóa luận tốt nghiệp vì chưa đạt 2,5 trở lên theo thang điểm 4 theo {dieu_khoan}, {so_hieu}."
+    }
+  },
+  {
+    "id": "tieng_anh_dau_vao",
+    "topic": "điều kiện điểm kiểm tra tiếng Anh đầu vào để đăng ký học tiếng Anh cơ bản 1",
+    "keywords": ["tiếng anh đầu vào", "kiểm tra trình độ tiếng anh", "tiếng anh cơ bản 1", "điểm đầu vào tiếng anh"],
+    "so_hieu": "QĐ-740/ĐHKTKTCN",
+    "dieu_khoan": "Điều 4, Khoản a",
+    "source_url": "",
+    "condition": {
+      "type": "threshold",
+      "field": "diem_tieng_anh_dau_vao",
+      "operator": ">=",
+      "value": 5,
+      "unit": "diem_10"
+    },
+    "verdict_template": {
+      "pass": "Sinh viên đạt yêu cầu bài kiểm tra đánh giá năng lực tiếng Anh đầu vào (từ 5 điểm trở lên theo thang điểm 10) nên được đăng ký học học phần Tiếng Anh cơ bản 1 theo {dieu_khoan}, {so_hieu}.",
+      "fail": "Sinh viên CHƯA đạt yêu cầu bài kiểm tra đánh giá năng lực tiếng Anh đầu vào (dưới 5 điểm theo thang điểm 10) nên cần học bổ sung học phần Tiếng Anh tăng cường đầu vào trước khi đăng ký Tiếng Anh cơ bản 1, theo {dieu_khoan}, {so_hieu}."
+    }
+  }
+]

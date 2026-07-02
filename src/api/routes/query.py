@@ -14,7 +14,7 @@ from loguru import logger
 
 from src.agent.graph import run_agent
 from src.agent.memory import ShortTermMemory, get_long_term_memory
-from src.api.schemas import QueryRequest, QueryResponse, SourceItem, ThinkingStep
+from src.api.schemas import ComplianceVerdict, QueryRequest, QueryResponse, SourceItem, ThinkingStep
 from src.guardrails import check_prompt_injection, validate_citations
 from src.rag.generator import stream_answer
 
@@ -168,6 +168,16 @@ async def query_endpoint(request: Request, body: QueryRequest) -> QueryResponse:
         for s in (result.get("steps") or [])
     ]
 
+    compliance = None
+    compliance_result = result.get("compliance_result")
+    if compliance_result:
+        compliance = ComplianceVerdict(
+            matched=compliance_result.get("matched", False),
+            verdict=compliance_result.get("verdict", "no_match"),
+            criterion_id=compliance_result.get("criterion_id", ""),
+            extracted_value=compliance_result.get("extracted_value"),
+        )
+
     return QueryResponse(
         answer=cleaned_answer,
         sources=sources,
@@ -176,6 +186,9 @@ async def query_endpoint(request: Request, body: QueryRequest) -> QueryResponse:
         latency_ms=result.get("latency_ms", latency),
         session_id=body.session_id,
         steps=steps,
+        retry_count=result.get("retry_count", 0),
+        grade_reason=result.get("grade_reason", ""),
+        compliance=compliance,
     )
 
 
