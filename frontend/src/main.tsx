@@ -191,6 +191,7 @@ function App() {
   const [docsLoaded, setDocsLoaded] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string>("");
   const [health, setHealth] = useState<"ok" | "degraded" | "error" | "unknown">("unknown");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -213,6 +214,7 @@ function App() {
     const id = genSessionId();
     setSessionId(id);
     setMessages([]);
+    setSidebarOpen(false);
   }
 
   useEffect(() => {
@@ -282,8 +284,17 @@ function App() {
 
   return (
     <div className="layout">
+      {/* ── Mobile topbar ── */}
+      <div className="mobile-topbar">
+        <button className="hamburger" onClick={() => setSidebarOpen(true)} aria-label="Mở menu">
+          ☰
+        </button>
+        <span className="mobile-topbar-title">DocuMind AI</span>
+      </div>
+      {sidebarOpen && <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />}
+
       {/* ── Sidebar ── */}
-      <aside className="sidebar">
+      <aside className={`sidebar${sidebarOpen ? " sidebar-open" : ""}`}>
         <div className="brand">
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
             <rect width="28" height="28" rx="8" fill="#0ea5e9" />
@@ -295,6 +306,9 @@ function App() {
             <div className="brand-name">DocuMind AI</div>
             <div className="brand-sub">Hỗ trợ sinh viên UNETI</div>
           </div>
+          <button className="sidebar-close" onClick={() => setSidebarOpen(false)} aria-label="Đóng menu">
+            ✕
+          </button>
         </div>
 
         <div className="health-row">
@@ -307,19 +321,19 @@ function App() {
         <nav>
           <button
             className={`nav-item${tab === "chat" ? " active" : ""}`}
-            onClick={() => setTab("chat")}
+            onClick={() => { setTab("chat"); setSidebarOpen(false); }}
           >
             💬 Hỏi đáp nội quy trường
           </button>
           <button
             className={`nav-item${tab === "docs" ? " active" : ""}`}
-            onClick={() => { setTab("docs"); loadDocs(); }}
+            onClick={() => { setTab("docs"); loadDocs(); setSidebarOpen(false); }}
           >
             📚 Văn bản đã lập chỉ mục
           </button>
           <button
             className={`nav-item${tab === "upload" ? " active" : ""}`}
-            onClick={() => setTab("upload")}
+            onClick={() => { setTab("upload"); setSidebarOpen(false); }}
           >
             📤 Tải lên văn bản
           </button>
@@ -333,7 +347,7 @@ function App() {
             <button
               key={s}
               className="chip"
-              onClick={() => { setTab("chat"); send(s); }}
+              onClick={() => { setTab("chat"); send(s); setSidebarOpen(false); }}
             >
               {s}
             </button>
