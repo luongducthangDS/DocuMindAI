@@ -26,6 +26,14 @@ interface Message {
   steps?: ThinkingStep[];
 }
 
+interface Bookmark {
+  id: string;
+  question: string;
+  answer: string;
+  sources: Source[];
+  savedAt: number;
+}
+
 interface Document {
   id: string;
   title: string;
@@ -90,6 +98,28 @@ function loadStoredMessages(): Message[] {
   } catch {
     return [];
   }
+}
+
+const LS_BOOKMARKS_KEY = "documind_bookmarks";
+
+function loadStoredBookmarks(): Bookmark[] {
+  try {
+    const raw = localStorage.getItem(LS_BOOKMARKS_KEY);
+    return raw ? (JSON.parse(raw) as Bookmark[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function bookmarkId(question: string, answer: string): string {
+  // Cheap non-cryptographic hash — only needs to be stable + unique enough
+  // to dedupe identical Q&A pairs, not collision-proof.
+  let h = 0;
+  const s = question + "|" + answer;
+  for (let i = 0; i < s.length; i++) {
+    h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+  }
+  return "bm-" + h;
 }
 
 const SUGGESTED = [
@@ -205,6 +235,42 @@ function ThinkingPanel({ steps }: { steps: ThinkingStep[] }) {
   );
 }
 
+// ── Answer actions (copy / bookmark) ──────────────────────────────────────────
+function AnswerActions({
+  bookmarked,
+  onCopy,
+  onToggleBookmark,
+}: {
+  bookmarked: boolean;
+  onCopy: () => Promise<boolean>;
+  onToggleBookmark: () => void;
+}) {
+  const [copied, setCopied] = React.useState(false);
+  return (
+    <div className="answer-actions">
+      <button
+        className="icon-btn"
+        title="Sao chép câu trả lời"
+        onClick={async () => {
+          if (await onCopy()) {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 1500);
+          }
+        }}
+      >
+        {copied ? "✅ Đã sao chép" : "📋 Sao chép"}
+      </button>
+      <button
+        className={`icon-btn${bookmarked ? " icon-btn-active" : ""}`}
+        title={bookmarked ? "Bỏ lưu" : "Lưu lại"}
+        onClick={onToggleBookmark}
+      >
+        {bookmarked ? "🔖 Đã lưu" : "🔖 Lưu"}
+      </button>
+    </div>
+  );
+}
+
 // ── Source card ────────────────────────────────────────────────────────────────
 function SourceCard({ src, msgIndex }: { src: Source; msgIndex: number }) {
   return (
@@ -229,7 +295,8 @@ function App() {
   const [messages, setMessages] = useState<Message[]>(loadStoredMessages);
   const [question, setQuestion] = useState("");
   const [busy, setBusy] = useState(false);
-  const [tab, setTab] = useState<"chat" | "docs" | "upload">("chat");
+  const [tab, setTab] = useState<"chat" | "docs" | "upload" | "bookmarks">("chat");
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>(loadStoredBookmarks);
   const [docs, setDocs] = useState<Document[]>([]);
   const [docsLoaded, setDocsLoaded] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string>("");
@@ -252,6 +319,37 @@ function App() {
       // localStorage unavailable (private mode, quota) — conversation just won't persist
     }
   }, [sessionId, messages]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(LS_BOOKMARKS_KEY, JSON.stringify(bookmarks));
+    } catch {
+      // localStorage unavailable — bookmarks just won't persist
+    }
+  }, [bookmarks]);
+
+  function isBookmarked(question: string, answer: string): boolean {
+    const id = bookmarkId(question, answer);
+    return bookmarks.some((b) => b.id === id);
+  }
+
+  function toggleBookmark(question: string, answer: string, sources: Source[]) {
+    const id = bookmarkId(question, answer);
+    setBookmarks((prev) =>
+      prev.some((b) => b.id === id)
+        ? prev.filter((b) => b.id !== id)
+        : [{ id, question, answer, sources, savedAt: Date.now() }, ...prev]
+    );
+  }
+
+  async function copyAnswer(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      return false;
+    }
+  }
 
   function newConversation() {
     const id = genSessionId();
@@ -375,6 +473,12 @@ function App() {
             📚 Văn bản đã lập chỉ mục
           </button>
           <button
+            className={`nav-item${tab === "bookmarks" ? " active" : ""}`}
+            onClick={() => { setTab("bookmarks"); setSidebarOpen(false); }}
+          >
+            🔖 Đã lưu{bookmarks.length > 0 ? ` (${bookmarks.length})` : ""}
+          </button>
+          <button
             className={`nav-item${tab === "upload" ? " active" : ""}`}
             onClick={() => { setTab("upload"); setSidebarOpen(false); }}
           >
@@ -454,6 +558,15 @@ function App() {
                               ))}
                             </div>
                           </div>
+                        )}
+                        {!noAnswer && (
+                          <AnswerActions
+                            bookmarked={isBookmarked(messages[i - 1]?.content ?? "", msg.content)}
+                            onCopy={() => copyAnswer(msg.content)}
+                            onToggleBookmark={() =>
+                              toggleBookmark(messages[i - 1]?.content ?? "", msg.content, msg.sources ?? [])
+                            }
+                          />
                         )}
                         <div className="msg-meta">
                           {msg.used_llm && msg.used_llm !== "none" && (
@@ -535,6 +648,50 @@ function App() {
                     {doc.ngay_ban_hanh && (
                       <div className="doc-date">Ban hành: {doc.ngay_ban_hanh}</div>
                     )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Bookmarks */}
+        {tab === "bookmarks" && (
+          <div className="panel">
+            <div className="panel-head">
+              Câu hỏi đã lưu
+              <span className="muted"> — {bookmarks.length} mục</span>
+            </div>
+            {bookmarks.length === 0 ? (
+              <div className="empty">
+                <div className="empty-icon">🔖</div>
+                <div className="empty-title">Chưa lưu câu hỏi nào</div>
+                <div className="empty-sub">
+                  Bấm "🔖 Lưu" dưới một câu trả lời để xem lại sau
+                </div>
+              </div>
+            ) : (
+              <div className="messages">
+                {bookmarks.map((b, i) => (
+                  <div key={b.id} className="bookmark-card">
+                    <div className="bookmark-question">{b.question}</div>
+                    <MdText text={b.answer} msgIndex={1000 + i} />
+                    {b.sources.length > 0 && (
+                      <div className="sources-section">
+                        <div className="sources-label">Nguồn trích dẫn</div>
+                        <div className="sources-list">
+                          {b.sources.map((src) => (
+                            <SourceCard key={src.index} src={src} msgIndex={1000 + i} />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    <button
+                      className="icon-btn"
+                      onClick={() => setBookmarks((prev) => prev.filter((x) => x.id !== b.id))}
+                    >
+                      🗑️ Bỏ lưu
+                    </button>
                   </div>
                 ))}
               </div>

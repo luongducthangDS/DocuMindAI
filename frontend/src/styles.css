@@ -273,6 +273,31 @@ nav { display: flex; flex-direction: column; gap: 2px; }
 .step-detail { font-size: 11px; color: var(--text2); }
 .step-ms { font-size: 11px; color: var(--text3); flex-shrink: 0; margin-top: 2px; }
 
+.answer-actions { display: flex; gap: 6px; margin-top: 10px; }
+.icon-btn {
+  font-size: 11px;
+  padding: 4px 9px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.icon-btn:hover { background: var(--surface2); color: var(--text1); }
+.icon-btn-active { color: var(--accent-hover); border-color: var(--accent); }
+
+.bookmark-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.bookmark-question { font-size: 13px; font-weight: 600; color: var(--accent-hover); margin-bottom: 4px; }
+
 .msg-meta { display: flex; align-items: center; gap: 8px; margin-top: 8px; justify-content: flex-end; }
 .latency { font-size: 11px; color: var(--text3); }
 .llm-badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
