@@ -83,7 +83,11 @@ def build_hybrid_retriever(
     if rerank:
         # top_n=8 balances precision vs recall; 5 was too aggressive for 20 candidates
         return _wrap_with_reranker(hybrid, top_n=8)
-    return hybrid
+    # No cross-encoder to trim the pool (e.g. Render free tier): RRF fusion scores
+    # are all clustered ~0.01-0.03 with no meaningful gap between relevant and
+    # irrelevant hits, so a score threshold can't discriminate — truncate to RRF's
+    # own rank order instead, matching the reranked top_n=8.
+    return _TruncatedRetriever(hybrid, top_n=8)
 
 
 def _wrap_with_reranker(base_retriever, top_n: int = 8):
@@ -150,6 +154,23 @@ class _RerankedRetriever:
         from llama_index.core.schema import QueryBundle
 
         return self._reranker.postprocess_nodes(nodes, QueryBundle(query_str=query))
+
+
+class _TruncatedRetriever:
+    """Thin wrapper: keep only the top-N of the RRF-fused pool (no cross-encoder
+    available to trim by relevance score, so rely on RRF's own rank order)."""
+
+    def __init__(self, base_retriever, top_n: int = 8):
+        self._base = base_retriever
+        self._top_n = top_n
+
+    async def aretrieve(self, query: str) -> list["NodeWithScore"]:
+        nodes = await self._base.aretrieve(query)
+        return nodes[: self._top_n]
+
+    def retrieve(self, query: str) -> list["NodeWithScore"]:
+        nodes = self._base.retrieve(query)
+        return nodes[: self._top_n]
 
 
 def nodes_to_chunks(nodes: list["NodeWithScore"]) -> list[RetrievedChunk]:
