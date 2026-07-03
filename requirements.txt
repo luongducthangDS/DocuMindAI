@@ -39,7 +39,6 @@ uvicorn[standard]==0.30.6
 websockets==13.0.1
 python-multipart==0.0.12
 slowapi==0.1.9
-redis==5.1.0
 aiofiles==24.1.0
 
 # ── Data Ingestion ────────────────────────────────────────────────────────────
@@ -48,7 +47,6 @@ requests==2.32.3
 beautifulsoup4==4.12.3
 lxml==5.3.0
 pdfplumber==0.11.4
-pypdf==4.3.1
 python-docx==1.2.0
 
 # ── PDF Report ────────────────────────────────────────────────────────────────
@@ -58,10 +56,6 @@ reportlab==4.2.2
 
 # ── Observability ─────────────────────────────────────────────────────────────
 loguru==0.7.2
-prometheus-client==0.21.0
-
-# ── Scheduling ────────────────────────────────────────────────────────────────
-apscheduler==3.10.4
 
 # ── Utilities ─────────────────────────────────────────────────────────────────
 pydantic==2.13.4
@@ -69,8 +63,6 @@ pydantic-settings==2.14.1
 python-dotenv==1.0.1
 tenacity==8.5.0
 httpx==0.27.2
-orjson==3.10.7
-ujson==5.10.0
 
 # ── Eval (RAGAS — not needed in production, safe to include) ─────────────────
 ragas==0.1.21

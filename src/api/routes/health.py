@@ -22,19 +22,13 @@ router = APIRouter(prefix="/api/v1", tags=["observability"])
 @router.get("/health", response_model=HealthResponse)
 async def health_check() -> HealthResponse:
     """Check status of all downstream services — runs checks in parallel."""
-    import asyncio
-
-    vector_store, redis = await asyncio.gather(
-        _check_vector_store(),
-        _check_redis(),
-    )
+    vector_store = await _check_vector_store()
     llm = _check_llm()
     sqlite = _check_sqlite()
-    services = [vector_store, redis, llm, sqlite]
+    services = [vector_store, llm, sqlite]
 
     # Core serving path needs corpus retrieval + an LLM provider.
-    # Redis and SQLite are optional in Railway/Render: Redis is only cache/session
-    # acceleration, and SQLite backs metrics/history best-effort persistence.
+    # SQLite is optional in Railway/Render: it backs metrics/history best-effort persistence.
     required = [vector_store, llm]
     all_required_healthy = all(s.healthy for s in required)
     any_required_healthy = any(s.healthy for s in required)
@@ -108,19 +102,6 @@ async def _check_chroma() -> ServiceStatus:
         if local_path.exists():
             return ServiceStatus(name="chromadb", healthy=True, detail="Local persistent mode")
         return ServiceStatus(name="chromadb", healthy=False, detail=str(exc)[:100])
-
-
-async def _check_redis() -> ServiceStatus:
-    try:
-        import redis.asyncio as aioredis
-
-        settings = get_settings()
-        client = aioredis.from_url(settings.redis_url, socket_connect_timeout=1)
-        await client.ping()
-        await client.aclose()
-        return ServiceStatus(name="redis", healthy=True, detail="PONG received")
-    except Exception as exc:
-        return ServiceStatus(name="redis", healthy=False, detail=str(exc)[:80])
 
 
 def _check_llm() -> ServiceStatus:

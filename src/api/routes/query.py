@@ -48,7 +48,7 @@ def _get_client_ip(request: Request) -> str:
         return forwarded.split(",")[0].strip()[:45]
     return (request.client.host if request.client else "unknown")[:45]
 
-# In-process session stores — replaced by Redis in production
+# In-process session store — not shared across workers/instances.
 _sessions: dict[str, ShortTermMemory] = {}
 
 

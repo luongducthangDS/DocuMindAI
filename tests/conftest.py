@@ -21,9 +21,7 @@ def patch_settings(tmp_path, monkeypatch):
     monkeypatch.setenv("LOGS_DIR", str(tmp_path / "logs"))
     monkeypatch.setenv("SQLITE_DB", str(tmp_path / "test.db"))
     monkeypatch.setenv("CHROMA_HOST", "localhost")
-    monkeypatch.setenv("REDIS_URL", "redis://localhost:6379/0")
     monkeypatch.setenv("ENVIRONMENT", "development")
-    monkeypatch.setenv("API_SECRET_KEY", "test-secret-key-32-chars-minimum!!")
 
     # Clear lru_cache so settings reload with test env
     from src.config import get_settings

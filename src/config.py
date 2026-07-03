@@ -56,9 +56,6 @@ class Settings(BaseSettings):
     qdrant_api_key: str = ""
     qdrant_collection: str = "documind_legal"
 
-    # Redis
-    redis_url: str = "redis://localhost:6379/0"
-
     # FastAPI
     api_host: str = "0.0.0.0"
     api_port: int = 8081
