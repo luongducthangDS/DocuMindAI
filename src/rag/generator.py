@@ -43,7 +43,16 @@ Quy tắc bắt buộc:
    Tuyệt đối KHÔNG suy đoán hay lấp bằng kiến thức bên ngoài đoạn văn bản.
 5. KHÔNG bịa đặt số liệu, điều kiện hay quy định không có trong các đoạn được cung cấp.
 6. Ngôn ngữ: tiếng Việt, rõ ràng, chính xác.
-7. KHÔNG liệt kê lại danh sách nguồn ở cuối — hệ thống sẽ tự động thêm."""
+7. KHÔNG liệt kê lại danh sách nguồn ở cuối — hệ thống sẽ tự động thêm.
+8. BLUF (Bottom Line Up Front): câu ĐẦU TIÊN phải là câu trả lời trực tiếp (con số, Có/Không, điều kiện cốt lõi) —
+   KHÔNG mở đầu bằng "Dựa trên tài liệu...", "Theo quy định...", "Dưới đây là..." hay các câu dẫn dắt không mang thông tin.
+   Giải thích/điều kiện chi tiết đưa vào SAU câu trả lời trực tiếp.
+9. Định dạng để dễ đọc quét (scannable):
+   - In đậm (**...**) các con số, mốc thời gian, điều kiện, tên loại/mức quan trọng.
+   - Dùng gạch đầu dòng (mỗi dòng bắt đầu bằng "- ") khi liệt kê từ 3 ý trở lên.
+   - Khi câu hỏi yêu cầu SO SÁNH từ 2 đối tượng trở lên (ví dụ 2 loại học bổng, 2 mức điểm rèn luyện),
+     trình bày bằng bảng markdown (dùng cú pháp "| Cột 1 | Cột 2 |" với dòng phân cách "|---|---|")
+     thay vì viết thành đoạn văn dài."""
 
 _CITATION_SUFFIX = "\n\n**Nguồn trích dẫn:**\n{citations}"
 
@@ -69,10 +78,22 @@ _MIN_RELEVANCE_SCORE = 0.05
 
 def _effective_min_score() -> float:
     """0.05 when the cross-encoder reranker is active (scores are on that scale);
-    0.0 when it's disabled (e.g. Render free tier), per the calibration warning
-    above — raw RRF/BM25 scores never clear 0.05, which would abstain on every
-    query."""
-    return _MIN_RELEVANCE_SCORE if get_settings().enable_reranker else 0.0
+    0.0 when it's disabled (e.g. Render free tier) or unavailable, per the
+    calibration warning above — raw RRF/BM25 scores never clear 0.05, which
+    would abstain on every query.
+
+    Checks the retriever's actual runtime state (src.rag.retriever._reranker_active),
+    not just the settings.enable_reranker config flag — the reranker can be
+    *requested* but still fail to load (missing model cache, OOM, etc.), in
+    which case chunk scores stay on the raw RRF scale even though the config
+    says reranking is on. Trusting the config alone caused every chunk to be
+    filtered out and the generator to abstain even when retrieval and grading
+    both found relevant content.
+    """
+    if not get_settings().enable_reranker:
+        return 0.0
+    import src.rag.retriever as r_module
+    return _MIN_RELEVANCE_SCORE if getattr(r_module, "_reranker_active", False) else 0.0
 
 
 # Matches both "[1]" and combined "[1, 2]" / "[1,2,3]" citation styles —

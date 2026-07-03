@@ -174,30 +174,74 @@ function renderWithCitations(text: string, msgIndex: number): React.ReactNode[] 
 }
 
 // ── Markdown renderer (lightweight) ───────────────────────────────────────────
-function MdText({ text, msgIndex }: { text: string; msgIndex: number }) {
-  return (
-    <div className="md">
-      {text.split("\n").map((line, i) => {
-        if (line.startsWith("### ")) return <h3 key={i}>{line.slice(4)}</h3>;
-        if (line.startsWith("## ")) return <h2 key={i}>{line.slice(3)}</h2>;
-        if (line.startsWith("# ")) return <h1 key={i}>{line.slice(2)}</h1>;
-        if (/^[\*\-]\s/.test(line)) return <p key={i} className="li">• {renderWithCitations(line.slice(2), msgIndex)}</p>;
-        if (/^\d+\.\s/.test(line)) return <p key={i} className="li">{renderWithCitations(line, msgIndex)}</p>;
-        if (line.trim() === "---") return <hr key={i} />;
-        if (line.trim() === "") return <div key={i} className="br" />;
-        // Bold inline
-        const parts = line.split(/\*\*(.*?)\*\*/g);
-        if (parts.length > 1) {
-          return (
-            <p key={i}>
-              {parts.map((p, j) => (j % 2 === 1 ? <strong key={j}>{p}</strong> : renderWithCitations(p, msgIndex)))}
-            </p>
-          );
-        }
-        return <p key={i}>{renderWithCitations(line, msgIndex)}</p>;
-      })}
+// Renders one line's content: bold (**...**) plus citation markers. Shared
+// between plain paragraphs and table cells so both get the same inline formatting.
+function renderInline(text: string, msgIndex: number): React.ReactNode {
+  const parts = text.split(/\*\*(.*?)\*\*/g);
+  if (parts.length === 1) return renderWithCitations(text, msgIndex);
+  return parts.map((p, j) => (j % 2 === 1 ? <strong key={j}>{p}</strong> : <React.Fragment key={j}>{renderWithCitations(p, msgIndex)}</React.Fragment>));
+}
+
+const TABLE_ROW_RE = /^\s*\|(.+)\|\s*$/;
+const TABLE_SEPARATOR_RE = /^\s*\|?[\s:-]+\|[\s:|-]*\|?\s*$/;
+
+function splitTableRow(line: string): string[] {
+  return line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim());
+}
+
+// Markdown tables span multiple consecutive lines (header + separator + rows),
+// so unlike every other construct here they can't be handled one line at a time.
+function renderTable(lines: string[], start: number, msgIndex: number): { node: React.ReactNode; next: number } | null {
+  if (!TABLE_ROW_RE.test(lines[start]) || !lines[start + 1] || !TABLE_SEPARATOR_RE.test(lines[start + 1])) {
+    return null;
+  }
+  const header = splitTableRow(lines[start]);
+  const rows: string[][] = [];
+  let i = start + 2;
+  while (i < lines.length && TABLE_ROW_RE.test(lines[i])) {
+    rows.push(splitTableRow(lines[i]));
+    i++;
+  }
+  const node = (
+    <div className="md-table-wrap" key={`table-${start}`}>
+      <table className="md-table">
+        <thead>
+          <tr>{header.map((h, j) => <th key={j}>{renderInline(h, msgIndex)}</th>)}</tr>
+        </thead>
+        <tbody>
+          {rows.map((row, ri) => (
+            <tr key={ri}>{row.map((cell, ci) => <td key={ci}>{renderInline(cell, msgIndex)}</td>)}</tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
+  return { node, next: i };
+}
+
+function MdText({ text, msgIndex }: { text: string; msgIndex: number }) {
+  const lines = text.split("\n");
+  const nodes: React.ReactNode[] = [];
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    const table = renderTable(lines, i, msgIndex);
+    if (table) {
+      nodes.push(table.node);
+      i = table.next;
+      continue;
+    }
+    if (line.startsWith("### ")) nodes.push(<h3 key={i}>{line.slice(4)}</h3>);
+    else if (line.startsWith("## ")) nodes.push(<h2 key={i}>{line.slice(3)}</h2>);
+    else if (line.startsWith("# ")) nodes.push(<h1 key={i}>{line.slice(2)}</h1>);
+    else if (/^[\*\-]\s/.test(line)) nodes.push(<p key={i} className="li">• {renderInline(line.slice(2), msgIndex)}</p>);
+    else if (/^\d+\.\s/.test(line)) nodes.push(<p key={i} className="li">{renderInline(line, msgIndex)}</p>);
+    else if (line.trim() === "---") nodes.push(<hr key={i} />);
+    else if (line.trim() === "") nodes.push(<div key={i} className="br" />);
+    else nodes.push(<p key={i}>{renderInline(line, msgIndex)}</p>);
+    i++;
+  }
+  return <div className="md">{nodes}</div>;
 }
 
 // ── Thinking panel ────────────────────────────────────────────────────────────

@@ -135,30 +135,61 @@ def _build_history_from_messages(state: AgentState) -> list[dict]:
 
 
 def _contextualize_query(query: str, history: list[dict]) -> str:
-    """Rewrite a context-dependent follow-up into a standalone question using
-    one cheap LLM call. Falls back to the original query unchanged on any
-    LLM failure — never blocks the turn on this step."""
+    """Rewrite a context-dependent follow-up into a standalone question.
+    Tries Groq first, then Gemini (mirroring generate_answer's Groq→Gemini
+    chain) — a Groq-only outage must not silently disable contextualization,
+    since that's exactly the failure mode this node exists to fix. Falls
+    back to the original query unchanged only if both providers fail."""
     settings = get_settings()
-    if not settings.groq_api_key:
-        return query
     history_block = "\n".join(
         f"{'Người dùng' if m['role'] == 'user' else 'Trợ lý'}: {m['content'][:300]}" for m in history
     )
     prompt = _CONTEXTUALIZE_PROMPT.format(history_block=history_block, query=query)
+
+    if settings.groq_api_key:
+        try:
+            from groq import Groq
+            client = Groq(api_key=settings.groq_api_key)
+            resp = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.0,
+                max_tokens=150,
+            )
+            rewritten = (resp.choices[0].message.content or "").strip().strip('"')
+            if rewritten:
+                return rewritten
+        except Exception as exc:
+            logger.warning("contextualize_node Groq failed, trying Gemini: {}", exc)
+
     try:
-        from groq import Groq
-        client = Groq(api_key=settings.groq_api_key)
-        resp = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.0,
-            max_tokens=150,
-        )
-        rewritten = (resp.choices[0].message.content or "").strip().strip('"')
-        return rewritten or query
+        import google.generativeai as genai
+
+        from src.rag.generator import _gemini_pairs
+
+        # contextualize_node sits on the critical path before router/retrieval
+        # for every follow-up turn — unlike generate_answer (the terminal step,
+        # where a long fallback chain is an acceptable cost), stalling here
+        # delays everything downstream. Cap attempts instead of exhausting all
+        # (key, model) pairs (up to 9 with 3 keys × 3 models) so a bad-provider
+        # day adds bounded latency, not a multi-call pileup, before giving up
+        # and returning the original query.
+        _MAX_GEMINI_FALLBACK_ATTEMPTS = 3
+        for api_key, model_name in _gemini_pairs()[:_MAX_GEMINI_FALLBACK_ATTEMPTS]:
+            try:
+                genai.configure(api_key=api_key)
+                response = genai.GenerativeModel(model_name).generate_content(prompt)
+                rewritten = (response.text or "").strip().strip('"')
+                if rewritten:
+                    return rewritten
+            except Exception as exc:
+                logger.debug("contextualize_node Gemini {} failed: {}", model_name, str(exc)[:100])
+                continue
     except Exception as exc:
-        logger.warning("contextualize_node LLM failed, using original query: {}", exc)
-        return query
+        logger.warning("contextualize_node Gemini fallback unavailable: {}", exc)
+
+    logger.warning("contextualize_node: both Groq and Gemini failed, using original query")
+    return query
 
 
 def contextualize_node(state: AgentState) -> dict:

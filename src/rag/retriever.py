@@ -14,6 +14,15 @@ from loguru import logger
 _active_retriever = None
 _active_index = None
 
+# True only once a cross-encoder reranker actually loaded and is wrapping the
+# active retriever. settings.enable_reranker alone isn't enough to gate the
+# generator's score threshold — the reranker can be *requested* but still fail
+# to load at runtime (missing model cache, OOM, Render free tier, etc.), in
+# which case chunk scores stay on the raw RRF fusion scale (~0.016) and a
+# 0.05 threshold calibrated for cross-encoder scores silently discards every
+# chunk. generator._effective_min_score() reads this flag, not the config.
+_reranker_active = False
+
 if TYPE_CHECKING:
     from llama_index.core import VectorStoreIndex
     from llama_index.core.schema import NodeWithScore
@@ -95,6 +104,7 @@ def _wrap_with_reranker(base_retriever, top_n: int = 8):
     Adds cross-encoder reranker on top of fusion retriever.
     Uses small but effective MiniLM model — runs locally, no API.
     """
+    global _reranker_active
     import os
     # HF_HOME may point to an unmounted network drive (e.g. G:\).
     # hf_xet (HuggingFace's transfer layer) reads HF_HOME for its log files and
@@ -120,11 +130,17 @@ def _wrap_with_reranker(base_retriever, top_n: int = 8):
             top_n=top_n,
         )
         logger.info("Cross-encoder reranker loaded: {} (top_n={})", model_name, top_n)
+        _reranker_active = True
         return _RerankedRetriever(base_retriever, reranker)
 
     except Exception as exc:
         logger.warning("Reranker unavailable, skipping: {}", exc)
-        return base_retriever
+        _reranker_active = False
+        # Same reasoning as the rerank=False branch in build_hybrid_retriever:
+        # without a cross-encoder, RRF fusion scores (~0.01-0.03) have no
+        # meaningful gap to threshold on, so truncate to rank order instead
+        # of returning the full top_k=20 pool.
+        return _TruncatedRetriever(base_retriever, top_n=top_n)
 
     finally:
         # Restore original HF env vars so the rest of the app still uses

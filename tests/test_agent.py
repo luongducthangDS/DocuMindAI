@@ -179,13 +179,41 @@ class TestContextualizeNode:
 
     def test_rewrite_llm_failure_falls_back_to_original(self, monkeypatch):
         from src.config import get_settings
-        monkeypatch.setenv("GROQ_API_KEY", "")
+        for key in ("GROQ_API_KEY", "GOOGLE_API_KEY", "GOOGLE_API_KEY_2", "GOOGLE_API_KEY_3"):
+            monkeypatch.setenv(key, "")
         get_settings.cache_clear()
 
         from src.agent.graph import _contextualize_query
 
         result = _contextualize_query("câu hỏi gốc", [{"role": "user", "content": "gì đó"}])
         assert result == "câu hỏi gốc"
+        get_settings.cache_clear()
+
+    def test_rewrite_falls_back_to_gemini_when_groq_fails(self, monkeypatch):
+        """Groq raising must not short-circuit to the original query — Gemini
+        should get a chance first, matching generate_answer's fallback chain."""
+        from src.config import get_settings
+        monkeypatch.setenv("GROQ_API_KEY", "fake-groq-key")
+        monkeypatch.setenv("GOOGLE_API_KEY", "fake-google-key")
+        monkeypatch.setenv("GOOGLE_API_KEY_2", "")
+        monkeypatch.setenv("GOOGLE_API_KEY_3", "")
+        get_settings.cache_clear()
+
+        from src.agent.graph import _contextualize_query
+
+        mock_groq_client = MagicMock()
+        mock_groq_client.chat.completions.create.side_effect = RuntimeError("groq down")
+
+        mock_gemini_response = MagicMock()
+        mock_gemini_response.text = "câu hỏi đã viết lại bởi Gemini"
+
+        with patch("groq.Groq", return_value=mock_groq_client), \
+             patch("google.generativeai.configure"), \
+             patch("google.generativeai.GenerativeModel") as mock_model_cls:
+            mock_model_cls.return_value.generate_content.return_value = mock_gemini_response
+            result = _contextualize_query("câu hỏi gốc", [{"role": "user", "content": "gì đó"}])
+
+        assert result == "câu hỏi đã viết lại bởi Gemini"
         get_settings.cache_clear()
 
     def test_contextualize_wired_before_router_in_compiled_graph(self):

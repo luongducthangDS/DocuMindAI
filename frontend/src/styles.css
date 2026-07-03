@@ -433,6 +433,12 @@ nav { display: flex; flex-direction: column; gap: 2px; }
 .md hr { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
 .md strong { color: var(--text1); font-weight: 600; }
 
+.md-table-wrap { overflow-x: auto; margin: 4px 0; }
+.md-table { border-collapse: collapse; width: 100%; font-size: 13px; }
+.md-table th, .md-table td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; vertical-align: top; }
+.md-table th { background: var(--surface2, rgba(255,255,255,.04)); color: var(--text1); font-weight: 600; }
+.md-table td { color: var(--text1); }
+
 /* ── Mobile (≤768px) ── */
 @media (max-width: 768px) {
   .layout { flex-direction: column; }

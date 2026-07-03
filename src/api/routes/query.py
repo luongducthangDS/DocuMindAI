@@ -213,7 +213,8 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
     try:
         while True:
             data = await websocket.receive_json()
-            query = data.get("query", "").strip()
+            raw_query = data.get("query", "").strip()
+            query = raw_query
 
             if not query or len(query) < 3:
                 await websocket.send_json({"error": "Query too short (min 3 chars)"})
@@ -231,6 +232,16 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
                     "guard_triggered": True,
                 })
                 continue
+
+            # Resolve context-dependent follow-ups before retrieval — same
+            # contextualization the REST /query path gets via run_agent's
+            # do_contextualize node, otherwise WS follow-ups reproduce the
+            # "90 điểm thì sao" false-negative bug.
+            history = session.as_messages()
+            if history:
+                from src.agent.graph import _contextualize_query
+
+                query = _contextualize_query(query, history[-6:])
 
             # Import retriever to get chunks
             try:
@@ -272,7 +283,11 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
                     "WS citation hallucination: session={} invalid={}", session_id, invalid_citations
                 )
 
-            session.add("user", query)
+            # Log the raw text the user actually typed, not the LLM-rewritten
+            # retrieval query — otherwise next turn's contextualize call reads
+            # its own prior rewrite as if it were the user's words, and the
+            # drift compounds turn over turn.
+            session.add("user", raw_query)
             session.add("assistant", full_answer)
             await websocket.send_json({
                 "done": True,
