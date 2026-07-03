@@ -22,7 +22,7 @@ from loguru import logger
 from src.agent.memory import LongTermMemory, ShortTermMemory
 from src.agent.tools import ALL_TOOLS
 from src.config import get_settings
-from src.rag.generator import generate_answer, stream_answer
+from src.rag.generator import _cited_sources, generate_answer, stream_answer
 from src.rag.grader import grade_chunks
 from src.rag.retriever import nodes_to_chunks, retrieve_direct_chroma
 
@@ -112,6 +112,12 @@ _CONTEXTUALIZE_PROMPT = """Dựa vào lịch sử hội thoại dưới đây, v
 người dùng thành một câu hỏi đầy đủ, độc lập, hiểu được mà KHÔNG cần xem lịch sử. Giữ nguyên ý \
 định người dùng, không thêm thông tin bịa. Nếu câu hỏi cuối đã tự đầy đủ ý nghĩa (không phụ \
 thuộc ngữ cảnh trước), giữ nguyên câu hỏi đó.
+
+QUAN TRỌNG: chỉ nối câu hỏi cuối với chủ đề trong lịch sử khi có từ/cụm từ trong câu hỏi cuối \
+THỰC SỰ tham chiếu tới lịch sử đó (ví dụ: "còn...", "vậy...thì sao", đại từ thay thế không rõ \
+nghĩa nếu tách khỏi lịch sử). Nếu câu hỏi cuối chứa một chủ đề/từ viết tắt KHÔNG xuất hiện và \
+KHÔNG liên quan tới lịch sử hội thoại, coi đó là câu hỏi ĐỘC LẬP, chủ đề mới — TUYỆT ĐỐI không \
+gán ghép nó vào chủ đề của lịch sử chỉ vì đó là chủ đề gần nhất.
 
 Lịch sử hội thoại:
 {history_block}
@@ -461,7 +467,16 @@ def answer_node(state: AgentState) -> dict:
 
 
 async def answer_node_async(state: AgentState) -> dict:
-    """Async version — collects full streamed answer before returning."""
+    """Async version — collects full streamed answer before returning.
+
+    Unlike the sync answer_node, stream_answer only yields raw tokens (no
+    citation/provider metadata), so sources must be recovered here the same
+    way generate_answer does it: parse the finished answer's [N] markers
+    against chunks. Without this, an answer with real inline citations came
+    back with sources=[] — the UI had text saying "[1]" but no source card
+    to click, once _fallback_to_retrieval_answer started actually reaching
+    this path with real chunks instead of always hitting the empty-chunks
+    abstain."""
     t0 = time.time()
     chunks = state.get("retrieved_chunks", [])
     parts = []
@@ -472,9 +487,31 @@ async def answer_node_async(state: AgentState) -> dict:
 
     return {
         "answer": answer,
+        "sources": _cited_sources(answer, chunks),
         "latency_ms": latency,
         "messages": [AIMessage(content=answer)],
     }
+
+
+async def _fallback_to_retrieval_answer(state: AgentState) -> dict:
+    """Shared graceful-degrade path for compare/summarize/report/compliance_check
+    when their specialized tool finds nothing usable. These intents route
+    around do_retrieve in the graph (route_by_intent only sends simple_qa/
+    unknown there), so state["retrieved_chunks"] is always empty at this
+    point — calling answer_node_async(state) directly always hit the
+    zero-chunks abstain immediately, regardless of whether the corpus
+    actually had an answer. Run retrieval first so the fallback is real."""
+    import asyncio
+
+    retrieve_result = await asyncio.to_thread(retrieve_node, state)
+    state = {**state, **retrieve_result}
+    answer_result = await answer_node_async(state)
+    # Merge retrieve_result into the returned state update too, not just pass
+    # it to answer_node_async — otherwise the graph's final retrieved_chunks
+    # stays empty, which zeroes chunk_count in the API response and silently
+    # disables guardrails.validate_citations (it bails out whenever
+    # chunk_count <= 0), even though the answer above is genuinely cited.
+    return {**retrieve_result, **answer_result}
 
 
 def _parse_compare_args(query: str) -> tuple[str, str, str]:
@@ -523,7 +560,7 @@ async def compare_node(state: AgentState) -> dict:
         }
     except Exception as exc:
         logger.error("compare_node failed: {}", exc)
-        return await answer_node_async(state)
+        return await _fallback_to_retrieval_answer(state)
 
 
 async def summarize_node(state: AgentState) -> dict:
@@ -539,7 +576,7 @@ async def summarize_node(state: AgentState) -> dict:
         }
     except Exception as exc:
         logger.error("summarize_node failed: {}", exc)
-        return await answer_node_async(state)
+        return await _fallback_to_retrieval_answer(state)
 
 
 _COMPLIANCE_VERDICT_PREFIX = {
@@ -573,12 +610,12 @@ async def compliance_check_node(state: AgentState) -> dict:
         result = check_compliance(state["query"])
     except Exception as exc:
         logger.error("compliance_check_node failed: {}", exc)
-        return await answer_node_async(state)
+        return await _fallback_to_retrieval_answer(state)
 
     if result["verdict"] == "no_match":
         # No curated criterion matches this situation at all — normal RAG
         # retrieval has a better shot than a bare "no match" message.
-        return await answer_node_async(state)
+        return await _fallback_to_retrieval_answer(state)
 
     answer = _render_compliance_answer(result)
     ms = int((time.time() - t0) * 1000)
@@ -623,7 +660,7 @@ async def report_node(state: AgentState) -> dict:
         }
     except Exception as exc:
         logger.error("report_node failed: {}", exc)
-        return await answer_node_async(state)
+        return await _fallback_to_retrieval_answer(state)
 
 
 def persist_node(state: AgentState) -> dict:

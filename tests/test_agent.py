@@ -367,6 +367,71 @@ class TestRetryLoopIntegration:
         assert result["grade"] == "relevant"
 
 
+# ── Graceful-degrade fallback (compare/summarize/report/compliance_check) ───────
+
+class TestFallbackToRetrievalAnswer:
+    """compliance_check_node/compare_node/summarize_node/report_node all route
+    around do_retrieve in the graph, so state["retrieved_chunks"] starts empty.
+    Their fallback used to call answer_node_async(state) directly, which always
+    hit stream_answer's zero-chunks abstain regardless of whether the corpus
+    had an answer — reproduced live by a "no_match" compliance query that should
+    have found the answer via plain RAG. _fallback_to_retrieval_answer must run
+    retrieval first."""
+
+    def test_fallback_runs_retrieval_before_answering(self):
+        from src.agent.graph import _fallback_to_retrieval_answer
+        from src.rag.retriever import RetrievedChunk
+
+        chunk = RetrievedChunk(text="nội dung liên quan", score=0.5, metadata={})
+        state = {
+            "messages": [], "query": "câu hỏi", "retrieved_chunks": [], "steps": [],
+        }
+        seen_chunks = []
+
+        async def fake_stream_answer(query, chunks):
+            seen_chunks.append(chunks)
+            yield "Trả lời [1]"
+
+        async def run():
+            with patch("src.agent.graph.retrieve_node", return_value={"retrieved_chunks": [chunk]}) as mock_retrieve, \
+                 patch("src.agent.graph.stream_answer", side_effect=fake_stream_answer):
+                return await _fallback_to_retrieval_answer(state), mock_retrieve
+
+        result, mock_retrieve = asyncio.run(run())
+        mock_retrieve.assert_called_once()
+        # stream_answer must have received the freshly retrieved chunk, not []
+        assert seen_chunks == [[chunk]]
+        assert result["answer"] == "Trả lời [1]"
+        # retrieved_chunks must land in the returned state update too, not just
+        # get used internally — otherwise chunk_count stays 0 in the API layer
+        # and validate_citations' hallucination guard silently no-ops.
+        assert result["retrieved_chunks"] == [chunk]
+        assert result["sources"] and result["sources"][0]["index"] == 1
+
+    def test_compliance_no_match_uses_fallback_retrieval(self):
+        from src.agent.graph import compliance_check_node
+        from src.rag.retriever import RetrievedChunk
+
+        chunk = RetrievedChunk(text="nội dung liên quan", score=0.5, metadata={})
+        state = {"messages": [], "query": "câu hỏi", "retrieved_chunks": [], "steps": []}
+        seen_chunks = []
+
+        async def fake_stream_answer(query, chunks):
+            seen_chunks.append(chunks)
+            yield "Trả lời [1]"
+
+        async def run():
+            with patch("src.rag.compliance.check_compliance", return_value={"verdict": "no_match"}), \
+                 patch("src.agent.graph.retrieve_node", return_value={"retrieved_chunks": [chunk]}) as mock_retrieve, \
+                 patch("src.agent.graph.stream_answer", side_effect=fake_stream_answer):
+                return await compliance_check_node(state), mock_retrieve
+
+        result, mock_retrieve = asyncio.run(run())
+        mock_retrieve.assert_called_once()
+        assert seen_chunks == [[chunk]]
+        assert result["answer"] == "Trả lời [1]"
+
+
 # ── Schema Tests ───────────────────────────────────────────────────────────────
 
 class TestSchemas:
