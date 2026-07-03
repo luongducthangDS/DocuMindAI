@@ -6,13 +6,7 @@ Report routes:
 
 from __future__ import annotations
 
-import smtplib
-from email.mime.application import MIMEApplication
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from pathlib import Path
-
-from fastapi import APIRouter, BackgroundTasks, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import FileResponse
 from loguru import logger
 
@@ -23,10 +17,7 @@ router = APIRouter(prefix="/api/v1", tags=["reports"])
 
 
 @router.post("/report/create", response_model=ReportResponse)
-async def create_report(
-    body: ReportRequest,
-    background_tasks: BackgroundTasks,
-) -> ReportResponse:
+async def create_report(body: ReportRequest) -> ReportResponse:
     """
     Trigger report generation. Heavy work runs in background thread.
     Returns download URL immediately after enqueuing.
@@ -50,9 +41,6 @@ async def create_report(
 
     safe_name = body.filename + ".pdf"
     download_url = f"/api/v1/reports/{safe_name}"
-
-    if body.email_to:
-        background_tasks.add_task(_send_report_email, body.email_to, body.title, safe_name)
 
     return ReportResponse(
         status="success",
@@ -94,44 +82,3 @@ async def download_report(filename: str) -> FileResponse:
         media_type="application/pdf",
         filename=filename,
     )
-
-
-def _send_report_email(to_email: str, report_title: str, filename: str) -> None:
-    """Send report as email attachment. Runs in background thread."""
-    settings = get_settings()
-
-    if not settings.smtp_user or not settings.smtp_password:
-        logger.warning("SMTP not configured, skipping email delivery")
-        return
-
-    file_path = settings.reports_dir / filename
-    if not file_path.exists():
-        logger.error("Report file not found for email: {}", filename)
-        return
-
-    try:
-        msg = MIMEMultipart()
-        msg["From"] = settings.smtp_user
-        msg["To"] = to_email
-        msg["Subject"] = f"DocuMind AI — Báo cáo: {report_title[:80]}"
-
-        body = (
-            f"Xin chào,\n\nBáo cáo pháp lý '{report_title}' đã được tạo và đính kèm bên dưới.\n\n"
-            "Lưu ý: Nội dung chỉ mang tính tham khảo.\n\n— DocuMind AI"
-        )
-        msg.attach(MIMEText(body, "plain", "utf-8"))
-
-        with open(file_path, "rb") as f:
-            attachment = MIMEApplication(f.read(), _subtype="pdf")
-            attachment.add_header("Content-Disposition", "attachment", filename=filename)
-            msg.attach(attachment)
-
-        with smtplib.SMTP(settings.smtp_host, settings.smtp_port) as server:
-            server.starttls()
-            server.login(settings.smtp_user, settings.smtp_password)
-            server.send_message(msg)
-
-        logger.info("Report emailed to {} successfully", to_email[:5] + "***")
-
-    except Exception as exc:
-        logger.error("Failed to send report email: {}", exc)

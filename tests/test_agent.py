@@ -451,14 +451,3 @@ class TestSchemas:
         assert ".." not in req.filename
         assert "/" not in req.filename
         assert "etc" in req.filename or req.filename  # sanitized but not empty
-
-    def test_report_request_validates_email(self):
-        from pydantic import ValidationError
-        from src.api.schemas import ReportRequest
-
-        with pytest.raises(ValidationError):
-            ReportRequest(
-                title="Test",
-                query="test query",
-                email_to="not-an-email",
-            )

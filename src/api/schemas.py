@@ -103,7 +103,6 @@ class ReportRequest(BaseModel):
     title: str = Field(..., min_length=3, max_length=200)
     query: str = Field(..., min_length=3, max_length=500)
     filename: str = Field(default="report", max_length=60)
-    email_to: str | None = None
 
     @field_validator("filename")
     @classmethod
@@ -111,15 +110,6 @@ class ReportRequest(BaseModel):
         # Only allow safe characters — prevent path traversal
         safe = re.sub(r"[^a-zA-Z0-9_-]", "_", v)
         return safe[:60] or "report"
-
-    @field_validator("email_to")
-    @classmethod
-    def validate_email(cls, v: str | None) -> str | None:
-        if v is None:
-            return None
-        if not re.match(r"^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$", v):
-            raise ValueError("Invalid email address")
-        return v
 
 
 class ReportResponse(BaseModel):

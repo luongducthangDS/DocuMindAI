@@ -82,7 +82,7 @@ frontend/src/
   styles.css
 
 scripts/
-  ingest_uneti.py    Ingest UNETI pre-chunked JSON vào ChromaDB
+  ingest_uneti_md.py    Ingest UNETI .md files (chunk theo Điều/Khoản) vào ChromaDB
   rebuild_chroma_direct.py   Ingest từ data/raw/ (dùng cho JSON pháp luật)
   expand_corpus.py   Crawl thêm văn bản
   migrate_chroma_to_qdrant.py   Migrate corpus ChromaDB local → Qdrant Cloud
