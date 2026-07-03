@@ -39,65 +39,49 @@ class TestShortTermMemory:
 
 
 class TestLongTermMemory:
-    def test_create_and_retrieve_session(self, tmp_path):
+    def _fetch_query_log(self, mem, session_id):
+        with mem._connect() as conn:
+            rows = conn.execute(
+                "SELECT query, answer_snippet, latency_ms, used_llm FROM query_log WHERE session_id = ?",
+                (session_id,),
+            ).fetchall()
+        return [dict(r) for r in rows]
+
+    def test_log_query_persists(self, tmp_path):
         db = tmp_path / "test_mem.db"
         mem = LongTermMemory(db_path=db)
-        sid = mem.create_session()
-        assert len(sid) == 36  # UUID format
-
-        # Should not raise on second call (IGNORE duplicate)
-        mem.create_session(session_id=sid)
-
-    def test_log_and_retrieve_queries(self, tmp_path):
-        db = tmp_path / "test_mem.db"
-        mem = LongTermMemory(db_path=db)
-        sid = mem.create_session()
 
         mem.log_query(
-            session_id=sid,
+            session_id="s1",
             query="Điều kiện thành lập công ty?",
             answer_snippet="Cần ít nhất 2 thành viên",
             latency_ms=250,
             used_llm="groq",
         )
 
-        recent = mem.get_recent_queries(sid, limit=5)
-        assert len(recent) == 1
-        assert recent[0]["used_llm"] == "groq"
-        assert recent[0]["latency_ms"] == 250
-
-    def test_update_session_summary(self, tmp_path):
-        db = tmp_path / "test_mem.db"
-        mem = LongTermMemory(db_path=db)
-        sid = mem.create_session()
-        mem.update_session_summary(sid, "User asked about labor law")
-        summary = mem.get_session_summary(sid)
-        assert "labor law" in summary
+        rows = self._fetch_query_log(mem, "s1")
+        assert len(rows) == 1
+        assert rows[0]["used_llm"] == "groq"
+        assert rows[0]["latency_ms"] == 250
 
     def test_long_query_is_truncated(self, tmp_path):
         db = tmp_path / "test_mem.db"
         mem = LongTermMemory(db_path=db)
-        sid = mem.create_session()
 
         very_long_query = "A" * 1000
-        # Should not raise
-        mem.log_query(sid, very_long_query, "short answer", 100, "groq")
+        mem.log_query("s1", very_long_query, "short answer", 100, "groq")
 
-        recent = mem.get_recent_queries(sid)
-        assert len(recent[0]["query"]) <= 500
+        rows = self._fetch_query_log(mem, "s1")
+        assert len(rows[0]["query"]) <= 500
 
     def test_sql_injection_prevention(self, tmp_path):
         db = tmp_path / "test_mem.db"
         mem = LongTermMemory(db_path=db)
-        # Injection attempt in session_id should be caught by validation
-        # at the API layer, but DB itself must handle safely
-        sid = mem.create_session()
-        malicious = "'; DROP TABLE sessions; --"
+        malicious = "'; DROP TABLE query_log; --"
         # Should not raise, logs to query_log with parameterized query
-        mem.log_query(sid, malicious, "answer", 100, "groq")
-        # Sessions table should still exist
-        recent = mem.get_recent_queries(sid)
-        assert isinstance(recent, list)
+        mem.log_query("s1", malicious, "answer", 100, "groq")
+        rows = self._fetch_query_log(mem, "s1")
+        assert isinstance(rows, list) and len(rows) == 1
 
 
 # ── Graph Tests ────────────────────────────────────────────────────────────────

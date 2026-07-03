@@ -1,7 +1,6 @@
 """
 LLM generation with mandatory citations.
 Primary: Groq Llama-3.3-70B | Fallback: Gemini 2.0 Flash Lite
-Retry logic via tenacity; fallback logic on timeout/rate-limit.
 """
 
 from __future__ import annotations
@@ -11,12 +10,6 @@ import re
 from typing import AsyncIterator
 
 from loguru import logger
-from tenacity import (
-    retry,
-    retry_if_exception_type,
-    stop_after_attempt,
-    wait_exponential,
-)
 
 from src.config import get_settings
 from src.rag.retriever import RetrievedChunk
@@ -61,12 +54,6 @@ Quy tắc bắt buộc:
      thay vì viết thành đoạn văn dài."""
 
 _CITATION_SUFFIX = "\n\n**Nguồn trích dẫn:**\n{citations}"
-
-_GROQ_ERRORS = (
-    "groq.RateLimitError",
-    "groq.APITimeoutError",
-    "groq.APIConnectionError",
-)
 
 
 _MAX_CHUNK_CHARS = 3_000   # ~750 tokens per chunk

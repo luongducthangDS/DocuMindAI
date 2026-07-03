@@ -5,7 +5,6 @@ Two-tier memory:
 """
 
 import sqlite3
-import uuid
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -72,14 +71,6 @@ class LongTermMemory:
     def _init_db(self) -> None:
         with self._connect() as conn:
             conn.executescript("""
-                CREATE TABLE IF NOT EXISTS sessions (
-                    id TEXT PRIMARY KEY,
-                    summary TEXT NOT NULL,
-                    query_count INTEGER DEFAULT 0,
-                    created_at TEXT NOT NULL,
-                    updated_at TEXT NOT NULL
-                );
-
                 CREATE TABLE IF NOT EXISTS query_log (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     session_id TEXT NOT NULL,
@@ -87,8 +78,7 @@ class LongTermMemory:
                     answer_snippet TEXT,
                     latency_ms INTEGER,
                     used_llm TEXT,
-                    created_at TEXT NOT NULL,
-                    FOREIGN KEY (session_id) REFERENCES sessions(id)
+                    created_at TEXT NOT NULL
                 );
 
                 CREATE INDEX IF NOT EXISTS idx_query_log_session
@@ -119,31 +109,6 @@ class LongTermMemory:
             """)
         logger.debug("LongTermMemory DB initialized: {}", self._db)
 
-    def create_session(self, session_id: str | None = None) -> str:
-        sid = session_id or str(uuid.uuid4())
-        now = datetime.utcnow().isoformat()
-        with self._connect() as conn:
-            conn.execute(
-                "INSERT OR IGNORE INTO sessions (id, summary, created_at, updated_at) VALUES (?, ?, ?, ?)",
-                (sid, "", now, now),
-            )
-        return sid
-
-    def update_session_summary(self, session_id: str, summary: str) -> None:
-        now = datetime.utcnow().isoformat()
-        with self._connect() as conn:
-            conn.execute(
-                "UPDATE sessions SET summary = ?, updated_at = ?, query_count = query_count + 1 WHERE id = ?",
-                (summary[:2000], now, session_id),  # cap summary length
-            )
-
-    def get_session_summary(self, session_id: str) -> str:
-        with self._connect() as conn:
-            row = conn.execute(
-                "SELECT summary FROM sessions WHERE id = ?", (session_id,)
-            ).fetchone()
-        return row["summary"] if row else ""
-
     def log_query(
         self,
         session_id: str,
@@ -167,18 +132,6 @@ class LongTermMemory:
                     now,
                 ),
             )
-
-    def get_recent_queries(self, session_id: str, limit: int = 5) -> list[dict]:
-        with self._connect() as conn:
-            rows = conn.execute(
-                """SELECT query, answer_snippet, latency_ms, used_llm, created_at
-                   FROM query_log
-                   WHERE session_id = ?
-                   ORDER BY created_at DESC
-                   LIMIT ?""",
-                (session_id, limit),
-            ).fetchall()
-        return [dict(r) for r in rows]
 
     def log_upload(
         self,

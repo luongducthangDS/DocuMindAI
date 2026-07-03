@@ -1,7 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -63,7 +62,6 @@ class Settings(BaseSettings):
     # FastAPI
     api_host: str = "0.0.0.0"
     api_port: int = 8081
-    api_secret_key: str = "change-me"
     environment: str = "development"
     allowed_origins: str = "http://localhost:8501"
 
@@ -99,11 +97,6 @@ class Settings(BaseSettings):
     smtp_port: int = 587
     smtp_user: str = ""
     smtp_password: str = ""
-
-    @field_validator("allowed_origins")
-    @classmethod
-    def parse_origins(cls, v: str) -> str:
-        return v
 
     @property
     def cors_origins(self) -> list[str]:

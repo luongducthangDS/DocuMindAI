@@ -5,7 +5,6 @@ Produces structured PDF with header, table of contents, sections, footnotes.
 
 from __future__ import annotations
 
-import textwrap
 from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
