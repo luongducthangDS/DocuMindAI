@@ -93,7 +93,7 @@ def _load_nodes_from_backend(backend) -> list:
 
     Provider-agnostic (works for both Chroma and Qdrant backends). Caps at
     _BM25_NODE_CAP nodes — BM25 memory scales linearly with corpus size,
-    and beyond ~10k nodes the index itself exceeds typical Railway/Render
+    and beyond ~10k nodes the index itself exceeds typical Render
     free-tier RAM. For very large corpora, consider a dedicated BM25 service
     (Elasticsearch/Typesense).
     """

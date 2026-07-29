@@ -42,7 +42,7 @@ router = APIRouter(prefix="/api/v1", tags=["query"])
 
 
 def _get_client_ip(request: Request) -> str:
-    """Proxy-aware IP extraction — respects X-Forwarded-For (Railway/Cloudflare)."""
+    """Proxy-aware IP extraction — respects X-Forwarded-For (Render/Cloudflare)."""
     forwarded = request.headers.get("x-forwarded-for", "")
     if forwarded:
         return forwarded.split(",")[0].strip()[:45]
@@ -88,7 +88,7 @@ async def query_endpoint(request: Request, body: QueryRequest) -> QueryResponse:
         logger.warning("Guard blocked query session={} reason={}", body.session_id, guard.reason)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Query không hợp lệ. Vui lòng đặt câu hỏi về quy định UNETI.",
+            detail="Query không hợp lệ. Vui lòng đặt câu hỏi về tài liệu ngân hàng.",
         )
 
     error_detail: str | None = None
@@ -228,7 +228,7 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
             if guard.blocked:
                 logger.warning("WS guard blocked session={} reason={}", session_id, guard.reason)
                 await websocket.send_json({
-                    "error": "Query không hợp lệ. Vui lòng đặt câu hỏi về quy định UNETI.",
+                    "error": "Query không hợp lệ. Vui lòng đặt câu hỏi về tài liệu ngân hàng.",
                     "guard_triggered": True,
                 })
                 continue

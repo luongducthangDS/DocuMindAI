@@ -87,8 +87,8 @@ def get_embedder() -> "BaseEmbedding":
     no local model load, for RAM-constrained hosts (see _HFInferenceAPIEmbedding).
     """
     settings = get_settings()
-    # The bundled Chroma corpus is indexed with this 384-dim model. A Railway
-    # variable from an older deploy can otherwise silently break retrieval.
+    # The bundled Chroma corpus is indexed with this 384-dim model. A stale
+    # env var from an older deploy can otherwise silently break retrieval.
     model_name = _INDEXED_EMBEDDING_MODEL
     if settings.embedding_model and settings.embedding_model != model_name:
         logger.warning(

@@ -4,7 +4,13 @@ Project hướng dẫn cho Claude Code. Đọc file này trước khi làm bất
 
 ## Project overview
 
-Chatbot RAG nội bộ hỗ trợ sinh viên UNETI (Trường Đại học Kinh tế - Kỹ thuật Công nghiệp) tra cứu nội quy, học bổng, điểm rèn luyện, chuẩn đầu ra.
+AI agent RAG nội bộ tra cứu tài liệu ngân hàng — quy định, biểu phí, sản phẩm (vay, thẻ,
+tiền gửi), quy trình nghiệp vụ. Trả lời kèm trích dẫn nguồn, từ chối khi câu hỏi ngoài
+phạm vi tài liệu đã nạp.
+
+**Trạng thái hiện tại:** đang ở giai đoạn dựng khung — kiến trúc, pipeline ingest, prompt
+đã chuyển sang domain ngân hàng, nhưng **chưa có corpus thật** (`data/chroma_db/` rỗng).
+Xem mục "Corpus" bên dưới để nạp tài liệu đầu tiên.
 
 **Stack:**
 - Backend: FastAPI + LangGraph agent + vector store qua `VECTOR_STORE_PROVIDER`
@@ -16,29 +22,34 @@ Chatbot RAG nội bộ hỗ trợ sinh viên UNETI (Trường Đại học Kinh 
 
 **Deploy (2026-07, theo default-tech-stack skill):**
 - Local dev: như cũ, không đổi gì (`.\start.ps1`)
-- Production: frontend → Vercel (`frontend/vercel.json`, env `VITE_API_URL`),
+- Production: **chỉ Render** — frontend → Vercel (`frontend/vercel.json`, env `VITE_API_URL`),
   backend → Render (`render.yaml`, dùng chung Dockerfile hiện có)
-- CI/CD cũ (`.github/workflows/deploy.yml`) build Docker + deploy Railway (monolith,
-  serve luôn React build) — vẫn còn, dùng nếu không muốn tách kiến trúc
+- Đã xoá CI/CD Railway (`.github/workflows/deploy.yml`, `railway.toml`, `deploy_railway.ps1`,
+  `scripts/start_railway.sh`) — không còn dùng Railway ở bất kỳ đâu trong repo
 - Không dùng Supabase/Postgres — dự án không có bảng quan hệ nào (chỉ log JSONL)
 
-## Corpus hiện tại
+## Corpus
 
-7 văn bản UNETI, tổng 91 chunks trong ChromaDB (`data/chroma_db/`), chunk theo Điều/Khoản:
-- QĐ-740: Quy định học, kiểm tra & chuẩn đầu ra ngoại ngữ (15 chunks)
-- QĐ-747: Quy chế đánh giá điểm rèn luyện sinh viên (19 chunks)
-- QĐ-748: Quy định học bổng khuyến khích học tập (11 chunks)
-- QĐ-670: Quy định chuẩn đầu ra tin học (8 chunks)
-- QĐ-828: Quy định hướng dẫn & đánh giá khóa luận tốt nghiệp (18 chunks)
-- QĐ-1228: Phương thức đánh giá chuẩn đầu ra chương trình đào tạo (7 chunks)
-- QĐ-853: Quy định ngoại ngữ tiếng Anh cho sinh viên chính quy (13 chunks)
+Chưa có tài liệu ngân hàng thật nào được nạp. Pipeline ingest (`scripts/ingest_documents.py`)
+đã tổng quát hoá khỏi UNETI — chunk theo Điều/Khoản (`src/ingestion/chunker.py`, tái dùng được
+vì thông tư/quyết định ngân hàng cũng theo cấu trúc này), nhận input là một thư mục `.md` bất kỳ
+thay vì danh sách file hard-code.
 
-Nguồn MD: `D:\Projects for CV\chatbot_uneti_final\source\{pdf,scan}\md\*.md`
-
-Để ingest lại hoặc thêm tài liệu mới:
+Để nạp tài liệu ngân hàng:
 ```powershell
-python scripts/ingest_uneti_md.py --reset
+# Không có manifest — metadata tạm suy ra từ tên file
+python scripts/ingest_documents.py --source-dir data/raw/banking_docs --reset
+
+# Có manifest JSON (so_hieu, title, doc_type, ngay_ban_hanh, url, institution mỗi file)
+python scripts/ingest_documents.py --source-dir data/raw/banking_docs --manifest data/raw/manifest.json --reset
+
+# Xem trước số chunk mà không ghi vào DB
+python scripts/ingest_documents.py --source-dir data/raw/banking_docs --dry-run
 ```
+
+`data/compliance/criteria.json` (dùng bởi `src/rag/compliance.py` cho compliance_check —
+kiểm tra pass/fail một tình huống cụ thể, ví dụ "thu nhập 15tr có đủ điều kiện vay tín chấp
+không?") cũng đang rỗng — cần author lại theo tiêu chí ngân hàng thật khi có corpus.
 
 ## Chạy local
 
@@ -71,6 +82,7 @@ src/
                        đổi VECTOR_STORE_PROVIDER không cần sửa call site nào khác
     retriever.py      Hybrid retriever + reranker, RetrievedChunk dataclass
     generator.py      LLM generation (Groq primary / Gemini fallback), score filtering
+    compliance.py     Compliance-check engine (pass/fail theo tiêu chí JSON hand-curated)
   agent/
     graph.py      LangGraph agent graph
     memory.py     ShortTermMemory (in-process, max 10 turns)
@@ -82,9 +94,9 @@ frontend/src/
   styles.css
 
 scripts/
-  ingest_uneti_md.py    Ingest UNETI .md files (chunk theo Điều/Khoản) vào ChromaDB
+  ingest_documents.py        Ingest thư mục .md bất kỳ (chunk theo Điều/Khoản) vào ChromaDB
   rebuild_chroma_direct.py   Ingest từ data/raw/ (dùng cho JSON pháp luật)
-  expand_corpus.py   Crawl thêm văn bản
+  expand_corpus.py           Crawl thêm văn bản
   migrate_chroma_to_qdrant.py   Migrate corpus ChromaDB local → Qdrant Cloud
                                  (đọc embeddings có sẵn, không re-embed)
 
@@ -94,7 +106,7 @@ eval/
   metrics.py         Local metrics: hit_rate, MRR, citation_rate, ooc_refusal_rate
 
 logs/
-  chat_history.jsonl   Log mỗi query/response (append, structured JSON)
+  chat_history.jsonl   Log mỗi query/response (append, structured JSON; tự tạo lại khi chạy)
 ```
 
 ## Config quan trọng (.env)
@@ -119,7 +131,7 @@ for k in ("HF_HOME", "HF_HUB_CACHE", "TRANSFORMERS_CACHE", "SENTENCE_TRANSFORMER
 
 **LLM temperature:** `0.0` (không phải 0.1) để citation ổn định giữa các lần chạy.
 
-**ChromaDB:** Dùng local `PersistentClient` (không cần server). HTTP server ở `localhost:8000` thường không chạy — code tự fallback sang local.
+**ChromaDB:** Dùng local `PersistentClient` (không cần server). HTTP server ở `localhost:8000` thường không chạy — code tự fallback sang local. Corpus hiện đang rỗng — `data/chroma_db/` sẽ được tạo lại khi chạy ingest.
 
 **Vite proxy:** `frontend/vite.config.ts` proxy `/api` → `http://localhost:8081`. Nếu đổi port backend phải cập nhật cả đây. Khi deploy tách domain (Vercel), frontend dùng `VITE_API_URL` thay vì proxy — xem `frontend/.env.example`.
 
@@ -127,12 +139,13 @@ for k in ("HF_HOME", "HF_HUB_CACHE", "TRANSFORMERS_CACHE", "SENTENCE_TRANSFORMER
 `python scripts/migrate_chroma_to_qdrant.py --verify`, rồi set `VECTOR_STORE_PROVIDER=qdrant`
 + `QDRANT_URL` + `QDRANT_API_KEY` trong `.env`. Toàn bộ code retrieval (main.py init, BM25
 corpus load, health check, direct-query fallback) đi qua `src/rag/vector_backend.py` nên
-không cần sửa gì thêm. Đã test roundtrip với dữ liệu thật (91 chunks) — top-1 khớp tuyệt đối
-giữa Chroma và Qdrant.
+không cần sửa gì thêm — nhưng cần chạy migrate lại sau khi có corpus ngân hàng thật (script
+đọc embeddings có sẵn trong Chroma, không re-embed).
 
 ## Eval (RAGAS)
 
-Chỉ chạy khi cần benchmark, không phải production:
+Chỉ chạy khi cần benchmark, không phải production. `data/eval/test_questions.json` đang rỗng
+(bộ câu hỏi UNETI cũ đã xoá) — cần soạn lại bộ câu hỏi ngân hàng trước khi eval có ý nghĩa:
 ```powershell
 python eval/run_evals.py --strategies dense hybrid --output reports/ragas_50q.json
 ```

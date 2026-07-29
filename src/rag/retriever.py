@@ -60,7 +60,7 @@ def build_hybrid_retriever(
     QueryFusionRetriever: combines dense + BM25 with Reciprocal Rank Fusion.
     Falls back to vector-only if BM25 init fails (e.g. empty corpus).
 
-    top_k=20: candidate pool before reranking. With the 91-chunk UNETI corpus,
+    top_k=20: candidate pool before reranking. For a small corpus (~100 chunks),
     pulling 20 candidates gives the cross-encoder enough material to find the best 8.
     RRF fusion similarity_top_k must equal top_k (not top_k//2) so that both
     the dense and sparse lists contribute their full candidate sets to fusion.

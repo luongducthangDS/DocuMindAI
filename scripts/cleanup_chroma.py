@@ -1,6 +1,6 @@
 """
 scripts/cleanup_chroma.py — xóa sạch mọi collection KHÔNG liên quan trong ChromaDB,
-chỉ giữ lại corpus production `documind_legal` (91 chunk UNETI).
+chỉ giữ lại corpus production `documind_legal`.
 
 An toàn: KEEP được hard-code, script không bao giờ xóa collection trong KEEP.
 Mặc định chạy ở chế độ xem trước (dry-run). Thêm --apply để xóa thật.

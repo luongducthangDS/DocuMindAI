@@ -1,4 +1,4 @@
-# CPU-only PyTorch (avoids ~2GB CUDA download — Railway has no GPU)
+# CPU-only PyTorch (avoids ~2GB CUDA download — Render has no GPU)
 --extra-index-url https://download.pytorch.org/whl/cpu
 
 # ── Core RAG ──────────────────────────────────────────────────────────────────

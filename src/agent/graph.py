@@ -100,8 +100,8 @@ _ROUTER_PROMPT = """Phân loại ý định câu hỏi sau vào MỘT trong các
 - compare: so sánh hai văn bản hoặc hai quy định
 - summarize: yêu cầu tóm tắt một văn bản
 - report: yêu cầu tạo báo cáo PDF hoặc tổng hợp nhiều văn bản
-- compliance_check: kiểm tra một tình huống cụ thể có đáp ứng điều kiện/quy định hay không (ví dụ: "sinh viên có điểm rèn luyện 60 có đạt loại khá không?", "GPA 2.3 có đủ điều kiện làm khóa luận không?")
-- unknown: không liên quan đến pháp luật
+- compliance_check: kiểm tra một tình huống cụ thể có đáp ứng điều kiện/quy định hay không (ví dụ: "thu nhập 15 triệu/tháng có đủ điều kiện vay tín chấp không?", "hạn mức thẻ 50 triệu có cần chứng minh thu nhập không?")
+- unknown: không liên quan đến tài liệu ngân hàng
 
 Chỉ trả về một từ duy nhất (không giải thích)."""
 
@@ -115,14 +115,14 @@ thuộc ngữ cảnh trước), giữ nguyên câu hỏi đó.
 
 QUAN TRỌNG: từ nối như "còn...", "vậy...", "thì sao" chỉ là tín hiệu NGỮ PHÁP, KHÔNG tự nó \
 chứng minh câu hỏi cuối cùng chủ đề với lịch sử. Phải kiểm tra thêm: câu hỏi cuối có mang theo \
-DANH TỪ CHỦ ĐỀ CỤ THỂ của riêng nó không (ví dụ "học phí", "TOEIC", "học bổng")?
+DANH TỪ CHỦ ĐỀ CỤ THỂ của riêng nó không (ví dụ "lãi suất", "hạn mức thẻ", "phí thường niên")?
 - Nếu câu hỏi cuối KHÔNG có danh từ chủ đề riêng — chỉ có số/thuộc tính mơ hồ đứng một mình \
 (ví dụ "90 thì sao", "còn khoản 2", "vậy thì sao") — thì nối với chủ đề gần nhất trong lịch sử.
 - Nếu câu hỏi cuối CÓ danh từ chủ đề cụ thể của riêng nó mà danh từ đó KHÔNG xuất hiện trong \
 lịch sử — dù có từ nối "vậy/còn/thì sao" đi kèm — vẫn coi là câu hỏi ĐỘC LẬP, chủ đề mới. \
-Ví dụ: lịch sử đang nói về "điểm rèn luyện", câu hỏi cuối là "vậy học phí kỳ này thì sao" — \
-"học phí" là danh từ chủ đề mới, KHÔNG liên quan điểm rèn luyện — viết lại thành câu hỏi độc \
-lập về học phí, TUYỆT ĐỐI không ghép "điểm rèn luyện" vào.
+Ví dụ: lịch sử đang nói về "lãi suất vay", câu hỏi cuối là "vậy phí thường niên thẻ thì sao" — \
+"phí thường niên" là danh từ chủ đề mới, KHÔNG liên quan lãi suất vay — viết lại thành câu hỏi độc \
+lập về phí thường niên, TUYỆT ĐỐI không ghép "lãi suất vay" vào.
 
 Lịch sử hội thoại:
 {history_block}
@@ -518,15 +518,15 @@ def _parse_compare_args(query: str) -> tuple[str, str, str]:
     but with the full query — better than passing identical nonsense before.
     """
     import re
-    # Pattern: "so sánh QĐ-740 và QĐ-747 về học bổng"
+    # Pattern: "so sánh QĐ-740 và TT-747 về lãi suất"
     m = re.search(
-        r"(QĐ-\w+|QĐ\s*\d+|\d{2,4}/\w+[-/]\w+)",
+        r"(QĐ-\w+|QĐ\s*\d+|TT-\w+|TT\s*\d+|NĐ-\w+|\d{2,4}/\w+[-/]\w+)",
         query, re.IGNORECASE
     )
     parts = re.split(r"\s+(?:và|with|vs\.?)\s+", query, maxsplit=1, flags=re.IGNORECASE)
     if len(parts) == 2:
         doc_a = parts[0].strip()
-        # aspect is everything after the second doc token (e.g., "về học bổng")
+        # aspect is everything after the second doc token (e.g., "về lãi suất")
         right = parts[1].strip()
         aspect_match = re.split(r"\s+(?:về|on|regarding)\s+", right, maxsplit=1, flags=re.IGNORECASE)
         doc_b = aspect_match[0].strip()
@@ -610,16 +610,15 @@ async def compliance_check_node(state: AgentState) -> dict:
 
     if result["verdict"] in ("no_match", "insufficient_info"):
         # no_match: no curated criterion matches this situation at all.
-        # insufficient_info: a criterion matched by keyword (e.g. "điểm rèn
-        # luyện") but no number was extractable — this also fires on
-        # genuinely out-of-corpus questions ("Đại học Bách Khoa yêu cầu điểm
-        # rèn luyện tối thiểu bao nhiêu?"), since match_criteria only checks
-        # keyword overlap, not whether the question is even about UNETI. In
-        # both cases normal RAG has a better shot: it can either answer a
-        # legitimate no-number question (e.g. "điều kiện làm khóa luận là
-        # gì?" doesn't need a number) or correctly refuse via the system
-        # prompt's own out-of-corpus rule — better than this node's generic
-        # "vui lòng nêu rõ con số" message either way.
+        # insufficient_info: a criterion matched by keyword (e.g. "lãi suất")
+        # but no number was extractable — this also fires on genuinely
+        # out-of-corpus questions, since match_criteria only checks keyword
+        # overlap, not whether the question is even in-scope. In both cases
+        # normal RAG has a better shot: it can either answer a legitimate
+        # no-number question (e.g. "điều kiện mở thẻ tín dụng là gì?" doesn't
+        # need a number) or correctly refuse via the system prompt's own
+        # out-of-corpus rule — better than this node's generic "vui lòng nêu
+        # rõ con số" message either way.
         return await _fallback_to_retrieval_answer(state)
 
     answer = _render_compliance_answer(result)

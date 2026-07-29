@@ -44,18 +44,12 @@ COPY src/ ./src/
 COPY scripts/ ./scripts/
 COPY ingest.py ./
 
-# Pre-loaded corpus
-COPY data/chroma_db/ ./data/chroma_db/
-
 # Cache dirs
 ENV HOME=/app
 ENV HF_HOME=/app/.cache/huggingface
 ENV TRANSFORMERS_CACHE=/app/.cache/huggingface
 
-RUN mkdir -p data/raw data/processed data/eval logs reports .cache/huggingface
-
-# Fix Windows line endings
-RUN sed -i 's/\r$//' scripts/start_railway.sh
+RUN mkdir -p data/raw data/processed data/eval data/chroma_db logs reports .cache/huggingface
 
 # Pre-download embedding model at build time
 RUN python -c "\
@@ -72,4 +66,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=3 \
 
 EXPOSE 8080
 
-CMD ["sh", "scripts/start_railway.sh"]
+CMD ["sh", "-c", "exec uvicorn src.api.main:app --host 0.0.0.0 --port ${PORT:-8080} --workers 1 --log-level info"]

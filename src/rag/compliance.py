@@ -1,12 +1,13 @@
 """
 Structured compliance-check ("kiểm định tuân thủ") for narrow, quantifiable
-pass/fail regulation lookups (GPA thresholds, điểm rèn luyện brackets, etc.).
+pass/fail regulation lookups (interest-rate thresholds, credit-limit
+brackets, income conditions, etc.).
 
 This is a companion to the RAG pipeline, NOT a replacement or general rule
 engine — it only covers the small set of criteria hand-curated in
 data/compliance/criteria.json, each cross-referenced against the source
-UNETI document at authoring time. Anything not matched falls back to normal
-RAG (see compliance_check_node in src/agent/graph.py).
+banking document at authoring time. Anything not matched falls back to
+normal RAG (see compliance_check_node in src/agent/graph.py).
 """
 
 from __future__ import annotations
@@ -29,13 +30,16 @@ _OPERATORS = {
 }
 
 # Tried in order: number immediately near a known label keyword, then a number
-# followed by a unit marker (điểm/%), then any number at all.
+# followed by a unit marker (%/triệu/đồng), then any number at all.
+# NOTE: these labels are placeholders for the banking domain — update to match
+# the actual fields used in data/compliance/criteria.json once real criteria
+# are authored (e.g. specific product names, rate types).
 _NUMBER_NEAR_LABEL_RE = re.compile(
-    r"(?:điểm rèn luyện|điểm trung bình chung tích lũy|điểm trung bình chung|"
-    r"gpa|đtb|điểm)\D{0,20}?(\d+(?:[.,]\d+)?)",
+    r"(?:lãi suất|hạn mức|thu nhập|tỷ lệ nợ|số dư|kỳ hạn|phí thường niên|phí)"
+    r"\D{0,20}?(\d+(?:[.,]\d+)?)",
     re.IGNORECASE,
 )
-_TRAILING_UNIT_NUMBER_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:điểm|%)")
+_TRAILING_UNIT_NUMBER_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:%|triệu|đồng)")
 _ANY_NUMBER_RE = re.compile(r"(\d+(?:[.,]\d+)?)")
 
 # Below this cosine similarity, an embedding match is considered noise rather

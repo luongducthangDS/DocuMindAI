@@ -28,7 +28,7 @@ async def health_check() -> HealthResponse:
     services = [vector_store, llm, sqlite]
 
     # Core serving path needs corpus retrieval + an LLM provider.
-    # SQLite is optional in Railway/Render: it backs metrics/history best-effort persistence.
+    # SQLite is optional on Render: it backs metrics/history best-effort persistence.
     required = [vector_store, llm]
     all_required_healthy = all(s.healthy for s in required)
     any_required_healthy = any(s.healthy for s in required)

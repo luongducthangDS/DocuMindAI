@@ -3,7 +3,6 @@
 > **RAG + Agentic AI cho văn bản pháp luật Việt Nam**  
 > Portfolio project production-grade — AI Engineer position
 
-[![CI/CD](https://github.com/luongducthangDS/documind-ai/actions/workflows/deploy.yml/badge.svg)](https://github.com/luongducthangDS/documind-ai/actions)
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-blue.svg)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -12,7 +11,6 @@
 ## Demo
 
 ```
-🔗 Live: https://documind.up.railway.app
 📊 LangSmith: https://smith.langchain.com/projects/documind-ai
 🤗 HF Space: https://huggingface.co/spaces/luongducthangDS/documind-ai
 ```
@@ -142,7 +140,7 @@ User Query (HTTP / WebSocket)
 | Hybrid Search | BM25 + RRF + cross-encoder | +25% context recall vs naive |
 | Backend | FastAPI + WebSocket | Async, streaming, type-safe |
 | Frontend | React + Vite | Production UI served as static assets by FastAPI |
-| Deploy | Docker + Railway | Auto healthcheck, env vars |
+| Deploy | Docker + Render | Auto healthcheck, env vars |
 | Observability | LangSmith + `@traceable` | Every LLM call traced |
 | Eval | RAGAS 0.1.21 | Faithfulness, relevancy, recall |
 | PDF | ReportLab | Pure Python, no LaTeX |
@@ -161,7 +159,7 @@ User Query (HTTP / WebSocket)
 | **Retrieval strategy** | BM25 + Dense + RRF | Dense-only (MiniLM) | 30%+ query chứa tên điều luật cụ thể ("Điều 48"); BM25 xử lý exact match tốt hơn embedding 2x; RRF không cần hyperparameter |
 | **Cache placement** | Redis **trước** retrieval | Không cache / sau LLM | Tiết kiệm toàn bộ pipeline (1.2s) thay vì chỉ LLM (0.8s); key đơn giản hơn (query string, không phải serialized response) |
 | **Vector DB** | ChromaDB local persistent | Pinecone / Weaviate cloud | Zero cold start khi demo; không phụ thuộc API limit; data bundled trong Docker image |
-| **Embedding model** | MiniLM-L12-v2 (120MB) | BAAI/bge-m3 (2.27GB) | Railway free tier: 512MB RAM limit; MiniLM đủ để eval pipeline, corpus nhỏ (356 chunks) |
+| **Embedding model** | MiniLM-L12-v2 (120MB) | BAAI/bge-m3 (2.27GB) | Render free tier: 512MB RAM limit; MiniLM đủ để eval pipeline, corpus nhỏ |
 | **Reranker input** | Top-20 từ RRF | Top-5 trực tiếp | Retriever ưu tiên recall (top-20); reranker ưu tiên precision; cross-encoder O(20) ≈ 150ms, không phải O(356) |
 | **Citation approach** | System prompt bắt buộc | Post-processing | LLM tự chọn [N] phù hợp ngữ cảnh; post-processing fail với câu phức tạp; domain pháp luật cần citation per claim |
 | **Fallback LLM** | Gemini 2.0 Flash Lite | Retry Groq | LangSmith trace phát hiện Groq timeout ~8%; Gemini fallback < 200ms overhead; retry sẽ nhân đôi latency khi fail |
@@ -401,7 +399,7 @@ cd frontend
 npm install
 npm run dev
 
-# Production/Railway builds React and serves dist/ from FastAPI
+# Production (Render) builds React and serves dist/ from FastAPI
 ```
 
 ---

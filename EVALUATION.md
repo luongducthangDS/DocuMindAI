@@ -1,6 +1,13 @@
 # DocuMind AI — Evaluation & Findings
 
-RAG assistant for UNETI student regulations (Vietnamese legal/administrative QA).
+> **Historical record.** This evaluation was run during the project's earlier phase, when
+> the corpus was UNETI student regulations. That corpus and question set have since been
+> removed as the project pivoted to banking documents (see `CLAUDE.md`). The retrieval
+> ablation methodology and engineering findings below are still representative of how this
+> pipeline behaves — kept for reference until a banking-domain eval replaces it.
+
+RAG assistant for UNETI student regulations (Vietnamese legal/administrative QA) — the
+domain this evaluation was run against.
 This document summarizes how the system was evaluated, the measured results, and the
 engineering issues found and fixed during evaluation.
 
