@@ -111,6 +111,17 @@ function loadStoredBookmarks(): Bookmark[] {
   }
 }
 
+type Theme = "light" | "dark";
+const LS_THEME_KEY = "documind_theme";
+
+function loadStoredTheme(): Theme {
+  try {
+    return localStorage.getItem(LS_THEME_KEY) === "dark" ? "dark" : "light";
+  } catch {
+    return "light";
+  }
+}
+
 function bookmarkId(question: string, answer: string): string {
   // Cheap non-cryptographic hash — only needs to be stable + unique enough
   // to dedupe identical Q&A pairs, not collision-proof.
@@ -123,11 +134,11 @@ function bookmarkId(question: string, answer: string): string {
 }
 
 const SUGGESTED = [
-  "Điều kiện để được xét học bổng khuyến khích học tập là gì?",
-  "Cách tính điểm rèn luyện của sinh viên như thế nào?",
-  "Chuẩn đầu ra ngoại ngữ yêu cầu mức độ nào?",
-  "Sinh viên bị trừ điểm rèn luyện trong trường hợp nào?",
-  "Chuẩn đầu ra tin học yêu cầu những gì?",
+  "Điều kiện để được vay tín chấp là gì?",
+  "Cách tính lãi suất trả góp như thế nào?",
+  "Hạn mức thẻ tín dụng tối đa là bao nhiêu?",
+  "Phí thường niên áp dụng trong trường hợp nào?",
+  "Quy trình mở tài khoản doanh nghiệp gồm những bước gì?",
 ];
 
 // ── Citation helpers ──────────────────────────────────────────────────────────
@@ -321,9 +332,9 @@ function SourceCard({ src, msgIndex }: { src: Source; msgIndex: number }) {
     <div className="source-card" id={sourceDomId(msgIndex, src.index)}>
       <div className="source-header">
         <span className="source-index">[{src.index}]</span>
+        {src.dieu_header && <span className="source-dieu">{src.dieu_header}</span>}
       </div>
-      {src.dieu_header && <div className="source-dieu">{src.dieu_header}</div>}
-      <div className="source-title">{src.title || "Văn bản pháp luật"}</div>
+      <div className="source-title">{src.title || "Văn bản ngân hàng"}</div>
       {src.source_url && (
         <a href={src.source_url} target="_blank" rel="noreferrer" className="source-link">
           Xem nguồn →
@@ -346,12 +357,22 @@ function App() {
   const [uploadStatus, setUploadStatus] = useState<string>("");
   const [health, setHealth] = useState<"ok" | "degraded" | "error" | "unknown">("unknown");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [theme, setTheme] = useState<Theme>(loadStoredTheme);
   const fileRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    document.body.setAttribute("data-theme", theme);
+    try {
+      localStorage.setItem(LS_THEME_KEY, theme);
+    } catch {
+      // localStorage unavailable — theme just won't persist across reloads
+    }
+  }, [theme]);
 
   // Persist conversation so a page refresh doesn't wipe it — the backend's
   // ShortTermMemory is keyed by sessionId, but only the frontend can survive reload.
@@ -466,6 +487,22 @@ function App() {
   }
 
   const healthDot = health === "ok" ? "dot-green" : health === "degraded" ? "dot-yellow" : "dot-red";
+  const healthLabel = health === "ok" ? "Hệ thống bình thường" : health === "degraded" ? "Suy giảm" : health === "unknown" ? "Đang kiểm tra…" : "Lỗi kết nối";
+
+  const NAV_DEFS: { id: typeof tab; icon: string; label: string; badge?: string }[] = [
+    { id: "chat", icon: "💬", label: "Hỏi đáp tài liệu ngân hàng" },
+    { id: "docs", icon: "📚", label: "Văn bản đã lập chỉ mục", badge: docsLoaded ? String(docs.length) : undefined },
+    { id: "bookmarks", icon: "🔖", label: "Đã lưu", badge: bookmarks.length > 0 ? String(bookmarks.length) : undefined },
+    { id: "upload", icon: "📤", label: "Tải lên văn bản" },
+  ];
+
+  const HEADERS: Record<typeof tab, [string, string]> = {
+    chat: ["Hỏi đáp tài liệu ngân hàng", "Trả lời kèm trích dẫn nguồn cụ thể"],
+    docs: ["Văn bản đã lập chỉ mục", `${docs.length} văn bản`],
+    bookmarks: ["Câu trả lời đã lưu", `${bookmarks.length} mục`],
+    upload: ["Tải lên văn bản", "PDF được tách theo Điều / Khoản"],
+  };
+  const [headerTitle, headerSub] = HEADERS[tab];
 
   return (
     <div className="layout">
@@ -481,96 +518,99 @@ function App() {
       {/* ── Sidebar ── */}
       <aside className={`sidebar${sidebarOpen ? " sidebar-open" : ""}`}>
         <div className="brand">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <rect width="28" height="28" rx="8" fill="#0ea5e9" />
-            <path d="M8 8h12M8 13h12M8 18h8" stroke="white" strokeWidth="2" strokeLinecap="round" />
-            <circle cx="21" cy="19" r="4" fill="#22c55e" />
-            <path d="M19.5 19l1 1 1.5-1.5" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+          <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+            <rect width="34" height="34" rx="9" style={{ fill: "var(--accent)" }} />
+            <path d="M10 10h14M10 15.5h14M10 21h9" stroke="#fdfaf2" strokeWidth="2.2" strokeLinecap="round" />
+            <circle cx="24" cy="23.5" r="4.6" style={{ fill: "var(--highlight)" }} />
+            <path d="M22.2 23.5l1.2 1.2 2-2.2" stroke="#fdfaf2" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <div>
-            <div className="brand-name">DocuMind AI</div>
-            <div className="brand-sub">Hỗ trợ sinh viên UNETI</div>
+            <div className="brand-name">DocuMind</div>
+            <div className="brand-sub">Trợ lý tra cứu tài liệu ngân hàng</div>
           </div>
           <button className="sidebar-close" onClick={() => setSidebarOpen(false)} aria-label="Đóng menu">
             ✕
           </button>
         </div>
 
-        <div className="health-row">
-          <span className={`dot ${healthDot}`} />
-          <span className="health-label">
-            {health === "ok" ? "Hệ thống bình thường" : health === "degraded" ? "Suy giảm" : health === "unknown" ? "Đang kiểm tra…" : "Lỗi kết nối"}
-          </span>
-        </div>
-
         <nav>
-          <button
-            className={`nav-item${tab === "chat" ? " active" : ""}`}
-            onClick={() => { setTab("chat"); setSidebarOpen(false); }}
-          >
-            💬 Hỏi đáp nội quy trường
-          </button>
-          <button
-            className={`nav-item${tab === "docs" ? " active" : ""}`}
-            onClick={() => { setTab("docs"); loadDocs(); setSidebarOpen(false); }}
-          >
-            📚 Văn bản đã lập chỉ mục
-          </button>
-          <button
-            className={`nav-item${tab === "bookmarks" ? " active" : ""}`}
-            onClick={() => { setTab("bookmarks"); setSidebarOpen(false); }}
-          >
-            🔖 Đã lưu{bookmarks.length > 0 ? ` (${bookmarks.length})` : ""}
-          </button>
-          <button
-            className={`nav-item${tab === "upload" ? " active" : ""}`}
-            onClick={() => { setTab("upload"); setSidebarOpen(false); }}
-          >
-            📤 Tải lên văn bản
-          </button>
+          {NAV_DEFS.map((nv) => (
+            <button
+              key={nv.id}
+              className={`nav-item${tab === nv.id ? " active" : ""}`}
+              onClick={() => { setTab(nv.id); if (nv.id === "docs") loadDocs(); setSidebarOpen(false); }}
+            >
+              <span className="nav-bar" />
+              <span>{nv.icon}</span>
+              <span className="nav-label">{nv.label}</span>
+              {nv.badge && <span className="nav-badge">{nv.badge}</span>}
+            </button>
+          ))}
         </nav>
 
         <div className="divider" />
 
-        <div className="sugg-label">Câu hỏi gợi ý</div>
-        <div className="suggestions">
-          {SUGGESTED.map((s) => (
-            <button
-              key={s}
-              className="chip"
-              onClick={() => { setTab("chat"); send(s); setSidebarOpen(false); }}
-            >
-              {s}
-            </button>
-          ))}
+        <div>
+          <div className="sugg-label">Câu hỏi gợi ý</div>
+          <div className="suggestions">
+            {SUGGESTED.map((s) => (
+              <button
+                key={s}
+                className="chip"
+                onClick={() => { setTab("chat"); send(s); setSidebarOpen(false); }}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <button
-          className="nav-item"
-          onClick={newConversation}
-          disabled={messages.length === 0}
-        >
-          🗑️ Cuộc trò chuyện mới
-        </button>
+        <div className="sidebar-footer">
+          <button
+            className="new-chat-btn"
+            onClick={newConversation}
+            disabled={messages.length === 0}
+          >
+            + Cuộc trò chuyện mới
+          </button>
 
-        <div className="session-info">
-          <span className="session-label">Phiên:</span>
-          <span className="session-id">{sessionId}</span>
+          <div className="status-row">
+            <span className="status-left">
+              <span className={`dot ${healthDot}`} />
+              <span className="health-label">{healthLabel}</span>
+            </span>
+            <button
+              className="theme-toggle"
+              onClick={() => setTheme((t) => (t === "light" ? "dark" : "light"))}
+              title="Đổi giao diện sáng / tối"
+            >
+              {theme === "light" ? "◐ Tối" : "◑ Sáng"}
+            </button>
+          </div>
+
+          <div className="session-info">
+            <span className="session-label">Phiên:</span>
+            <span className="session-id">{sessionId}</span>
+          </div>
         </div>
       </aside>
 
       {/* ── Main ── */}
       <main className="main">
+        <div className="header-bar">
+          <span className="header-title">{headerTitle}</span>
+          <span className="header-sub">{headerSub}</span>
+        </div>
         {/* Chat */}
         {tab === "chat" && (
           <div className="panel chat-panel">
             <div className="messages">
               {messages.length === 0 && (
                 <div className="empty">
-                  <div className="empty-icon">🎓</div>
-                  <div className="empty-title">Hỏi đáp nội quy UNETI</div>
+                  <div className="empty-icon">🏦</div>
+                  <div className="empty-title">Hỏi đáp tài liệu ngân hàng</div>
                   <div className="empty-sub">
-                    Đặt câu hỏi về học bổng, điểm rèn luyện, chuẩn đầu ra — trả lời kèm trích dẫn quy định
+                    Đặt câu hỏi về lãi suất, hạn mức, phí dịch vụ, quy trình nghiệp vụ — trả lời kèm trích dẫn quy định
                   </div>
                 </div>
               )}
@@ -614,7 +654,7 @@ function App() {
                         )}
                         <div className="msg-meta">
                           {msg.used_llm && msg.used_llm !== "none" && (
-                            <span className={`llm-badge ${msg.used_llm.startsWith("groq") ? "badge-groq" : msg.used_llm.startsWith("gemini") ? "badge-gemini" : "badge-fallback"}`}>
+                            <span className="llm-badge">
                               {msg.used_llm === "groq" ? "Llama 3.3 70B" : msg.used_llm === "gemini" ? "Gemini" : msg.used_llm === "extractive_fallback" ? "Trích xuất trực tiếp" : msg.used_llm}
                             </span>
                           )}
@@ -642,26 +682,31 @@ function App() {
             </div>
 
             <div className="input-bar">
-              <textarea
-                rows={2}
-                placeholder="Nhập câu hỏi pháp luật… (Enter để gửi)"
-                value={question}
-                disabled={busy}
-                onChange={(e) => setQuestion(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    send(question);
-                  }
-                }}
-              />
-              <button
-                className="btn-primary"
-                disabled={busy || !question.trim()}
-                onClick={() => send(question)}
-              >
-                Gửi câu hỏi ↵
-              </button>
+              <div className="input-bar-inner">
+                <textarea
+                  rows={2}
+                  placeholder="Đặt câu hỏi về tài liệu ngân hàng… (Enter để gửi)"
+                  value={question}
+                  disabled={busy}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      send(question);
+                    }
+                  }}
+                />
+                <button
+                  className="btn-primary"
+                  disabled={busy || !question.trim()}
+                  onClick={() => send(question)}
+                >
+                  Gửi ↵
+                </button>
+              </div>
+              <div className="input-disclaimer">
+                Câu trả lời chỉ mang tính tham khảo, không thay thế tư vấn nghiệp vụ ngân hàng chính thức.
+              </div>
             </div>
           </div>
         )}
@@ -669,10 +714,6 @@ function App() {
         {/* Docs */}
         {tab === "docs" && (
           <div className="panel">
-            <div className="panel-head">
-              Văn bản đã lập chỉ mục
-              <span className="muted"> — {docs.length} văn bản</span>
-            </div>
             {docs.length === 0 ? (
               <div className="empty">
                 <div className="empty-icon">📭</div>
@@ -685,13 +726,13 @@ function App() {
                   <div key={doc.id} className="doc-card">
                     <div className="doc-title">{doc.title}</div>
                     <div className="doc-meta">
-                      {doc.so_hieu && <span className="doc-tag">{doc.so_hieu}</span>}
                       {doc.doc_type && <span className="doc-tag">{doc.doc_type}</span>}
                     </div>
-                    <div className="doc-chunks">{doc.chunk_count} đoạn</div>
-                    {doc.ngay_ban_hanh && (
-                      <div className="doc-date">Ban hành: {doc.ngay_ban_hanh}</div>
-                    )}
+                    {doc.so_hieu && <div className="muted">{doc.so_hieu}</div>}
+                    <div className="doc-footer">
+                      <span>{doc.chunk_count} đoạn</span>
+                      {doc.ngay_ban_hanh && <span>Ban hành: {doc.ngay_ban_hanh}</span>}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -702,10 +743,6 @@ function App() {
         {/* Bookmarks */}
         {tab === "bookmarks" && (
           <div className="panel">
-            <div className="panel-head">
-              Câu hỏi đã lưu
-              <span className="muted"> — {bookmarks.length} mục</span>
-            </div>
             {bookmarks.length === 0 ? (
               <div className="empty">
                 <div className="empty-icon">🔖</div>
@@ -746,7 +783,6 @@ function App() {
         {/* Upload */}
         {tab === "upload" && (
           <div className="panel">
-            <div className="panel-head">Tải lên văn bản PDF</div>
             <div className="upload-zone"
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {
@@ -770,7 +806,7 @@ function App() {
               <div className="upload-text">
                 {busy ? "Đang xử lý…" : "Kéo thả PDF hoặc click để chọn"}
               </div>
-              <div className="upload-sub">Hỗ trợ: Luật, Nghị định, Thông tư, Quyết định</div>
+              <div className="upload-sub">Hỗ trợ: Quy định, Biểu phí, Thông tư, Quyết định — tối đa 20MB</div>
             </div>
             {uploadStatus && (
               <div className={`upload-status ${uploadStatus.startsWith("✅") ? "success" : uploadStatus.startsWith("❌") ? "error" : "info"}`}>
