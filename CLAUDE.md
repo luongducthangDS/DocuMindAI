@@ -8,9 +8,12 @@ AI agent RAG nội bộ tra cứu tài liệu ngân hàng — quy định, biể
 tiền gửi), quy trình nghiệp vụ. Trả lời kèm trích dẫn nguồn, từ chối khi câu hỏi ngoài
 phạm vi tài liệu đã nạp.
 
-**Trạng thái hiện tại:** đang ở giai đoạn dựng khung — kiến trúc, pipeline ingest, prompt
-đã chuyển sang domain ngân hàng, nhưng **chưa có corpus thật** (`data/chroma_db/` rỗng).
-Xem mục "Corpus" bên dưới để nạp tài liệu đầu tiên.
+**Trạng thái hiện tại:** Đã hoàn thiện toàn diện bộ dữ liệu ngân hàng mẫu, compliance check, và test suite 100% pass:
+- Corpus ngân hàng chuẩn gồm 6 văn bản quy định & nghiệp vụ tại `data/raw/banking_docs/` với `manifest.json`.
+- Đã ingest hoàn chỉnh 36 chunks vào ChromaDB `data/chroma_db/`.
+- Tiêu chí kiểm định tuân thủ ngân hàng `data/compliance/criteria.json` với 5 bộ quy tắc định lượng (thu nhập vay tín chấp, trần tỷ lệ DTI, trần hạn mức thẻ tín chấp, trần lãi suất không kỳ hạn và dưới 6 tháng theo NHNN).
+- Bộ câu hỏi benchmark 25 câu tại `data/eval/test_questions.json`.
+- Test suite: 84/84 tests passed (100%).
 
 **Stack:**
 - Backend: FastAPI + LangGraph agent + vector store qua `VECTOR_STORE_PROVIDER`
@@ -28,28 +31,30 @@ Xem mục "Corpus" bên dưới để nạp tài liệu đầu tiên.
   `scripts/start_railway.sh`) — không còn dùng Railway ở bất kỳ đâu trong repo
 - Không dùng Supabase/Postgres — dự án không có bảng quan hệ nào (chỉ log JSONL)
 
-## Corpus
+## Corpus & Compliance
 
-Chưa có tài liệu ngân hàng thật nào được nạp. Pipeline ingest (`scripts/ingest_documents.py`)
-đã tổng quát hoá khỏi UNETI — chunk theo Điều/Khoản (`src/ingestion/chunker.py`, tái dùng được
-vì thông tư/quyết định ngân hàng cũng theo cấu trúc này), nhận input là một thư mục `.md` bất kỳ
-thay vì danh sách file hard-code.
+Corpus ngân hàng hiện có 6 văn bản chuẩn hoá cấu trúc `Điều ...`:
+1. `01_thong_tu_39_2016_cho_vay.md`: Quy định cho vay & điều kiện cấp tín dụng.
+2. `02_thong_tu_18_2024_the_ngan_hang.md`: Nghiệp vụ thẻ & hạn mức tín chấp tối đa 100tr.
+3. `03_thong_tu_48_2018_tien_gui_tiet_kiem.md`: Tiền gửi tiết kiệm & quy tắc rút trước hạn.
+4. `04_quyet_dinh_lai_suat_nhnn.md`: Trần lãi suất huy động và cho vay ưu tiên (QĐ 1124/1125).
+5. `05_quy_che_cho_vay_tieu_dung_tin_chap.md`: Vay tiêu dùng tín chấp, thu nhập tối thiểu 5tr, DTI <= 60%.
+6. `06_bieu_phi_dich_vu_tai_khoan_va_the.md`: Biểu phí duy trì tài khoản, thẻ, chính sách miễn lãi 45 ngày.
 
-Để nạp tài liệu ngân hàng:
+Lệnh ingest tài liệu:
 ```powershell
-# Không có manifest — metadata tạm suy ra từ tên file
-python scripts/ingest_documents.py --source-dir data/raw/banking_docs --reset
-
-# Có manifest JSON (so_hieu, title, doc_type, ngay_ban_hanh, url, institution mỗi file)
+# Ingest tài liệu ngân hàng cùng manifest vào ChromaDB
 python scripts/ingest_documents.py --source-dir data/raw/banking_docs --manifest data/raw/manifest.json --reset
 
 # Xem trước số chunk mà không ghi vào DB
 python scripts/ingest_documents.py --source-dir data/raw/banking_docs --dry-run
 ```
 
-`data/compliance/criteria.json` (dùng bởi `src/rag/compliance.py` cho compliance_check —
-kiểm tra pass/fail một tình huống cụ thể, ví dụ "thu nhập 15tr có đủ điều kiện vay tín chấp
-không?") cũng đang rỗng — cần author lại theo tiêu chí ngân hàng thật khi có corpus.
+`data/compliance/criteria.json` định nghĩa các tiêu chí kiểm định tuân thủ định lượng (pass/fail) cho agent node `compliance_check`.
+Đánh giá retrieval benchmark:
+```powershell
+python eval/run_evals.py --strategies dense rerank --retrieval-only --limit 5
+```
 
 ## Chạy local
 

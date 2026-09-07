@@ -4,16 +4,27 @@
 !.env.example
 
 # Raw / processed data (large files, not needed for deployment)
-data/raw/
+data/raw/*
+!data/raw/banking_docs/
+!data/raw/manifest.json
 data/processed/
 data/hf_cache/
 
-# Eval questions and benchmark results ARE committed (portfolio evidence)
+# Eval questions, compliance criteria, and benchmark results ARE committed (portfolio evidence)
 # data/eval/   ← intentionally NOT ignored
 # reports/     ← intentionally NOT ignored
+!data/compliance/
+!data/compliance/criteria.json
+
+# Virtualenvs
+.venv/
+.venv_audit/
+venv/
 
 # Runtime artifacts (generated at runtime, not source)
 logs/
+data/chroma_db/
+reports/coverage/
 __pycache__/
 *.pyc
 *.pyo
@@ -41,6 +52,10 @@ data/*.json
 data/*.docx
 data/*.html
 data/*.js
+
+# UI mockups & archives
+frontend/UI design suggestions for legal query platform.zip
+frontend/UI design suggestions for legal query platform/
 
 node_modules/
 frontend/node_modules/

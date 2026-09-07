@@ -44,6 +44,7 @@ _local_hf = _repo_root / "data" / "hf_cache"
 _local_hf.mkdir(parents=True, exist_ok=True)
 for _k in ("HF_HOME", "HF_HUB_CACHE", "TRANSFORMERS_CACHE", "SENTENCE_TRANSFORMERS_HOME"):
     os.environ[_k] = str(_local_hf)
+os.environ["HF_HUB_OFFLINE"] = "1"
 
 import chromadb
 from loguru import logger

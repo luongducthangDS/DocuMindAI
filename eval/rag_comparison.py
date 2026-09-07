@@ -51,6 +51,7 @@ from typing import Any
 _local_hf = str(Path(__file__).resolve().parents[1] / "data" / "hf_cache")
 for _k in ("HF_HOME", "HF_HUB_CACHE", "TRANSFORMERS_CACHE", "SENTENCE_TRANSFORMERS_HOME"):
     os.environ[_k] = _local_hf
+os.environ["HF_HUB_OFFLINE"] = "1"
 
 # Windows console defaults to cp1252 which can't encode Vietnamese / box-drawing chars.
 # Reconfigure stdout/stderr to UTF-8 so print() doesn't crash on non-ASCII output.

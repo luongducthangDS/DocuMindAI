@@ -106,6 +106,15 @@ def get_embedder() -> "BaseEmbedding":
     # low_cpu_mem_usage: load weights tensor-by-tensor instead of all at once,
     # halving peak RAM.  Critical on machines with limited pagefile (Windows).
     _model_kwargs = {"low_cpu_mem_usage": True}
+    local_cache = settings.data_dir / "hf_cache"
+    if local_cache.exists():
+        import os
+        os.environ["HF_HOME"] = str(local_cache)
+        os.environ["HF_HUB_CACHE"] = str(local_cache / "hub")
+        os.environ["TRANSFORMERS_CACHE"] = str(local_cache / "hub")
+        os.environ["SENTENCE_TRANSFORMERS_HOME"] = str(local_cache)
+        os.environ["HF_HUB_OFFLINE"] = "1"
+        _model_kwargs["local_files_only"] = True
 
     try:
         from llama_index.embeddings.huggingface import HuggingFaceEmbedding

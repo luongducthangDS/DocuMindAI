@@ -29,6 +29,7 @@ _hf_local = _repo_root / "data" / "hf_cache"
 if _hf_local.exists():
     os.environ.setdefault("HF_HOME", str(_hf_local))
     os.environ.setdefault("TRANSFORMERS_CACHE", str(_hf_local / "hub"))
+    os.environ.setdefault("HF_HUB_OFFLINE", "1")
 
 sys.path.insert(0, str(_repo_root))
 from eval.rag_comparison import main

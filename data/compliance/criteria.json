@@ -1,0 +1,127 @@
+[
+  {
+    "id": "vay_tin_chap_thu_nhap",
+    "topic": "Điều kiện thu nhập tối thiểu vay tín chấp",
+    "keywords": [
+      "vay tín chấp",
+      "thu nhập tối thiểu",
+      "thu nhập hàng tháng",
+      "thu nhập",
+      "điều kiện vay tín chấp"
+    ],
+    "condition": {
+      "field": "thu nhập",
+      "operator": ">=",
+      "value": 5.0,
+      "unit": "triệu VNĐ/tháng"
+    },
+    "so_hieu": "Quy chế CV-05/2023/NH",
+    "dieu_khoan": "Điều 6",
+    "source_url": "https://banking.example.vn/quy-che-cho-vay-tieu-dung",
+    "verdict_template": {
+      "pass": "Khách hàng có mức thu nhập đạt điều kiện tối thiểu để xét duyệt hồ sơ vay tín chấp tiêu dùng theo {dieu_khoan} {so_hieu}.",
+      "fail": "Mức thu nhập chưa đạt ngưỡng tối thiểu (5.0 triệu VNĐ/tháng) để xét duyệt hồ sơ vay tín chấp theo {dieu_khoan} {so_hieu}."
+    }
+  },
+  {
+    "id": "ty_le_dti_cho_vay",
+    "topic": "Tỷ lệ nợ trên thu nhập (DTI) tối đa khi cấp tín dụng",
+    "keywords": [
+      "tỷ lệ nợ",
+      "dti",
+      "nghĩa vụ nợ",
+      "tổng thu nhập",
+      "khả năng trả nợ"
+    ],
+    "condition": {
+      "field": "tỷ lệ nợ",
+      "operator": "<=",
+      "value": 60.0,
+      "unit": "%"
+    },
+    "so_hieu": "Thông tư 39/2016/TT-NHNN",
+    "dieu_khoan": "Điều 7",
+    "source_url": "https://sbv.gov.vn/thong-tu-39-2016",
+    "verdict_template": {
+      "pass": "Tỷ lệ nợ trên thu nhập (DTI) nằm trong ngưỡng an toàn cho phép theo {dieu_khoan} {so_hieu}.",
+      "fail": "Tỷ lệ nợ trên thu nhập (DTI) vượt quá giới hạn an toàn tối đa 60% theo {dieu_khoan} {so_hieu}."
+    }
+  },
+  {
+    "id": "han_muc_the_tin_dung_tin_chap",
+    "topic": "Hạn mức tối đa phát hành thẻ tín dụng không tài sản bảo đảm",
+    "keywords": [
+      "hạn mức thẻ",
+      "thẻ tín dụng",
+      "thẻ tín dụng tín chấp",
+      "hạn mức phát hành"
+    ],
+    "condition": {
+      "field": "hạn mức",
+      "operator": "<=",
+      "value": 100.0,
+      "unit": "triệu VNĐ"
+    },
+    "so_hieu": "Thông tư 18/2024/TT-NHNN",
+    "dieu_khoan": "Điều 14",
+    "source_url": "https://sbv.gov.vn/thong-tu-18-2024",
+    "verdict_template": {
+      "pass": "Hạn mức thẻ tín dụng tuân thủ quy định tối đa cho khách hàng cá nhân không tài sản bảo đảm theo {dieu_khoan} {so_hieu}.",
+      "fail": "Hạn mức đề xuất vượt trần 100 triệu VNĐ đối với thẻ tín dụng tín chấp theo {dieu_khoan} {so_hieu}."
+    }
+  },
+  {
+    "id": "lai_suat_tien_gui_khong_ky_han",
+    "topic": "Trần lãi suất tiền gửi không kỳ hạn và dưới 1 tháng",
+    "keywords": [
+      "tiền gửi không kỳ hạn",
+      "lãi suất không kỳ hạn",
+      "dưới 1 tháng",
+      "trần lãi suất không kỳ hạn"
+    ],
+    "condition": {
+      "field": "lãi suất",
+      "operator": "<=",
+      "value": 0.5,
+      "unit": "%/năm"
+    },
+    "so_hieu": "Quyết định 1124/QĐ-NHNN",
+    "dieu_khoan": "Điều 1",
+    "source_url": "https://sbv.gov.vn/quyet-dinh-1124",
+    "verdict_template": {
+      "pass": "Mức lãi suất tiền gửi không kỳ hạn tuân thủ trần lãi suất do Ngân hàng Nhà nước quy định theo {dieu_khoan} {so_hieu}.",
+      "fail": "Mức lãi suất vượt trần tối đa 0.5%/năm áp dụng cho tiền gửi không kỳ hạn và kỳ hạn dưới 1 tháng theo {dieu_khoan} {so_hieu}."
+    }
+  },
+  {
+    "id": "lai_suat_tien_gui_duoi_6_thang",
+    "topic": "Trần lãi suất tiền gửi có kỳ hạn từ 1 tháng đến dưới 6 tháng",
+    "keywords": [
+      "tiền gửi kỳ hạn dưới 6 tháng",
+      "lãi suất dưới 6 tháng",
+      "kỳ hạn 1 tháng đến dưới 6 tháng",
+      "trần lãi suất 6 tháng",
+      "kỳ hạn dưới 6 tháng",
+      "kỳ hạn 1 tháng",
+      "kỳ hạn 2 tháng",
+      "kỳ hạn 3 tháng",
+      "kỳ hạn 4 tháng",
+      "kỳ hạn 5 tháng",
+      "lãi suất 3 tháng",
+      "lãi suất 1 tháng"
+    ],
+    "condition": {
+      "field": "lãi suất",
+      "operator": "<=",
+      "value": 4.75,
+      "unit": "%/năm"
+    },
+    "so_hieu": "Quyết định 1124/QĐ-NHNN",
+    "dieu_khoan": "Điều 1",
+    "source_url": "https://sbv.gov.vn/quyet-dinh-1124",
+    "verdict_template": {
+      "pass": "Mức lãi suất tiền gửi kỳ hạn 1 đến dưới 6 tháng tuân thủ trần lãi suất quy định theo {dieu_khoan} {so_hieu}.",
+      "fail": "Mức lãi suất vượt trần tối đa 4.75%/năm đối với tiền gửi có kỳ hạn từ 1 tháng đến dưới 6 tháng theo {dieu_khoan} {so_hieu}."
+    }
+  }
+]

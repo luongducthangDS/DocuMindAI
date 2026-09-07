@@ -1,0 +1,50 @@
+{
+  "01_thong_tu_39_2016_cho_vay.md": {
+    "so_hieu": "39/2016/TT-NHNN",
+    "title": "Thông tư quy định về hoạt động cho vay của tổ chức tín dụng đối với khách hàng",
+    "doc_type": "Thông tư",
+    "ngay_ban_hanh": "2016-12-30",
+    "url": "https://sbv.gov.vn/thong-tu-39-2016",
+    "institution": "Ngân hàng Nhà nước Việt Nam"
+  },
+  "02_thong_tu_18_2024_the_ngan_hang.md": {
+    "so_hieu": "18/2024/TT-NHNN",
+    "title": "Thông tư quy định về hoạt động thẻ ngân hàng",
+    "doc_type": "Thông tư",
+    "ngay_ban_hanh": "2024-06-28",
+    "url": "https://sbv.gov.vn/thong-tu-18-2024",
+    "institution": "Ngân hàng Nhà nước Việt Nam"
+  },
+  "03_thong_tu_48_2018_tien_gui_tiet_kiem.md": {
+    "so_hieu": "48/2018/TT-NHNN",
+    "title": "Thông tư quy định về tiền gửi tiết kiệm",
+    "doc_type": "Thông tư",
+    "ngay_ban_hanh": "2018-12-31",
+    "url": "https://sbv.gov.vn/thong-tu-48-2018",
+    "institution": "Ngân hàng Nhà nước Việt Nam"
+  },
+  "04_quyet_dinh_lai_suat_nhnn.md": {
+    "so_hieu": "1124/QĐ-NHNN",
+    "title": "Quyết định về mức lãi suất tối đa đối với tiền gửi bằng đồng Việt Nam",
+    "doc_type": "Quyết định",
+    "ngay_ban_hanh": "2023-06-16",
+    "url": "https://sbv.gov.vn/quyet-dinh-1124",
+    "institution": "Ngân hàng Nhà nước Việt Nam"
+  },
+  "05_quy_che_cho_vay_tieu_dung_tin_chap.md": {
+    "so_hieu": "Quy chế CV-05/2023/NH",
+    "title": "Quy chế cho vay tiêu dùng tín chấp khách hàng cá nhân",
+    "doc_type": "Quy chế nội bộ",
+    "ngay_ban_hanh": "2023-03-15",
+    "url": "https://banking.example.vn/quy-che-cho-vay-tieu-dung",
+    "institution": "Ngân hàng Thương mại"
+  },
+  "06_bieu_phi_dich_vu_tai_khoan_va_the.md": {
+    "so_hieu": "Biểu phí 88/2024/QĐ-NH",
+    "title": "Biểu phí và điều kiện dịch vụ tài khoản, thẻ và ngân hàng số",
+    "doc_type": "Biểu phí dịch vụ",
+    "ngay_ban_hanh": "2024-01-01",
+    "url": "https://banking.example.vn/bieu-phi-dich-vu",
+    "institution": "Ngân hàng Thương mại"
+  }
+}

@@ -48,20 +48,20 @@ class TestExtractSituationValue:
     def test_labeled_number_near_keyword(self):
         from src.rag.compliance import extract_situation_value
 
-        condition = {"field": "diem_ren_luyen", "unit": "diem_100"}
-        assert extract_situation_value("Sinh viên có điểm rèn luyện 70 thì xếp loại gì?", condition) == 70.0
+        condition = {"field": "thu nhập", "unit": "triệu VNĐ/tháng"}
+        assert extract_situation_value("Khách hàng có thu nhập 15 triệu đồng/tháng có được vay không?", condition) == 15.0
 
-    def test_decimal_gpa_value(self):
+    def test_decimal_interest_rate_value(self):
         from src.rag.compliance import extract_situation_value
 
-        condition = {"field": "gpa_scale4", "unit": "gpa_scale_4"}
-        assert extract_situation_value("GPA của em là 2,6 thì có được học bổng không?", condition) == 2.6
+        condition = {"field": "lãi suất", "unit": "%/năm"}
+        assert extract_situation_value("Ngân hàng áp dụng lãi suất 4,5% kỳ hạn 3 tháng", condition) == 4.5
 
     def test_percent_value(self):
         from src.rag.compliance import extract_situation_value
 
-        condition = {"field": "x", "unit": "percent"}
-        assert extract_situation_value("Sinh viên nghỉ quá 20% số tiết", condition) == 20.0
+        condition = {"field": "tỷ lệ nợ", "unit": "percent"}
+        assert extract_situation_value("Khách hàng có tỷ lệ nợ 55% thì có đủ chuẩn không?", condition) == 55.0
 
     def test_no_number_falls_back_to_llm_then_none_without_key(self, monkeypatch):
         from src.config import get_settings
@@ -69,50 +69,50 @@ class TestExtractSituationValue:
 
         monkeypatch.setenv("GROQ_API_KEY", "")
         get_settings.cache_clear()
-        condition = {"field": "gpa_scale4", "unit": "gpa_scale_4"}
-        assert extract_situation_value("Em có đủ điều kiện làm khóa luận không?", condition) is None
+        condition = {"field": "thu nhập", "unit": "triệu VNĐ/tháng"}
+        assert extract_situation_value("Khách hàng muốn vay tín chấp thì có được duyệt không?", condition) is None
         get_settings.cache_clear()
 
 
 class TestMatchCriteria:
-    def test_matches_scholarship_by_keyword(self):
+    def test_matches_vay_tin_chap_by_keyword(self):
         from src.rag.compliance import load_criteria, match_criteria
 
         criteria = load_criteria()
-        result = match_criteria("Điểm trung bình chung học tập của em là 2,6 thì có được học bổng khuyến khích học tập không?", criteria)
+        result = match_criteria("Khách hàng có thu nhập 8 triệu muốn vay tín chấp tiêu dùng", criteria)
         assert result is not None
-        assert result["id"] == "hoc_bong_kkht_dtb"
+        assert result["id"] == "vay_tin_chap_thu_nhap"
 
-    def test_matches_ren_luyen_by_keyword(self):
+    def test_matches_dti_by_keyword(self):
         from src.rag.compliance import load_criteria, match_criteria
 
         criteria = load_criteria()
-        result = match_criteria("Điểm rèn luyện 70 có xếp loại khá trở lên không?", criteria)
+        result = match_criteria("Tỷ lệ nợ trên thu nhập DTI của khách hàng là 50% có vay được không?", criteria)
         assert result is not None
-        assert result["id"] == "diem_ren_luyen_kha"
+        assert result["id"] == "ty_le_dti_cho_vay"
 
-    def test_matches_khoa_luan_by_keyword(self):
+    def test_matches_the_tin_dung_by_keyword(self):
         from src.rag.compliance import load_criteria, match_criteria
 
         criteria = load_criteria()
-        result = match_criteria("GPA 2.6 có đủ điều kiện đăng ký khóa luận tốt nghiệp không?", criteria)
+        result = match_criteria("Hạn mức thẻ tín dụng tín chấp 80 triệu có được phê duyệt không?", criteria)
         assert result is not None
-        assert result["id"] == "khoa_luan_dtb_tich_luy"
+        assert result["id"] == "han_muc_the_tin_dung_tin_chap"
 
-    def test_matches_tieng_anh_dau_vao_by_keyword(self):
+    def test_matches_lai_suat_khong_ky_han_by_keyword(self):
         from src.rag.compliance import load_criteria, match_criteria
 
         criteria = load_criteria()
-        result = match_criteria("Điểm kiểm tra trình độ tiếng Anh đầu vào 6 có đăng ký được Tiếng Anh cơ bản 1 không?", criteria)
+        result = match_criteria("Lãi suất tiền gửi không kỳ hạn là 0.8% có hợp lệ không?", criteria)
         assert result is not None
-        assert result["id"] == "tieng_anh_dau_vao"
+        assert result["id"] == "lai_suat_tien_gui_khong_ky_han"
 
     def test_no_keyword_match_falls_back_to_embedding_and_returns_none_below_threshold(self):
         from src.rag.compliance import load_criteria, match_criteria
 
         criteria = load_criteria()
         with patch("src.rag.compliance._match_by_embedding", return_value=None) as mock_embed:
-            result = match_criteria("Học phí kỳ này là bao nhiêu?", criteria)
+            result = match_criteria("Giờ mở cửa của chi nhánh ngân hàng là mấy giờ?", criteria)
         assert result is None
         mock_embed.assert_called_once()
 
@@ -126,34 +126,35 @@ class TestCheckCompliance:
     def test_pass_verdict(self):
         from src.rag.compliance import check_compliance
 
-        result = check_compliance("GPA 2,6 có đủ điều kiện làm khóa luận tốt nghiệp không?")
+        result = check_compliance("Thu nhập 8 triệu có đủ điều kiện vay tín chấp không?")
         assert result["matched"] is True
-        assert result["criterion_id"] == "khoa_luan_dtb_tich_luy"
+        assert result["criterion_id"] == "vay_tin_chap_thu_nhap"
         assert result["verdict"] == "pass"
-        assert result["extracted_value"] == 2.6
-        assert "QĐ-828" in result["citation"]["so_hieu"]
+        assert result["extracted_value"] == 8.0
+        assert "CV-05/2023/NH" in result["citation"]["so_hieu"]
 
     def test_fail_verdict(self):
         from src.rag.compliance import check_compliance
 
-        result = check_compliance("Điểm rèn luyện 40 có xếp loại khá trở lên không?")
+        result = check_compliance("Thu nhập 3.5 triệu có đủ điều kiện vay tín chấp không?")
         assert result["matched"] is True
-        assert result["criterion_id"] == "diem_ren_luyen_kha"
+        assert result["criterion_id"] == "vay_tin_chap_thu_nhap"
         assert result["verdict"] == "fail"
-        assert result["extracted_value"] == 40.0
+        assert result["extracted_value"] == 3.5
 
     def test_boundary_value_passes(self):
-        """GPA exactly at the 2.5 threshold should pass (>=)."""
+        """Income exactly at the 5.0 threshold should pass (>=)."""
         from src.rag.compliance import check_compliance
 
-        result = check_compliance("Điểm trung bình chung tích lũy 2,5 có đủ điều kiện làm khóa luận không?")
+        result = check_compliance("Khách hàng có thu nhập 5 triệu đồng/tháng có được vay tín chấp không?")
         assert result["verdict"] == "pass"
+        assert result["extracted_value"] == 5.0
 
     def test_no_match_when_unrelated(self):
         from src.rag.compliance import check_compliance
 
         with patch("src.rag.compliance._match_by_embedding", return_value=None):
-            result = check_compliance("Học phí học kỳ này là bao nhiêu?")
+            result = check_compliance("Thời gian làm việc phòng giao dịch là khi nào?")
         assert result["matched"] is False
         assert result["verdict"] == "no_match"
 
@@ -163,7 +164,7 @@ class TestCheckCompliance:
 
         monkeypatch.setenv("GROQ_API_KEY", "")
         get_settings.cache_clear()
-        result = check_compliance("Em có đủ điều kiện làm khóa luận tốt nghiệp không?")
+        result = check_compliance("Khách hàng muốn vay tín chấp thì có đủ điều kiện không?")
         assert result["matched"] is True
         assert result["verdict"] == "insufficient_info"
         assert result["extracted_value"] is None
@@ -172,6 +173,6 @@ class TestCheckCompliance:
     def test_citation_matches_curated_source(self):
         from src.rag.compliance import check_compliance
 
-        result = check_compliance("Điểm rèn luyện 90 có xếp loại khá trở lên không?")
-        assert result["citation"]["so_hieu"] == "QĐ-848/ĐHKTKTCN"
-        assert result["citation"]["dieu_khoan"] == "Điều 12"
+        result = check_compliance("Lãi suất tiền gửi không kỳ hạn là 0.2% có đúng quy định không?")
+        assert result["citation"]["so_hieu"] == "Quyết định 1124/QĐ-NHNN"
+        assert result["citation"]["dieu_khoan"] == "Điều 1"

@@ -1,0 +1,177 @@
+[
+  {
+    "id": "bank_01",
+    "question": "Điều kiện về độ tuổi và năng lực hành vi dân sự để cá nhân được vay vốn ngân hàng theo Thông tư 39/2016/TT-NHNN là gì?",
+    "ground_truth": "Theo Điều 7 Thông tư 39/2016/TT-NHNN, khách hàng cá nhân phải từ đủ 18 tuổi trở lên có năng lực hành vi dân sự đầy đủ theo quy định của pháp luật hoặc từ đủ 15 tuổi đến chưa đủ 18 tuổi không bị mất hoặc hạn chế năng lực hành vi dân sự.",
+    "category": "cho_vay",
+    "source_doc": "39/2016/TT-NHNN"
+  },
+  {
+    "id": "bank_02",
+    "question": "Mức lãi suất chậm trả tối đa đối với khoản nợ gốc hoặc lãi tiền vay theo Thông tư 39/2016/TT-NHNN được quy định như thế nào?",
+    "ground_truth": "Theo Điều 13 Thông tư 39/2016/TT-NHNN, trường hợp khách hàng không trả đúng hạn tiền lãi thì phải trả lãi chậm trả theo mức thỏa thuận nhưng không vượt quá 10%/năm tính trên số dư lãi chậm trả tương ứng với thời gian chậm trả.",
+    "category": "cho_vay",
+    "source_doc": "39/2016/TT-NHNN"
+  },
+  {
+    "id": "bank_03",
+    "question": "Khi khoản nợ vay bị chuyển sang nợ quá hạn, mức lãi suất áp dụng đối với nợ gốc quá hạn tối đa là bao nhiêu %?",
+    "ground_truth": "Theo Điều 13 Thông tư 39/2016/TT-NHNN, trường hợp khoản nợ vay bị chuyển nợ quá hạn thì khách hàng phải trả lãi trên nợ gốc bị quá hạn theo mức thỏa thuận nhưng không vượt quá 150% lãi suất cho vay trong hạn tại thời điểm chuyển nợ quá hạn.",
+    "category": "cho_vay",
+    "source_doc": "39/2016/TT-NHNN"
+  },
+  {
+    "id": "bank_04",
+    "question": "Tổ chức tín dụng và khách hàng có thể thỏa thuận những phương thức cho vay nào theo Thông tư 39/2016/TT-NHNN?",
+    "ground_truth": "Theo Điều 9 Thông tư 39/2016/TT-NHNN, các phương thức cho vay bao gồm: cho vay từng lần, cho vay theo hạn mức, cho vay thấu chi, và cho vay tuần hoàn (revolving loan).",
+    "category": "cho_vay",
+    "source_doc": "39/2016/TT-NHNN"
+  },
+  {
+    "id": "bank_05",
+    "question": "Hồ sơ đề nghị vay vốn ngân hàng của khách hàng cá nhân gồm những tài liệu cơ bản nào?",
+    "ground_truth": "Theo Điều 14 Thông tư 39/2016/TT-NHNN, hồ sơ gồm: Giấy đề nghị vay vốn; Tài liệu chứng minh tư cách pháp lý (Căn cước công dân/Hộ chiếu); Tài liệu chứng minh mục đích sử dụng vốn; Tài liệu chứng minh khả năng tài chính và nguồn trả nợ; Tài liệu chứng minh quyền sở hữu tài sản bảo đảm (nếu có).",
+    "category": "cho_vay",
+    "source_doc": "39/2016/TT-NHNN"
+  },
+  {
+    "id": "bank_06",
+    "question": "Những đối tượng cá nhân nào được phép gửi tiền gửi tiết kiệm theo Thông tư 48/2018/TT-NHNN?",
+    "ground_truth": "Theo Điều 3 Thông tư 48/2018/TT-NHNN, người gửi tiền tiết kiệm gồm công dân Việt Nam từ đủ 18 tuổi trở lên có năng lực hành vi dân sự đầy đủ; công dân Việt Nam từ đủ 15 tuổi đến dưới 18 tuổi không bị mất hoặc hạn chế năng lực hành vi dân sự và có tài sản riêng; người mất hoặc hạn chế năng lực hành vi dân sự thực hiện qua người đại diện pháp luật.",
+    "category": "tien_gui",
+    "source_doc": "48/2018/TT-NHNN"
+  },
+  {
+    "id": "bank_07",
+    "question": "Khi khách hàng rút tiền tiết kiệm có kỳ hạn trước hạn thì phần tiền gửi rút trước hạn được áp dụng lãi suất như thế nào?",
+    "ground_truth": "Theo Điều 10 Thông tư 48/2018/TT-NHNN và Thông tư 04/2022/TT-NHNN, đối với phần tiền gửi rút trước hạn, tổ chức tín dụng áp dụng mức lãi suất tối đa bằng mức lãi suất tiền gửi không kỳ hạn thấp nhất tại thời điểm rút; phần tiền gửi còn lại tiếp tục được hưởng mức lãi suất cam kết ban đầu.",
+    "category": "tien_gui",
+    "source_doc": "48/2018/TT-NHNN"
+  },
+  {
+    "id": "bank_08",
+    "question": "Quy định về tự động kéo dài thời hạn gửi tiền (tái tục) khi đến hạn mà khách hàng không đến rút tiền được thực hiện ra sao?",
+    "ground_truth": "Theo Điều 12 Thông tư 48/2018/TT-NHNN, nếu khách hàng không đến rút và không có yêu cầu khác, ngân hàng tự động kéo dài thời hạn gửi tiền theo phương thức tự động tái tục nợ gốc hoặc tự động nhập lãi vào gốc chuyển sang kỳ hạn mới tương đương theo lãi suất niêm yết tại ngày tái tục.",
+    "category": "tien_gui",
+    "source_doc": "48/2018/TT-NHNN"
+  },
+  {
+    "id": "bank_09",
+    "question": "Trần lãi suất tối đa đối với tiền gửi không kỳ hạn và có kỳ hạn dưới 1 tháng bằng đồng Việt Nam là bao nhiêu theo Quyết định 1124/QĐ-NHNN?",
+    "ground_truth": "Theo Điều 1 Quyết định 1124/QĐ-NHNN, mức lãi suất tối đa áp dụng đối với tiền gửi không kỳ hạn và có kỳ hạn dưới 1 tháng bằng đồng Việt Nam (VND) là 0,5%/năm.",
+    "category": "lai_suat",
+    "source_doc": "1124/QĐ-NHNN"
+  },
+  {
+    "id": "bank_10",
+    "question": "Theo Quyết định 1124/QĐ-NHNN, mức lãi suất tối đa áp dụng cho tiền gửi có kỳ hạn từ 1 tháng đến dưới 6 tháng là bao nhiêu?",
+    "ground_truth": "Theo Điều 1 Quyết định 1124/QĐ-NHNN, mức lãi suất tối đa áp dụng đối với tiền gửi có kỳ hạn từ 1 tháng đến dưới 6 tháng là 4,75%/năm (riêng Quỹ tín dụng nhân dân và Tổ chức tài chính vi mô là 5,25%/năm).",
+    "category": "lai_suat",
+    "source_doc": "1124/QĐ-NHNN"
+  },
+  {
+    "id": "bank_11",
+    "question": "Lãi suất tối đa áp dụng đối với tiền gửi bằng Đô la Mỹ (USD) của cá nhân và tổ chức là bao nhiêu?",
+    "ground_truth": "Theo Điều 2 Quyết định 1124/QĐ-NHNN, mức lãi suất tối đa áp dụng đối với tiền gửi bằng Đô la Mỹ (USD) của tổ chức và cá nhân tại tổ chức tín dụng là 0%/năm.",
+    "category": "lai_suat",
+    "source_doc": "1124/QĐ-NHNN"
+  },
+  {
+    "id": "bank_12",
+    "question": "Mức trần lãi suất cho vay ngắn hạn đối với 5 lĩnh vực kinh tế ưu tiên theo Quyết định 1125/QĐ-NHNN là bao nhiêu %/năm?",
+    "ground_truth": "Theo Điều 3 Quyết định 1124/QĐ-NHNN (tham chiếu Quyết định 1125/QĐ-NHNN), mức lãi suất cho vay ngắn hạn tối đa bằng VND đối với các lĩnh vực ưu tiên như nông nghiệp nông thôn, xuất khẩu, doanh nghiệp nhỏ và vừa, công nghiệp hỗ trợ, công nghệ cao là 4,0%/năm.",
+    "category": "lai_suat",
+    "source_doc": "1124/QĐ-NHNN"
+  },
+  {
+    "id": "bank_13",
+    "question": "Hạn mức cấp tín dụng tối đa đối với việc phát hành thẻ tín dụng tín chấp cho khách hàng cá nhân theo Thông tư 18/2024/TT-NHNN là bao nhiêu?",
+    "ground_truth": "Theo Điều 14 Thông tư 18/2024/TT-NHNN, trường hợp phát hành thẻ tín dụng không có tài sản bảo đảm (thẻ tín dụng tín chấp) cho khách hàng cá nhân, hạn mức thẻ tối đa được cấp không vượt quá 100 triệu đồng Việt Nam, trừ khách hàng có xếp hạng tín dụng nội bộ xuất sắc và thu nhập từ 30 triệu đồng/tháng trở lên.",
+    "category": "the_ngan_hang",
+    "source_doc": "18/2024/TT-NHNN"
+  },
+  {
+    "id": "bank_14",
+    "question": "Hạn mức rút tiền mặt tối đa qua thẻ tín dụng được quy định là bao nhiêu % tổng hạn mức tín dụng?",
+    "ground_truth": "Theo Điều 14 Thông tư 18/2024/TT-NHNN, hạn mức rút tiền mặt tối đa không vượt quá 50% tổng hạn mức tín dụng được cấp đối với thẻ tín dụng của khách hàng cá nhân.",
+    "category": "the_ngan_hang",
+    "source_doc": "18/2024/TT-NHNN"
+  },
+  {
+    "id": "bank_15",
+    "question": "Người từ đủ 15 tuổi đến dưới 18 tuổi được phát hành những loại thẻ ngân hàng nào theo Thông tư 18/2024/TT-NHNN?",
+    "ground_truth": "Theo Điều 9 Thông tư 18/2024/TT-NHNN, người từ đủ 15 tuổi đến chưa đủ 18 tuổi không bị mất hoặc hạn chế năng lực hành vi dân sự được phát hành thẻ ghi nợ không thấu chi và thẻ trả trước.",
+    "category": "the_ngan_hang",
+    "source_doc": "18/2024/TT-NHNN"
+  },
+  {
+    "id": "bank_16",
+    "question": "Điều kiện thu nhập tối thiểu để được xét duyệt vay tín chấp tiêu dùng theo Quy chế CV-05/2023/NH tại các đô thị loại 1 là bao nhiêu?",
+    "ground_truth": "Theo Điều 6 Quy chế CV-05/2023/NH, khách hàng làm việc tại các đô thị loại 1 và loại đặc biệt như Hà Nội, TP.HCM phải có thu nhập thực nhận chuyển khoản tối thiểu từ 5,0 triệu VNĐ/tháng (đối với địa bàn khác tối thiểu từ 4,5 triệu VNĐ/tháng).",
+    "category": "cho_vay",
+    "source_doc": "Quy chế CV-05/2023/NH"
+  },
+  {
+    "id": "bank_17",
+    "question": "Độ tuổi quy định đối với khách hàng cá nhân tham gia vay tiêu dùng tín chấp theo Quy chế CV-05/2023/NH là từ bao nhiêu tuổi?",
+    "ground_truth": "Theo Điều 4 Quy chế CV-05/2023/NH, khách hàng cá nhân phải là công dân Việt Nam có độ tuổi từ đủ 20 tuổi đến không quá 60 tuổi tại thời điểm kết thúc thời hạn khoản vay.",
+    "category": "cho_vay",
+    "source_doc": "Quy chế CV-05/2023/NH"
+  },
+  {
+    "id": "bank_18",
+    "question": "Hạn mức tối đa và thời hạn vay tối đa đối với sản phẩm vay tín chấp tiêu dùng cá nhân theo Quy chế CV-05/2023/NH là bao nhiêu?",
+    "ground_truth": "Theo Điều 8 Quy chế CV-05/2023/NH, hạn mức cho vay tối đa lên đến 500 triệu đồng Việt Nam (hoặc 10 đến 12 lần thu nhập hàng tháng) và thời hạn vay tối đa là 60 tháng (05 năm).",
+    "category": "cho_vay",
+    "source_doc": "Quy chế CV-05/2023/NH"
+  },
+  {
+    "id": "bank_19",
+    "question": "Phí thường niên của thẻ ghi nợ nội địa và thẻ ghi nợ quốc tế Visa/Mastercard chuẩn theo biểu phí dịch vụ là bao nhiêu?",
+    "ground_truth": "Theo Điều 5 Biểu phí dịch vụ 88/2024/QĐ-NH, phí thường niên của thẻ ghi nợ nội địa là 66.000 VNĐ/năm (miễn phí năm đầu tiên) và thẻ ghi nợ quốc tế chuẩn là 110.000 VNĐ/năm.",
+    "category": "the_ngan_hang",
+    "source_doc": "Biểu phí 88/2024/QĐ-NH"
+  },
+  {
+    "id": "bank_20",
+    "question": "Thời gian miễn lãi tối đa đối với thẻ tín dụng quốc tế là bao nhiêu ngày theo biểu phí dịch vụ?",
+    "ground_truth": "Theo Điều 8 Biểu phí dịch vụ 88/2024/QĐ-NH, thời gian miễn lãi tối đa lên đến 45 ngày đối với thẻ hạng chuẩn và lên đến 55 ngày đối với thẻ hạng Platinum/Signature khi thanh toán hàng hóa dịch vụ.",
+    "category": "the_ngan_hang",
+    "source_doc": "Biểu phí 88/2024/QĐ-NH"
+  },
+  {
+    "id": "bank_21",
+    "question": "Mức phí rút tiền mặt tại ATM và phí phạt chậm thanh toán đối với thẻ tín dụng quốc tế được tính như thế nào?",
+    "ground_truth": "Theo Điều 8 Biểu phí dịch vụ 88/2024/QĐ-NH, mức phí rút tiền mặt tại cây ATM là 4,0% trên số tiền rút (tối thiểu 50.000 VNĐ) và phí phạt chậm thanh toán là 5,0% trên số tiền chậm trả tối thiểu (tối thiểu 100.000 VNĐ).",
+    "category": "the_ngan_hang",
+    "source_doc": "Biểu phí 88/2024/QĐ-NH"
+  },
+  {
+    "id": "bank_22",
+    "question": "Điều kiện về số dư bình quân tối thiểu để được miễn phí duy trì tài khoản thanh toán và mức phí áp dụng nếu không đạt là bao nhiêu?",
+    "ground_truth": "Theo Điều 1 Biểu phí dịch vụ 88/2024/QĐ-NH, tài khoản được miễn phí duy trì nếu số dư bình quân trong tháng đạt tối thiểu từ 2.000.000 VNĐ; nếu dưới mức này áp dụng phí duy trì là 11.000 VNĐ/tháng.",
+    "category": "tai_khoan",
+    "source_doc": "Biểu phí 88/2024/QĐ-NH"
+  },
+  {
+    "id": "bank_23",
+    "question": "Khách hàng có mức thu nhập 8 triệu đồng/tháng làm việc tại Hà Nội có đủ điều kiện về thu nhập để vay tiêu dùng tín chấp không?",
+    "ground_truth": "Theo Điều 6 Quy chế CV-05/2023/NH, mức thu nhập tối thiểu để xét vay tín chấp tại Hà Nội là 5,0 triệu VNĐ/tháng. Do đó khách hàng có thu nhập 8 triệu đồng/tháng hoàn toàn đủ điều kiện về mức thu nhập tối thiểu.",
+    "category": "compliance",
+    "source_doc": "Quy chế CV-05/2023/NH"
+  },
+  {
+    "id": "bank_24",
+    "question": "Trường Đại học Kinh tế Kỹ thuật Công nghiệp có bao nhiêu cơ sở đào tạo?",
+    "ground_truth": "Câu hỏi này không liên quan đến quy định ngân hàng, nghiệp vụ tín dụng hay dịch vụ tài chính trong cơ sở dữ liệu.",
+    "category": "out_of_corpus",
+    "source_doc": "None"
+  },
+  {
+    "id": "bank_25",
+    "question": "Quy định về điều kiện cấp visa du học tại Nhật Bản năm 2024 như thế nào?",
+    "ground_truth": "Câu hỏi này không liên quan đến quy định ngân hàng, nghiệp vụ tín dụng hay dịch vụ tài chính trong cơ sở dữ liệu.",
+    "category": "out_of_corpus",
+    "source_doc": "None"
+  }
+]

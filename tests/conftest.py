@@ -16,6 +16,7 @@ def patch_settings(tmp_path, monkeypatch):
     """Patch all settings to use tmp_path and dummy API keys."""
     monkeypatch.setenv("GROQ_API_KEY", "gsk_test_key")
     monkeypatch.setenv("GOOGLE_API_KEY", "AIza_test_key")
+    monkeypatch.setenv("GENERATOR_PROVIDER", "groq")
     monkeypatch.setenv("DATA_DIR", str(tmp_path / "data"))
     monkeypatch.setenv("REPORTS_DIR", str(tmp_path / "reports"))
     monkeypatch.setenv("LOGS_DIR", str(tmp_path / "logs"))
