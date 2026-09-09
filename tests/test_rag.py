@@ -82,6 +82,40 @@ class TestGenerator:
         result = generate_answer("câu hỏi", chunks)
         assert "gemini" in result["used_llm"]
 
+    @patch("src.rag.generator._call_groq", side_effect=Exception("Timeout"))
+    @patch("src.rag.generator._call_gemini", side_effect=Exception("quota exhausted"))
+    @patch("src.rag.generator._call_openai_compat")
+    def test_generate_answer_falls_back_to_openai_compat(self, mock_openai, mock_gemini, mock_groq):
+        from src.rag.generator import generate_answer
+
+        mock_openai.return_value = "Câu trả lời từ OpenAI-compatible [1]"
+        chunks = [
+            RetrievedChunk(
+                text="nội dung",
+                score=0.8,
+                metadata={"title": "Law", "dieu_header": "", "source_url": ""},
+            )
+        ]
+        result = generate_answer("câu hỏi", chunks)
+        assert result["used_llm"] == "openai_compat_fallback"
+        assert "OpenAI-compatible" in result["answer"]
+
+    @patch("src.rag.generator._call_groq", side_effect=Exception("Timeout"))
+    @patch("src.rag.generator._call_gemini", side_effect=Exception("quota"))
+    @patch("src.rag.generator._call_openai_compat", side_effect=Exception("no key"))
+    def test_generate_answer_all_llms_fail_uses_extractive(self, mock_o, mock_g, mock_gr):
+        from src.rag.generator import generate_answer
+
+        chunks = [
+            RetrievedChunk(
+                text="nội dung điều luật",
+                score=0.8,
+                metadata={"title": "Law", "dieu_header": "Điều 5", "source_url": ""},
+            )
+        ]
+        result = generate_answer("câu hỏi", chunks)
+        assert result["used_llm"] == "extractive_fallback"
+
     def test_build_context_includes_all_chunks(self):
         from src.rag.generator import _build_context
 

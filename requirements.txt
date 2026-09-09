@@ -23,6 +23,7 @@ langsmith==0.1.120
 # ── LLM Providers ─────────────────────────────────────────────────────────────
 groq==0.37.1
 google-generativeai==0.7.2
+openai==1.30.1            # backup cuối: endpoint tương thích OpenAI (xem generator._call_openai_compat)
 
 # ── Embedding (CPU-only torch) ────────────────────────────────────────────────
 sentence-transformers==3.1.1

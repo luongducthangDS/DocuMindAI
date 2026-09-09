@@ -19,6 +19,12 @@ class Settings(BaseSettings):
     gemini_judge_models: str = "gemini-3.1-flash-lite"
     primary_llm: str = "groq/llama-3.3-70b-versatile"
     fallback_llm: str = "gemini/gemini-2.5-flash-lite"
+    # Lớp backup cuối (trước extractive): endpoint tương thích OpenAI.
+    # Để trống openai_api_base = OpenAI thật; hoặc trỏ tới vLLM/OpenRouter/Together...
+    # Chuỗi generation: Groq → Gemini → OpenAI-compatible → extractive (không LLM).
+    openai_api_key: str = ""
+    openai_api_base: str = ""
+    openai_model: str = "gpt-4o-mini"
     # generator_provider: nhà cung cấp sinh câu trả lời. "groq" (mặc định, llama-3.3-70b)
     # hoặc "gemini" (bỏ qua Groq, dùng thẳng Gemini — hữu ích khi Groq cạn TPD/ngày).
     generator_provider: str = "groq"

@@ -252,10 +252,46 @@ def _call_gemini(prompt: str, context: str, history: list[dict] | None = None) -
     raise last_exc  # all pairs exhausted
 
 
+def _call_openai_compat(prompt: str, context: str, history: list[dict] | None = None) -> str | None:
+    """Backup cuối cùng trước extractive: gọi endpoint tương thích OpenAI.
+
+    Kích hoạt khi có OPENAI_API_KEY. OPENAI_API_BASE trống → OpenAI thật;
+    hoặc trỏ tới vLLM / OpenRouter / Together / bất kỳ endpoint OpenAI-compatible.
+    """
+    settings = get_settings()
+    if not settings.openai_api_key:
+        raise RuntimeError("OPENAI_API_KEY not set")
+
+    from openai import OpenAI
+
+    client_kwargs: dict = {"api_key": settings.openai_api_key}
+    if settings.openai_api_base:
+        client_kwargs["base_url"] = settings.openai_api_base
+    client = OpenAI(**client_kwargs)
+
+    messages = [{"role": "system", "content": _SYSTEM_PROMPT}]
+    if history:
+        messages.extend(history)
+    messages.append(
+        {"role": "user", "content": f"**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {prompt}"}
+    )
+    try:
+        response = client.chat.completions.create(
+            model=settings.openai_model,
+            messages=messages,
+            temperature=0.0,
+            max_tokens=1536,
+        )
+        return response.choices[0].message.content
+    except Exception as exc:
+        logger.error("OpenAI-compat API error (type={}, detail={})", type(exc).__name__, str(exc)[:300])
+        raise
+
+
 @_traceable(
     name="rag-generate-answer",
     run_type="llm",
-    tags=["groq", "gemini", "legal-qa", "citations"],
+    tags=["groq", "gemini", "openai-compat", "legal-qa", "citations"],
 )
 def generate_answer(
     query: str,
@@ -323,7 +359,15 @@ def generate_answer(
             used_llm = "gemini"
             logger.info("Gemini answered query ({} chars)", len(answer or ""))
         except Exception as exc:
-            logger.error("Both LLMs failed: {}", exc)
+            logger.warning("Gemini failed, trying OpenAI-compatible backup: {}", exc)
+
+    if answer is None:
+        try:
+            answer = _call_openai_compat(query, context, history=history)
+            used_llm = "openai_compat_fallback"
+            logger.info("OpenAI-compat answered query ({} chars)", len(answer or ""))
+        except Exception as exc:
+            logger.error("All LLM providers failed: {}", exc)
             answer = _build_extractive_answer(query, chunks)
             used_llm = "extractive_fallback"
 
