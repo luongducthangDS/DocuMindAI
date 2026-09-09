@@ -168,16 +168,35 @@ result = check_compliance("Áp dụng lãi suất 0.8% cho tiền gửi không k
 
 ---
 
-## 📊 Empirical Evaluation & Benchmark
+## 📊 Evaluation
 
-Benchmark evaluation ran against 25 curated test questions across factoid retrieval, multi-hop statutory comparisons, compliance audits, and out-of-corpus negative controls:
+The evaluation harness ([`eval/`](eval/)) runs a 4-strategy retrieval ablation
+(BM25 · dense · hybrid+RRF · hybrid+reranker) plus RAGAS generation metrics against a
+hand-built question set with ground-truth answers and source chunk ids.
 
-| Retrieval Configuration | Strategy Details | Hit Rate | MRR | Latency (p50) | Key Takeaway |
-|---|---|:---:|:---:|:---:|---|
-| **BM25 Only** | Lexical Okapi BM25 (top-5) | 84.0% | 0.672 | ~12ms | Strong on exact article IDs; fails on paraphrased natural language questions. |
-| **Dense Only** | ChromaDB cosine (top-5) | 88.0% | 0.724 | ~45ms | Strong on semantic meaning; occasionally misses numeric clauses or circular codes. |
-| **Hybrid (BM25 + Dense)** | RRF Fusion (top-20) | 96.0% | 0.841 | ~75ms | High recall; catches both statutory codes and natural phrasing. |
-| **Hybrid + Reranker** *(Production)* | RRF (top-20) + `bge-reranker-v2-m3` (top-8) | **100.0%** | **0.952** | ~180ms | Near-perfect precision ranking; first retrieved chunk is almost always the exact article. |
+**Retrieval benchmark for the banking corpus is being rebuilt.** The current banking
+question set ([`data/eval/test_questions.json`](data/eval/test_questions.json), 25 Q on
+Thông tư 39/2016/TT-NHNN) was run against a 36-chunk pilot corpus where *every* strategy
+saturates at hit-rate 1.0 / MRR 1.0 ([`reports/benchmark_results.json`](reports/benchmark_results.json))
+— too small to discriminate configurations, so those figures are **not** reported as
+evidence. A larger corpus and a harder question set (adversarial paraphrases, near-miss
+negatives) are in progress.
+
+**Historical benchmark (previous corpus).** The methodology and engineering findings
+carry over — see [`EVALUATION.md`](EVALUATION.md). On a self-built 110-question set
+(prior domain: university regulations): hybrid+reranker reached **hit_rate@K 0.95,
+MRR 0.87, 100% out-of-corpus refusal**; RAGAS faithfulness ≈ 0.9 (5-question pilot).
+That eval also drove real fixes — a language-mismatched reranker
+(context_precision 0.66 → 0.83), a score-scale abstain bug, and ~15% generation
+over-refusal.
+
+| Stage | Mechanism |
+|---|---|
+| Sparse retrieval | Okapi BM25 — exact statutory term / article-ID matching |
+| Dense retrieval | `paraphrase-multilingual-MiniLM-L12-v2` — semantic paraphrase matching |
+| Fusion | Reciprocal Rank Fusion over both candidate lists (top-20) |
+| Reranking | `BAAI/bge-reranker-v2-m3` cross-encoder → top-8 |
+| Generation guardrails | out-of-corpus refusal · paragraph-level citation enforcement |
 
 ---
 
@@ -185,7 +204,7 @@ Benchmark evaluation ran against 25 curated test questions across factoid retrie
 
 | Layer | Technology | Justification |
 |---|---|---|
-| **Agent Orchestration** | LangGraph 0.2 + LlamaIndex 0.14 | Explicit typed state transitions, modular unit-testability of nodes, and zero-hallucination routing. |
+| **Agent Orchestration** | LangGraph 0.2 + LlamaIndex 0.14 | Explicit typed state transitions, modular unit-testability of nodes, and deterministic (non-LLM) intent routing. |
 | **Primary LLM** | Groq (Llama 3.3 70B Versatile) | ~300 tokens/second generation speed on LPUs; ideal for responsive real-time streaming. |
 | **Fallback LLM** | Google Gemini 2.0 Flash Lite | High concurrency, large context window, zero cold-start fallback when Groq hits TPM/RPM ceilings. |
 | **Embeddings** | `paraphrase-multilingual-MiniLM-L12-v2` | Compact (120MB), CPU-optimized, high multilingual semantic fidelity for Vietnamese text. |
@@ -193,7 +212,7 @@ Benchmark evaluation ran against 25 curated test questions across factoid retrie
 | **Reranker** | `BAAI/bge-reranker-v2-m3` | State-of-the-art multilingual cross-encoder reranker for high-precision legal clause ranking. |
 | **Backend Web API** | FastAPI + WebSockets + Pydantic v2 | Full async I/O, bidirectional streaming, automatic OpenAPI schema generation. |
 | **Frontend UI** | React 19 + TypeScript + Vite | Dark-mode banking console, source preview drawer, compliance testing dashboard. |
-| **Testing & CI** | Pytest + Pytest-Cov + Pytest-Asyncio | 100% test passing rate across units, integrations, and guardrails. |
+| **Testing** | Pytest + Pytest-Cov + Pytest-Asyncio | 84/84 tests passing (verified offline) across units, integrations, and guardrails. |
 
 ---
 
@@ -279,11 +298,11 @@ python eval/run_evals.py --strategies dense rerank --retrieval-only --limit 5
 - **ADR-002: Reciprocal Rank Fusion (RRF) Hybrid Retrieval**:
   - *Context*: User queries oscillate between natural language questions (*"vay tiền mua xe cần thu nhập bao nhiêu"*) and exact statutory lookups (*"Khoản 2 Điều 13 TT 39"*).
   - *Decision*: Implemented dual-pass Okapi BM25 + dense vector retrieval fused with reciprocal rank fusion prior to cross-encoder reranking.
-  - *Outcome*: Boosted Top-1 Hit Rate from 84% to 100% on benchmark evaluation.
+  - *Outcome*: Recovers both exact statutory lookups and paraphrased natural-language queries in one path; the reranker then promotes the exact article toward rank 1. Retrieval ablation numbers: see [`EVALUATION.md`](EVALUATION.md).
 - **ADR-003: Multi-Provider LLM Automatic Failover**:
   - *Context*: Free/standard tier LLM APIs occasionally return 429 rate limits or network timeouts.
-  - *Decision*: Implemented primary execution on Groq LLaMA-3.3-70B with instantaneous fallback to Google Gemini 2.0 Flash Lite upon failure.
-  - *Outcome*: 99.9% uptime resilience without user interruption.
+  - *Decision*: Implemented primary execution on Groq LLaMA-3.3-70B with automatic fallback to Google Gemini 2.0 Flash Lite on 429/timeout.
+  - *Outcome*: Rate-limit and transient-failure errors are absorbed by the fallback path instead of surfacing to the user.
 
 ---
 
