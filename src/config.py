@@ -16,9 +16,9 @@ class Settings(BaseSettings):
     google_api_key: str = ""
     google_api_key_2: str = ""
     google_api_key_3: str = ""
-    gemini_judge_models: str = "gemini-3.1-flash-lite"
+    gemini_judge_models: str = "gemini-3.1-flash-lite,gemini-3.5-flash-lite"
     primary_llm: str = "groq/llama-3.3-70b-versatile"
-    fallback_llm: str = "gemini/gemini-2.5-flash-lite"
+    fallback_llm: str = "gemini/gemini-3.1-flash-lite"
     # Lớp backup cuối (trước extractive): endpoint tương thích OpenAI.
     # Để trống openai_api_base = OpenAI thật; hoặc trỏ tới vLLM/OpenRouter/Together...
     # Chuỗi generation: Groq → Gemini → OpenAI-compatible → extractive (không LLM).
@@ -29,8 +29,11 @@ class Settings(BaseSettings):
     # hoặc "gemini" (bỏ qua Groq, dùng thẳng Gemini — hữu ích khi Groq cạn TPD/ngày).
     generator_provider: str = "groq"
     # gemini_generation_models: danh sách model Gemini cho generation, phân cách dấu phẩy.
-    # Generation sẽ xoay vòng 3 key × các model này. Ưu tiên model RPD cao (3.1-flash-lite=500/ngày).
-    gemini_generation_models: str = "gemini-2.5-flash-lite,gemini-3.1-flash-lite,gemini-2.5-flash"
+    # Generation sẽ xoay vòng 3 key × các model này. Ưu tiên model RPD cao.
+    # Free tier RPD/RPM (Ted 2026-09-10): 3.1-flash-lite=500/15, 3.5-flash-lite=500/15,
+    # 2.5-flash-lite=20/10. Các "flash" thường (2.5/3/3.5/3.6/3.7/3.8) chỉ RPD 20.
+    # gemini-2.0-* / 1.5-* / 2.5-pro / 3.1-pro = KHÔNG có quota trên key này.
+    gemini_generation_models: str = "gemini-3.1-flash-lite,gemini-3.5-flash-lite,gemini-2.5-flash-lite"
     embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     # embedding_provider: "local" (mặc định, load model vào RAM qua sentence-transformers/
     # torch, ~700MB) hoặc "hf_api" (gọi HuggingFace Inference API, không load model —
