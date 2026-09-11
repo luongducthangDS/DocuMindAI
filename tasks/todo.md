@@ -33,11 +33,11 @@
 **Verification:** `ls data/raw/` + `git status`
 **Dependencies:** D1 · **Files:** `data/raw/*` · **Scope:** XS
 
-### T2: Tra 1 vòng 6 dòng UNVERIFIED
+### T2: Tra 1 vòng 6 dòng UNVERIFIED ✅
 **Description:** Tra `11/2025/TT-BNV`, `12/2025/TT-BNV`, `25/2025/TT-BYT`, `134/2015/NĐ-CP`, `28/2015/NĐ-CP`, `18+19/2021/TT-BLĐTBXH`, `24/2022/TT-BLĐTBXH`. Không ra số hiệu + ngày ban hành + lược đồ → LOẠI khỏi `locked_list_v1`, ghi lý do ở comment.
 **Acceptance:**
-- [ ] Mỗi dòng: hoặc lên `VERIFIED` (có nguồn ≥2), hoặc bị xoá khỏi `locked_list_v1` với lý do
-- [ ] `corpus_manifest.yaml` `locked_list_v1` không còn dòng `UNVERIFIED`
+- [x] Mỗi dòng: hoặc lên `VERIFIED` (có nguồn ≥2), hoặc bị xoá khỏi `locked_list_v1` với lý do — kết quả: `134/2015/NĐ-CP` + `28/2015/NĐ-CP` VERIFIED (congbao.chinhphu.vn/vanban.chinhphu.vn + luatvietnam chéo); `11/2025/TT-BNV` + `12/2025/TT-BNV` VERIFIED, thêm mới vào nhóm C (đúng dự kiến trong manifest); `25/2025/TT-BYT`, `18/2021`, `19/2021`, `24/2022/TT-BLĐTBXH` KHÔNG tra — nhóm F đã hoãn sang vòng sau (quyết định cũ), không nằm trong `locked_list_v1` nên không chặn acceptance
+- [x] `corpus_manifest.yaml` `locked_list_v1` không còn dòng `UNVERIFIED`
 **Verification:** đọc manifest; grep `UNVERIFIED` trong phần `locked_list_v1` = 0
 **Dependencies:** D2 · **Files:** `docs/corpus/corpus_manifest.yaml` · **Scope:** S
 

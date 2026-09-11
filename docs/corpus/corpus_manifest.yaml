@@ -191,7 +191,33 @@ documents:
     nguon: "https://vanban.chinhphu.vn/?docid=214269&pageid=27160"
     verify_status: "PARTIAL"
 
-  # Cần bổ sung: Thông tư của Bộ Nội vụ / BLĐTBXH hướng dẫn NĐ 158/2025 & 159/2025 — UNVERIFIED, tra sau.
+  - doc_id: "11-2025-TT-BNV"
+    loai: "Thông tư"
+    so_hieu: "11/2025/TT-BNV"
+    ten: "Hướng dẫn một số điều của Luật Bảo hiểm xã hội về bảo hiểm xã hội tự nguyện"
+    co_quan: "Bộ Nội vụ"
+    ngay_ban_hanh: "2025-06-30"
+    ngay_hieu_luc: "2025-07-01"
+    trang_thai: "con_hieu_luc"
+    huong_dan_cho: ["159/2025/NĐ-CP"]
+    nguon: "https://vbpl.ts24.com.vn/support/solutions/articles/16000218817"
+    verify_status: "VERIFIED (T2, 2026-09-11 — xaydungchinhsach.chinhphu.vn + luatvietnam.vn + thuvienphapluat khớp ngày; thêm vào nhóm C theo dự kiến ở SPEC-corpus-acquisition.md)"
+
+  - doc_id: "12-2025-TT-BNV"
+    loai: "Thông tư"
+    so_hieu: "12/2025/TT-BNV"
+    ten: "Quy định chi tiết một số điều của Luật Bảo hiểm xã hội về bảo hiểm xã hội bắt buộc"
+    co_quan: "Bộ Nội vụ"
+    ngay_ban_hanh: "2025-06-30"
+    ngay_hieu_luc: "2025-07-01"
+    trang_thai: "con_hieu_luc"
+    huong_dan_cho: ["158/2025/NĐ-CP"]
+    nguon: "https://xaydungchinhsach.chinhphu.vn/toan-van-thong-tu-12-2025-tt-bnv-quy-dinh-chi-tiet-mot-so-dieu-cua-luat-bhxh-ve-bhxh-bat-buoc-11925070415595016.htm"
+    verify_status: "VERIFIED (T2, 2026-09-11 — xaydungchinhsach.chinhphu.vn + english.luatvietnam.vn + snv.dongnai.gov.vn khớp ngày; thêm vào nhóm C theo dự kiến ở SPEC-corpus-acquisition.md)"
+
+  # 25/2025/TT-BYT, 18/2021 + 19/2021/TT-BLĐTBXH, 24/2022/TT-BLĐTBXH: KHÔNG tra vòng này —
+  # thuộc nhóm F (TNLĐ-BNN) đã HOÃN sang vòng sau (xem memory documind-labor-pivot).
+  # Không mở rộng corpus ngoài nhóm F chỉ để đóng nốt T2.
 
   # ─────────────────────────────────────────────────────────────
   # D. BHXH — KHUNG LỊCH SỬ (point-in-time trước 2025-07-01)
@@ -239,12 +265,13 @@ documents:
     so_hieu: "134/2015/NĐ-CP"
     ten: "Quy định chi tiết một số điều của Luật Bảo hiểm xã hội về bảo hiểm xã hội tự nguyện"
     co_quan: "Chính phủ"
-    ngay_ban_hanh: "UNVERIFIED"
-    ngay_hieu_luc: "UNVERIFIED"
+    ngay_ban_hanh: "2015-12-29"
+    ngay_hieu_luc: "2016-02-15"
     trang_thai: "het_hieu_luc"
-    het_hieu_luc_tu: "2025-07-01"             # PARTIAL
+    het_hieu_luc_tu: "2025-07-01"
     bi_thay_the_boi: ["159/2025/NĐ-CP"]
-    verify_status: "UNVERIFIED"
+    nguon: "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-134-2015-nd-cp-18598.htm"
+    verify_status: "VERIFIED (T2, 2026-09-11 — congbao.chinhphu.vn + vanban.chinhphu.vn + thuvienphapluat/luatvietnam khớp ngày; NĐ 159/2025 xác nhận thay thế từ 2025-07-01)"
 
   # ─────────────────────────────────────────────────────────────
   # E. BẢO HIỂM THẤT NGHIỆP
@@ -290,12 +317,13 @@ documents:
     so_hieu: "28/2015/NĐ-CP"
     ten: "Quy định chi tiết thi hành một số điều của Luật Việc làm về bảo hiểm thất nghiệp"
     co_quan: "Chính phủ"
-    ngay_ban_hanh: "UNVERIFIED"
-    ngay_hieu_luc: "UNVERIFIED"
+    ngay_ban_hanh: "2015-03-12"
+    ngay_hieu_luc: "2015-05-01"
     trang_thai: "het_hieu_luc"
-    het_hieu_luc_tu: "2026-01-01"             # PARTIAL
+    het_hieu_luc_tu: "2026-01-01"
     bi_thay_the_boi: ["374/2025/NĐ-CP"]
-    verify_status: "UNVERIFIED"
+    nguon: "https://vanban.chinhphu.vn/?pageid=27160&docid=179249"
+    verify_status: "VERIFIED (T2, 2026-09-11 — vanban.chinhphu.vn + luatvietnam.vn khớp ngày; NĐ 374/2025 xác nhận thay thế từ 2026-01-01)"
     ghi_chu: "Đã bị sửa bởi NĐ 61/2020/NĐ-CP. Cần VBHN nếu nạp."
 
   # ─────────────────────────────────────────────────────────────
@@ -406,10 +434,9 @@ documents:
 #   Nhóm F (TNLĐ–BNN): 84/2015/QH13 · 88/2020/NĐ-CP · 58/2020/NĐ-CP  (tần suất hỏi thấp hơn 3 chế độ kia)
 #   Optional: 12/2022/NĐ-CP · 152/2020/NĐ-CP + 70/2023/NĐ-CP
 #
-# 6 dòng CHƯA XÁC MINH ĐƯỢC — quy tắc Ted: tra 1 vòng, vẫn không ra ngày + lược đồ => LOẠI THẲNG,
-# không giữ ở trạng thái UNVERIFIED. (manifest có 1 dòng không xác minh được = mất giá trị làm tuyên bố phạm vi)
-#   11/2025/TT-BNV · 12/2025/TT-BNV  -> tra (có thể là TT hướng dẫn NĐ 158/159 — nếu ra thì thuộc nhóm C)
-#   25/2025/TT-BYT · 18/2021/TT-BLĐTBXH · 19/2021/TT-BLĐTBXH · 24/2022/TT-BLĐTBXH  -> phần lớn liên quan nhóm F đã hoãn => tra chung với F vòng sau
+# 6 dòng CHƯA XÁC MINH — KẾT QUẢ T2 (2026-09-11):
+#   11/2025/TT-BNV · 12/2025/TT-BNV  -> RA (nguồn ≥2), thuộc nhóm C, đã thêm vào locked_list_v1 (doc_id 11-2025-TT-BNV, 12-2025-TT-BNV)
+#   25/2025/TT-BYT · 18/2021/TT-BLĐTBXH · 19/2021/TT-BLĐTBXH · 24/2022/TT-BLĐTBXH  -> KHÔNG tra, thuộc nhóm F đã HOÃN sang vòng sau (không mở rộng corpus ngoài nhóm F)
 
 # ─────────────────────────────────────────────────────────────
 # DANH SÁCH CHỐT VÒNG NÀY — 18 văn bản + 4 VBHN
@@ -424,6 +451,8 @@ locked_list_v1:
     - "41-2024-QH15"                  # Luật BHXH 2024
     - "158-2025-ND-CP"
     - "159-2025-ND-CP"
+    - "12-2025-TT-BNV"                 # hướng dẫn 158/2025 (T2, thêm mới)
+    - "11-2025-TT-BNV"                 # hướng dẫn 159/2025 (T2, thêm mới)
     - "74-2025-QH15"                  # Luật Việc làm 2025 (HL 2026-01-01)
     - "374-2025-ND-CP"
   het_hieu_luc_giu_cho_point_in_time:
@@ -431,9 +460,9 @@ locked_list_v1:
     - "58-2014-QH13"                  # Luật BHXH 2014 (.. 2025-06-30)
     - "115-2015-ND-CP"
     - "59-2015-TT-BLDTBXH"
-    - "134-2015-ND-CP"               # UNVERIFIED số/ngày — tra 1 vòng hoặc loại
+    - "134-2015-ND-CP"               # VERIFIED T2 (2026-09-11)
     - "38-2013-QH13"                  # Luật Việc làm 2013 (.. 2025-12-31)
-    - "28-2015-ND-CP"               # UNVERIFIED số/ngày — tra 1 vòng hoặc loại
+    - "28-2015-ND-CP"               # VERIFIED T2 (2026-09-11)
   van_ban_hop_nhat:                   # ƯU TIÊN CAO NHẤT với BLLĐ 2019 — không có VBHN thì không reconstruct được version nào
     - "18/VBHN-VPQH (BLLĐ 2019, 12/02/2026)"       # PARTIAL — 1 nguồn nêu 125/VBHN; xác minh
     # D2/Q2 (2026-09-11, Ted): nhóm NĐ/TT dưới đây là phụ trợ (không phải BLLĐ chính) — nếu
@@ -501,10 +530,10 @@ locked_list_v1:
 #
 # ─────────────────────────────────────────────────────────────
 # THỨ TỰ VIỆC (cập nhật — bỏ bước đếm VBHN khỏi đường tới hành động)
-#   1. Ted xác nhận phương án (a).
-#   2. Tra 1 vòng 6 dòng chưa xác minh (11+12/2025-TT-BNV, 134/2015, 28/2015 + nhóm F).
-#      Không ra ngày + lược đồ => LOẠI THẲNG.
-#   3. Đối chiếu Công báo: ngày ban hành/hiệu lực mọi dòng PARTIAL (18 văn bản).
+#   1. Ted xác nhận phương án (a). ✅
+#   2. ✅ (T2, 2026-09-11) Tra 1 vòng 6 dòng chưa xác minh: 134/2015, 28/2015 -> VERIFIED;
+#      11+12/2025-TT-BNV -> VERIFIED, thêm vào nhóm C; nhóm F (25/2025-BYT, 18+19/2021, 24/2022-BLĐTBXH) -> hoãn, không tra.
+#   3. Đối chiếu Công báo: ngày ban hành/hiệu lực mọi dòng PARTIAL (18 văn bản + 2 TT mới).
 #   4. Đối chiếu lược đồ vbpl.vn: mọi quan hệ sua_doi_boi / thay_the.
 #   5. Acquire text sạch 18 văn bản + VBHN BLLĐ 18/VBHN-VPQH (cho bước implement dựng version Điều 139).
 #   6. Thư viện câu hỏi (40–60 câu, theo tình huống) + gold answers.
