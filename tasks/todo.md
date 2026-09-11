@@ -41,11 +41,11 @@
 **Verification:** đọc manifest; grep `UNVERIFIED` trong phần `locked_list_v1` = 0
 **Dependencies:** D2 · **Files:** `docs/corpus/corpus_manifest.yaml` · **Scope:** S
 
-### T3: Đối chiếu Công báo các mốc ngày PARTIAL
+### T3: Đối chiếu Công báo các mốc ngày PARTIAL ✅
 **Description:** Đối chiếu `congbao.chinhphu.vn`: `ngay_ban_hanh`/`ngay_hieu_luc` mọi dòng PARTIAL (đặc biệt NĐ 293/2025, 158/2025, 159/2025, 374/2025, 115/2015, TT 59/2015).
 **Acceptance:**
-- [ ] Mọi dòng `locked_list_v1` có `ngay_ban_hanh` + `ngay_hieu_luc` xác nhận từ Công báo hoặc toàn văn chính thức
-- [ ] `verify_status` cập nhật `PARTIAL` → `VERIFIED` khi đủ nguồn
+- [x] Mọi dòng `locked_list_v1` có `ngay_ban_hanh` + `ngay_hieu_luc` xác nhận từ Công báo hoặc toàn văn chính thức — cả 19 văn bản trong `locked_list_v1` đều `VERIFIED` (script kiểm tra grep xác nhận 0 dòng PARTIAL/UNVERIFIED)
+- [x] `verify_status` cập nhật `PARTIAL` → `VERIFIED` khi đủ nguồn (293/2025, 158/2025, 159/2025 qua Công báo trực tiếp; 115/2015, 59/2015-TT qua Công báo trực tiếp). 88-2020-ND-CP + 58-2020-ND-CP vẫn PARTIAL nhưng thuộc nhóm F đã hoãn, không nằm trong `locked_list_v1` nên không chặn
 **Verification:** đọc manifest; mỗi dòng có `nguon` trỏ Công báo/chinhphu.vn
 **Dependencies:** T2 · **Files:** `docs/corpus/corpus_manifest.yaml` · **Scope:** S–M
 

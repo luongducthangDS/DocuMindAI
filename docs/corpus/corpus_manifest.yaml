@@ -121,13 +121,13 @@ documents:
     so_hieu: "293/2025/NĐ-CP"
     ten: "Quy định mức lương tối thiểu đối với người lao động làm việc theo hợp đồng lao động"
     co_quan: "Chính phủ"
-    ngay_ban_hanh: "2025-11-10"              # PARTIAL — nguồn thứ cấp, xác nhận Công báo
+    ngay_ban_hanh: "2025-11-10"
     ngay_hieu_luc: "2026-01-01"
     trang_thai: "con_hieu_luc"
     thay_the: ["74/2024/NĐ-CP"]
     muc_luong_thang: {vung_I: 5310000, vung_II: 4730000, vung_III: 4140000, vung_IV: 3700000}
-    nguon: "https://thuvienphapluat.vn/phap-luat-doanh-nghiep/bai-viet/cap-nhat-muc-luong-toi-thieu-vung-2026-chinh-thuc-theo-nghi-dinh-293-2025-nd-cp-15934.html"
-    verify_status: "PARTIAL"
+    nguon: "https://congbao.chinhphu.vn/cong-bao-so-1591-1592-ngay-19-11-2025-46566.htm"
+    verify_status: "VERIFIED (T3, 2026-09-11 — Công báo số 1591+1592 ngày 19/11/2025 + vanban.chinhphu.vn/xaydungchinhsach.chinhphu.vn khớp ngày/mức lương)"
     ghi_chu: "Số hiệu + 4 mức lương xác minh 2 nguồn; ngày ban hành + mức lương giờ CẦN đối chiếu toàn văn Công báo."
 
   - doc_id: "74-2024-ND-CP"
@@ -173,12 +173,12 @@ documents:
     so_hieu: "158/2025/NĐ-CP"
     ten: "Quy định chi tiết và hướng dẫn thi hành một số điều của Luật Bảo hiểm xã hội về bảo hiểm xã hội bắt buộc"
     co_quan: "Chính phủ"
-    ngay_ban_hanh: "2025-06-25"              # PARTIAL — xác nhận Công báo
+    ngay_ban_hanh: "2025-06-25"
     ngay_hieu_luc: "2025-07-01"
     trang_thai: "con_hieu_luc"
     sua_doi: ["58/2020/NĐ-CP"]               # NĐ này sửa NĐ 58/2020 (mức đóng TNLĐ-BNN)
-    nguon: "https://vanban.chinhphu.vn/?pageid=27160&docid=214189"
-    verify_status: "PARTIAL"
+    nguon: "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-158-2025-nd-cp-45240.htm"
+    verify_status: "VERIFIED (T3, 2026-09-11 — congbao.chinhphu.vn Công báo số 851+852 xác nhận ngày ban hành/hiệu lực)"
 
   - doc_id: "159-2025-ND-CP"
     loai: "Nghị định"
@@ -188,8 +188,9 @@ documents:
     ngay_ban_hanh: "2025-06-25"
     ngay_hieu_luc: "2025-07-01"
     trang_thai: "con_hieu_luc"
-    nguon: "https://vanban.chinhphu.vn/?docid=214269&pageid=27160"
-    verify_status: "PARTIAL"
+    thay_the: ["134/2015/NĐ-CP"]
+    nguon: "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-159-2025-nd-cp-45253/57094.htm"
+    verify_status: "VERIFIED (T3, 2026-09-11 — congbao.chinhphu.vn + vanban.chinhphu.vn khớp ngày; xác nhận thay thế 134/2015/NĐ-CP)"
 
   - doc_id: "11-2025-TT-BNV"
     loai: "Thông tư"
@@ -244,9 +245,10 @@ documents:
     ngay_ban_hanh: "2015-11-11"
     ngay_hieu_luc: "2016-01-01"
     trang_thai: "het_hieu_luc"
-    het_hieu_luc_tu: "2025-07-01"             # PARTIAL — xác minh (bị NĐ 158/2025 thay)
+    het_hieu_luc_tu: "2025-07-01"
     bi_thay_the_boi: ["158/2025/NĐ-CP"]
-    verify_status: "PARTIAL"
+    nguon: "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-115-2015-nd-cp-18101.htm"
+    verify_status: "VERIFIED (T3, 2026-09-11 — congbao.chinhphu.vn khớp ngày ban hành)"
 
   - doc_id: "59-2015-TT-BLDTBXH"
     loai: "Thông tư"
@@ -254,10 +256,11 @@ documents:
     ten: "Quy định chi tiết và hướng dẫn thi hành một số điều của Luật Bảo hiểm xã hội về bảo hiểm xã hội bắt buộc"
     co_quan: "Bộ Lao động - Thương binh và Xã hội"
     ngay_ban_hanh: "2015-12-29"
-    ngay_hieu_luc: "2016-02-15"               # PARTIAL — xác minh
+    ngay_hieu_luc: "2016-02-15"
     trang_thai: "het_hieu_luc"
-    het_hieu_luc_tu: "2025-07-01"             # PARTIAL
-    verify_status: "PARTIAL"
+    het_hieu_luc_tu: "2025-07-01"
+    nguon: "https://congbao.chinhphu.vn/van-ban/thong-tu-so-59-2015-tt-bldtbxh-18869.htm"
+    verify_status: "VERIFIED (T3, 2026-09-11 — congbao.chinhphu.vn Công báo số 139+140 khớp ngày ban hành/hiệu lực)"
     ghi_chu: "Đã bị sửa nhiều lần (TT 06/2021/TT-BLĐTBXH...). Nếu nạp cho point-in-time cần VBHN."
 
   - doc_id: "134-2015-ND-CP"
