@@ -40,8 +40,8 @@ Kết thúc module này: `data/raw/lao_dong/` chứa toàn văn 18 văn bản `l
 - Mở 3 file `data/raw/lao_dong/` ngẫu nhiên, đối chiếu điều đầu + điều cuối với nguồn `chinhphu.vn`.
 - Script kiểm tra frontmatter (viết ở `clause-schema-ingestion`, hoặc test tạm ở đây).
 
-## Open Questions
+## Open Questions — D2 CHỐT (2026-09-11, Ted)
 
-1. **Nguồn toàn văn** khi vbpl.vn là SPA: Ted tự tải, hay dùng luatvietnam.vn / thuvienphapluat (chặn bot) / chinhphu.vn "toàn văn" (chỉ có VB mới)? Với VB lịch sử (BHXH 2014, Việc làm 2013) + VBHN — nguồn nào?
-2. **VBHN các NĐ** (145/2020, TT 59/2015, NĐ 28/2015): số hiệu VBHN chưa tra — cần cho point-in-time nhóm lịch sử. Nếu không lấy được → nhóm `het_hieu_luc_giu_cho_point_in_time` chỉ dùng bản gốc (không phản ánh sửa đổi giữa chừng), chấp nhận được không?
-3. **NĐ 38/2022** (lương tối thiểu 2022): giữ để point-in-time lùi tới 2022, hay cắt ở 2024?
+1. **Nguồn toàn văn** khi vbpl.vn là SPA: **de-facto đã chốt** qua thực tế dùng trong `corpus_manifest.yaml` (`meta.nguon_uu_tien`) — ưu tiên `vanban.chinhphu.vn` / `congbao.chinhphu.vn` / `vbpl.vn` cho số hiệu + mốc ngày chính thức; `thuvienphapluat.vn` / `luatvietnam.vn` dùng làm nguồn cross-check thứ cấp (đã áp dụng khi bound N1 ở session 4). VB lịch sử (BHXH 2014, Việc làm 2013) + VBHN cũng theo thứ tự ưu tiên này, thử `vbpl.vn` hoặc trang bộ chủ quản trước khi rơi xuống nguồn thứ cấp.
+2. **VBHN các NĐ** (145/2020, TT 59/2015, NĐ 28/2015): **CHẤP NHẬN dùng bản gốc nếu không tra được số hiệu VBHN** — nhóm này là phụ trợ (không phải BLLĐ chính), không chặn tiến độ. Phải ghi rõ hạn chế "không phản ánh sửa đổi giữa chừng" trong `corpus_manifest.yaml` (đã ghi, xem `van_ban_hop_nhat`) và trong README (mục Hạn chế, làm ở T30/T31).
+3. **NĐ 38/2022** (lương tối thiểu 2022): **CẮT ở 2024** — bỏ khỏi corpus vòng này (đã xoá khỏi `corpus_manifest.yaml`). point-in-time lương tối thiểu bắt đầu từ `74/2024/NĐ-CP` (2024-07-01), không lùi tới 2022.

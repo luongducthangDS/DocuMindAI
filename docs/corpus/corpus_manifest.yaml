@@ -147,18 +147,9 @@ documents:
     verify_status: "VERIFIED"
     ghi_chu: "GIỮ trong corpus để trả lời point-in-time cho khoảng 2024-07-01 .. 2025-12-31."
 
-  - doc_id: "38-2022-ND-CP"
-    loai: "Nghị định"
-    so_hieu: "38/2022/NĐ-CP"
-    ten: "Quy định mức lương tối thiểu đối với người lao động làm việc theo hợp đồng lao động"
-    co_quan: "Chính phủ"
-    ngay_ban_hanh: "2022-06-12"
-    ngay_hieu_luc: "2022-07-01"
-    trang_thai: "het_hieu_luc"
-    het_hieu_luc_tu: "2024-07-01"
-    bi_thay_the_boi: ["74/2024/NĐ-CP"]
-    verify_status: "PARTIAL"
-    ghi_chu: "Tùy chọn — chỉ nạp nếu muốn point-in-time lùi tới 2022. Mức lương cần tra toàn văn."
+  # D2/Q3 (2026-09-11, Ted): BỎ NĐ 38/2022/NĐ-CP khỏi corpus vòng này — cắt point-in-time
+  # lương tối thiểu ở mốc 2024-07-01 (NĐ 74/2024) để giảm phạm vi verify. Không nạp bản
+  # lương tối thiểu 2022-07-01 .. 2024-06-30.
 
   # ─────────────────────────────────────────────────────────────
   # C. BHXH — KHUNG HIỆN HÀNH (từ 2025-07-01)
@@ -436,19 +427,21 @@ locked_list_v1:
     - "74-2025-QH15"                  # Luật Việc làm 2025 (HL 2026-01-01)
     - "374-2025-ND-CP"
   het_hieu_luc_giu_cho_point_in_time:
-    - "74-2024-ND-CP"                 # lương tối thiểu 2024-07-01 .. 2025-12-31
-    - "38-2022-ND-CP"                 # lương tối thiểu 2022-07-01 .. 2024-06-30 (tùy chọn lùi tới 2022)
+    - "74-2024-ND-CP"                 # lương tối thiểu 2024-07-01 .. 2025-12-31 (point-in-time cắt ở đây, D2/Q3)
     - "58-2014-QH13"                  # Luật BHXH 2014 (.. 2025-06-30)
     - "115-2015-ND-CP"
     - "59-2015-TT-BLDTBXH"
     - "134-2015-ND-CP"               # UNVERIFIED số/ngày — tra 1 vòng hoặc loại
     - "38-2013-QH13"                  # Luật Việc làm 2013 (.. 2025-12-31)
     - "28-2015-ND-CP"               # UNVERIFIED số/ngày — tra 1 vòng hoặc loại
-  van_ban_hop_nhat:                   # ƯU TIÊN CAO NHẤT — không có VBHN thì không reconstruct được version nào
+  van_ban_hop_nhat:                   # ƯU TIÊN CAO NHẤT với BLLĐ 2019 — không có VBHN thì không reconstruct được version nào
     - "18/VBHN-VPQH (BLLĐ 2019, 12/02/2026)"       # PARTIAL — 1 nguồn nêu 125/VBHN; xác minh
-    - "VBHN NĐ 145/2020/NĐ-CP"                      # số hiệu VBHN chưa tra
-    - "VBHN TT 59/2015/TT-BLĐTBXH"                  # bị TT 06/2021 sửa — cần VBHN
-    - "VBHN NĐ 28/2015/NĐ-CP"                       # bị NĐ 61/2020 sửa — cần VBHN
+    # D2/Q2 (2026-09-11, Ted): nhóm NĐ/TT dưới đây là phụ trợ (không phải BLLĐ chính) — nếu
+    # không tra được số hiệu VBHN thì CHẤP NHẬN dùng bản gốc, ghi rõ hạn chế "không phản ánh
+    # sửa đổi giữa chừng" trong manifest + README (không chặn tiến độ Phase 1).
+    - "VBHN NĐ 145/2020/NĐ-CP"                      # số hiệu VBHN chưa tra — fallback: bản gốc nếu không ra
+    - "VBHN TT 59/2015/TT-BLĐTBXH"                  # bị TT 06/2021 sửa — fallback: bản gốc nếu không ra
+    - "VBHN NĐ 28/2015/NĐ-CP"                       # bị NĐ 61/2020 sửa — fallback: bản gốc nếu không ra
 
 # Luật sửa BLLĐ 2019 in-place (xác minh 1 nguồn — thuvienphapluat/luatvietnam; đối chiếu Công báo):
 #   41/2024/QH15 (Luật BHXH 2024, HL 2025-07-01)

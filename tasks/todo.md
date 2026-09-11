@@ -7,17 +7,17 @@
 
 ## Phase 0 — Decision gate (Ted)
 
-### D1: Chốt nhánh git
+### D1: Chốt nhánh git ✅
 **Description:** Repo chỉ có `main`; 2 commit chưa push trên `feature/llm-openai-backup` (llm backup chain). Chốt: push nhánh đó lên `origin` rồi tạo `feature/labor-pivot` từ nó, hay merge `main` trước.
 **Acceptance:**
-- [ ] Ted chốt phương án; nhánh làm việc cho pivot đã tạo từ base đúng
+- [x] Ted chốt phương án; nhánh làm việc cho pivot đã tạo từ base đúng (`feature/llm-openai-backup` đã push origin, `feature/labor-pivot` branch từ đó — xác nhận qua `git merge-base`)
 **Verification:** `git branch --show-current` = nhánh pivot; `git log --oneline -3` đúng base
 **Dependencies:** None · **Files:** — · **Scope:** XS
 
-### D2: Chốt nguồn lấy toàn văn corpus
+### D2: Chốt nguồn lấy toàn văn corpus ✅
 **Description:** vbpl.vn bản mới là SPA (WebFetch chỉ lấy vỏ). Chốt nguồn cho 18 VB + VBHN + VB lịch sử.
 **Acceptance:**
-- [ ] Ted chốt: tự tải vào `data/raw/lao_dong/` HAY em thử luatvietnam/chinhphu.vn; nguồn cho VB lịch sử + VBHN rõ
+- [x] Ted chốt: chinhphu.vn/congbao.chinhphu.vn/vbpl.vn ưu tiên + thuvienphapluat/luatvietnam cross-check; NĐ 38/2022 bỏ (cắt point-in-time ở 2024); VBHN nhóm phụ trợ (145/2020, TT 59/2015, NĐ 28/2015) chấp nhận bản gốc nếu không tra được — xem `SPEC-corpus-acquisition.md` Open Questions
 **Verification:** ghi quyết định vào `SPEC-corpus-acquisition.md` Open Questions
 **Dependencies:** None · **Files:** `docs/spec/SPEC-corpus-acquisition.md` · **Scope:** XS
 
@@ -25,11 +25,11 @@
 
 ## Phase 1 — corpus-acquisition
 
-### T1: Xoá tài liệu ngân hàng bịa + audit `data/raw/`
+### T1: Xoá tài liệu ngân hàng bịa + audit `data/raw/` ✅
 **Description:** Kiểm `data/raw/` thực tế (memory 2 ngày tuổi), xoá file corpus ngân hàng bịa: `05_quy_che_cho_vay_...md`, `06_bieu_phi_...md`, file 01–04 (tóm lược viết tay + URL `sbv.gov.vn` bịa). Ghi lại file nào đã xoá.
 **Acceptance:**
-- [ ] `data/raw/` không còn file corpus ngân hàng bịa
-- [ ] Liệt kê file đã xoá trong commit message
+- [x] `data/raw/` không còn file corpus ngân hàng bịa
+- [x] Liệt kê file đã xoá trong commit message (commit `7dfe5ec`)
 **Verification:** `ls data/raw/` + `git status`
 **Dependencies:** D1 · **Files:** `data/raw/*` · **Scope:** XS
 
