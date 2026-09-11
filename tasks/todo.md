@@ -49,13 +49,15 @@
 **Verification:** đọc manifest; mỗi dòng có `nguon` trỏ Công báo/chinhphu.vn
 **Dependencies:** T2 · **Files:** `docs/corpus/corpus_manifest.yaml` · **Scope:** S–M
 
-### T4: Đối chiếu lược đồ sửa đổi + xác nhận điều BLLĐ bị sửa in-place
+### T4: Đối chiếu lược đồ sửa đổi + xác nhận điều BLLĐ bị sửa in-place ✅
 **Description:** Đối chiếu quan hệ `sua_doi_boi`/`thay_the`/`bi_thay_the_boi`. Trọng tâm: 4 luật nghi sửa BLLĐ (41/2024, 113/2025, 71/2025, 124/2025) — xác nhận CHÍNH XÁC điều/khoản nào bị sửa in-place (đọc điều "sửa đổi, bổ sung" trong toàn văn từng luật sửa).
 **Acceptance:**
-- [ ] Bảng `sua_doi_boi` BLLĐ 2019: mỗi quan hệ có `pham_vi` tới điều/khoản cụ thể + `verify: VERIFIED`
-- [ ] Danh sách cuối cùng "khoản BLLĐ bị sửa in-place" (kỳ vọng ≈ chỉ Điều 139 k1)
-- [ ] Ghi rõ 71/2025 và 124/2025 có/không sửa BLLĐ (hiện UNVERIFIED)
-**Verification:** đọc manifest; đối chiếu 1 quan hệ với toàn văn luật sửa
+- [x] Bảng `sua_doi_boi` BLLĐ 2019: mỗi quan hệ có `pham_vi` tới điều/khoản cụ thể + `verify: VERIFIED` — đọc TRỰC TIẾP bản `.signed.pdf` gốc (chữ ký Chủ tịch Quốc hội) của cả 3 luật, không dựa nguồn thứ cấp
+- [x] Danh sách cuối cùng "khoản BLLĐ bị sửa in-place": **N1 = 4 khoản/điểm** — Điều 154 khoản 8a (71/2025), Điều 139 khoản 1 (113/2025), Điều 59 k2 điểm a + Điều 61 khoản 3 (124/2025)
+- [x] Ghi rõ 71/2025 và 124/2025 có/không sửa BLLĐ: **CẢ HAI CÓ sửa** (khác giả thuyết ban đầu). 41/2024/QH15 **KHÔNG sửa BLLĐ** (xác nhận qua danh sách luật sửa trong VBHN 18/VBHN-VPQH chính thức)
+- ⚠️ **Phát hiện quan trọng:** nhiều nguồn thứ cấp (luatvietnam, baochinhphu.vn tổng hợp) GÁN SAI nội dung Điều 139 (thai sản) cho 71/2025/QH15 — đã bác bỏ bằng văn bản gốc. 71/2025 thực ra sửa Điều 154 (không liên quan thai sản). Nguyên nhân: các luật khi trích BLLĐ đều ghi "đã được sửa đổi theo Luật số 71/2025/QH15" như cách định danh phiên bản, không phải luật đó sửa đúng điều đang trích.
+- Bonus: phát hiện `113/2025/QH15` Điều 29 khoản 2 sửa cả Luật BHXH 2024 (Điều 53 k2 điểm c — nghỉ của lao động nam khi vợ sinh đôi/con thứ 2) — ghi vào `sua_doi_boi` của `41-2024-QH15`
+**Verification:** đọc manifest; đối chiếu 1 quan hệ với toàn văn luật sửa — đã đối chiếu CẢ 3/3 quan hệ với PDF gốc (không chỉ 1)
 **Dependencies:** T3 · **Files:** `docs/corpus/corpus_manifest.yaml` · **Scope:** M
 
 ### T5: Acquire toàn văn sạch 18 VB + VBHN BLLĐ

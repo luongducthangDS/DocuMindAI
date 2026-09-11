@@ -45,27 +45,30 @@ documents:
     thay_the: ["10/2012/QH13"]
     bi_thay_the_boi: []
     sua_doi_boi:
-      - so_hieu: "113/2025/QH15"           # Luật Dân số 2025 — XÁC NHẬN sửa BLLĐ
+      # T4 (2026-09-11): đọc TOÀN VĂN GỐC (bản .signed.pdf, chữ ký Chủ tịch Quốc hội) của cả
+      # 3 luật sửa — không dựa vào nguồn thứ cấp (nhiều bài báo/luatvietnam ghi SAI, gán nhầm
+      # nội dung Điều 139 cho 71/2025/QH15 — đã bác bỏ, xem ghi_chu bên dưới).
+      - so_hieu: "71/2025/QH15"            # Luật Công nghiệp công nghệ số, thông qua 14/06/2025
+        hieu_luc_tu: "2026-01-01"
+        pham_vi: "Điều 49 khoản 4: bổ sung khoản 8a vào Điều 154 BLLĐ ('Nhân lực công nghiệp công nghệ số chất lượng cao theo quy định của pháp luật về công nghiệp công nghệ số'). KHÔNG liên quan Điều 139/thai sản."
+        verify: "VERIFIED (T4, đọc trực tiếp datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/71qh15.signed.pdf trang 27, Điều 49 khoản 4)"
+      - so_hieu: "113/2025/QH15"           # Luật Dân số, thông qua 10/12/2025
         hieu_luc_tu: "2026-07-01"
-        pham_vi: "khoản 1 Điều 139 (nghỉ thai sản: nữ 6 tháng; sinh con thứ 2 → 7 tháng; sinh đôi trở lên +1 tháng/con)"
-        verify: "VERIFIED (1 nguồn thuvienphapluat + luatvietnam)"
-      - so_hieu: "71/2025/QH15"            # Luật Công nghiệp công nghệ số — HL 2026-01-01
+        pham_vi: "Điều 29 khoản 1: sửa khoản 1 Điều 139 BLLĐ (nghỉ thai sản: nữ 6 tháng; sinh con thứ 2 → 7 tháng, trước sinh không quá 2 tháng; sinh đôi trở lên, từ con thứ 2 mỗi con +1 tháng). Điều 29 khoản 2 CÙNG LUẬT sửa điểm c khoản 2 Điều 53 Luật BHXH 2024 (41/2024/QH15) — nghỉ của lao động NAM khi vợ sinh đôi/con thứ 2 (10 ngày làm việc) — đây là sửa Luật BHXH, KHÔNG phải BLLĐ, ghi chú riêng."
+        verify: "VERIFIED (T4, đọc trực tiếp datafiles.chinhphu.vn/cpp/files/vbpq/2026/01/luat113-2025.pdf trang 13, Điều 29 khoản 1)"
+      - so_hieu: "124/2025/QH15"           # Luật Giáo dục nghề nghiệp, thông qua 10/12/2025
         hieu_luc_tu: "2026-01-01"
-        pham_vi: "NGHI NGỜ — nguồn thứ cấp nói 'sửa BLLĐ' nhưng điểm cụ thể nêu ra là về thuế TNDN, không phải BLLĐ. Rà VBHN xác nhận có/không."
-        verify: "UNVERIFIED"
-      - so_hieu: "124/2025/QH15"           # Luật GDNN 2025 — HL 2026-01-01
-        hieu_luc_tu: "2026-01-01"
-        pham_vi: "KHÔNG có nguồn nào xác nhận sửa BLLĐ. Có thể là 0."
-        verify: "UNVERIFIED"
-      - so_hieu: "41/2024/QH15"            # Luật BHXH 2024 — NGHI NGỜ CONFLATION
-        hieu_luc_tu: "2025-07-01"
-        pham_vi: "NGHI NGỜ nhầm số hiệu: 1 nguồn viết '41/2024/QH14' (sai — phải QH15) khi nói BLLĐ bị Luật BHXH sửa. KHÔNG nguồn chính nào xác nhận điều khoản thi hành Luật BHXH 2024 sửa in-place BLLĐ 2019. Coi như 0 cho tới khi VBHN chứng minh khác."
-        verify: "UNVERIFIED (doubtful)"
+        pham_vi: "Điều 43 khoản 1: (a) sửa điểm a khoản 2 Điều 59 BLLĐ (quyền NSDLĐ lập cơ sở GDNN/mở lớp đào tạo nghề tại nơi làm việc); (b) sửa khoản 3 Điều 61 BLLĐ (NSDLĐ tuyển người học nghề/tập nghề để làm việc cho mình thì không được thu học phí)."
+        verify: "VERIFIED (T4, đọc trực tiếp datafiles.chinhphu.vn/cpp/files/vbpq/2026/01/luat124-2025.pdf trang 22, Điều 43 khoản 1)"
+      - so_hieu: "41/2024/QH15"            # Luật BHXH 2024 — KHÔNG sửa BLLĐ
+        hieu_luc_tu: "N/A"
+        pham_vi: "KHÔNG sửa BLLĐ 2019. Xác nhận qua VBHN 18/VBHN-VPQH (bản hợp nhất chính thức, National Assembly Office) — lời giới thiệu VBHN chỉ liệt kê ĐÚNG 3 luật sửa BLLĐ: 71/2025/QH15, 113/2025/QH15, 124/2025/QH15. Không có 41/2024/QH15 trong danh sách này."
+        verify: "VERIFIED KHÔNG SỬA (T4, đối chiếu danh sách luật sửa trong lời giới thiệu VBHN 18/VBHN-VPQH)"
     van_ban_hop_nhat: "18/VBHN-VPQH năm 2026 (VPQH) — bản mới nhất; 125/VBHN-VPQH năm 2025 là bản hợp nhất TRƯỚC"
     cau_truc: "17 chương / 220 điều"
     nguon: "https://vanban.chinhphu.vn/?pageid=27160&docid=198540"
     verify_status: "VERIFIED"
-    ghi_chu: "Đường tắt bound N1 (Ted): đọc ĐIỀU 'sửa đổi, bổ sung' trong mỗi luật sửa (text sạch chinhphu.vn), không cần VBHN ở bước quyết định. KQ: xem mục 'BOUND N1' dưới."
+    ghi_chu: "T4 (2026-09-11): N1 THẬT = 4 khoản/điểm bị sửa in-place, xác nhận qua toàn văn gốc 3 luật (71/2025, 113/2025, 124/2025). Xem bảng sua_doi_boi + mục 'BOUND N1 — KẾT QUẢ T4' dưới."
 
   - doc_id: "145-2020-ND-CP"
     loai: "Nghị định"
@@ -166,7 +169,12 @@ documents:
     cau_truc: "11 chương / 141 điều"
     nguon: "https://xaydungchinhsach.chinhphu.vn/toan-van-luat-so-41-2024-qh15-bao-hiem-xa-hoi-119240723163650489.htm"
     verify_status: "VERIFIED"
-    ghi_chu: "Điểm mới demoable: giảm năm đóng tối thiểu hưởng lương hưu 20 -> 15 năm; trợ cấp hưu trí xã hội; siết BHXH một lần."
+    sua_doi_boi:
+      - so_hieu: "113/2025/QH15"          # Luật Dân số, thông qua 10/12/2025
+        hieu_luc_tu: "2026-07-01"
+        pham_vi: "Điều 29 khoản 2: sửa điểm c khoản 2 Điều 53 Luật BHXH 2024 — lao động NAM khi vợ sinh đôi hoặc sinh con thứ 2 được nghỉ 10 ngày làm việc; sinh ba trở lên +3 ngày/con tính từ con thứ 3. Ghi nhận qua T4 (BLLĐ), không thuộc phạm vi in-place BLLĐ nhưng cùng luật sửa."
+        verify: "VERIFIED (T4, đọc trực tiếp datafiles.chinhphu.vn/cpp/files/vbpq/2026/01/luat113-2025.pdf trang 13-14, Điều 29 khoản 2)"
+    ghi_chu: "Điểm mới demoable: giảm năm đóng tối thiểu hưởng lương hưu 20 -> 15 năm; trợ cấp hưu trí xã hội; siết BHXH một lần. Bản thân Luật BHXH 2024 KHÔNG sửa BLLĐ (xem 45-2019-QH14.sua_doi_boi), nhưng CHÍNH Luật BHXH 2024 bị 113/2025/QH15 sửa 1 điểm (Điều 53 k2 điểm c, nghỉ của lao động nam) — xem sua_doi_boi trên."
 
   - doc_id: "158-2025-ND-CP"
     loai: "Nghị định"
@@ -475,11 +483,11 @@ locked_list_v1:
     - "VBHN TT 59/2015/TT-BLĐTBXH"                  # bị TT 06/2021 sửa — fallback: bản gốc nếu không ra
     - "VBHN NĐ 28/2015/NĐ-CP"                       # bị NĐ 61/2020 sửa — fallback: bản gốc nếu không ra
 
-# Luật sửa BLLĐ 2019 in-place (xác minh 1 nguồn — thuvienphapluat/luatvietnam; đối chiếu Công báo):
-#   41/2024/QH15 (Luật BHXH 2024, HL 2025-07-01)
-#   113/2025/QH15 (Luật Dân số 2025, HL 2026-07-01 — Điều 139 nghỉ thai sản)
-#   71/2025/QH15 (Luật Công nghiệp công nghệ số 2025 — phạm vi/HL chưa rõ)
-#   124/2025/QH15 (Luật Giáo dục nghề nghiệp 2025 — phạm vi/HL chưa rõ)
+# Luật sửa BLLĐ 2019 in-place — T4 (2026-09-11), xác nhận qua TOÀN VĂN GỐC .signed.pdf (chữ ký CTQH):
+#   71/2025/QH15  (Luật Công nghiệp công nghệ số, HL 2026-01-01) — Điều 154 khoản 8a (mới)
+#   113/2025/QH15 (Luật Dân số, HL 2026-07-01) — Điều 139 khoản 1 (nghỉ thai sản)
+#   124/2025/QH15 (Luật Giáo dục nghề nghiệp, HL 2026-01-01) — Điều 59 khoản 2 điểm a + Điều 61 khoản 3
+#   41/2024/QH15  (Luật BHXH 2024) — KHÔNG sửa BLLĐ (xác nhận qua danh sách luật sửa trong VBHN 18/VBHN-VPQH)
 
 # ─────────────────────────────────────────────────────────────
 # BƯỚC TRƯỚC VERIFY: ĐẾM SỐ KHOẢN ≥2 VERSION — HAI CON SỐ, KHÔNG CỘNG GỘP
@@ -499,24 +507,36 @@ locked_list_v1:
 # MỚI, không phải version mới.
 #
 # ─────────────────────────────────────────────────────────────
-# BOUND N1 — CHỐT trong 1 lượt (2026-09-09, đường tắt của Ted: đọc điều "sửa đổi, bổ sung"
-# trong từng luật sửa, không cần VBHN ở bước quyết định)
+# BOUND N1 — KẾT QUẢ T4 (2026-09-11, đọc toàn văn gốc .signed.pdf, KHÔNG dựa nguồn thứ cấp)
 # ─────────────────────────────────────────────────────────────
 # N1 = số khoản có ≥2 version qua SỬA IN-PLACE, trong văn bản CÒN hiệu lực (BLLĐ 2019 + NĐ 145/2020).
 #
-# Kết quả bound:
-#   113/2025/QH15 (Luật Dân số): sửa khoản 1 Điều 139 BLLĐ  ................ ~1–2 khoản  [VERIFIED]
-#   71/2025/QH15  (CN công nghệ số): NGHI NGỜ có sửa BLLĐ — điểm cụ thể là thuế TNDN  .. ~0–3  [UNVERIFIED]
-#   124/2025/QH15 (GDNN): không nguồn nào xác nhận sửa BLLĐ  .................. ~0–2  [UNVERIFIED]
-#   41/2024/QH15  (Luật BHXH 2024): NGHI NGỜ CONFLATION (1 nguồn ghi sai 'QH14'); không xác nhận .. ~0–5  [doubtful]
-#   145-2020-ND-CP: "chưa phát hiện văn bản sửa đổi"  ....................... ~0
+# CẢNH BÁO NGUỒN THỨ CẤP: nhiều bài báo/trang luật (kể cả luatvietnam, baochinhphu.vn tổng hợp)
+# GÁN SAI nội dung Điều 139 (thai sản) cho 71/2025/QH15 — SAI. Đọc trực tiếp bản .signed.pdf
+# (chữ ký Chủ tịch Quốc hội) mới thấy 71/2025 sửa Điều 154, không đụng Điều 139. Nguyên nhân
+# nhầm lẫn: điều luật khi trích dẫn BLLĐ đều ghi "đã được sửa đổi, bổ sung theo Luật số
+# 71/2025/QH15" như một cách định danh phiên bản BLLĐ đang dẫn chiếu (thông lệ soạn thảo),
+# KHÔNG có nghĩa luật đó sửa đúng điều đang trích. Bài học corpus: KHÔNG tin nguồn thứ cấp cho
+# quan hệ sửa đổi — luôn đọc điều khoản thi hành trong văn bản GỐC.
 #
-#   => N1 (cận trên) ≈ 3–12 khoản.  N1 GẦN NHƯ CHẮC CHẮN < 30.
+# Kết quả CHỐT (4 khoản/điểm, mỗi khoản 1 nguồn = văn bản gốc, verify: VERIFIED):
+#   71/2025/QH15  (CN công nghệ số, HL 2026-01-01): Điều 154 khoản 8a (MỚI) ............ 1 khoản
+#   113/2025/QH15 (Dân số, HL 2026-07-01): Điều 139 khoản 1 (nghỉ thai sản) ............ 1 khoản
+#   124/2025/QH15 (GDNN, HL 2026-01-01): Điều 59 k2 điểm a + Điều 61 khoản 3 ............ 2 khoản
+#   41/2024/QH15  (Luật BHXH 2024): KHÔNG sửa BLLĐ (xác nhận qua VBHN 18/VBHN-VPQH) ..... 0
+#   145-2020-ND-CP: "chưa phát hiện văn bản sửa đổi" ...................................... 0
+#
+#   => N1 THẬT = 4 khoản/điểm bị sửa in-place. N1 < 30 — XÁC NHẬN, không còn là ước tính.
 #
 # METRIC ĐÚNG (Ted): không phải "bao nhiêu khoản ≥2 version" mà "trong ~50 câu hỏi tần suất
 # cao, bao nhiêu câu ĐỔI ĐÁP ÁN theo as_of_date QUA CƠ CHẾ IN-PLACE".
-#   => Hiện: ~1 câu (nghỉ thai sản, Điều 139, từ 2026-07-01). Các thay đổi lớn khác
-#      (lương tối thiểu / BHXH một lần / 20→15 năm / BHTN) đều là DOC-LEVEL, không tính.
+#   => Vẫn ~1 câu có giá trị demo cao (nghỉ thai sản, Điều 139, từ 2026-07-01) — đây là thay
+#      đổi trực tiếp ảnh hưởng người lao động, dễ hiểu, đã HIỆU LỰC (hôm nay 2026-09-11 > 2026-07-01).
+#      Điều 154 (khoản 8a, quản lý nhà nước) + Điều 59/61 (đào tạo nghề tại nơi làm việc) là
+#      in-place THẬT nhưng ít giá trị demo UX (không phải câu hỏi tần suất cao của NLĐ phổ thông)
+#      — vẫn nạp đủ cho đúng temporal-retrieval, nhưng KHÔNG dùng làm demo chính.
+#      Các thay đổi lớn khác (lương tối thiểu / BHXH một lần / 20→15 năm / BHTN) đều là
+#      DOC-LEVEL, không tính vào N1.
 #
 # ═════════════════════════════════════════════════════════════
 # QUYẾT ĐỊNH (N1 < 30) — đề xuất: PHƯƠNG ÁN (a). Chờ Ted xác nhận Y/N.
