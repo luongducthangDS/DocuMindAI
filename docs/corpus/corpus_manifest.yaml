@@ -50,7 +50,7 @@ documents:
       # nội dung Điều 139 cho 71/2025/QH15 — đã bác bỏ, xem ghi_chu bên dưới).
       - so_hieu: "71/2025/QH15"            # Luật Công nghiệp công nghệ số, thông qua 14/06/2025
         hieu_luc_tu: "2026-01-01"
-        pham_vi: "Điều 49 khoản 4: bổ sung khoản 8a vào Điều 154 BLLĐ ('Nhân lực công nghiệp công nghệ số chất lượng cao theo quy định của pháp luật về công nghiệp công nghệ số'). KHÔNG liên quan Điều 139/thai sản."
+        pham_vi: "Điều 49 khoản 4: bổ sung khoản 8a vào Điều 154 BLLĐ (Điều 154 = 'Người lao động nước ngoài làm việc tại Việt Nam KHÔNG thuộc diện cấp giấy phép lao động'; khoản 8a mới = 'Nhân lực công nghiệp công nghệ số chất lượng cao theo quy định của pháp luật về công nghiệp công nghệ số' -> nhóm này được miễn giấy phép lao động). KHÔNG liên quan Điều 139/thai sản."
         verify: "VERIFIED (T4, đọc trực tiếp datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/71qh15.signed.pdf trang 27, Điều 49 khoản 4)"
       - so_hieu: "113/2025/QH15"           # Luật Dân số, thông qua 10/12/2025
         hieu_luc_tu: "2026-07-01"
@@ -537,6 +537,21 @@ locked_list_v1:
 #      — vẫn nạp đủ cho đúng temporal-retrieval, nhưng KHÔNG dùng làm demo chính.
 #      Các thay đổi lớn khác (lương tối thiểu / BHXH một lần / 20→15 năm / BHTN) đều là
 #      DOC-LEVEL, không tính vào N1.
+
+# ─────────────────────────────────────────────────────────────
+# T5 (2026-09-12) — ĐỐI CHIẾU CHÉO VBHN 18/VBHN-VPQH XÁC NHẬN TOÀN BỘ KẾT QUẢ T4
+# ─────────────────────────────────────────────────────────────
+# Sau khi acquire toàn văn, bản hợp nhất chính thức (VBHN 18/VBHN-VPQH) tự nó ghi cước chú
+# cho từng khoản bị sửa — khớp 4/4 phát hiện của T4, nguồn độc lập với 3 bản .signed.pdf:
+#   Điều 139 k1  -> cước chú 44: "sửa đổi, bổ sung theo khoản 1 Điều 29 Luật Dân số
+#                   113/2025/QH15, hiệu lực 01/7/2026"
+#   Điều 154 k8a -> cước chú 55: "bổ sung theo khoản 4 Điều 49 Luật Công nghiệp công nghệ số
+#                   71/2025/QH15, hiệu lực 01/01/2026"
+#   Điều 61 k3   -> cước chú 33: "sửa đổi, bổ sung theo điểm b khoản 1 Điều 43 Luật Giáo dục
+#                   nghề nghiệp 124/2025/QH15, hiệu lực 01/01/2026"
+#   Điều 59      -> sửa theo Luật GDNN 124/2025 (điểm a khoản 2)
+# Bản gốc 45/2019/QH14 trong corpus KHÔNG chứa các khoản này (đúng — là bản trước khi sửa),
+# nên cặp (45-2019-QH14, 18-VBHN-VPQH) dùng được làm 2 version cho point-in-time ở T9.
 #
 # ═════════════════════════════════════════════════════════════
 # QUYẾT ĐỊNH (N1 < 30) — đề xuất: PHƯƠNG ÁN (a). Chờ Ted xác nhận Y/N.

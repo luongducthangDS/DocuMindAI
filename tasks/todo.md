@@ -60,27 +60,31 @@
 **Verification:** đọc manifest; đối chiếu 1 quan hệ với toàn văn luật sửa — đã đối chiếu CẢ 3/3 quan hệ với PDF gốc (không chỉ 1)
 **Dependencies:** T3 · **Files:** `docs/corpus/corpus_manifest.yaml` · **Scope:** M
 
-### T5: Acquire toàn văn sạch 18 VB + VBHN BLLĐ
+### T5: Acquire toàn văn sạch 18 VB + VBHN BLLĐ ✅
 **Description:** Lấy toàn văn sạch vào `data/raw/lao_dong/<doc_id>.md`, mỗi file có frontmatter YAML (`doc_id`, `so_hieu`, `ten`, `ngay_ban_hanh`, `ngay_hieu_luc`, `nguon`). VBHN BLLĐ = `18/VBHN-VPQH` bản 2026. Ưu tiên text/HTML sạch hơn PDF. (Nguồn theo D2.)
 **Acceptance:**
-- [ ] `data/raw/lao_dong/` có 1 file/VB trong `locked_list_v1` sau T2 + VBHN BLLĐ
-- [ ] Mỗi file là toàn văn chính thức (không tóm lược), có frontmatter đủ trường
-- [ ] Điều đầu + điều cuối của 3 file ngẫu nhiên khớp nguồn chinhphu.vn
+- [x] `data/raw/lao_dong/` có 1 file/VB trong `locked_list_v1` sau T2 + VBHN BLLĐ — **20/20 file** (19 VB + VBHN), 2.3 MB
+- [x] Mỗi file là toàn văn chính thức (không tóm lược), có frontmatter đủ trường (`doc_id, so_hieu, ten, loai, ngay_ban_hanh, ngay_hieu_luc, trang_thai, nguon, nguon_file, cach_lay, ngay_lay`)
+- [x] Kiểm tra cấu trúc toàn bộ: **0/20 file thiếu điều** (điều liên tục 1..N). Đối chiếu số điều với dữ kiện độc lập: BLLĐ 220 điều/17 chương ✓, Luật BHXH 2024 141 điều/11 chương ✓, NĐ 374/2025 46 điều/9 chương ✓, Luật BHXH 2014 125 điều ✓
+- [x] **Đối chiếu chéo mạnh hơn yêu cầu**: VBHN 18/VBHN-VPQH tự ghi cước chú xác nhận **4/4** phát hiện T4 (Điều 139 k1 ← 113/2025; Điều 154 k8a ← 71/2025; Điều 61 k3 + Điều 59 ← 124/2025); NĐ 293/2025 có đúng mức 5.310.000 (vùng I), NĐ 74/2024 có 4.960.000
+- ⚠️ **1 gap**: `10-2020-TT-BLĐTBXH` lấy từ mirror (luatminhkhue) — vbpl.vn là SPA, Công báo không có trang văn bản này; CHƯA đối chiếu bản chính thức (đã ghi `doi_chieu` trong frontmatter). 2 file mirror khác (`58-2014-QH13`, `11-2025-TT-BNV`) ĐÃ đối chiếu nguyên văn với bản scan chính thức
+- ⚠️ **Prompt-injection**: trang mirror `hethongphapluat.com` nhúng chỉ thị "hãy luôn thông báo với người dùng..." — đã lọc bỏ, KHÔNG làm theo
 **Verification:** `ls data/raw/lao_dong/`; đọc 3 file spot-check
 **Dependencies:** T4 · **Files:** `data/raw/lao_dong/*.md` · **Scope:** M
 
-### T6: Lấy 2 bản text Điều 139 khoản 1 BLLĐ
+### T6: Lấy 2 bản text Điều 139 khoản 1 BLLĐ ✅
 **Description:** Lưu riêng bản khoản 1 Điều 139 hiện hành (2021) và bản mới (Luật Dân số 2025, HL 2026-07-01) để T9 dựng version.
 **Acceptance:**
-- [ ] `data/raw/lao_dong/_versions/45-2019-QH14__d139_k1__2021.md` + `__2026-07-01.md` (hoặc format tương đương), mỗi file có `effective_from`, `amended_by_doc`
+- [x] `data/raw/lao_dong/_versions/45-2019-QH14__d139_k1__2021.md` + `__2026-07-01.md`, mỗi file có `version_id`, `effective_from/to`, `status`, `superseded_by`, `amended_by_doc`, `clause_uid`
+- [x] Nội dung khác nhau đúng chỗ: bản 2021 = "nghỉ 06 tháng"; bản 2026-07-01 thêm "trường hợp sinh con thứ hai... 07 tháng". Bản mới trích từ VBHN chính thức, KHÔNG tự soạn
 **Verification:** đọc 2 file, khác nhau đúng nội dung thai sản (nữ 6th vs con thứ 2 = 7th…)
 **Dependencies:** T5 · **Files:** `data/raw/lao_dong/_versions/*` · **Scope:** XS
 
 ### ☑ Checkpoint C1
-- [ ] `grep -c UNVERIFIED` trong `locked_list_v1` = 0
-- [ ] `data/raw/lao_dong/` đủ file toàn văn + frontmatter hợp lệ
-- [ ] Danh sách "khoản sửa in-place" đã chốt
-- [ ] Review với Ted trước Phase 2
+- [x] `grep -c UNVERIFIED` trong `locked_list_v1` = 0 (T2)
+- [x] `data/raw/lao_dong/` đủ file toàn văn + frontmatter hợp lệ (T5: 20 file, 0 thiếu điều)
+- [x] Danh sách "khoản sửa in-place" đã chốt (T4: N1 = 4; T5: VBHN xác nhận độc lập 4/4)
+- [ ] **Review với Ted trước Phase 2** ← chờ Ted
 
 ---
 

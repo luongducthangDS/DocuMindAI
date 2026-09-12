@@ -5,8 +5,9 @@
 
 # Raw / processed data (large files, not needed for deployment)
 data/raw/*
-!data/raw/banking_docs/
-!data/raw/manifest.json
+# Corpus lao động/BHXH: toàn văn chính thức, LÀ bằng chứng portfolio -> commit
+!data/raw/lao_dong/
+!data/raw/lao_dong/**
 data/processed/
 data/hf_cache/
 
