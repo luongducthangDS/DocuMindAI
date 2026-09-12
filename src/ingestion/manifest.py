@@ -168,3 +168,15 @@ def load_manifest(path: str | Path) -> dict[str, DocEntry]:
         f", {len(missing)} missing" if missing else "",
     )
     return entries
+
+
+def corpus_earliest_point_in_time(path: str | Path, default: str = "2015-01-01") -> str:
+    """Earliest date the corpus can answer for (`meta.earliest_point_in_time`).
+
+    `temporal-retrieval` compares `as_of_date` against this to tell the user the
+    question falls before the corpus starts, instead of answering from law that
+    was never indexed.
+    """
+    data = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
+    value = _as_str((data.get("meta") or {}).get("earliest_point_in_time"))
+    return value or default

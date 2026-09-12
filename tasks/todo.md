@@ -150,8 +150,8 @@
 ### T12: `src/rag/temporal.py` + test
 **Description:** Hàm thuần: `versions_in_force(chunks, as_of) -> filtered`; `is_out_of_range(as_of, earliest) -> bool`; tie-break lấy `effective_from` muộn nhất + log warning.
 **Acceptance:**
-- [ ] Quy tắc: `effective_from <= T AND (effective_to rỗng OR effective_to > T) AND status != repealed`
-- [ ] `tests/test_temporal.py`: bảng version → in-force tại nhiều T; out-of-range; tie-break
+- [x] Quy tắc: `effective_from <= T AND (effective_to rỗng OR effective_to > T) AND status != repealed` — `is_in_force()`; `effective_to` là mốc loại trừ (bản sau tiếp quản đúng ngày đó), sentinel `9999-12-31` = mở
+- [x] `tests/test_temporal.py`: **24 test xanh** — bảng version tại nhiều mốc T (doc-level lương tối thiểu + in-place Điều 139 k1), out-of-range (lấy `earliest_point_in_time` từ manifest), tie-break giữ `effective_from` muộn nhất + cảnh báo khi 2 version KHÁC nhau cùng hiệu lực
 **Verification:** `pytest tests/test_temporal.py -v`
 **Dependencies:** C2 · **Files:** `src/rag/temporal.py`, `tests/test_temporal.py` · **Scope:** S
 
