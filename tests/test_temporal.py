@@ -177,3 +177,91 @@ class TestOutOfRange:
 
 def test_today_iso_format():
     assert len(today_iso()) == 10 and today_iso().count("-") == 2
+
+
+# ── graph node + generator wiring (T14) ───────────────────────────────────────
+
+class TestTemporalFilterNode:
+    @staticmethod
+    def _state(as_of, chunks):
+        return {
+            "query": "mức lương tối thiểu vùng I",
+            "retrieved_chunks": chunks,
+            "as_of_date": as_of,
+            "steps": [],
+        }
+
+    @pytest.fixture
+    def two_decrees(self):
+        return [
+            chunk("74-2024-ND-CP__d3", "2024-07-01", "2026-01-01", text="4.960.000"),
+            chunk("293-2025-ND-CP__d3", "2026-01-01", text="5.310.000"),
+        ]
+
+    def test_node_keeps_version_in_force(self, two_decrees):
+        from src.agent.graph import temporal_filter_node
+
+        out = temporal_filter_node(self._state("2025-03-01", two_decrees))
+        assert [c.text for c in out["retrieved_chunks"]] == ["4.960.000"]
+        assert out["time_out_of_range"] is False
+        assert "2025-03-01" in out["steps"][-1]["detail"]
+
+    def test_node_switches_version_at_later_date(self, two_decrees):
+        from src.agent.graph import temporal_filter_node
+
+        out = temporal_filter_node(self._state("2026-02-01", two_decrees))
+        assert [c.text for c in out["retrieved_chunks"]] == ["5.310.000"]
+
+    def test_node_drops_chunks_before_corpus_coverage(self, two_decrees):
+        """A 2010 question must not be answered with law indexed from 2015 on."""
+        from src.agent.graph import temporal_filter_node
+
+        out = temporal_filter_node(self._state("2010-01-01", two_decrees))
+        assert out["retrieved_chunks"] == []
+        assert out["time_out_of_range"] is True
+        assert "2015-01-01" in out["steps"][-1]["detail"]
+
+    def test_node_defaults_to_today_when_state_has_no_date(self, two_decrees):
+        from src.agent.graph import temporal_filter_node
+
+        state = self._state("", two_decrees)
+        out = temporal_filter_node(state)
+        assert out["time_out_of_range"] is False
+        assert today_iso() in out["steps"][-1]["detail"]
+
+    def test_node_sits_between_retrieve_and_grade(self):
+        """Filtering must happen after retrieval and before grading.
+
+        Grading relevance on chunks that are out of force would judge text the
+        answer can never cite.
+        """
+        from src.agent.graph import build_graph
+
+        edges = set(build_graph().builder.edges)
+        assert ("do_retrieve", "do_temporal_filter") in edges
+        assert ("do_temporal_filter", "do_grade") in edges
+        assert ("do_retrieve", "do_grade") not in edges
+
+
+class TestGeneratorOutOfRange:
+    def test_out_of_range_answer_names_coverage_start(self):
+        from src.rag.generator import generate_answer
+
+        result = generate_answer(
+            "lương tối thiểu vùng I năm 2010",
+            [],
+            as_of_date="2010-01-01",
+            time_out_of_range=True,
+            earliest_covered="2015-01-01",
+        )
+        assert "2015-01-01" in result["answer"]
+        assert "2010-01-01" in result["answer"]
+        assert result["used_llm"] == "none"
+        assert result["chunk_count"] == 0
+
+    def test_as_of_block_states_the_date(self):
+        from src.rag.generator import _as_of_block
+
+        block = _as_of_block("2026-02-01")
+        assert "2026-02-01" in block
+        assert _as_of_block("") == ""

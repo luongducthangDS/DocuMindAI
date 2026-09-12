@@ -114,6 +114,23 @@ def _cited_sources(answer: str, chunks: list[RetrievedChunk]) -> list[dict]:
     ]
 
 
+def _as_of_block(as_of_date: str | None) -> str:
+    """Prompt preamble stating which date the answer must speak for.
+
+    The chunks were already filtered by `versions_in_force`, so the model is not
+    asked to reason about dates — only to name the date it is answering for and
+    to use the figures of that version (minimum wage, contribution rates...).
+    """
+    if not as_of_date:
+        return ""
+    return (
+        f"**Thời điểm tra cứu:** {as_of_date}\n"
+        "Các đoạn dưới đây đã được lọc theo hiệu lực tại ngày này. Khi nêu số liệu "
+        "(mức lương tối thiểu, tỷ lệ đóng, thời gian nghỉ...), dùng đúng con số của bản có "
+        f"hiệu lực tại {as_of_date} và nêu rõ mốc thời điểm này trong câu trả lời.\n\n"
+    )
+
+
 def _build_context(chunks: list[RetrievedChunk]) -> tuple[str, str]:
     """Returns (context_block, citation_list). Truncates to stay within LLM limits."""
     context_parts = []
@@ -299,6 +316,9 @@ def generate_answer(
     use_fallback: bool = False,
     history: list[dict] | None = None,
     min_score: float | None = None,
+    as_of_date: str | None = None,
+    time_out_of_range: bool = False,
+    earliest_covered: str = "",
 ) -> dict:
     """
     Generate answer with citations.
@@ -308,6 +328,23 @@ def generate_answer(
     of the parent 'documind-agent' run, showing the prompt, LLM response, and
     which provider was used (Groq primary / Gemini fallback).
     """
+    if time_out_of_range:
+        # Answering a date the corpus never covered would mean presenting later
+        # law as if it applied then — say what the corpus covers instead.
+        moc = f" ({as_of_date})" if as_of_date else ""
+        tu_ngay = earliest_covered or "mốc sớm nhất của corpus"
+        return {
+            "answer": (
+                f"Câu hỏi về thời điểm{moc} nằm ngoài khoảng thời gian hệ thống phủ. "
+                f"Corpus hiện chỉ phủ từ {tu_ngay} trở đi, nên tôi không có căn cứ để trả lời "
+                "cho mốc thời gian này.\n\n"
+                f"Bạn có thể hỏi lại với một mốc thời điểm từ {tu_ngay} trở đi."
+            ),
+            "sources": [],
+            "used_llm": "none",
+            "chunk_count": 0,
+        }
+
     if not chunks:
         return {
             "answer": "Tôi không tìm thấy văn bản pháp luật liên quan đến câu hỏi này.",
@@ -340,6 +377,7 @@ def generate_answer(
     chunks = relevant_chunks
 
     context, citation_list = _build_context(chunks)
+    context = _as_of_block(as_of_date) + context
     prefer_gemini = get_settings().generator_provider.lower() == "gemini"
     used_llm = "gemini" if prefer_gemini else "groq"
     answer = None

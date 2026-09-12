@@ -166,16 +166,16 @@
 ### T14: Node `do_temporal_filter` + generator
 **Description:** Chèn node `do_temporal_filter` giữa `do_retrieve` và `do_grade` — gọi `versions_in_force`. Set `time_out_of_range`. Generator prompt nhận `as_of_date` (nêu mốc + chọn đúng số doc-level như lương tối thiểu). `steps` hiển thị "đang tra theo mốc <ngày>".
 **Acceptance:**
-- [ ] `as_of_date=2025-03-01` "lương tối thiểu vùng I" → 4.96tr; `2026-02-01` → 5.31tr
-- [ ] "nghỉ thai sản" `2026-05-01` vs `2026-09-10` → 2 đáp án khác, trích đúng bản Điều 139
-- [ ] `as_of_date=2010-01-01` → "corpus chỉ phủ từ 2015-01-01"
-- [ ] `as_of_date` = hôm nay → hành vi retriever không đổi (regression)
+- [x] `as_of_date=2025-03-01` "lương tối thiểu vùng I" → 4.96tr; `2026-02-01` → 5.31tr — chạy THẬT trên index: @2025-03-01 chỉ còn chunk `74-2024-ND-CP` (4.960.000), @2026-02-01 chỉ còn `293-2025-ND-CP` (5.310.000)
+- [x] "nghỉ thai sản" `2026-05-01` vs `2026-09-10` → 2 đáp án khác, trích đúng bản Điều 139 — chạy THẬT: cùng `clause_uid 45-2019-QH14__d139_k1`, @2026-05-01 giữ `__v2021-01-01`, @2026-09-10 giữ `__v2026-07-01` (bản có "con thứ hai 07 tháng")
+- [x] `as_of_date=2010-01-01` → "corpus chỉ phủ từ 2015-01-01" — node bỏ hết chunk + bật `time_out_of_range`; generator có nhánh riêng trả lời nêu mốc phủ, KHÔNG gọi LLM
+- [x] `as_of_date` = hôm nay → hành vi retriever không đổi (regression) — `retriever.py` không bị sửa 1 dòng; toàn repo **150 passed**
 **Verification:** `pytest tests/test_agent.py tests/test_temporal.py -v` + 3 truy vấn tay
 **Dependencies:** T13 · **Files:** `src/agent/graph.py`, `src/rag/generator.py` · **Scope:** M
 
 ### ☑ Checkpoint C3
-- [ ] 3 mốc `as_of_date` cho kết quả khác nhau (2 doc-level + 1 in-place)
-- [ ] `pytest tests/test_temporal.py tests/test_agent.py tests/test_rag.py` xanh
+- [x] 3 mốc `as_of_date` cho kết quả khác nhau (2 doc-level + 1 in-place) — xác nhận trên index thật (lương tối thiểu 2 mốc; Điều 139 k1 2 version)
+- [x] `pytest tests/test_temporal.py tests/test_agent.py tests/test_rag.py` xanh — toàn repo 150 passed, ruff không thêm lỗi mới
 
 ---
 

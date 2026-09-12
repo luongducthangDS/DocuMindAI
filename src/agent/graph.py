@@ -26,7 +26,7 @@ from src.rag.generator import _cited_sources, generate_answer, stream_answer
 from src.rag.grader import grade_chunks
 from src.ingestion.manifest import corpus_earliest_point_in_time
 from src.rag.retriever import nodes_to_chunks, retrieve_direct_chroma
-from src.rag.temporal import is_out_of_range, today_iso
+from src.rag.temporal import is_out_of_range, today_iso, versions_in_force
 
 # Hard cap on retrieval retries — bounds the only cycle in the graph so
 # genuinely out-of-corpus questions still terminate instead of looping.
@@ -372,6 +372,45 @@ def retrieve_node(state: AgentState) -> dict:
         }
 
 
+def temporal_filter_node(state: AgentState) -> dict:
+    """Keep only the clause versions in force at `as_of_date`.
+
+    Sits between `do_retrieve` and `do_grade` so retrieval itself (fusion,
+    rerank) stays untouched — the boundary set in SPEC-temporal-retrieval.
+    """
+    t0 = time.time()
+    chunks = state.get("retrieved_chunks") or []
+    as_of = state.get("as_of_date") or today_iso()
+    earliest = corpus_earliest_point_in_time()
+
+    if is_out_of_range(as_of, earliest):
+        # Before the corpus starts there is no lawful basis to answer from.
+        # Drop the chunks rather than let the generator answer a 2010 question
+        # with today's law; the flag tells it to state the coverage limit.
+        ms = int((time.time() - t0) * 1000)
+        steps = state.get("steps") or []
+        logger.info("as_of_date {} is before corpus coverage ({})", as_of, earliest)
+        return {
+            "retrieved_chunks": [],
+            "time_out_of_range": True,
+            "steps": steps + [{
+                "label": "Lọc theo hiệu lực",
+                "detail": f"Mốc {as_of} nằm trước phạm vi corpus (từ {earliest})",
+                "ms": ms,
+            }],
+        }
+
+    filtered = versions_in_force(chunks, as_of)
+    ms = int((time.time() - t0) * 1000)
+    steps = state.get("steps") or []
+    detail = f"Đang tra theo mốc {as_of} — giữ {len(filtered)}/{len(chunks)} đoạn"
+    return {
+        "retrieved_chunks": filtered,
+        "time_out_of_range": False,
+        "steps": steps + [{"label": "Lọc theo hiệu lực", "detail": detail, "ms": ms}],
+    }
+
+
 def grade_node(state: AgentState) -> dict:
     """Assess whether retrieved chunks are actually relevant to the query."""
     t0 = time.time()
@@ -451,7 +490,14 @@ def answer_node(state: AgentState) -> dict:
     chunks = state.get("retrieved_chunks", [])
     history = _build_history_from_messages(state)
 
-    result = generate_answer(state["query"], chunks, history=history or None)
+    result = generate_answer(
+        state["query"],
+        chunks,
+        history=history or None,
+        as_of_date=state.get("as_of_date") or "",
+        time_out_of_range=bool(state.get("time_out_of_range")),
+        earliest_covered=corpus_earliest_point_in_time(),
+    )
     latency = int((time.time() - t0) * 1000)
 
     llm_label = {"groq": "Llama 3.3 70B", "gemini": "Gemini", "none": "Không cần LLM"}.get(
@@ -729,6 +775,7 @@ def build_graph() -> StateGraph:
     g.add_node("do_contextualize", contextualize_node)
     g.add_node("router", router_node)
     g.add_node("do_retrieve", retrieve_node)
+    g.add_node("do_temporal_filter", temporal_filter_node)
     g.add_node("do_grade", grade_node)
     g.add_node("do_reformulate", reformulate_node)
     g.add_node("do_answer", answer_node)
@@ -741,7 +788,8 @@ def build_graph() -> StateGraph:
     g.add_edge(START, "do_contextualize")
     g.add_edge("do_contextualize", "router")
     g.add_conditional_edges("router", route_by_intent)
-    g.add_edge("do_retrieve", "do_grade")
+    g.add_edge("do_retrieve", "do_temporal_filter")
+    g.add_edge("do_temporal_filter", "do_grade")
     g.add_conditional_edges(
         "do_grade", route_after_grade, {"do_answer": "do_answer", "do_reformulate": "do_reformulate"}
     )
