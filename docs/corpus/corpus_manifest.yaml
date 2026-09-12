@@ -65,6 +65,42 @@ documents:
         pham_vi: "KHÔNG sửa BLLĐ 2019. Xác nhận qua VBHN 18/VBHN-VPQH (bản hợp nhất chính thức, National Assembly Office) — lời giới thiệu VBHN chỉ liệt kê ĐÚNG 3 luật sửa BLLĐ: 71/2025/QH15, 113/2025/QH15, 124/2025/QH15. Không có 41/2024/QH15 trong danh sách này."
         verify: "VERIFIED KHÔNG SỬA (T4, đối chiếu danh sách luật sửa trong lời giới thiệu VBHN 18/VBHN-VPQH)"
     van_ban_hop_nhat: "18/VBHN-VPQH năm 2026 (VPQH) — bản mới nhất; 125/VBHN-VPQH năm 2025 là bản hợp nhất TRƯỚC"
+    # T7 (2026-09-12): bản MÁY ĐỌC của các quan hệ sửa in-place ở trên.
+    # `pham_vi` phía trên là văn xuôi cho người đọc; khối này là nguồn duy nhất
+    # cho code (src/ingestion/manifest.py) — không parse văn xuôi.
+    file_toan_van: "18-VBHN-VPQH.md"     # text hiện hành = bản hợp nhất (đã gồm 4 sửa đổi)
+    file_ban_goc: "45-2019-QH14.md"      # bản 2019 gốc — chỉ dùng dựng version CŨ
+    consolidated_from: "18/VBHN-VPQH"
+    sua_doi_in_place:
+      - clause_uid: "45-2019-QH14__d139_k1"
+        dieu: 139
+        khoan: 1
+        dieu_tieu_de: "Nghỉ thai sản"
+        effective_from: "2026-07-01"
+        amended_by_doc: "113/2025/QH15"
+        version_cu: "_versions/45-2019-QH14__d139_k1__2021.md"
+        version_moi: "_versions/45-2019-QH14__d139_k1__2026-07-01.md"
+      - clause_uid: "45-2019-QH14__d154_k8a"
+        dieu: 154
+        khoan: 8          # khoản 8a — số hiệu khoản dạng chữ, lưu 8 + hau_to "a"
+        khoan_hau_to: "a"
+        dieu_tieu_de: "Người lao động nước ngoài làm việc tại Việt Nam không thuộc diện cấp giấy phép lao động"
+        effective_from: "2026-01-01"
+        amended_by_doc: "71/2025/QH15"
+        loai_sua: "bo_sung_khoan_moi"   # khoản MỚI, không có bản cũ
+      - clause_uid: "45-2019-QH14__d59_k2_pa"
+        dieu: 59
+        khoan: 2
+        diem: "a"
+        dieu_tieu_de: "Đào tạo nghề nghiệp và phát triển kỹ năng nghề"
+        effective_from: "2026-01-01"
+        amended_by_doc: "124/2025/QH15"
+      - clause_uid: "45-2019-QH14__d61_k3"
+        dieu: 61
+        khoan: 3
+        dieu_tieu_de: "Học nghề, tập nghề để làm việc cho người sử dụng lao động"
+        effective_from: "2026-01-01"
+        amended_by_doc: "124/2025/QH15"
     cau_truc: "17 chương / 220 điều"
     nguon: "https://vanban.chinhphu.vn/?pageid=27160&docid=198540"
     verify_status: "VERIFIED"

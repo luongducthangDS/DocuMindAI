@@ -59,6 +59,8 @@ reportlab==4.2.2
 loguru==0.7.2
 
 # ── Utilities ─────────────────────────────────────────────────────────────────
+# YAML: corpus_manifest.yaml (đã có sẵn qua chromadb/transformers, khai báo tường minh)
+PyYAML==6.0.3
 pydantic==2.13.4
 pydantic-settings==2.14.1
 python-dotenv==1.0.1

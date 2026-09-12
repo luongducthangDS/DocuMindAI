@@ -90,53 +90,58 @@
 
 ## Phase 2 — clause-schema-ingestion
 
-### T7: Manifest loader YAML + bản đồ hiệu lực
+### T7: Manifest loader YAML + bản đồ hiệu lực ✅
 **Description:** `src/ingestion/manifest.py`: đọc `corpus_manifest.yaml`, trả `{doc_id → {so_hieu, ten, ngay_hieu_luc, het_hieu_luc_tu, in_place_amended_clauses[]}}`.
 **Acceptance:**
-- [ ] `load_manifest(path)` trả dict đúng cấu trúc cho `locked_list_v1`
-- [ ] Bỏ qua dòng ngoài `locked_list_v1`
+- [x] `load_manifest(path)` trả `{doc_id: DocEntry}` cho 19 văn bản `locked_list_v1` (có `in_place_amended_clauses`, `effective_to` với sentinel `9999-12-31`)
+- [x] Bỏ qua dòng ngoài `locked_list_v1` (nhóm F + optional đã hoãn: 12-2022, 152-2020, 88-2020, 58-2020 — có test)
+- Thêm khối **máy đọc** `sua_doi_in_place` vào manifest (4 khoản T4) — code KHÔNG parse `pham_vi` văn xuôi
 **Verification:** `pytest tests/test_ingestion.py::test_load_manifest -v`
 **Dependencies:** C1 · **Files:** `src/ingestion/manifest.py`, `tests/test_ingestion.py` · **Scope:** S
 
-### T8: Mở rộng `chunker.py` — `clause_uid` + metadata version
+### T8: Mở rộng `chunker.py` — `clause_uid` + metadata version ✅
 **Description:** Với mỗi Điều sinh `clause_uid` cấp điều; với Điều nằm trong `in_place_amended_clauses` tách tới `khoan`. Gắn `dieu`, `dieu_tieu_de`, `khoan`, `effective_from/to`, `status`, `verify_status`, `version_id`. Giữ nguyên metadata cũ (`source_url, title, doc_type, so_hieu, dieu_header, khoan_count, ...`). Chốt quy ước `effective_to` rỗng.
 **Acceptance:**
-- [ ] `chunk_by_dieu(text, doc_meta)` trả chunk có `clause_uid` + trường version
-- [ ] Metadata cũ còn nguyên (test regression)
-- [ ] Điều bị sửa in-place tách tới khoản; điều khác giữ cấp điều
+- [x] `chunk_by_dieu(text, doc_meta, amendments)` trả chunk có `clause_uid`, `version_id`, `effective_from/to`, `status`, `dieu`, `dieu_tieu_de`, `khoan`, `diem`
+- [x] Metadata cũ còn nguyên — 111 test toàn repo xanh, có test regression riêng
+- [x] 4 khoản bị sửa in-place tách tới khoản; 216 điều còn lại giữ cấp điều
+- [x] **Chốt `effective_to` rỗng = `9999-12-31`** (sentinel): ChromaDB không nhận None, và so sánh chuỗi ngày thành đồng nhất cho temporal filter
+- Phát sinh: VBHN nhúng cước chú (`1.44 Khoản này được sửa đổi…`) che ranh giới khoản, và trích nguyên văn điều của luật sửa → thêm `strip_consolidated_footnotes` / `strip_consolidated_quotations` vào `cleaner.py`; phụ lục/biểu mẫu (`Mẫu số 12`) có `Điều 1.` riêng → tách thành chunk `__pl<n>`, không đánh số điều
 **Verification:** `pytest tests/test_ingestion.py -v`
 **Dependencies:** T7 · **Files:** `src/ingestion/chunker.py`, `tests/test_ingestion.py` · **Scope:** M
 
-### T9: Dựng 2-version cho Điều 139 k1
+### T9: Dựng 2-version cho Điều 139 k1 ✅
 **Description:** Đọc 2 file `_versions/` (T6). Sinh 2 record khoản 1 Điều 139: bản cũ `effective_to=2026-07-01, status=superseded, superseded_by=<v mới>`; bản mới `effective_from=2026-07-01, amended_by_doc="Luật Dân số 2025 (113/2025/QH15)"`, `status` tính theo ngày build.
 **Acceptance:**
-- [ ] Sau ingest, `clause_uid = 45-2019-QH14__d139_k1` có đúng 2 `version_id`
-- [ ] `superseded_by` bản cũ trỏ `version_id` bản mới (tồn tại)
+- [x] `clause_uid = 45-2019-QH14__d139_k1` có đúng 2 `version_id`: `__v2021-01-01` (superseded, `effective_to=2026-07-01`) và `__v2026-07-01` (in_force)
+- [x] `superseded_by` bản cũ trỏ đúng `version_id` bản mới (validator kiểm mọi liên kết)
+- Viết ở `src/ingestion/versions.py`; text bản mới lấy từ VBHN, bản cũ từ `_versions/` — không tự soạn
 **Verification:** `pytest tests/test_ingestion.py::test_dieu139_two_versions -v` + query index
 **Dependencies:** T8 · **Files:** `src/ingestion/chunker.py` hoặc `src/ingestion/versions.py`, `tests/test_ingestion.py` · **Scope:** S
 
-### T10: Mở rộng `scripts/ingest_documents.py`
+### T10: Mở rộng `scripts/ingest_documents.py` ✅
 **Description:** Đọc `data/raw/lao_dong/` + `corpus_manifest.yaml` (YAML, hiện đọc manifest JSON). Lấy per-file metadata từ frontmatter + manifest. Bỏ record `verify_status != VERIFIED`. Đẩy chunk + full metadata vào ChromaDB.
 **Acceptance:**
-- [ ] `python scripts/ingest_documents.py --source-dir data/raw/lao_dong --manifest docs/corpus/corpus_manifest.yaml --reset` chạy sạch, in số chunk/VB
-- [ ] Collection `count > 0`; mỗi chunk có `clause_uid`, `effective_from`, `status`
-- [ ] 0 record `UNVERIFIED`
+- [x] Lệnh chạy sạch: **1146 chunk / 19 văn bản** (manifest YAML → pipeline clause-level; manifest JSON vẫn dùng pipeline cũ)
+- [x] Collection `documind_legal` = 1146 record, mỗi chunk có `clause_uid`, `effective_from`, `status`
+- [x] 0 record `UNVERIFIED` (có test với manifest giả)
 **Verification:** chạy lệnh + `python -c` đếm + kiểm metadata 1 chunk
 **Dependencies:** T9 · **Files:** `scripts/ingest_documents.py` · **Scope:** S–M
 
-### T11: `validate_corpus.py` + mở rộng test ingestion
+### T11: `validate_corpus.py` + mở rộng test ingestion ✅
 **Description:** `scripts/validate_corpus.py`: frontmatter đủ trường; `clause_uid` unique/version; mọi `superseded_by` trỏ `version_id` tồn tại; 0 `UNVERIFIED` trong index. Mở rộng `tests/test_ingestion.py`.
 **Acceptance:**
-- [ ] `python scripts/validate_corpus.py` exit 0 trên corpus đã ingest
-- [ ] `tests/test_ingestion.py`: parse điều→khoản, sinh `clause_uid`, 2-version, loại `UNVERIFIED`
+- [x] `python scripts/validate_corpus.py --check-index` **exit 0** (PASS, 0 lỗi) — kiểm frontmatter, uid/version trùng, `superseded_by` treo, khoảng hiệu lực, record UNVERIFIED, và cả record ngân hàng sót lại
+- [x] `tests/test_ingestion.py` mở rộng lên **47 test**: parse điều→khoản, `clause_uid`/`version_id`, 2-version Điều 139, `clause_status` theo `as_of`, phụ lục không thành điều, loại UNVERIFIED
+- Validator đã bắt được 1 lỗi thật khi viết: file VBHN thiếu `ngay_hieu_luc` → đã sửa
 **Verification:** `pytest tests/test_ingestion.py tests/test_rag.py -v` + chạy validate
 **Dependencies:** T10 · **Files:** `scripts/validate_corpus.py`, `tests/test_ingestion.py` · **Scope:** M
 
 ### ☑ Checkpoint C2
-- [ ] Ingest thật chạy sạch; index có clause metadata
-- [ ] `pytest tests/test_ingestion.py tests/test_rag.py` xanh
-- [ ] `scripts/validate_corpus.py` pass
-- [ ] Retriever + generator cũ vẫn hoạt động (query thử 1 câu)
+- [x] Ingest thật chạy sạch; index có clause metadata (1146 record)
+- [x] `pytest` toàn repo: **111 passed**; `ruff` sạch trên file mới (chỉ còn E402 do phải set HF cache trước import — theo đúng pattern có sẵn)
+- [x] `scripts/validate_corpus.py --check-index` pass, exit 0
+- [x] Retriever cũ vẫn chạy — thử 3 câu: "nghỉ thai sản" trả về **cả 2 version Điều 139 k1**; "lương tối thiểu vùng I" trả NĐ 74/2024 (đã hết hiệu lực) xếp trên NĐ 293/2025 → **đúng lý do cần temporal filter ở Phase 3a**
 
 ---
 
