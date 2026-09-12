@@ -10,6 +10,7 @@ map produced here; nothing else parses the manifest directly.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from functools import lru_cache
 from pathlib import Path
 
 import yaml
@@ -21,6 +22,11 @@ from loguru import logger
 EFFECTIVE_TO_OPEN = "9999-12-31"
 
 _VERIFIED_PREFIX = "VERIFIED"
+
+# Repo-root-relative default so callers (API, graph) do not depend on cwd.
+DEFAULT_MANIFEST_PATH = (
+    Path(__file__).resolve().parents[2] / "docs" / "corpus" / "corpus_manifest.yaml"
+)
 
 
 @dataclass(frozen=True)
@@ -170,7 +176,10 @@ def load_manifest(path: str | Path) -> dict[str, DocEntry]:
     return entries
 
 
-def corpus_earliest_point_in_time(path: str | Path, default: str = "2015-01-01") -> str:
+@lru_cache(maxsize=4)
+def corpus_earliest_point_in_time(
+    path: str | Path = DEFAULT_MANIFEST_PATH, default: str = "2015-01-01"
+) -> str:
     """Earliest date the corpus can answer for (`meta.earliest_point_in_time`).
 
     `temporal-retrieval` compares `as_of_date` against this to tell the user the

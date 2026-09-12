@@ -101,6 +101,7 @@ async def query_endpoint(request: Request, body: QueryRequest) -> QueryResponse:
             query=body.query,
             session_id=body.session_id,
             history=session.as_messages(),
+            as_of_date=body.as_of_date,
         )
     except Exception as exc:
         error_detail = str(exc)

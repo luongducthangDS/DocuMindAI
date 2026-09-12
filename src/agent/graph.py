@@ -24,7 +24,9 @@ from src.agent.tools import ALL_TOOLS
 from src.config import get_settings
 from src.rag.generator import _cited_sources, generate_answer, stream_answer
 from src.rag.grader import grade_chunks
+from src.ingestion.manifest import corpus_earliest_point_in_time
 from src.rag.retriever import nodes_to_chunks, retrieve_direct_chroma
+from src.rag.temporal import is_out_of_range, today_iso
 
 # Hard cap on retrieval retries — bounds the only cycle in the graph so
 # genuinely out-of-corpus questions still terminate instead of looping.
@@ -64,6 +66,10 @@ class AgentState(TypedDict):
     grade: Literal["relevant", "irrelevant", "unknown"]
     grade_reason: str
     compliance_result: dict | None
+    # temporal-retrieval: mốc thời điểm tra cứu (ISO) + cờ nằm ngoài khoảng
+    # thời gian corpus phủ được. Cả hai luôn có mặt trong state.
+    as_of_date: str
+    time_out_of_range: bool
 
 
 # ── LLM Setup ─────────────────────────────────────────────────────────────────
@@ -771,6 +777,7 @@ async def run_agent(
     query: str,
     session_id: str = "default",
     history: list[dict] | None = None,
+    as_of_date: str | None = None,
 ) -> AgentState:
     """Main entry point for agent invocation.
 
@@ -779,6 +786,9 @@ async def run_agent(
     (router classification, answer generation) and tool invocations.
     """
     graph = get_graph()
+
+    # Thiếu as_of_date = tra theo quy định hiện hành hôm nay.
+    as_of = (as_of_date or "").strip() or today_iso()
 
     messages = [HumanMessage(content=query)]
     if history:
@@ -806,6 +816,8 @@ async def run_agent(
         "grade": "unknown",
         "grade_reason": "",
         "compliance_result": None,
+        "as_of_date": as_of,
+        "time_out_of_range": is_out_of_range(as_of, corpus_earliest_point_in_time()),
     }
 
     result = await graph.ainvoke(initial_state)

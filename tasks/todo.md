@@ -158,8 +158,8 @@
 ### T13: `as_of_date` qua state + API
 **Description:** `AgentState` thêm `as_of_date: str` + `time_out_of_range: bool`. `run_agent(..., as_of_date=None)`. `QueryRequest` (schemas.py) thêm `as_of_date: str | None = None`. Route `query.py` truyền xuống. **Chốt AgentState keys ở đây — 3b/3c phụ thuộc.**
 **Acceptance:**
-- [ ] `POST /query {"query":"...","as_of_date":"2025-06-01"}` không lỗi; thiếu field → mặc định hôm nay
-- [ ] `as_of_date` xuất hiện trong `AgentState` khi chạy
+- [x] `POST /query {"query":"...","as_of_date":"2025-06-01"}` không lỗi; thiếu field → mặc định hôm nay — `QueryRequest.as_of_date` validate ISO (từ chối `01/06/2025`), rỗng/trắng → `None` → `run_agent` lấy hôm nay
+- [x] `as_of_date` xuất hiện trong `AgentState` khi chạy — test bắt state thật qua `get_graph` giả; thêm `time_out_of_range` (so với `earliest_point_in_time` đọc từ manifest, không hardcode). `tests/test_agent.py`: 39 passed
 **Verification:** `pytest tests/test_agent.py -v` + curl API
 **Dependencies:** T12 · **Files:** `src/agent/graph.py`, `src/api/schemas.py`, `src/api/routes/query.py` · **Scope:** S–M
 
