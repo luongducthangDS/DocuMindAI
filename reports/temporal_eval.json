@@ -1,0 +1,2040 @@
+{
+  "meta": {
+    "gold_set": "data/eval/temporal_questions.json",
+    "n_questions": 30,
+    "arms": [
+      "no_temporal",
+      "prompt_only",
+      "temporal_filter"
+    ],
+    "retrieval_only": false,
+    "corpus_earliest_point_in_time": "2015-01-01",
+    "retriever": "hybrid BM25 + dense, RRF fusion, cross-encoder rerank → top-8",
+    "rescored": true
+  },
+  "rows": [
+    {
+      "id": "ld_t01a",
+      "pair_id": "luong_toi_thieu_thang_vung_1",
+      "question": "Mức lương tối thiểu tháng áp dụng cho người lao động làm việc ở vùng I là bao nhiêu?",
+      "as_of_date": "2025-03-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 26725,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Mức lương tối thiểu tháng áp dụng cho người lao động làm việc tại **Vùng I** là **5.310.000 đồng/tháng** [1], [3].",
+          "used_llm": "gemini",
+          "generate_ms": 4727,
+          "score": {
+            "correct": false,
+            "missing": [
+              "4.960.000"
+            ],
+            "forbidden_present": [
+              "5.310.000"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Mức lương tối thiểu tháng áp dụng cho người lao động làm việc ở **vùng I** là **5.310.000 đồng/tháng** [1], [3].\n\nThông tin này được cập nhật tại thời điểm tra cứu ngày **01/03/2025**.",
+          "used_llm": "gemini",
+          "generate_ms": 1344,
+          "score": {
+            "correct": false,
+            "missing": [
+              "4.960.000"
+            ],
+            "forbidden_present": [
+              "5.310.000"
+            ]
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 2
+          },
+          "answer": "Mức lương tối thiểu tháng áp dụng cho người lao động làm việc tại **Vùng I** là **4.960.000 đồng/tháng**, tính đến thời điểm tra cứu ngày **2025-03-01** [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1465,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t01b",
+      "pair_id": "luong_toi_thieu_thang_vung_1",
+      "question": "Mức lương tối thiểu tháng áp dụng cho người lao động làm việc ở vùng I là bao nhiêu?",
+      "as_of_date": "2026-02-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 26302,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Mức lương tối thiểu tháng áp dụng cho người lao động làm việc ở vùng I là **5.310.000 đồng/tháng** (theo một số nguồn) [1], [2] hoặc **4.960.000 đồng/tháng** (theo các nguồn khác) [3], [4].",
+          "used_llm": "gemini",
+          "generate_ms": 1204,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "4.960.000"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Mức lương tối thiểu tháng áp dụng cho người lao động làm việc ở **vùng I** là **5.310.000 đồng/tháng** (theo mức quy định tại thời điểm tra cứu 2026-02-01) [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1495,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 2
+          },
+          "answer": "Mức lương tối thiểu tháng áp dụng cho người lao động làm việc ở **vùng I** là **5.310.000 đồng/tháng** (tính tại thời điểm tra cứu **2026-02-01**) [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1029,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t02a",
+      "pair_id": "luong_toi_thieu_gio_vung_3",
+      "question": "Mức lương tối thiểu giờ của vùng III là bao nhiêu?",
+      "as_of_date": "2025-08-15",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 26537,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Mức lương tối thiểu giờ của Vùng III là **20.000 đồng/giờ** [1, 2] hoặc **18.600 đồng/giờ** [3, 4].",
+          "used_llm": "gemini",
+          "generate_ms": 1563,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "20.000"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Mức lương tối thiểu giờ của Vùng III là **20.000 đồng/giờ** [1, 2] hoặc **18.600 đồng/giờ** [3, 4].\n\n**Lưu ý:** Có hai mức lương tối thiểu giờ khác nhau được ghi nhận cho Vùng III trong các tài liệu được cung cấp:\n\n| Nguồn | Mức lương tối thiểu giờ (đồng/giờ) |\n|---|---|\n| [1], [2] | 20.000 |\n| [3], [4] | 18.600 |",
+          "used_llm": "gemini",
+          "generate_ms": 1725,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "20.000"
+            ]
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 3
+          },
+          "answer": "Mức lương tối thiểu giờ của Vùng III là **18.600 đồng/giờ** [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1308,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t02b",
+      "pair_id": "luong_toi_thieu_gio_vung_3",
+      "question": "Mức lương tối thiểu giờ của vùng III là bao nhiêu?",
+      "as_of_date": "2026-03-10",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 26377,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Mức lương tối thiểu giờ của **vùng III** là **20.000 đồng/giờ** [1], [2].",
+          "used_llm": "gemini",
+          "generate_ms": 1003,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Mức lương tối thiểu giờ của **Vùng III** là **20.000 đồng/giờ**, theo quy định có hiệu lực tại thời điểm **2026-03-10** [1], [2].",
+          "used_llm": "gemini",
+          "generate_ms": 2010,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 4
+          },
+          "answer": "Mức lương tối thiểu giờ của vùng III là **20.000 đồng/giờ** [1].\n\nThông tin này được cập nhật theo quy định có hiệu lực tại thời điểm tra cứu ngày **2026-03-10** [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1350,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t03a",
+      "pair_id": "luong_toi_thieu_thang_vung_4",
+      "question": "Doanh nghiệp ở vùng IV phải trả mức lương tối thiểu tháng thấp nhất là bao nhiêu?",
+      "as_of_date": "2024-09-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 26424,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Doanh nghiệp hoạt động ở **vùng IV** phải trả mức lương tối thiểu tháng thấp nhất là **3.700.000 đồng/tháng** [1] hoặc **3.450.000 đồng/tháng** [3], tùy thuộc theo quy định cụ thể tại văn bản áp dụng. \n\nChi tiết mức lương tối thiểu tháng theo các nguồn tài liệu:\n- Mức **3.700.000 đồng/tháng** [1].\n- Mức **3.450.000 đồng/tháng** [3].",
+          "used_llm": "gemini",
+          "generate_ms": 1347,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "3.700.000"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Tại thời điểm tra cứu **01/09/2024**, doanh nghiệp hoạt động ở **vùng IV** phải trả mức lương tối thiểu tháng thấp nhất là **3.450.000 đồng/tháng** [3], [4].",
+          "used_llm": "gemini",
+          "generate_ms": 1153,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 3
+          },
+          "answer": "Tại thời điểm tra cứu **2024-09-01**, doanh nghiệp hoạt động ở **vùng IV** phải trả mức lương tối thiểu tháng thấp nhất là **3.450.000 đồng/tháng** [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1115,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t03b",
+      "pair_id": "luong_toi_thieu_thang_vung_4",
+      "question": "Doanh nghiệp ở vùng IV phải trả mức lương tối thiểu tháng thấp nhất là bao nhiêu?",
+      "as_of_date": "2026-01-05",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 26392,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Doanh nghiệp ở Vùng IV phải trả mức lương tối thiểu tháng **3.700.000 đồng/tháng** [1, 2].\n\nHoặc:\n\nDoanh nghiệp ở Vùng IV phải trả mức lương tối thiểu tháng **3.450.000 đồng/tháng** [3, 4].\n\nThông tin này phụ thuộc vào văn bản cụ thể được áp dụng.",
+          "used_llm": "gemini",
+          "generate_ms": 1686,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "3.450.000"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Doanh nghiệp ở vùng IV phải trả mức lương tối thiểu tháng thấp nhất là **3.700.000 đồng/tháng** [1, 2].\n\nMức lương tối thiểu này áp dụng cho người lao động làm việc theo tháng và đảm bảo mức lương theo công việc hoặc chức danh của người lao động làm việc đủ thời giờ làm việc bình thường trong tháng và hoàn thành định mức lao động hoặc công việc đã thỏa thuận không được thấp hơn mức lương tối thiểu tháng [5, 6, 7, 8].\n\nĐối với người lao động áp dụng hình thức trả lương theo tuần, ngày, sản phẩm hoặc lương khoán, mức lương quy đổi theo tháng cũng không được thấp hơn mức lương tối thiểu tháng [5, 6, 7, 8].",
+          "used_llm": "gemini",
+          "generate_ms": 2240,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 2
+          },
+          "answer": "Doanh nghiệp ở Vùng IV phải trả mức lương tối thiểu tháng thấp nhất là **3.700.000 đồng/tháng** [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1437,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t04a",
+      "pair_id": "dieu_kien_huong_luong_huu",
+      "question": "Người lao động phải đóng bảo hiểm xã hội tối thiểu bao nhiêu năm thì được hưởng lương hưu?",
+      "as_of_date": "2024-05-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 26538,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": false,
+            "distractor": false,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Người lao động cần đóng bảo hiểm xã hội tối thiểu **20 năm** để được hưởng lương hưu [1], [3].\n\nTuy nhiên, có trường hợp ngoại lệ sau:\n- **Lao động nữ** là cán bộ, công chức cấp xã hoặc người hoạt động không chuyên trách ở xã, phường, thị trấn tham gia bảo hiểm xã hội khi nghỉ việc chỉ cần có từ **đủ 15 năm đến dưới 20 năm** đóng bảo hiểm xã hội và đủ tuổi nghỉ hưu theo quy định thì được hưởng lương hưu [3].",
+          "used_llm": "gemini",
+          "generate_ms": 1710,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": false,
+            "distractor": false,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Người lao động cần đóng bảo hiểm xã hội từ **đủ 15 năm đến 20 năm** trở lên tùy vào từng trường hợp cụ thể để được hưởng lương hưu [1], [3].\n\nChi tiết các điều kiện về thời gian đóng bảo hiểm xã hội như sau:\n\n- **20 năm:** Là mức đóng tối thiểu áp dụng cho phần lớn người lao động theo quy định chung [1], [3].\n- **Từ đủ 15 năm đến dưới 20 năm:** Áp dụng cho đối tượng là **lao động nữ** là cán bộ, công chức cấp xã hoặc là người hoạt động không chuyên trách ở xã, phường, thị trấn khi nghỉ việc và đã đủ tuổi nghỉ hưu theo quy định [3].\n\n*Lưu ý: Nếu người lao động đã đủ tuổi nghỉ hưu nhưng chưa đủ 20 năm đóng bảo hiểm xã hội thì có thể đóng cho đến khi đủ 20 năm để hưởng lương hưu [1], hoặc trong trường hợp thiếu tối đa 06 tháng, người lao động được lựa chọn đóng một lần cho số tháng còn thiếu [2].*",
+          "used_llm": "gemini",
+          "generate_ms": 1777,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": false,
+            "distractor": false,
+            "clean": false,
+            "n_chunks": 7
+          },
+          "answer": "Người lao động thường phải đóng bảo hiểm xã hội từ đủ **20 năm** trở lên để được hưởng lương hưu [1], [3].\n\nTuy nhiên, có một số trường hợp ngoại lệ về thời gian đóng bảo hiểm xã hội tối thiểu được quy định như sau:\n\n- **Lao động nữ là cán bộ, công chức cấp xã hoặc người hoạt động không chuyên trách ở xã, phường, thị trấn:** Được hưởng lương hưu khi có từ đủ **15 năm đến dưới 20 năm** đóng bảo hiểm xã hội và đáp ứng điều kiện về tuổi nghỉ hưu [3].\n- **Trường hợp thiếu thời gian đóng:** Người lao động đã đủ điều kiện về tuổi nhưng thời gian đóng bảo hiểm xã hội chưa đủ **20 năm** thì được phép đóng cho đến khi đủ **20 năm** để hưởng lương hưu [1]. Nếu thời gian đóng bảo hiểm xã hội bắt buộc còn thiếu tối đa **06 tháng**, người lao động có thể lựa chọn đóng một lần cho số tháng còn thiếu để được hưởng lương hưu [2].",
+          "used_llm": "gemini",
+          "generate_ms": 1914,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t04b",
+      "pair_id": "dieu_kien_huong_luong_huu",
+      "question": "Người lao động phải đóng bảo hiểm xã hội tối thiểu bao nhiêu năm thì được hưởng lương hưu?",
+      "as_of_date": "2025-09-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 26394,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Người lao động phải đóng bảo hiểm xã hội tối thiểu **20 năm** để được hưởng lương hưu theo quy định chung [1].\n\nTuy nhiên, có trường hợp ngoại lệ sau:\n- Lao động nữ là **cán bộ, công chức cấp xã** hoặc là **người hoạt động không chuyên trách ở xã, phường, thị trấn** chỉ cần đóng bảo hiểm xã hội từ **đủ 15 năm đến dưới 20 năm** [3].",
+          "used_llm": "gemini",
+          "generate_ms": 1611,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Người lao động phải đóng bảo hiểm xã hội tối thiểu **20 năm** thì được hưởng lương hưu [1], [3]. \n\nRiêng trường hợp lao động nữ là **cán bộ, công chức cấp xã** hoặc là **người hoạt động không chuyên trách ở xã, phường, thị trấn** tham gia bảo hiểm xã hội khi nghỉ việc thì thời gian đóng bảo hiểm xã hội tối thiểu là **từ đủ 15 năm đến dưới 20 năm** và đủ tuổi nghỉ hưu [3].",
+          "used_llm": "gemini",
+          "generate_ms": 1324,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": false,
+            "distractor": false,
+            "clean": false,
+            "n_chunks": 2
+          },
+          "answer": "Người lao động phải đóng bảo hiểm xã hội từ đủ **20 năm** trở lên để được hưởng lương hưu [1], riêng đối với **lao động nữ là cán bộ, công chức cấp xã hoặc là người hoạt động không chuyên trách ở xã, phường, thị trấn**, thời gian đóng tối thiểu là từ đủ **15 năm đến dưới 20 năm** (tại thời điểm tra cứu 2025-09-01) [1]. \n\nCác điều kiện chi tiết để hưởng lương hưu bao gồm:\n- Người lao động nói chung (các điểm a, b, c, d, g, h và i khoản 1 Điều 2 của Luật Bảo hiểm xã hội): Phải có đủ **20 năm** đóng bảo hiểm xã hội trở lên và thỏa mãn một trong các điều kiện về độ tuổi, công việc hoặc trường hợp đặc biệt quy định tại khoản 1 Điều 54 [1].\n- Sĩ quan, quân nhân, công an... (điểm đ và e khoản 1 Điều 2 của Luật Bảo hiểm xã hội): Phải có đủ **20 năm** đóng bảo hiểm xã hội trở lên và thỏa mãn các điều kiện về mức tuổi thấp hơn so với tuổi nghỉ hưu hoặc trường hợp nhiễm HIV do tai nạn rủi ro nghề nghiệp quy định tại khoản 2 Điều 54 [1].\n- Lao động nữ là cán bộ, công chức cấp xã hoặc người hoạt động không chuyên trách ở cấp xã: Có từ đủ **15 năm đến dưới 20 năm** đóng bảo hiểm xã hội và đủ tuổi nghỉ hưu quy định [1].",
+          "used_llm": "gemini",
+          "generate_ms": 2103,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "Điều 54"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t05a",
+      "pair_id": "tro_cap_mot_lan_khi_sinh_con",
+      "question": "Lao động nữ sinh con được trợ cấp một lần bằng bao nhiêu?",
+      "as_of_date": "2024-10-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 26408,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Lao động nữ sinh con được trợ cấp một lần cho mỗi con bằng **02 lần mức lương cơ sở** tại tháng sinh con [1, 2].\n\nHoặc, trong trường hợp lao động nữ mang thai hộ, mức trợ cấp một lần cho mỗi con cũng bằng **02 lần mức tham chiếu** tại tháng lao động nữ sinh con [3, 4].\n\nNgoài ra, có một quy định khác về trợ cấp thai sản là **2.000.000 đồng** cho mỗi con được sinh ra [5]. Tuy nhiên, quy định này có thể được điều chỉnh theo quyết định của Chính phủ [5].",
+          "used_llm": "gemini",
+          "generate_ms": 1903,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "mức tham chiếu"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Lao động nữ sinh con được trợ cấp một lần **bằng 02 lần mức lương cơ sở** tại tháng sinh con [1, 2].\n\nTrong trường hợp chỉ có cha tham gia bảo hiểm xã hội thì cha được trợ cấp một lần **bằng 02 lần mức lương cơ sở** tại tháng sinh con cho mỗi con [1, 2].\n\nĐối với lao động nữ sinh con, nhận con khi nhờ mang thai hộ hoặc nhận nuôi con nuôi dưới 06 tháng tuổi, mức trợ cấp một lần cho mỗi con là **02 lần mức tham chiếu** tại tháng lao động nữ sinh con, nhận con do nhờ mang thai hộ, nhận nuôi con nuôi [3, 4].",
+          "used_llm": "gemini",
+          "generate_ms": 1858,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "mức tham chiếu"
+            ]
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 2
+          },
+          "answer": "Lao động nữ sinh con được trợ cấp một lần bằng **02 lần mức lương cơ sở** tại tháng sinh con [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1361,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t05b",
+      "pair_id": "tro_cap_mot_lan_khi_sinh_con",
+      "question": "Lao động nữ sinh con được trợ cấp một lần bằng bao nhiêu?",
+      "as_of_date": "2026-02-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 25314,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Lao động nữ sinh con được trợ cấp một lần bằng **02 lần mức lương cơ sở** hoặc **02 lần mức tham chiếu** tại tháng sinh con, tùy thuộc vào văn bản áp dụng cụ thể [1], [3].\n\nCác điều kiện chi tiết bao gồm:\n\n- Mức trợ cấp được tính bằng **02 lần mức lương cơ sở** tại tháng lao động nữ sinh con [1], [2].\n- Mức trợ cấp được tính bằng **02 lần mức tham chiếu** tại tháng lao động nữ sinh con [3], [4].\n- Để được hưởng trợ cấp, lao động nữ sinh con cần đáp ứng đủ điều kiện quy định tại **khoản 2 hoặc khoản 3 hoặc khoản 5 Điều 50** của Luật (áp dụng đối với văn bản tham chiếu [3], [4]).\n- Trường hợp lao động nữ sinh con nhưng **không đủ điều kiện** hưởng trợ cấp thì người chồng có đủ điều kiện theo quy định của Luật vẫn được hưởng trợ cấp một lần bằng **02 lần mức tham chiếu** tại tháng sinh con [3], [4].",
+          "used_llm": "gemini",
+          "generate_ms": 1786,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "mức lương cơ sở"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Lao động nữ sinh con được trợ cấp một lần bằng **02 lần mức lương cơ sở** (tại thời điểm tháng sinh con) [1, 2] hoặc **02 lần mức tham chiếu** (tại thời điểm tháng sinh con) [3, 4] tùy thuộc vào quy định áp dụng.\n\nĐể được hưởng trợ cấp này, lao động nữ cần đáp ứng các điều kiện sau:\n- Phải có đủ điều kiện theo quy định tại **khoản 2, khoản 3 hoặc khoản 5 Điều 50** của Luật Bảo hiểm xã hội [3, 4].\n- Trường hợp lao động nữ sinh con nhưng không đủ các điều kiện nêu trên thì người chồng có đủ điều kiện theo quy định tại **khoản 2 Điều 50** của Luật này vẫn được hưởng trợ cấp một lần [3, 4].\n\n*Lưu ý: Thông tin về mức lương cơ sở hoặc mức tham chiếu được xác định tại thời điểm tháng lao động nữ sinh con [1, 2, 3, 4].*",
+          "used_llm": "gemini",
+          "generate_ms": 2136,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "mức lương cơ sở"
+            ]
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 3
+          },
+          "answer": "Lao động nữ sinh con được trợ cấp một lần bằng **02 lần mức tham chiếu** tại tháng sinh con [1].\n\nChi tiết điều kiện hưởng trợ cấp một lần như sau:\n- Lao động nữ sinh con phải có đủ điều kiện theo quy định tại **khoản 2**, **khoản 3** hoặc **khoản 5 Điều 50** của Luật [1].\n- Trường hợp lao động nữ sinh con không đủ điều kiện nêu trên nhưng người chồng có đủ điều kiện tại **khoản 2 Điều 50** thì người chồng sẽ là người được nhận trợ cấp một lần này [1].",
+          "used_llm": "gemini",
+          "generate_ms": 2633,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t06a",
+      "pair_id": "tran_tien_luong_dong_bhxh",
+      "question": "Tiền lương tháng làm căn cứ đóng bảo hiểm xã hội bắt buộc cao nhất bằng bao nhiêu?",
+      "as_of_date": "2024-03-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 26084,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Tiền lương tháng làm căn cứ đóng bảo hiểm xã hội bắt buộc cao nhất bằng **20 lần mức tham chiếu tại thời điểm đóng** [2].\n\nCác quy định chi tiết liên quan:\n- Đối với đối tượng theo chế độ tiền lương do người sử dụng lao động quyết định hoặc các trường hợp lựa chọn tiền lương đóng, mức cao nhất áp dụng là **20 lần mức tham chiếu** [2].\n- Mức thấp nhất tương ứng được quy định bằng **mức tham chiếu** tại thời điểm đóng [2].",
+          "used_llm": "gemini",
+          "generate_ms": 1389,
+          "score": {
+            "correct": false,
+            "missing": [
+              "mức lương cơ sở"
+            ],
+            "forbidden_present": [
+              "mức tham chiếu"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Tiền lương tháng làm căn cứ đóng bảo hiểm xã hội bắt buộc cao nhất bằng **20 lần mức tham chiếu** tại thời điểm đóng [2].",
+          "used_llm": "gemini",
+          "generate_ms": 1039,
+          "score": {
+            "correct": false,
+            "missing": [
+              "mức lương cơ sở"
+            ],
+            "forbidden_present": [
+              "mức tham chiếu"
+            ]
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": false,
+            "distractor": false,
+            "clean": false,
+            "n_chunks": 1
+          },
+          "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+          "used_llm": "gemini",
+          "generate_ms": 986,
+          "score": {
+            "correct": false,
+            "missing": [
+              "20 lần",
+              "mức lương cơ sở"
+            ],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t06b",
+      "pair_id": "tran_tien_luong_dong_bhxh",
+      "question": "Tiền lương tháng làm căn cứ đóng bảo hiểm xã hội bắt buộc cao nhất bằng bao nhiêu?",
+      "as_of_date": "2025-10-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 26213,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Tiền lương làm căn cứ đóng bảo hiểm xã hội bắt buộc cao nhất bằng **20 lần mức tham chiếu** tại thời điểm đóng [2] hoặc **20 lần mức lương tối thiểu tháng theo vùng** do Chính phủ công bố tại thời điểm đóng bảo hiểm thất nghiệp [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1551,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Tiền lương tháng làm căn cứ đóng bảo hiểm xã hội bắt buộc cao nhất bằng **20 lần mức tham chiếu** tại thời điểm đóng [2].",
+          "used_llm": "gemini",
+          "generate_ms": 1766,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 7
+          },
+          "answer": "Tiền lương tháng làm căn cứ đóng bảo hiểm xã hội bắt buộc cao nhất bằng **20 lần mức tham chiếu** tại thời điểm đóng [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1515,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t07a",
+      "pair_id": "che_do_bhxh_tu_nguyen",
+      "question": "Bảo hiểm xã hội tự nguyện gồm những chế độ nào?",
+      "as_of_date": "2024-06-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 26299,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+          "used_llm": "gemini",
+          "generate_ms": 2070,
+          "score": {
+            "correct": false,
+            "missing": [
+              "hưu trí",
+              "tử tuất"
+            ],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+          "used_llm": "gemini",
+          "generate_ms": 1036,
+          "score": {
+            "correct": false,
+            "missing": [
+              "hưu trí",
+              "tử tuất"
+            ],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": false,
+            "distractor": false,
+            "clean": false,
+            "n_chunks": 3
+          },
+          "answer": "Người tham gia bảo hiểm xã hội tự nguyện được hưởng **chế độ hưu trí** và **chế độ tử tuất** [3].",
+          "used_llm": "gemini",
+          "generate_ms": 1954,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t07b",
+      "pair_id": "che_do_bhxh_tu_nguyen",
+      "question": "Bảo hiểm xã hội tự nguyện gồm những chế độ nào?",
+      "as_of_date": "2025-12-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 26165,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+          "used_llm": "gemini",
+          "generate_ms": 1276,
+          "score": {
+            "correct": false,
+            "missing": [
+              "thai sản",
+              "hưu trí",
+              "tử tuất"
+            ],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Bảo hiểm xã hội tự nguyện bao gồm các chế độ trợ cấp hằng tháng, chế độ hưu trí, chế độ tử tuất và trợ cấp hưu trí xã hội (trong hệ thống bảo hiểm xã hội đa tầng) [1, 2, 3].",
+          "used_llm": "gemini",
+          "generate_ms": 1268,
+          "score": {
+            "correct": false,
+            "missing": [
+              "thai sản"
+            ],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": false,
+            "distractor": false,
+            "clean": false,
+            "n_chunks": 4
+          },
+          "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+          "used_llm": "gemini",
+          "generate_ms": 1016,
+          "score": {
+            "correct": false,
+            "missing": [
+              "thai sản",
+              "hưu trí",
+              "tử tuất"
+            ],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t08a",
+      "pair_id": "muc_huong_tro_cap_that_nghiep",
+      "question": "Mức hưởng trợ cấp thất nghiệp hằng tháng được tính thế nào và tối đa là bao nhiêu?",
+      "as_of_date": "2025-05-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 26270,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Mức hưởng trợ cấp thất nghiệp hằng tháng được tính bằng **60%** mức lương bình quân của **06 tháng liền kề có đóng bảo hiểm thất nghiệp** trước khi thất nghiệp [1, 2, 3, 4, 5, 6].\n\nMức hưởng này có các giới hạn tối đa như sau:\n- **Không quá 05 lần mức lương tối thiểu vùng** theo quy định của Bộ luật Lao động tại thời điểm chấm dứt hợp đồng lao động [1, 2].\n- **Không quá 05 lần mức lương cơ sở** đối với người lao động thuộc đối tượng thực hiện chế độ tiền lương do Nhà nước quy định [3, 4].\n- **Không quá 05 lần mức lương tối thiểu tháng theo vùng** do Chính phủ công bố được áp dụng tại tháng cuối cùng đóng bảo hiểm thất nghiệp [5, 6].",
+          "used_llm": "gemini",
+          "generate_ms": 1887,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Mức hưởng trợ cấp thất nghiệp hằng tháng được tính bằng **60% mức lương bình quân của 06 tháng liền kề có đóng bảo hiểm thất nghiệp trước khi thất nghiệp** [1, 2, 3, 4, 5, 6].\n\nTối đa, mức hưởng này không quá **05 lần mức lương tối thiểu vùng** theo quy định của Bộ luật Lao động tại thời điểm chấm dứt hợp đồng lao động [1, 2, 3, 4] hoặc **05 lần mức lương tối thiểu tháng theo vùng** do Chính phủ công bố được áp dụng tại tháng cuối cùng đóng bảo hiểm thất nghiệp [5, 6].\n\nTrường hợp người lao động thuộc đối tượng thực hiện chế độ tiền lương do Nhà nước quy định, mức hưởng tối đa không quá **05 lần mức lương cơ sở** [3, 4].\n\nNếu những tháng cuối cùng trước khi thất nghiệp, người lao động có thời gian gián đoạn đóng bảo hiểm thất nghiệp, thì 06 tháng liền kề để tính mức hưởng trợ cấp thất nghiệp là bình quân tiền lương của 06 tháng đóng bảo hiểm thất nghiệp trước khi người lao động chấm dứt hợp đồng lao động, hợp đồng làm việc hoặc chấm dứt làm việc theo quy định của pháp luật [1, 2].\n\nTháng hưởng trợ cấp thất nghiệp được tính theo tháng dương lịch [1, 2]. Mỗi tháng hưởng trợ cấp thất nghiệp được tính từ ngày người lao động bắt đầu hưởng trợ cấp thất nghiệp đến ngày đó của tháng sau trừ 01 ngày, trường hợp tháng sau không có ngày tương ứng thì ngày kết thúc của tháng hưởng trợ cấp thất nghiệp là ngày cuối cùng của tháng đó [1, 2].",
+          "used_llm": "gemini",
+          "generate_ms": 2731,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 2
+          },
+          "answer": "Mức hưởng trợ cấp thất nghiệp hằng tháng bằng **60%** mức bình quân tiền lương tháng đóng bảo hiểm thất nghiệp của **06 tháng liền kề trước khi thất nghiệp** [1].\n\nMức hưởng trợ cấp thất nghiệp hằng tháng tối đa:\n*   Đối với người lao động thuộc đối tượng thực hiện chế độ tiền lương do Nhà nước quy định: tối đa không quá **05 lần mức lương cơ sở** [1].\n*   Đối với người lao động đóng bảo hiểm thất nghiệp theo chế độ tiền lương do người sử dụng lao động quyết định: tối đa không quá **05 lần mức lương tối thiểu vùng** theo quy định của Bộ luật lao động tại thời điểm chấm dứt hợp đồng lao động hoặc hợp đồng làm việc [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1590,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t08b",
+      "pair_id": "muc_huong_tro_cap_that_nghiep",
+      "question": "Mức hưởng trợ cấp thất nghiệp hằng tháng được tính thế nào và tối đa là bao nhiêu?",
+      "as_of_date": "2026-03-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 25374,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Mức hưởng trợ cấp thất nghiệp hằng tháng được tính bằng **60%** mức bình quân tiền lương tháng đóng bảo hiểm thất nghiệp của **06 tháng liền kề** (hoặc 06 tháng gần nhất) trước khi thất nghiệp [1, 3, 5].\n\nMức hưởng tối đa được quy định như sau:\n\n| Đối tượng lao động | Mức hưởng tối đa |\n|---|---|\n| Người lao động thuộc chế độ tiền lương do **Nhà nước** quy định | Không quá **05 lần mức lương cơ sở** [3] |\n| Người lao động thuộc chế độ tiền lương do **người sử dụng lao động** quyết định | Không quá **05 lần mức lương tối thiểu vùng** [3, 5] |\n\n*Lưu ý:* Đối với mức tối đa là 05 lần mức lương tối thiểu vùng, quy định tại các tài liệu tham chiếu được áp dụng tại thời điểm chấm dứt hợp đồng lao động [1, 3] hoặc tại tháng cuối cùng đóng bảo hiểm thất nghiệp [5].",
+          "used_llm": "gemini",
+          "generate_ms": 3782,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "mức lương cơ sở"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Mức hưởng trợ cấp thất nghiệp hằng tháng bằng **60%** mức bình quân tiền lương tháng đóng bảo hiểm thất nghiệp của **06 tháng** liền kề trước khi thất nghiệp [3, 4] hoặc **06 tháng** đã đóng bảo hiểm thất nghiệp gần nhất trước khi chấm dứt hợp đồng lao động/làm việc [5, 6].\n\nMức hưởng tối đa tại thời điểm tra cứu 2026-03-01 được quy định cụ thể như sau:\n\n| Đối tượng lao động | Mức hưởng tối đa |\n|---|---|\n| Người lao động thuộc đối tượng thực hiện chế độ tiền lương do **Nhà nước** quy định | Không quá **05 lần** mức lương cơ sở [3, 4] |\n| Người lao động đóng bảo hiểm thất nghiệp theo chế độ tiền lương do **người sử dụng lao động** quyết định | Không quá **05 lần** mức lương tối thiểu vùng [3, 4, 5, 6] |\n\n*Lưu ý:* Đối với nhóm lao động theo chế độ tiền lương do người sử dụng lao động quyết định, mức lương tối thiểu vùng được áp dụng tại **tháng cuối cùng** đóng bảo hiểm thất nghiệp [5, 6].",
+          "used_llm": "gemini",
+          "generate_ms": 5190,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "mức lương cơ sở"
+            ]
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 3
+          },
+          "answer": "Mức hưởng trợ cấp thất nghiệp hằng tháng được tính bằng **60%** mức bình quân tiền lương tháng đóng bảo hiểm thất nghiệp của **06 tháng** gần nhất trước khi chấm dứt hợp đồng lao động hoặc hợp đồng làm việc [1], [2].\n\nMức hưởng tối đa không quá **05 lần** mức lương tối thiểu vùng (tại thời điểm chấm dứt hợp đồng lao động) được áp dụng tại thời điểm tra cứu **2026-03-01** [1], [2].\n\nCác quy định chi tiết về cách tính:\n- Trường hợp người lao động có thời gian gián đoạn đóng bảo hiểm thất nghiệp trước khi thất nghiệp, **06 tháng** liền kề để tính mức hưởng là bình quân tiền lương của **06 tháng** đóng bảo hiểm thất nghiệp trước thời điểm chấm dứt hợp đồng [1].\n- Tháng hưởng trợ cấp được tính theo **tháng dương lịch**, bắt đầu từ ngày người lao động được hưởng trợ cấp đến ngày tương ứng của tháng sau trừ **01 ngày** [1].",
+          "used_llm": "gemini",
+          "generate_ms": 3010,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t09a",
+      "pair_id": "thoi_diem_huong_tro_cap_that_nghiep",
+      "question": "Thời điểm hưởng trợ cấp thất nghiệp được tính từ ngày nào kể từ ngày nộp đủ hồ sơ?",
+      "as_of_date": "2025-06-15",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 26281,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Thời điểm hưởng trợ cấp thất nghiệp được tính từ **ngày thứ 16** [1], [2], [3], [4] (hoặc **ngày làm việc thứ 11** theo một số quy định khác) kể từ ngày nộp đủ hồ sơ hưởng trợ cấp thất nghiệp [5], [6].\n\nChi tiết theo các văn bản tham chiếu:\n- Được tính từ **ngày thứ 16** kể từ ngày nộp đủ hồ sơ [1], [2].\n- Được tính từ **ngày thứ 16 theo ngày làm việc** kể từ ngày nộp hồ sơ đề nghị hưởng trợ cấp thất nghiệp [3], [4].\n- Là **ngày làm việc thứ 11** kể từ ngày nộp đủ hồ sơ hưởng trợ cấp thất nghiệp [5], [6].",
+          "used_llm": "gemini",
+          "generate_ms": 1678,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "thứ 11"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Thời điểm hưởng trợ cấp thất nghiệp được tính từ **ngày thứ 16** (hoặc **ngày làm việc thứ 16**) kể từ ngày nộp đủ hồ sơ hưởng trợ cấp thất nghiệp [1, 2, 3, 4].\n\n- Theo một số quy định khác trong tài liệu, thời điểm này được tính là **ngày làm việc thứ 11** kể từ ngày nộp đủ hồ sơ hưởng trợ cấp thất nghiệp [5, 6].",
+          "used_llm": "gemini",
+          "generate_ms": 1317,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "thứ 11"
+            ]
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 3
+          },
+          "answer": "Thời điểm hưởng trợ cấp thất nghiệp được tính từ **ngày thứ 16** kể từ ngày nộp đủ hồ sơ hưởng trợ cấp thất nghiệp [1, 2]. Tại thời điểm tra cứu ngày **15/06/2025**, quy định này được áp dụng theo các văn bản hiện hành [1, 2].",
+          "used_llm": "gemini",
+          "generate_ms": 1147,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t09b",
+      "pair_id": "thoi_diem_huong_tro_cap_that_nghiep",
+      "question": "Thời điểm hưởng trợ cấp thất nghiệp được tính từ ngày nào kể từ ngày nộp đủ hồ sơ?",
+      "as_of_date": "2026-04-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 25953,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Thời điểm hưởng trợ cấp thất nghiệp được tính từ ngày **thứ 16** kể từ ngày nộp đủ hồ sơ [1, 2, 3, 4], hoặc ngày làm việc thứ **11** kể từ ngày nộp đủ hồ sơ [5, 6].",
+          "used_llm": "gemini",
+          "generate_ms": 1501,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "thứ 16"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Thời điểm hưởng trợ cấp thất nghiệp được tính từ ngày thứ 16, kể từ ngày nộp đủ hồ sơ hưởng trợ cấp thất nghiệp [1, 2].\n\nHoặc:\nThời điểm hưởng trợ cấp thất nghiệp của người lao động được tính từ ngày thứ 16 theo ngày làm việc kể từ ngày nộp hồ sơ đề nghị hưởng trợ cấp thất nghiệp [3, 4].\n\nHoặc:\nThời điểm hưởng trợ cấp thất nghiệp là ngày làm việc thứ 11 kể từ ngày nộp đủ hồ sơ hưởng trợ cấp thất nghiệp [5, 6].",
+          "used_llm": "gemini",
+          "generate_ms": 1752,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "thứ 16"
+            ]
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 1
+          },
+          "answer": "Thời điểm hưởng trợ cấp thất nghiệp là ngày làm việc thứ **11** kể từ ngày nộp đủ hồ sơ hưởng trợ cấp thất nghiệp [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1572,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t10a",
+      "pair_id": "dieu_kien_chua_tim_duoc_viec_lam",
+      "question": "Sau khi nộp hồ sơ hưởng trợ cấp thất nghiệp, người lao động phải chưa tìm được việc làm trong bao lâu thì mới đủ điều kiện hưởng?",
+      "as_of_date": "2025-02-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 26124,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Người lao động phải chưa tìm được việc làm sau **15 ngày**, kể từ ngày nộp hồ sơ hưởng bảo hiểm thất nghiệp thì mới đủ điều kiện hưởng trợ cấp thất nghiệp [1].\n\nQuy định này áp dụng trừ các trường hợp sau:\n- Thực hiện **nghĩa vụ quân sự**, **nghĩa vụ công an** [1].\n- Đi **học tập** có thời hạn từ đủ **12 tháng** trở lên [1].\n- Chấp hành quyết định áp dụng biện pháp đưa vào **trường giáo dưỡng**, **cơ sở giáo dục bắt buộc**, **cơ sở cai nghiện bắt buộc** [1].\n- Bị **tạm giam**; chấp hành **hình phạt tù** [1].\n- Ra **nước ngoài định cư**; đi **lao động ở nước ngoài** theo hợp đồng [1].\n- **Chết** [1].",
+          "used_llm": "gemini",
+          "generate_ms": 2899,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Người lao động phải chưa tìm được việc làm sau **15 ngày**, kể từ ngày nộp hồ sơ hưởng bảo hiểm thất nghiệp thì mới đủ điều kiện hưởng trợ cấp thất nghiệp [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1727,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 4
+          },
+          "answer": "Người lao động phải chưa tìm được việc làm sau **15 ngày** kể từ ngày nộp hồ sơ hưởng trợ cấp thất nghiệp để đủ điều kiện hưởng trợ cấp [1].\n\nTại thời điểm tra cứu **2025-02-01**, quy định này có một số ngoại lệ không bắt buộc phải đáp ứng điều kiện \"chưa tìm được việc làm\" nêu trên nếu người lao động thuộc các trường hợp sau:\n- Thực hiện **nghĩa vụ quân sự**, **nghĩa vụ công an**.\n- Đi **học tập** có thời hạn từ đủ **12 tháng** trở lên.\n- Chấp hành quyết định áp dụng biện pháp đưa vào **trường giáo dưỡng**, **cơ sở giáo dục bắt buộc**, **cơ sở cai nghiện bắt buộc**.\n- Bị **tạm giam** hoặc chấp hành **hình phạt tù**.\n- Ra **nước ngoài định cư** hoặc đi **lao động ở nước ngoài** theo hợp đồng.\n- **Chết**.",
+          "used_llm": "gemini",
+          "generate_ms": 2676,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t10b",
+      "pair_id": "dieu_kien_chua_tim_duoc_viec_lam",
+      "question": "Sau khi nộp hồ sơ hưởng trợ cấp thất nghiệp, người lao động phải chưa tìm được việc làm trong bao lâu thì mới đủ điều kiện hưởng?",
+      "as_of_date": "2026-05-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 25999,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Người lao động phải chưa tìm được việc làm trong thời hạn **15 ngày** kể từ ngày nộp hồ sơ hưởng bảo hiểm thất nghiệp (trừ một số trường hợp ngoại lệ) [1].\n\nCác trường hợp ngoại lệ (vẫn được hưởng dù chưa tìm được việc làm sau 15 ngày) bao gồm:\n- Thực hiện **nghĩa vụ quân sự, nghĩa vụ công an** [1].\n- Đi **học tập có thời hạn từ đủ 12 tháng trở lên** [1].\n- Chấp hành quyết định áp dụng biện pháp **đưa vào trường giáo dưỡng, cơ sở giáo dục bắt buộc, cơ sở cai nghiện bắt buộc** [1].\n- **Bị tạm giam** hoặc chấp hành **hình phạt tù** [1].\n- **Ra nước ngoài định cư** hoặc đi **lao động ở nước ngoài theo hợp đồng** [1].\n- **Chết** [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1676,
+          "score": {
+            "correct": false,
+            "missing": [
+              "10 ngày"
+            ],
+            "forbidden_present": [
+              "15 ngày"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Người lao động phải **chưa tìm được việc làm sau 15 ngày**, kể từ ngày nộp hồ sơ hưởng bảo hiểm thất nghiệp [1].\n\nCác trường hợp ngoại lệ (vẫn được tính là đủ điều kiện dù có việc làm hoặc rơi vào các trường hợp đặc biệt theo quy định) không bao gồm khoảng thời gian chờ này, tuy nhiên người lao động sẽ không được hưởng nếu thuộc các trường hợp tại thời điểm sau 15 ngày mà đã thực hiện nghĩa vụ quân sự, đi học tập đủ 12 tháng trở lên, bị tạm giam, ra nước ngoài định cư... [1]. Thời điểm bắt đầu tính hưởng trợ cấp thất nghiệp là **ngày thứ 16** theo ngày làm việc kể từ ngày nộp hồ sơ [2].",
+          "used_llm": "gemini",
+          "generate_ms": 1714,
+          "score": {
+            "correct": false,
+            "missing": [
+              "10 ngày"
+            ],
+            "forbidden_present": [
+              "15 ngày"
+            ]
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": false,
+            "distractor": false,
+            "clean": false,
+            "n_chunks": 2
+          },
+          "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+          "used_llm": "gemini",
+          "generate_ms": 1279,
+          "score": {
+            "correct": false,
+            "missing": [
+              "10 ngày"
+            ],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t11a",
+      "pair_id": "nghi_thai_san_thoi_gian",
+      "question": "Lao động nữ được nghỉ thai sản trước và sau khi sinh con bao lâu?",
+      "as_of_date": "2026-05-01",
+      "temporal_kind": "clause_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 26109,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Lao động nữ được nghỉ thai sản trước và sau khi sinh con là **06 tháng** [1, 2, 3, 4, 5, 6, 7]. Thời gian nghỉ trước khi sinh không quá **02 tháng** [1, 2, 3, 4, 5, 6].\n\nĐối với các trường hợp cụ thể:\n- Sinh con thứ hai: lao động nữ được nghỉ thai sản trước và sau khi sinh con là **07 tháng** [1, 3].\n- Sinh đôi trở lên: tính từ con thứ hai trở đi, cứ mỗi con, người mẹ được nghỉ thêm **01 tháng** [1, 2, 3, 4, 5, 6].",
+          "used_llm": "gemini",
+          "generate_ms": 2847,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "07 tháng",
+              "7 tháng"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "**06 tháng** [1, 2, 3, 4, 5, 6, 7, 8].\n\n**Chi tiết:**\n*   Thời gian nghỉ trước khi sinh không quá **02 tháng** [1, 3, 5, 6].\n*   Trường hợp sinh con thứ hai, lao động nữ được nghỉ thai sản trước và sau khi sinh con là **07 tháng** [1, 3].\n*   Trường hợp sinh đôi trở lên, cứ mỗi con từ con thứ hai trở đi, người mẹ được nghỉ thêm **01 tháng** [1, 2, 3, 4, 5, 6].",
+          "used_llm": "gemini",
+          "generate_ms": 1785,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "07 tháng",
+              "7 tháng"
+            ]
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 2
+          },
+          "answer": "Lao động nữ được nghỉ thai sản trước và sau khi sinh con là **06 tháng** [1]. Thời gian nghỉ trước khi sinh không quá **02 tháng** [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1276,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t11b",
+      "pair_id": "nghi_thai_san_thoi_gian",
+      "question": "Lao động nữ được nghỉ thai sản trước và sau khi sinh con bao lâu?",
+      "as_of_date": "2026-09-10",
+      "temporal_kind": "clause_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 26000,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Lao động nữ được nghỉ thai sản trước và sau khi sinh con là **06 tháng** [5], [6].\n\nCác quy định chi tiết khác bao gồm:\n- **Thời gian nghỉ trước khi sinh**: Tối đa không quá **02 tháng** [5], [6].\n- **Trường hợp sinh đôi trở lên**: Tính từ con thứ hai trở đi, cứ mỗi con người mẹ được nghỉ thêm **01 tháng** [5], [6].\n- **Thời gian hưởng chế độ**: Tính bao gồm cả ngày nghỉ lễ, nghỉ Tết, ngày nghỉ hằng tuần [5], [6].",
+          "used_llm": "gemini",
+          "generate_ms": 2102,
+          "score": {
+            "correct": false,
+            "missing": [
+              "07 tháng"
+            ],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Lao động nữ sinh con được nghỉ việc hưởng chế độ thai sản trước và sau khi sinh con là **06 tháng** [5], [6].\n\nCác điều kiện và quy định liên quan tại thời điểm **2026-09-10** như sau:\n\n- **Thời gian nghỉ trước khi sinh**: Tối đa không quá **02 tháng** [5], [6].\n- **Trường hợp sinh đôi trở lên**: Tính từ con thứ hai trở đi, cứ mỗi con, người mẹ được nghỉ thêm **01 tháng** [5], [6].\n- **Thời gian nghỉ này**: Đã tính bao gồm cả ngày nghỉ lễ, nghỉ Tết, ngày nghỉ hằng tuần [5], [6].",
+          "used_llm": "gemini",
+          "generate_ms": 1659,
+          "score": {
+            "correct": false,
+            "missing": [
+              "07 tháng"
+            ],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 2
+          },
+          "answer": "Lao động nữ được nghỉ thai sản trước và sau khi sinh con là **06 tháng**, trường hợp sinh con thứ hai được nghỉ **07 tháng**, với thời gian nghỉ trước khi sinh tối đa là **02 tháng** [1].\n\nNgoài ra, tại thời điểm tra cứu **2026-09-10**, các quy định bổ sung về thời gian nghỉ như sau:\n- Trường hợp sinh đôi trở lên: Tính từ con thứ hai trở đi, cứ mỗi con được nghỉ thêm **01 tháng** [1].\n- Trường hợp mang thai đôi trở lên mà có thai chết trong tử cung hoặc khi chuyển dạ: Thời gian nghỉ việc được tính theo số thai bao gồm cả con sống, con chết và thai chết [2].",
+          "used_llm": "gemini",
+          "generate_ms": 3648,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t12a",
+      "pair_id": "nghi_thai_san_con_thu_hai",
+      "question": "Lao động nữ sinh con thứ hai được nghỉ thai sản mấy tháng?",
+      "as_of_date": "2026-03-01",
+      "temporal_kind": "clause_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 25800,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Lao động nữ sinh con thứ hai được nghỉ thai sản tổng cộng là **07 tháng** (trước và sau khi sinh con) [1], [2]. \n\nCác điều kiện và quy định chi tiết:\n- Thời gian nghỉ trước khi sinh tối đa **không quá 02 tháng** [1], [2].\n- Thời gian hưởng chế độ thai sản tính cả **ngày nghỉ lễ, nghỉ Tết, ngày nghỉ hằng tuần** [5], [6].",
+          "used_llm": "gemini",
+          "generate_ms": 1346,
+          "score": {
+            "correct": false,
+            "missing": [
+              "06 tháng"
+            ],
+            "forbidden_present": [
+              "07 tháng",
+              "7 tháng"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Lao động nữ sinh con thứ hai được nghỉ thai sản **07 tháng** [1]. \n\nCác điều kiện và quy định chi tiết liên quan:\n- Thời gian nghỉ trước khi sinh tối đa **không quá 02 tháng** [1].\n- Trường hợp sinh đôi trở lên tính từ con thứ hai trở đi, cứ mỗi con người mẹ được **nghỉ thêm 01 tháng** [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1249,
+          "score": {
+            "correct": false,
+            "missing": [
+              "06 tháng"
+            ],
+            "forbidden_present": [
+              "07 tháng",
+              "7 tháng"
+            ]
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 2
+          },
+          "answer": "Lao động nữ sinh con thứ hai (sinh đôi) được nghỉ thai sản tổng cộng **07 tháng**, tính đến thời điểm tra cứu ngày **2026-03-01** [1].\n\nChi tiết quy định thời gian nghỉ thai sản:\n- Thời gian nghỉ thai sản thông thường trước và sau khi sinh con là **06 tháng** (thời gian nghỉ trước khi sinh tối đa **02 tháng**) [1].\n- Trường hợp sinh đôi trở lên, tính từ con thứ **02** trở đi, cứ mỗi con người mẹ được nghỉ thêm **01 tháng** [1]. \n- Đối với lao động nữ nhờ mang thai hộ, thời gian nghỉ tính từ thời điểm nhận con cho đến khi con đủ **06 tháng** tuổi, và cũng được nghỉ thêm **01 tháng** cho mỗi con tính từ con thứ hai trở đi trong trường hợp sinh đôi trở lên [2]. Thông tin cụ thể về việc sinh con thứ hai không phải sinh đôi chưa được đề cập trong tài liệu [1], [2].",
+          "used_llm": "gemini",
+          "generate_ms": 1585,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "07 tháng",
+              "7 tháng"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t12b",
+      "pair_id": "nghi_thai_san_con_thu_hai",
+      "question": "Lao động nữ sinh con thứ hai được nghỉ thai sản mấy tháng?",
+      "as_of_date": "2026-08-01",
+      "temporal_kind": "clause_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 25467,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "**07 tháng** [1, 2].",
+          "used_llm": "gemini",
+          "generate_ms": 1399,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Lao động nữ sinh con thứ hai được nghỉ thai sản **07 tháng** [1, 2]. Thời gian nghỉ trước khi sinh không quá **02 tháng** [1, 2].",
+          "used_llm": "gemini",
+          "generate_ms": 1526,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 2
+          },
+          "answer": "Lao động nữ sinh con thứ hai được nghỉ thai sản **07 tháng** [1]. Thời gian nghỉ này bao gồm cả thời gian nghỉ trước và sau khi sinh con, trong đó thời gian nghỉ trước khi sinh không quá **02 tháng** [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1615,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t13a",
+      "pair_id": "luong_lam_them_ngay_thuong",
+      "question": "Làm thêm giờ vào ngày thường được trả lương ít nhất bằng bao nhiêu phần trăm?",
+      "as_of_date": "2024-02-01",
+      "temporal_kind": "control",
+      "expected_behavior": "answer",
+      "retrieve_ms": 25328,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Người lao động làm thêm giờ vào ngày thường được trả lương ít nhất bằng **150%** [1], [3].",
+          "used_llm": "gemini",
+          "generate_ms": 4990,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Người lao động làm thêm giờ vào ngày thường được trả lương ít nhất bằng **150%** tiền lương theo đơn giá tiền lương hoặc tiền lương thực trả theo công việc đang làm [1], [2], [3], [4].",
+          "used_llm": "gemini",
+          "generate_ms": 1861,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 4
+          },
+          "answer": "Người lao động làm thêm giờ vào ngày thường được trả lương ít nhất bằng **150%** [1], [2].",
+          "used_llm": "gemini",
+          "generate_ms": 2377,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t13b",
+      "pair_id": "luong_lam_them_ngay_thuong",
+      "question": "Làm thêm giờ vào ngày thường được trả lương ít nhất bằng bao nhiêu phần trăm?",
+      "as_of_date": "2026-06-01",
+      "temporal_kind": "control",
+      "expected_behavior": "answer",
+      "retrieve_ms": 25275,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Người lao động làm thêm giờ vào ngày thường được trả lương **ít nhất bằng 150%** đơn giá tiền lương hoặc tiền lương thực trả theo công việc đang làm [1], [2].",
+          "used_llm": "gemini",
+          "generate_ms": 1265,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Người lao động làm thêm giờ vào ngày thường được trả lương **ít nhất bằng 150%** tiền lương tính theo đơn giá tiền lương hoặc tiền lương thực trả theo công việc đang làm [1], [2], [3], [4].",
+          "used_llm": "gemini",
+          "generate_ms": 1110,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 5
+          },
+          "answer": "Làm thêm giờ vào ngày thường được trả lương ít nhất bằng **150%** tiền lương tính theo đơn giá tiền lương hoặc tiền lương thực trả theo công việc đang làm [1]. \n\nTại thời điểm tra cứu **2026-06-01**, các điều kiện và mức áp dụng cụ thể bao gồm:\n- Đối với người lao động **hưởng lương theo thời gian**: Tính bằng tiền lương giờ thực trả của công việc đang làm vào ngày làm việc bình thường nhân với mức **ít nhất 150%** nhân với số giờ làm thêm [2].\n- Đối với người lao động **hưởng lương theo sản phẩm**: Tính bằng đơn giá tiền lương sản phẩm của ngày làm việc bình thường nhân với mức **ít nhất 150%** nhân với số sản phẩm làm thêm [2].",
+          "used_llm": "gemini",
+          "generate_ms": 1592,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t14a",
+      "pair_id": "nghi_hang_nam",
+      "question": "Người lao động làm đủ 12 tháng trong điều kiện bình thường được nghỉ hằng năm bao nhiêu ngày?",
+      "as_of_date": "2024-06-01",
+      "temporal_kind": "control",
+      "expected_behavior": "answer",
+      "retrieve_ms": 25401,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "**12 ngày làm việc** là số ngày nghỉ hằng năm của người lao động làm đủ 12 tháng trong điều kiện bình thường [1, 2].",
+          "used_llm": "gemini",
+          "generate_ms": 1761,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "**12 ngày làm việc** đối với người lao động làm việc đủ 12 tháng trong điều kiện bình thường [1, 2].",
+          "used_llm": "gemini",
+          "generate_ms": 2006,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 5
+          },
+          "answer": "**12 ngày làm việc** đối với người lao động làm đủ 12 tháng trong điều kiện bình thường [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1287,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t14b",
+      "pair_id": "nghi_hang_nam",
+      "question": "Người lao động làm đủ 12 tháng trong điều kiện bình thường được nghỉ hằng năm bao nhiêu ngày?",
+      "as_of_date": "2026-06-01",
+      "temporal_kind": "control",
+      "expected_behavior": "answer",
+      "retrieve_ms": 25260,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Người lao động làm việc đủ **12 tháng** trong điều kiện bình thường được nghỉ hằng năm **12 ngày** làm việc [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1464,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Người lao động làm việc đủ 12 tháng trong điều kiện bình thường được nghỉ hằng năm **12 ngày làm việc** [1], [2].",
+          "used_llm": "gemini",
+          "generate_ms": 1330,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 4
+          },
+          "answer": "Người lao động làm việc đủ **12 tháng** trong điều kiện bình thường được nghỉ hằng năm **12 ngày làm việc** [1]. \n\nĐây là quy định có hiệu lực tại thời điểm tra cứu ngày **2026-06-01** [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1360,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t15",
+      "pair_id": "ngoai_pham_vi_thoi_gian_luong",
+      "question": "Mức lương tối thiểu vùng I là bao nhiêu?",
+      "as_of_date": "2010-01-01",
+      "temporal_kind": "out_of_range",
+      "expected_behavior": "time_out_of_range",
+      "retrieve_ms": 25259,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Mức lương tối thiểu vùng I được quy định theo hai mức tùy theo văn bản tài liệu: theo nguồn [1], [2] mức lương tối thiểu tháng là **4.960.000 đồng/tháng** và mức lương tối thiểu giờ là **23.800 đồng/giờ**; theo nguồn [3], [4] mức lương tối thiểu tháng là **5.310.000 đồng/tháng** và mức lương tối thiểu giờ là **25.500 đồng/giờ**.",
+          "used_llm": "gemini",
+          "generate_ms": 1300,
+          "score": {
+            "correct": false,
+            "missing": [
+              "2015"
+            ],
+            "forbidden_present": [
+              "4.960.000",
+              "5.310.000"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Tại thời điểm tra cứu **2010-01-01**, mức lương tối thiểu tháng đối với **Vùng I** là **4.960.000 đồng/tháng** và mức lương tối thiểu giờ là **23.800 đồng/giờ** [1, 2].",
+          "used_llm": "gemini",
+          "generate_ms": 1273,
+          "score": {
+            "correct": false,
+            "missing": [
+              "2015"
+            ],
+            "forbidden_present": [
+              "4.960.000"
+            ]
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 0
+          },
+          "answer": "Câu hỏi về thời điểm (2010-01-01) nằm ngoài khoảng thời gian hệ thống phủ. Corpus hiện chỉ phủ từ 2015-01-01 trở đi, nên tôi không có căn cứ để trả lời cho mốc thời gian này.\n\nBạn có thể hỏi lại với một mốc thời điểm từ 2015-01-01 trở đi.",
+          "used_llm": "none",
+          "generate_ms": 0,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t16",
+      "pair_id": "ngoai_pham_vi_thoi_gian_huu_tri",
+      "question": "Điều kiện hưởng lương hưu gồm những gì?",
+      "as_of_date": "2012-06-01",
+      "temporal_kind": "out_of_range",
+      "expected_behavior": "time_out_of_range",
+      "retrieve_ms": 25320,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Người lao động được hưởng lương hưu khi có đủ các điều kiện chung là **đủ tuổi nghỉ hưu theo quy định** và có **từ đủ 15 năm đến 20 năm đóng bảo hiểm xã hội trở lên** (tùy thuộc vào từng trường hợp cụ thể) [1], [2], [3]. \n\nCụ thể các điều kiện theo từng nhóm đối tượng như sau:\n\n- **Điều kiện chung về tuổi và thời gian đóng (theo quy định chung):**\n  - Nam đủ **60 tuổi**, nữ đủ **55 tuổi** và có đủ **20 năm đóng bảo hiểm xã hội** trở lên [1], [3].\n  - Trường hợp đã đủ điều kiện về tuổi nhưng thời gian đóng bảo hiểm xã hội chưa đủ 20 năm thì được **đóng cho đến khi đủ 20 năm** để hưởng lương hưu [1].\n  - Đối tượng nghỉ việc có thời gian đóng bảo hiểm xã hội bắt buộc từ **đủ 15 năm trở lên** và đủ tuổi nghỉ hưu theo quy định của Bộ luật Lao động [2].\n\n- **Điều kiện đối với một số ngành nghề, công việc đặc thù hoặc trường hợp đặc biệt:**\n  - Có tổng thời gian đóng bảo hiểm xã hội bắt buộc từ **đủ 15 năm trở lên** khi làm nghề, công việc nặng nhọc, độc hại, nguy hiểm, đặc biệt nặng nhọc, độc hại, nguy hiểm hoặc làm việc ở vùng có điều kiện kinh tế - xã hội đặc biệt khó khăn (bao gồm cả thời gian làm việc ở nơi có phụ cấp khu vực hệ số **0,7 trở lên** trước ngày **01/01/2021**) kèm theo điều kiện về độ tuổi theo quy định [2], [3].\n  - Có tuổi thấp hơn tối đa **10 tuổi** so với tuổi quy định và có từ **đủ 15 năm trở lên** làm công việc khai thác than trong hầm lò [2], [3].\n  - Người bị nhiễm **HIV/AIDS** do tai nạn rủi ro nghề nghiệp trong khi thực hiện nhiệm vụ được giao [2], [3].\n  - Lao động nữ là người hoạt động chuyên trách hoặc không chuyên trách ở xã, phường, thị trấn khi nghỉ việc có từ **đủ 15 năm đến dưới 20 năm** đóng bảo hiểm xã hội và đủ **55 tuổi** [3].",
+          "used_llm": "gemini",
+          "generate_ms": 2496,
+          "score": {
+            "correct": false,
+            "missing": [
+              "2015"
+            ],
+            "forbidden_present": [
+              "20 năm",
+              "15 năm"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Điều kiện hưởng lương hưu bao gồm:\n\n*   **Về tuổi:**\n    *   Nam đủ **60 tuổi**, nữ đủ **55 tuổi** [1, 3].\n    *   Trường hợp làm nghề, công việc nặng nhọc, độc hại, nguy hiểm hoặc làm việc ở vùng có điều kiện kinh tế - xã hội đặc biệt khó khăn:\n        *   Nam từ đủ **55 tuổi** đến dưới 60 tuổi, nữ từ đủ **50 tuổi** đến dưới 55 tuổi và có đủ **15 năm** làm nghề/công việc nặng nhọc, độc hại, nguy hiểm hoặc làm việc ở nơi có phụ cấp khu vực hệ số **0,7** trở lên [3].\n        *   Nam nhỏ hơn tuổi quy định tối đa **5 tuổi**, nữ nhỏ hơn tuổi quy định tối đa **5 tuổi** và có đủ **15 năm** đóng bảo hiểm xã hội bắt buộc [2].\n        *   Nam nhỏ hơn tuổi quy định tối đa **10 tuổi** và có đủ **15 năm** làm công việc khai thác than trong hầm lò [2, 3].\n        *   Nam nhỏ hơn tuổi quy định tối đa **10 tuổi** và có đủ **15 năm** làm nghề, công việc nặng nhọc, độc hại, nguy hiểm hoặc làm việc ở vùng có điều kiện kinh tế - xã hội đặc biệt khó khăn [2].\n    *   Lao động nữ là người hoạt động chuyên trách hoặc không chuyên trách ở xã, phường, thị trấn: đủ **55 tuổi** và có từ đủ **15 năm** đến dưới **20 năm** đóng bảo hiểm xã hội [3].\n*   **Về thời gian đóng bảo hiểm xã hội:**\n    *   Đủ **20 năm** đóng bảo hiểm xã hội trở lên [1, 3].\n    *   Đủ **15 năm** đóng bảo hiểm xã hội bắt buộc trở lên đối với một số trường hợp đặc biệt như làm nghề nặng nhọc, độc hại, nguy hiểm, làm việc ở vùng kinh tế - xã hội đặc biệt khó khăn, hoặc khai thác than trong hầm lò [2, 3].\n*   **Các trường hợp đặc biệt khác:**\n    *   Người bị nhiễm HIV/AIDS do tai nạn rủi ro nghề nghiệp [2, 3].",
+          "used_llm": "gemini",
+          "generate_ms": 2795,
+          "score": {
+            "correct": false,
+            "missing": [
+              "2015"
+            ],
+            "forbidden_present": [
+              "20 năm",
+              "15 năm"
+            ]
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 0
+          },
+          "answer": "Câu hỏi về thời điểm (2012-06-01) nằm ngoài khoảng thời gian hệ thống phủ. Corpus hiện chỉ phủ từ 2015-01-01 trở đi, nên tôi không có căn cứ để trả lời cho mốc thời gian này.\n\nBạn có thể hỏi lại với một mốc thời điểm từ 2015-01-01 trở đi.",
+          "used_llm": "none",
+          "generate_ms": 0,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    }
+  ],
+  "summary": {
+    "overall": {
+      "no_temporal": {
+        "n": 30,
+        "context_gold": 0.7333333333333333,
+        "context_distractor": 0.7666666666666667,
+        "context_clean": 0.2,
+        "avg_chunks": 8.0,
+        "answer_accuracy": 0.36666666666666664
+      },
+      "prompt_only": {
+        "n": 30,
+        "context_gold": 0.7333333333333333,
+        "context_distractor": 0.7666666666666667,
+        "context_clean": 0.2,
+        "avg_chunks": 8.0,
+        "answer_accuracy": 0.4666666666666667
+      },
+      "temporal_filter": {
+        "n": 30,
+        "context_gold": 0.8,
+        "context_distractor": 0.0,
+        "context_clean": 0.8,
+        "avg_chunks": 2.8666666666666667,
+        "answer_accuracy": 0.8333333333333334
+      }
+    },
+    "by_kind": {
+      "clause_version": {
+        "no_temporal": {
+          "n": 4,
+          "context_gold": 1.0,
+          "context_distractor": 1.0,
+          "context_clean": 0.0,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 0.25
+        },
+        "prompt_only": {
+          "n": 4,
+          "context_gold": 1.0,
+          "context_distractor": 1.0,
+          "context_clean": 0.0,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 0.25
+        },
+        "temporal_filter": {
+          "n": 4,
+          "context_gold": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 2.0,
+          "answer_accuracy": 0.75
+        }
+      },
+      "control": {
+        "no_temporal": {
+          "n": 4,
+          "context_gold": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 1.0
+        },
+        "prompt_only": {
+          "n": 4,
+          "context_gold": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 1.0
+        },
+        "temporal_filter": {
+          "n": 4,
+          "context_gold": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 4.5,
+          "answer_accuracy": 1.0
+        }
+      },
+      "doc_version": {
+        "no_temporal": {
+          "n": 20,
+          "context_gold": 0.7,
+          "context_distractor": 0.85,
+          "context_clean": 0.1,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 0.3
+        },
+        "prompt_only": {
+          "n": 20,
+          "context_gold": 0.7,
+          "context_distractor": 0.85,
+          "context_clean": 0.1,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 0.45
+        },
+        "temporal_filter": {
+          "n": 20,
+          "context_gold": 0.7,
+          "context_distractor": 0.0,
+          "context_clean": 0.7,
+          "avg_chunks": 3.0,
+          "answer_accuracy": 0.8
+        }
+      },
+      "out_of_range": {
+        "no_temporal": {
+          "n": 2,
+          "context_gold": 0.0,
+          "context_distractor": 1.0,
+          "context_clean": 0.0,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 0.0
+        },
+        "prompt_only": {
+          "n": 2,
+          "context_gold": 0.0,
+          "context_distractor": 1.0,
+          "context_clean": 0.0,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 0.0
+        },
+        "temporal_filter": {
+          "n": 2,
+          "context_gold": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 0.0,
+          "answer_accuracy": 1.0
+        }
+      }
+    }
+  }
+}
