@@ -285,6 +285,12 @@
 ## Phase 4b — eval-goldset
 
 ### T24: `test_questions.json` (≥50 câu) — commit riêng TRƯỚC
+**Trạng thái:** ⚠️ MỘT PHẦN — nhóm C (temporal) đã xong và commit riêng
+(`5723245`, trước commit chạy eval): `data/eval/temporal_questions.json` 30 câu
+(20 `doc_version` / 4 `clause_version` / 4 `control` / 2 `out_of_range`),
+`tests/test_eval_goldset.py` 16 test xanh, mọi `source_clause` khớp index thật.
+**Còn lại:** nhóm A (≥30 câu tra cứu tình huống) + nhóm B (≥12 câu OOC — phụ thuộc
+`scope-gate` T15–T18 chưa làm). `data/eval/test_questions.json` VẪN là bộ banking cũ.
 **Description:** Viết gold set: ≥30 nhóm A (tra cứu tình huống, dùng lại `question-library`, ground truth viết tay từ toàn văn) + ≥12 nhóm B (12 loại OOC) + ≥8 nhóm C (temporal, cùng câu 2 `as_of_date`). Bổ sung field `source_clause`, `as_of_date`, `expected_behavior`. **Commit riêng, đứng trước commit chạy eval.**
 **Acceptance:**
 - [ ] ≥50 câu, đủ 3 nhóm; 0 câu banking; mọi câu A có `source_clause` tồn tại
@@ -294,6 +300,11 @@
 **Dependencies:** C5, C3 · **Files:** `data/eval/test_questions.json`, `tests/test_eval_goldset.py` · **Scope:** M
 
 ### T25: `scope_eval.py` + `temporal_eval.py`
+**Trạng thái:** ⚠️ MỘT PHẦN — `eval/temporal_eval.py` xong (commit `250c8a3`), chạy thật
+3 nhánh (`no_temporal` / `prompt_only` / `temporal_filter`) trên 30 câu:
+answer_accuracy 36.7% → 46.7% → **83.3%**, `context_distractor` 76.7% → **0%**.
+Kết quả: `reports/temporal_eval.json`, mổ xẻ: `reports/failure_analysis.md`.
+**Còn lại:** `eval/scope_eval.py` (chờ `scope-gate`).
 **Description:** `eval/scope_eval.py` chạy nhóm B qua `scope_gate` → precision/recall + confusion. `eval/temporal_eval.py` chạy nhóm C với `as_of_date` → % khớp ground truth đúng mốc. Optional: dòng so sánh nhóm C có/không temporal filter.
 **Acceptance:**
 - [ ] 2 script chạy độc lập, in metric
