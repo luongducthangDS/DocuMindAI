@@ -34,11 +34,16 @@ class Settings(BaseSettings):
     # 2.5-flash-lite=20/10. Các "flash" thường (2.5/3/3.5/3.6/3.7/3.8) chỉ RPD 20.
     # gemini-2.0-* / 1.5-* / 2.5-pro / 3.1-pro = KHÔNG có quota trên key này.
     gemini_generation_models: str = "gemini-3.1-flash-lite,gemini-3.5-flash-lite,gemini-2.5-flash-lite"
-    embedding_model: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    # embedding_model: nguồn sự thật DUY NHẤT cho model embedding (index lẫn query).
+    # Đổi giá trị này thì phải re-embed corpus: python scripts/reembed_corpus.py --yes
+    # Collection mang nhãn model đã index; lệch nhãn ⇒ EmbeddingModelMismatch lúc mở store.
+    # A/B trên gold set lao động (reports/embedding_ab.json): model dưới đây đạt
+    # final@8 = 1.000 so với 0.821 của paraphrase-multilingual-MiniLM-L12-v2.
+    embedding_model: str = "AITeamVN/Vietnamese_Embedding"
     # embedding_provider: "local" (mặc định, load model vào RAM qua sentence-transformers/
-    # torch, ~700MB) hoặc "hf_api" (gọi HuggingFace Inference API, không load model —
-    # dùng cho host RAM thấp như Render free 512MB). Cùng model, cùng vector 384-dim,
-    # corpus ChromaDB không cần re-index. Cần HF_TOKEN khi dùng "hf_api".
+    # torch) hoặc "hf_api" (gọi HuggingFace Inference API, không load model — dùng cho
+    # host RAM thấp). Cùng model, cùng số chiều, corpus không cần re-index khi đổi
+    # provider. Cần HF_TOKEN khi dùng "hf_api".
     embedding_provider: str = "local"
 
     # LangSmith

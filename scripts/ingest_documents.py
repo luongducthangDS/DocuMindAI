@@ -39,25 +39,25 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-# Force local HF cache before any HuggingFace imports
-_repo_root = Path(__file__).resolve().parents[1]
-_local_hf = _repo_root / "data" / "hf_cache"
-_local_hf.mkdir(parents=True, exist_ok=True)
-for _k in ("HF_HOME", "HF_HUB_CACHE", "TRANSFORMERS_CACHE", "SENTENCE_TRANSFORMERS_HOME"):
-    os.environ[_k] = str(_local_hf)
-os.environ["HF_HUB_OFFLINE"] = "1"
+from src.hf_env import use_local_hf_cache
+
+# Trước mọi import HuggingFace. offline=False: ingest là lúc hợp lệ để tải model
+# chưa có trong cache (ví dụ vừa đổi EMBEDDING_MODEL).
+use_local_hf_cache(offline=False, create=True)
 
 import chromadb
 from loguru import logger
 from sentence_transformers import SentenceTransformer
 
 from src.config import get_settings
+from src.rag.embedder import STORE_META_DIM, STORE_META_MODEL
 from src.ingestion.chunker import LegalChunk, chunk_by_dieu
 from src.ingestion.cleaner import strip_consolidated_footnotes, strip_consolidated_quotations
 from src.ingestion.manifest import DocEntry, load_manifest
 from src.ingestion.versions import build_version_chunks
 
-INDEXED_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+# Model embedding đọc từ settings.embedding_model — không hard-code ở đây nữa, vì
+# một bản sao lệch nghĩa là corpus được index bằng model khác model lúc truy vấn.
 
 _HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
 _MAX_LINE_CHARS = 2_000  # truncate scan-bloated table cells
@@ -237,13 +237,19 @@ def main() -> None:
         except Exception:
             pass
 
+    model_name = settings.embedding_model
+    model = SentenceTransformer(model_name)
+    logger.info("Model loaded: {}", model_name)
+
     collection = client.get_or_create_collection(
         name=settings.chroma_collection,
-        metadata={"hnsw:space": "cosine"},
+        metadata={
+            "hnsw:space": "cosine",
+            # Nhãn để lần mở store sau đối chiếu được với EMBEDDING_MODEL đang cấu hình.
+            STORE_META_MODEL: model_name,
+            STORE_META_DIM: model.get_sentence_embedding_dimension(),
+        },
     )
-
-    model = SentenceTransformer(INDEXED_MODEL)
-    logger.info("Model loaded: {}", INDEXED_MODEL)
 
     ids: list[str] = []
     docs: list[str] = []

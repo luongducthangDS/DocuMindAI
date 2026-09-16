@@ -39,13 +39,17 @@ import time
 from pathlib import Path
 from typing import Any
 
-# Force HF cache to the local path before any sentence_transformers import —
-# the system HF_HOME points at a Google Drive mount that is usually offline.
 _REPO_ROOT = Path(__file__).resolve().parents[1]
-_LOCAL_HF = str(_REPO_ROOT / "data" / "hf_cache")
-for _k in ("HF_HOME", "HF_HUB_CACHE", "TRANSFORMERS_CACHE", "SENTENCE_TRANSFORMERS_HOME"):
-    os.environ[_k] = _LOCAL_HF
-os.environ["HF_HUB_OFFLINE"] = "1"
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
+from src.hf_env import use_local_hf_cache  # noqa: E402
+
+# Trước mọi import sentence_transformers. Eval chỉ dùng model đã cache nên offline=True.
+# Lưu ý: đây là module vẫn bị import từ nơi khác (score_context được dùng lại),
+# nên việc set env ở đây phải vô hại với importer — use_local_hf_cache chỉ trỏ cache
+# về repo, và mọi entrypoint cần tải model đều tự gọi lại với offline=False.
+use_local_hf_cache(offline=True)
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -155,11 +159,19 @@ def apply_arm(arm: str, chunks: list, as_of: str, earliest: str) -> tuple[list, 
 # ── Runner ────────────────────────────────────────────────────────────────────
 
 def _build_retriever():
+    """Dựng đúng retriever mà production dùng — kể cả việc có bật reranker hay không.
+
+    Trước đây hard-code rerank=True, nên eval đo một cấu hình mà API có thể không
+    chạy (ENABLE_RERANKER=false). Số đo phải nói về hệ thống thật, nên đọc settings.
+    """
     from eval.rag_comparison import _init_rag_shared
+    from src.config import get_settings
     from src.rag.retriever import build_hybrid_retriever
 
     index, _collection, all_nodes, _embedder = _init_rag_shared()
-    return build_hybrid_retriever(index, nodes=all_nodes, rerank=True)
+    rerank = get_settings().enable_reranker
+    logger.info("Retriever cho eval: rerank={}", rerank)
+    return build_hybrid_retriever(index, nodes=all_nodes, rerank=rerank)
 
 
 def run(

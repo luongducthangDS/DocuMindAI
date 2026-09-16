@@ -1,0 +1,599 @@
+{
+  "meta": {
+    "gold_set": "data/eval/temporal_questions.json",
+    "n_questions": 30,
+    "corpus_chunks": 1146,
+    "candidate_pool": 20,
+    "final_top_n": 8,
+    "reranker": "BAAI/bge-reranker-v2-m3",
+    "note": "Chunking/corpus/BM25/reranker giữ nguyên; biến duy nhất là model embedding."
+  },
+  "arms": [
+    {
+      "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "stats": {
+        "dim": 384,
+        "index_seconds": 44.9,
+        "query_ms_per_question": 8.9,
+        "params_millions": 117.7
+      },
+      "rows": [
+        {
+          "id": "ld_t01a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t01b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 2
+        },
+        {
+          "id": "ld_t02a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t02b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 2
+        },
+        {
+          "id": "ld_t03a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t03b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 7
+        },
+        {
+          "id": "ld_t04a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": false,
+          "dense_at_20": false,
+          "hybrid_at_20": false,
+          "final_at_8": false,
+          "gold_rank_dense": 36
+        },
+        {
+          "id": "ld_t04b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": false,
+          "dense_at_20": false,
+          "hybrid_at_20": false,
+          "final_at_8": false,
+          "gold_rank_dense": 121
+        },
+        {
+          "id": "ld_t05a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 2
+        },
+        {
+          "id": "ld_t05b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 5
+        },
+        {
+          "id": "ld_t06a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": false,
+          "dense_at_20": true,
+          "hybrid_at_20": false,
+          "final_at_8": false,
+          "gold_rank_dense": 13
+        },
+        {
+          "id": "ld_t06b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": false,
+          "dense_at_20": false,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 39
+        },
+        {
+          "id": "ld_t07a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": false,
+          "dense_at_20": true,
+          "hybrid_at_20": false,
+          "final_at_8": false,
+          "gold_rank_dense": 15
+        },
+        {
+          "id": "ld_t07b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": false,
+          "dense_at_20": false,
+          "hybrid_at_20": false,
+          "final_at_8": false,
+          "gold_rank_dense": 34
+        },
+        {
+          "id": "ld_t08a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 3
+        },
+        {
+          "id": "ld_t08b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 2
+        },
+        {
+          "id": "ld_t09a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 4
+        },
+        {
+          "id": "ld_t09b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 7
+        },
+        {
+          "id": "ld_t10a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": false,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 18
+        },
+        {
+          "id": "ld_t10b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": false,
+          "dense_at_20": false,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 65
+        },
+        {
+          "id": "ld_t11a",
+          "temporal_kind": "clause_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 2
+        },
+        {
+          "id": "ld_t11b",
+          "temporal_kind": "clause_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t12a",
+          "temporal_kind": "clause_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 2
+        },
+        {
+          "id": "ld_t12b",
+          "temporal_kind": "clause_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t13a",
+          "temporal_kind": "control",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t13b",
+          "temporal_kind": "control",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t14a",
+          "temporal_kind": "control",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t14b",
+          "temporal_kind": "control",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t15",
+          "temporal_kind": "out_of_range",
+          "dense_at_8": false,
+          "dense_at_20": false,
+          "hybrid_at_20": false,
+          "final_at_8": false,
+          "gold_rank_dense": null
+        },
+        {
+          "id": "ld_t16",
+          "temporal_kind": "out_of_range",
+          "dense_at_8": false,
+          "dense_at_20": false,
+          "hybrid_at_20": false,
+          "final_at_8": false,
+          "gold_rank_dense": null
+        }
+      ]
+    },
+    {
+      "model": "AITeamVN/Vietnamese_Embedding",
+      "stats": {
+        "dim": 1024,
+        "index_seconds": 1358.1,
+        "query_ms_per_question": 77.8,
+        "params_millions": 567.8
+      },
+      "rows": [
+        {
+          "id": "ld_t01a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t01b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 2
+        },
+        {
+          "id": "ld_t02a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t02b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 2
+        },
+        {
+          "id": "ld_t03a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t03b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 2
+        },
+        {
+          "id": "ld_t04a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 2
+        },
+        {
+          "id": "ld_t04b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 6
+        },
+        {
+          "id": "ld_t05a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t05b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 2
+        },
+        {
+          "id": "ld_t06a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t06b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 3
+        },
+        {
+          "id": "ld_t07a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t07b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 2
+        },
+        {
+          "id": "ld_t08a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 3
+        },
+        {
+          "id": "ld_t08b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t09a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 4
+        },
+        {
+          "id": "ld_t09b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t10a",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 7
+        },
+        {
+          "id": "ld_t10b",
+          "temporal_kind": "doc_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 6
+        },
+        {
+          "id": "ld_t11a",
+          "temporal_kind": "clause_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t11b",
+          "temporal_kind": "clause_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 3
+        },
+        {
+          "id": "ld_t12a",
+          "temporal_kind": "clause_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 2
+        },
+        {
+          "id": "ld_t12b",
+          "temporal_kind": "clause_version",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 4
+        },
+        {
+          "id": "ld_t13a",
+          "temporal_kind": "control",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t13b",
+          "temporal_kind": "control",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t14a",
+          "temporal_kind": "control",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t14b",
+          "temporal_kind": "control",
+          "dense_at_8": true,
+          "dense_at_20": true,
+          "hybrid_at_20": true,
+          "final_at_8": true,
+          "gold_rank_dense": 1
+        },
+        {
+          "id": "ld_t15",
+          "temporal_kind": "out_of_range",
+          "dense_at_8": false,
+          "dense_at_20": false,
+          "hybrid_at_20": false,
+          "final_at_8": false,
+          "gold_rank_dense": null
+        },
+        {
+          "id": "ld_t16",
+          "temporal_kind": "out_of_range",
+          "dense_at_8": false,
+          "dense_at_20": false,
+          "hybrid_at_20": false,
+          "final_at_8": false,
+          "gold_rank_dense": null
+        }
+      ]
+    }
+  ],
+  "summaries": [
+    {
+      "n_scored": 28,
+      "n_excluded_out_of_range": 2,
+      "dense_recall_at_8": 0.7143,
+      "dense_recall_at_20": 0.8214,
+      "hybrid_recall_at_20": 0.8214,
+      "final_gold_at_8": 0.8214,
+      "dense_mrr": 0.4777,
+      "gold_rank_median": 2,
+      "gold_never_found": 0
+    },
+    {
+      "n_scored": 28,
+      "n_excluded_out_of_range": 2,
+      "dense_recall_at_8": 1.0,
+      "dense_recall_at_20": 1.0,
+      "hybrid_recall_at_20": 1.0,
+      "final_gold_at_8": 1.0,
+      "dense_mrr": 0.6599,
+      "gold_rank_median": 2,
+      "gold_never_found": 0
+    }
+  ]
+}

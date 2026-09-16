@@ -60,3 +60,6 @@ frontend/UI design suggestions for legal query platform/
 
 node_modules/
 frontend/node_modules/
+
+# Cache xep hang dense cua eval/embedding_ab.py — tai tao duoc, khong commit
+reports/_ab_cache/

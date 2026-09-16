@@ -25,10 +25,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 _repo_root = Path(__file__).resolve().parents[1]
-_local_hf = _repo_root / "data" / "hf_cache"
-for _k in ("HF_HOME", "HF_HUB_CACHE", "TRANSFORMERS_CACHE", "SENTENCE_TRANSFORMERS_HOME"):
-    os.environ.setdefault(_k, str(_local_hf))
-os.environ.setdefault("HF_HUB_OFFLINE", "1")
+sys.path.insert(0, str(_repo_root))
+
+from src.hf_env import use_local_hf_cache  # noqa: E402
+
+use_local_hf_cache(offline=True)
 
 from loguru import logger
 

@@ -1,19 +1,22 @@
 """
 Embedding model for DocuMind AI.
 
-CURRENT MODEL: paraphrase-multilingual-MiniLM-L12-v2 (384-dim)
-  - Fast, lightweight, works offline
-  - The bundled ChromaDB corpus is already indexed with this model — do NOT change
-    the model without re-indexing (dimensions must match)
+Model dùng cho cả index lẫn query đọc từ MỘT nguồn sự thật: settings.embedding_model
+(.env → EMBEDDING_MODEL). Không hard-code ở đây, không hard-code trong scripts.
 
-UPGRADE PATH to BGE-M3 (better Vietnamese recall, context_recall +5-8 pp est.):
-  1. pip install FlagEmbedding
-  2. Re-index corpus: python scripts/rebuild_index.py --model BAAI/bge-m3
-  3. Set EMBEDDING_MODEL=BAAI/bge-m3 in .env
-  Note: bge-m3 is 570M params — needs 2GB+ RAM and ~60s cold start on CPU.
+Ràng buộc thật cần giữ là "vector trong store phải sinh ra từ đúng model này" —
+ràng buộc đó được thực thi bằng metadata ghi kèm collection (xem
+assert_store_matches_model), chứ không phải bằng cách ghi đè config của người dùng.
+Lệch model ⇒ báo lỗi to và dừng, vì kết quả retrieval khi đó là rác im lặng.
 
-RAGAS benchmark (MiniLM baseline, 2025-05):
-  faithfulness=0.8714 | answer_relevancy=0.8231 | context_recall=0.7683
+Đổi model:
+  1. EMBEDDING_MODEL=<model mới> trong .env
+  2. python scripts/reembed_corpus.py --yes     (re-embed tại chỗ, giữ nguyên chunk)
+  3. pytest -q && python eval/temporal_eval.py  (xác nhận không vỡ)
+
+A/B trên gold set lao động 28 câu, 1146 chunks (reports/embedding_ab.json, 2026-09-16):
+  paraphrase-multilingual-MiniLM-L12-v2 (384d) → final@8 = 0.821
+  AITeamVN/Vietnamese_Embedding        (1024d) → final@8 = 1.000
 """
 
 from __future__ import annotations
@@ -27,11 +30,23 @@ from pydantic import PrivateAttr
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from src.config import get_settings
+from src.hf_env import HF_CACHE_DIR, use_local_hf_cache
 
 if TYPE_CHECKING:
     from huggingface_hub import InferenceClient
 
-_INDEXED_EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+# Khoá metadata ghi kèm collection để biết vector trong đó sinh từ model nào.
+STORE_META_MODEL = "embedding_model"
+STORE_META_DIM = "embedding_dim"
+
+
+class EmbeddingModelMismatch(RuntimeError):
+    """Vector store được index bằng model khác với model đang cấu hình.
+
+    Đây là lỗi chặn đường, không phải cảnh báo: cosine giữa hai không gian vector
+    khác nhau vẫn trả về số, vẫn xếp hạng được, nên hệ thống sẽ chạy "bình thường"
+    và trả lời sai — dạng hỏng tệ nhất vì không ai thấy.
+    """
 
 
 class _HFInferenceAPIEmbedding(BaseEmbedding):
@@ -87,15 +102,7 @@ def get_embedder() -> "BaseEmbedding":
     no local model load, for RAM-constrained hosts (see _HFInferenceAPIEmbedding).
     """
     settings = get_settings()
-    # The bundled Chroma corpus is indexed with this 384-dim model. A stale
-    # env var from an older deploy can otherwise silently break retrieval.
-    model_name = _INDEXED_EMBEDDING_MODEL
-    if settings.embedding_model and settings.embedding_model != model_name:
-        logger.warning(
-            "Ignoring EMBEDDING_MODEL={} because bundled ChromaDB was indexed with {}",
-            settings.embedding_model,
-            model_name,
-        )
+    model_name = settings.embedding_model
 
     if settings.embedding_provider == "hf_api":
         logger.info("Using HF Inference API for embeddings (no local model load): {}", model_name)
@@ -106,48 +113,86 @@ def get_embedder() -> "BaseEmbedding":
     # low_cpu_mem_usage: load weights tensor-by-tensor instead of all at once,
     # halving peak RAM.  Critical on machines with limited pagefile (Windows).
     _model_kwargs = {"low_cpu_mem_usage": True}
-    local_cache = settings.data_dir / "hf_cache"
-    if local_cache.exists():
-        import os
-        os.environ["HF_HOME"] = str(local_cache)
-        os.environ["HF_HUB_CACHE"] = str(local_cache / "hub")
-        os.environ["TRANSFORMERS_CACHE"] = str(local_cache / "hub")
-        os.environ["SENTENCE_TRANSFORMERS_HOME"] = str(local_cache)
-        os.environ["HF_HUB_OFFLINE"] = "1"
-        _model_kwargs["local_files_only"] = True
 
-    try:
-        from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+    # Truyền cache_folder TƯỜNG MINH thay vì trông vào biến môi trường:
+    # huggingface_hub đọc HF_HOME/HF_HUB_CACHE đúng một lần lúc import và đóng băng
+    # giá trị đó. Module này import llama_index (kéo theo huggingface_hub) ở đầu file,
+    # nên mọi thao tác os.environ bên trong hàm đều đã muộn — cache vẫn trỏ về
+    # HF_HOME của máy (G:\, thường offline) và model nằm sẵn trong repo bị coi như
+    # không tồn tại. Tham số thì không có vấn đề thời điểm đó.
+    cache_folder = str(HF_CACHE_DIR) if HF_CACHE_DIR.exists() else None
+    if cache_folder:
+        use_local_hf_cache(offline=True)  # cho các thư viện đọc env muộn (sentence_transformers)
 
-        embedder = HuggingFaceEmbedding(
-            model_name=model_name,
-            max_length=512,
-            trust_remote_code=False,  # security: never trust remote code by default
-            model_kwargs=_model_kwargs,
+    from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+
+    embedder = HuggingFaceEmbedding(
+        model_name=model_name,
+        max_length=512,
+        trust_remote_code=False,  # security: never trust remote code by default
+        cache_folder=cache_folder,
+        model_kwargs=_model_kwargs,
+    )
+    logger.info("Embedder ready: {} (cache: {})", model_name, cache_folder or "mặc định HF")
+    return embedder
+
+
+@lru_cache(maxsize=1)
+def get_embedding_dim() -> int:
+    """Chiều vector của model đang cấu hình, hỏi thẳng model thay vì hard-code.
+
+    Một lần embed chuỗi rỗng là đủ, và rẻ so với việc để hằng số lệch âm thầm.
+    """
+    dim = len(get_embedder().get_query_embedding(""))
+    logger.info("Embedding dim = {} ({})", dim, get_settings().embedding_model)
+    return dim
+
+
+def store_identity() -> dict:
+    """Metadata nhận dạng để ghi kèm collection lúc index."""
+    return {
+        STORE_META_MODEL: get_settings().embedding_model,
+        STORE_META_DIM: get_embedding_dim(),
+    }
+
+
+def assert_store_matches_model(collection_metadata: dict | None, *, where: str = "vector store") -> None:
+    """Dừng ngay nếu store được index bằng model khác model đang cấu hình.
+
+    Collection cũ (index trước khi có metadata này) chỉ cảnh báo — không thể
+    khẳng định nó sai, nhưng cũng không thể khẳng định nó đúng.
+    """
+    settings = get_settings()
+    meta = collection_metadata or {}
+    indexed_model = meta.get(STORE_META_MODEL)
+
+    if not indexed_model:
+        logger.warning(
+            "{} không ghi {} — không kiểm chứng được nó đã index bằng model nào. "
+            "Chạy scripts/reembed_corpus.py để gắn nhãn.",
+            where, STORE_META_MODEL,
         )
-        logger.info("Embedder ready: {}", model_name)
-        return embedder
+        return
 
-    except Exception as exc:
-        logger.error("Failed to load {} — retrying with local_files_only=True: {}", model_name, exc)
-        # Retry the SAME model from local disk only (no HF download).
-        # This avoids the hf_xet / G:\ issue on unmounted drives while keeping
-        # the correct embedding dimensions for the indexed ChromaDB corpus.
-        from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-
-        return HuggingFaceEmbedding(
-            model_name=model_name,
-            max_length=512,
-            trust_remote_code=False,
-            model_kwargs={**_model_kwargs, "local_files_only": True},
+    if indexed_model != settings.embedding_model:
+        raise EmbeddingModelMismatch(
+            f"{where} được index bằng '{indexed_model}' nhưng EMBEDDING_MODEL đang là "
+            f"'{settings.embedding_model}'. Truy vấn sẽ trả kết quả sai một cách im lặng. "
+            f"Cách xử lý: đặt lại EMBEDDING_MODEL='{indexed_model}', hoặc re-embed corpus "
+            f"bằng `python scripts/reembed_corpus.py --yes`."
         )
 
 
-def get_chroma_collection():
+def get_chroma_collection(*, verify: bool = True):
     """
     Return ChromaDB collection.
     Tries HTTP server first (production), falls back to local PersistentClient (dev).
     Uses heartbeat probe before attempting collection ops to fail fast.
+
+    verify=True: đối chiếu nhãn model của collection với EMBEDDING_MODEL và ném
+    EmbeddingModelMismatch nếu lệch. Chỉ so tên model — không nạp model, nên rẻ.
+    verify=False dành cho script đang chủ động ghi lại corpus bằng model khác
+    (scripts/reembed_corpus.py).
     """
     import chromadb
     from chromadb.config import Settings as ChromaSettings
@@ -168,8 +213,14 @@ def get_chroma_collection():
                 name=settings.chroma_collection,
                 metadata={"hnsw:space": "cosine"},
             )
+            if verify:
+                assert_store_matches_model(
+                    collection.metadata, where=f"Chroma collection '{settings.chroma_collection}'"
+                )
             logger.info("ChromaDB HTTP server ready: {}", settings.chroma_collection)
             return client, collection
+        except EmbeddingModelMismatch:
+            raise  # lỗi cấu hình, không phải lỗi kết nối — không được nuốt rồi fallback
         except Exception as exc:
             logger.warning(
                 "HTTP ChromaDB unavailable ({}), using local PersistentClient",
@@ -184,17 +235,18 @@ def get_chroma_collection():
         name=settings.chroma_collection,
         metadata={"hnsw:space": "cosine"},
     )
+    if verify:
+        assert_store_matches_model(
+            collection.metadata, where=f"Chroma collection '{settings.chroma_collection}'"
+        )
     logger.info("ChromaDB local persistent ready: {} @ {}", settings.chroma_collection, chroma_path)
     return local_client, collection
-
-
-_QDRANT_VECTOR_SIZE = 384  # must match the embedding model's output dim (MiniLM-L12-v2)
 
 
 def get_qdrant_client_and_collection() -> tuple:
     """
     Return (QdrantClient, collection_name). Creates the collection if it doesn't
-    exist yet (cosine distance, 384-dim to match the embedding model).
+    exist yet (cosine distance, chiều vector hỏi thẳng model đang cấu hình).
 
     Requires QDRANT_URL in .env (Qdrant Cloud cluster URL) + QDRANT_API_KEY.
     """
@@ -214,9 +266,22 @@ def get_qdrant_client_and_collection() -> tuple:
     if collection_name not in existing:
         client.create_collection(
             collection_name=collection_name,
-            vectors_config=VectorParams(size=_QDRANT_VECTOR_SIZE, distance=Distance.COSINE),
+            vectors_config=VectorParams(size=get_embedding_dim(), distance=Distance.COSINE),
         )
         logger.info("Created new Qdrant collection: {}", collection_name)
+    else:
+        # Collection sẵn có: chiều vector của nó là bằng chứng khách quan về model
+        # đã index — lệch thì mọi truy vấn về sau là rác, nên chặn ngay tại đây.
+        info = client.get_collection(collection_name)
+        vectors = info.config.params.vectors
+        indexed_dim = getattr(vectors, "size", None)
+        wanted = get_embedding_dim()
+        if indexed_dim is not None and indexed_dim != wanted:
+            raise EmbeddingModelMismatch(
+                f"Qdrant collection '{collection_name}' có vector {indexed_dim} chiều nhưng "
+                f"EMBEDDING_MODEL='{settings.embedding_model}' sinh vector {wanted} chiều. "
+                f"Chạy lại migrate/re-embed trước khi truy vấn."
+            )
 
     logger.info("Qdrant ready: {} @ {}", collection_name, settings.qdrant_url)
     return client, collection_name

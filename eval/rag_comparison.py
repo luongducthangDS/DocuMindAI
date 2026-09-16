@@ -45,13 +45,12 @@ import time
 from pathlib import Path
 from typing import Any
 
-# Force HF cache to local path before any sentence_transformers / transformers import.
-# System HF_HOME may point to G:\My Drive\HF_Cache_Models (Google Drive, often offline)
-# which causes a native-level crash (0xC0000005) on Windows when Drive is unmounted.
-_local_hf = str(Path(__file__).resolve().parents[1] / "data" / "hf_cache")
-for _k in ("HF_HOME", "HF_HUB_CACHE", "TRANSFORMERS_CACHE", "SENTENCE_TRANSFORMERS_HOME"):
-    os.environ[_k] = _local_hf
-os.environ["HF_HUB_OFFLINE"] = "1"
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from src.hf_env import use_local_hf_cache  # noqa: E402
+
+# Trước mọi import sentence_transformers / transformers.
+use_local_hf_cache(offline=True)
 
 # Windows console defaults to cp1252 which can't encode Vietnamese / box-drawing chars.
 # Reconfigure stdout/stderr to UTF-8 so print() doesn't crash on non-ASCII output.

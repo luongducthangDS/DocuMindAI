@@ -23,16 +23,15 @@ See eval/rag_comparison.py for implementation details.
 
 import os, sys, pathlib
 
-# Force HuggingFace to use local cache (not G:\My Drive) — must be set before any HF imports
 _repo_root = pathlib.Path(__file__).parent.parent
-_hf_local = _repo_root / "data" / "hf_cache"
-if _hf_local.exists():
-    os.environ.setdefault("HF_HOME", str(_hf_local))
-    os.environ.setdefault("TRANSFORMERS_CACHE", str(_hf_local / "hub"))
-    os.environ.setdefault("HF_HUB_OFFLINE", "1")
-
 sys.path.insert(0, str(_repo_root))
-from eval.rag_comparison import main
+
+from src.hf_env import use_local_hf_cache  # noqa: E402
+
+# Trước mọi import HF. rag_comparison cũng gọi lại — gọi hai lần là vô hại.
+use_local_hf_cache(offline=True)
+
+from eval.rag_comparison import main  # noqa: E402
 
 if __name__ == "__main__":
     main()
