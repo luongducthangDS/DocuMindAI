@@ -105,28 +105,27 @@ def _wrap_with_reranker(base_retriever, top_n: int = 8):
     Uses small but effective MiniLM model — runs locally, no API.
     """
     global _reranker_active
-    import os
-    # HF_HOME may point to an unmounted network drive (e.g. G:\).
-    # hf_xet (HuggingFace's transfer layer) reads HF_HOME for its log files and
-    # will crash if that path is inaccessible.  Force-redirect ALL HF caches to a
-    # guaranteed-local directory for the duration of the model load.
-    _hf_keys = ("HF_HOME", "HF_HUB_CACHE", "SENTENCE_TRANSFORMERS_HOME")
-    _saved = {k: os.environ.get(k) for k in _hf_keys}
-    # Use the project-local HF cache so reranker loads from data/hf_cache/
-    # regardless of whether the system HF_HOME points to an offline drive.
-    _project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    local_hf = os.path.join(_project_root, "data", "hf_cache")
-    os.environ["HF_HOME"] = local_hf
-    os.environ["HF_HUB_CACHE"] = os.path.join(local_hf, "hub")
-    os.environ["SENTENCE_TRANSFORMERS_HOME"] = local_hf
+    # SentenceTransformerRerank không nhận cache_folder (chỉ có model/top_n/device/
+    # trust_remote_code), nên ở đây buộc phải đi qua biến môi trường — khác với
+    # embedder, nơi cache được truyền thẳng làm tham số.
+    # Env được giữ nguyên sau khi load (khối finally cũ khôi phục lại HF_HOME trỏ về
+    # G:\ đã bị gỡ): trả về một đường dẫn offline chỉ tạo ra lỗi khó hiểu cho lần
+    # load model kế tiếp, không bảo vệ được gì.
+    from src.hf_env import resolve_cached_model, use_local_hf_cache
+
+    use_local_hf_cache(offline=True)
 
     try:
         from llama_index.core.postprocessor import SentenceTransformerRerank
         from src.config import get_settings
 
         model_name = get_settings().reranker_model
+        # Truyền đường dẫn cache đã resolve thay cho repo id khi model có sẵn: nếu chỉ
+        # đưa repo id, thư viện tra cache theo HF_HOME đã đóng băng lúc import (ổ G:\
+        # offline trên máy dev) và coi như model chưa tải, dù nó nằm trong repo.
+        model_ref = resolve_cached_model(model_name) or model_name
         reranker = SentenceTransformerRerank(
-            model=model_name,
+            model=model_ref,
             top_n=top_n,
         )
         logger.info("Cross-encoder reranker loaded: {} (top_n={})", model_name, top_n)
@@ -141,15 +140,6 @@ def _wrap_with_reranker(base_retriever, top_n: int = 8):
         # meaningful gap to threshold on, so truncate to rank order instead
         # of returning the full top_k=20 pool.
         return _TruncatedRetriever(base_retriever, top_n=top_n)
-
-    finally:
-        # Restore original HF env vars so the rest of the app still uses
-        # the user's configured cache (G:\) for non-xet operations.
-        for k, v in _saved.items():
-            if v is None:
-                os.environ.pop(k, None)
-            else:
-                os.environ[k] = v
 
 
 class _RerankedRetriever:

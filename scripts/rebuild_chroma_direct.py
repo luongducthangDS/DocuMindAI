@@ -5,18 +5,24 @@ import json
 import sys
 from pathlib import Path
 
-import chromadb
-from loguru import logger
-from sentence_transformers import SentenceTransformer
-
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from src.config import get_settings
+from src.hf_env import use_local_hf_cache  # noqa: E402
+
+# Trước mọi import HF. offline=False: ingest được phép tải model chưa cache.
+use_local_hf_cache(offline=False, create=True)
+
+import chromadb  # noqa: E402
+from loguru import logger  # noqa: E402
+from sentence_transformers import SentenceTransformer  # noqa: E402
+
+from src.config import get_settings  # noqa: E402
+from src.rag.embedder import STORE_META_DIM, STORE_META_MODEL  # noqa: E402
 from src.ingestion.chunker import chunk_by_dieu
 from src.ingestion.cleaner import clean_legal_text
 
 
-INDEXED_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+# Model embedding đọc từ settings.embedding_model — xem src/rag/embedder.py.
 
 
 def iter_json_docs(raw_dir: Path):
@@ -51,12 +57,17 @@ def main() -> None:
         except Exception as exc:
             logger.info("Collection reset skipped: {}", exc)
 
+    model_name = settings.embedding_model
+    model = SentenceTransformer(model_name)
+
     collection = client.get_or_create_collection(
         name=settings.chroma_collection,
-        metadata={"hnsw:space": "cosine"},
+        metadata={
+            "hnsw:space": "cosine",
+            STORE_META_MODEL: model_name,
+            STORE_META_DIM: model.get_sentence_embedding_dimension(),
+        },
     )
-
-    model = SentenceTransformer(INDEXED_MODEL)
     ids: list[str] = []
     docs: list[str] = []
     metas: list[dict] = []

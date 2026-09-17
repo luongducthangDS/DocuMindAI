@@ -451,3 +451,100 @@ class TestSchemas:
         assert ".." not in req.filename
         assert "/" not in req.filename
         assert "etc" in req.filename or req.filename  # sanitized but not empty
+
+
+# ── as_of_date plumbing (temporal-retrieval) ──────────────────────────────────
+
+class TestAsOfDateState:
+    """`as_of_date` must reach AgentState from run_agent, with today as default."""
+
+    @staticmethod
+    def _captured_state(**kwargs) -> dict:
+        from src.agent import graph as graph_mod
+
+        captured = {}
+
+        async def fake_ainvoke(state):
+            captured.update(state)
+            return state
+
+        fake_graph = MagicMock()
+        fake_graph.ainvoke = fake_ainvoke
+        with patch.object(graph_mod, "get_graph", return_value=fake_graph):
+            asyncio.run(graph_mod.run_agent(query="nghỉ thai sản mấy tháng", **kwargs))
+        return captured
+
+    def test_explicit_as_of_date_is_used(self):
+        state = self._captured_state(as_of_date="2025-06-01")
+        assert state["as_of_date"] == "2025-06-01"
+        assert state["time_out_of_range"] is False
+
+    def test_missing_as_of_date_defaults_to_today(self):
+        from src.rag.temporal import today_iso
+
+        state = self._captured_state()
+        assert state["as_of_date"] == today_iso()
+
+    def test_blank_as_of_date_defaults_to_today(self):
+        from src.rag.temporal import today_iso
+
+        state = self._captured_state(as_of_date="   ")
+        assert state["as_of_date"] == today_iso()
+
+    def test_date_before_corpus_start_flags_out_of_range(self):
+        state = self._captured_state(as_of_date="2010-01-01")
+        assert state["as_of_date"] == "2010-01-01"
+        assert state["time_out_of_range"] is True
+
+
+class TestAsOfDateRequestSchema:
+    def test_accepts_iso_date(self):
+        from src.api.schemas import QueryRequest
+
+        assert QueryRequest(query="câu hỏi thử", as_of_date="2026-01-01").as_of_date == "2026-01-01"
+
+    def test_defaults_to_none(self):
+        from src.api.schemas import QueryRequest
+
+        assert QueryRequest(query="câu hỏi thử").as_of_date is None
+
+    def test_rejects_non_iso_date(self):
+        from pydantic import ValidationError
+        from src.api.schemas import QueryRequest
+
+        with pytest.raises(ValidationError):
+            QueryRequest(query="câu hỏi thử", as_of_date="01/06/2025")
+
+
+class TestQueryRouteForwardsAsOfDate:
+    """The /query handler must forward as_of_date down to run_agent."""
+
+    def test_body_as_of_date_reaches_run_agent(self):
+        from src.api.routes import query as query_route
+
+        seen = {}
+
+        async def fake_run_agent(**kwargs):
+            seen.update(kwargs)
+            return {
+                "answer": "ok", "sources": [], "used_llm": "test",
+                "retrieved_chunks": [], "latency_ms": 1, "steps": [],
+                "retry_count": 0, "grade_reason": "", "compliance_result": None,
+                "error": None,
+            }
+
+        async def noop():
+            return None
+
+        request = MagicMock()
+        request.headers = {"user-agent": "pytest"}
+        request.client.host = "127.0.0.1"
+
+        from src.api.schemas import QueryRequest
+
+        body = QueryRequest(query="lương tối thiểu vùng I", as_of_date="2025-03-01")
+        with patch.object(query_route, "run_agent", fake_run_agent), \
+             patch("src.api.main.ensure_rag_initialized", noop):
+            asyncio.run(query_route.query_endpoint(request, body))
+
+        assert seen["as_of_date"] == "2025-03-01"

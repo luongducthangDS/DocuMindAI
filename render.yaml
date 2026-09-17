@@ -39,15 +39,17 @@ services:
         value: groq/llama-3.3-70b-versatile
       - key: FALLBACK_LLM
         value: gemini/gemini-2.5-flash-lite
+      # Phai khop model da index corpus (nhan ghi trong metadata collection).
+      # Lech nhan => EmbeddingModelMismatch luc khoi dong, khong chay tiep.
       - key: EMBEDDING_MODEL
-        value: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+        value: AITeamVN/Vietnamese_Embedding
       - key: INITIALIZE_RAG_ON_STARTUP
         value: "true"
       # Free tier = 512MB RAM. Reranker mặc định (BAAI/bge-reranker-v2-m3) nặng
       # ~2.2GB — bắt buộc phải tắt trên free tier; bật lại nếu nâng plan có nhiều RAM hơn.
       - key: ENABLE_RERANKER
         value: "false"
-      # Model embedding local (paraphrase-multilingual-MiniLM-L12-v2, 458MB trên đĩa)
+      # Model embedding local (AITeamVN/Vietnamese_Embedding, 2.2GB trên đĩa)
       # cộng baseline torch+transformers+llama_index tự nó đã vượt 512MB — tắt reranker
       # thôi KHÔNG đủ. EMBEDDING_PROVIDER=hf_api gọi HuggingFace Inference API thay vì
       # load model vào RAM (đã verify: cùng model, vector giống hệt local, không cần

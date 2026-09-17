@@ -1,0 +1,1185 @@
+{
+  "meta": {
+    "gold_set": "data/eval/temporal_questions.json",
+    "n_questions": 30,
+    "arms": [
+      "no_temporal",
+      "prompt_only",
+      "temporal_filter"
+    ],
+    "retrieval_only": true,
+    "corpus_earliest_point_in_time": "2015-01-01",
+    "retriever": "hybrid BM25 + dense, RRF fusion, cross-encoder rerank → top-8"
+  },
+  "rows": [
+    {
+      "id": "ld_t01a",
+      "pair_id": "luong_toi_thieu_thang_vung_1",
+      "question": "Mức lương tối thiểu tháng áp dụng cho người lao động làm việc ở vùng I là bao nhiêu?",
+      "as_of_date": "2025-03-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 559,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 4
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t01b",
+      "pair_id": "luong_toi_thieu_thang_vung_1",
+      "question": "Mức lương tối thiểu tháng áp dụng cho người lao động làm việc ở vùng I là bao nhiêu?",
+      "as_of_date": "2026-02-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 308,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 4
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t02a",
+      "pair_id": "luong_toi_thieu_gio_vung_3",
+      "question": "Mức lương tối thiểu giờ của vùng III là bao nhiêu?",
+      "as_of_date": "2025-08-15",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 337,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 4
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t02b",
+      "pair_id": "luong_toi_thieu_gio_vung_3",
+      "question": "Mức lương tối thiểu giờ của vùng III là bao nhiêu?",
+      "as_of_date": "2026-03-10",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 329,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 4
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t03a",
+      "pair_id": "luong_toi_thieu_thang_vung_4",
+      "question": "Doanh nghiệp ở vùng IV phải trả mức lương tối thiểu tháng thấp nhất là bao nhiêu?",
+      "as_of_date": "2024-09-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 273,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t03b",
+      "pair_id": "luong_toi_thieu_thang_vung_4",
+      "question": "Doanh nghiệp ở vùng IV phải trả mức lương tối thiểu tháng thấp nhất là bao nhiêu?",
+      "as_of_date": "2026-01-05",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 279,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t04a",
+      "pair_id": "dieu_kien_huong_luong_huu",
+      "question": "Người lao động phải đóng bảo hiểm xã hội tối thiểu bao nhiêu năm thì được hưởng lương hưu?",
+      "as_of_date": "2024-05-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 329,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 6
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t04b",
+      "pair_id": "dieu_kien_huong_luong_huu",
+      "question": "Người lao động phải đóng bảo hiểm xã hội tối thiểu bao nhiêu năm thì được hưởng lương hưu?",
+      "as_of_date": "2025-09-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 285,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": false,
+            "distractor": false,
+            "clean": false,
+            "n_chunks": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t05a",
+      "pair_id": "tro_cap_mot_lan_khi_sinh_con",
+      "question": "Lao động nữ sinh con được trợ cấp một lần bằng bao nhiêu?",
+      "as_of_date": "2024-10-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 333,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t05b",
+      "pair_id": "tro_cap_mot_lan_khi_sinh_con",
+      "question": "Lao động nữ sinh con được trợ cấp một lần bằng bao nhiêu?",
+      "as_of_date": "2026-02-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 283,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 5
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t06a",
+      "pair_id": "tran_tien_luong_dong_bhxh",
+      "question": "Tiền lương tháng làm căn cứ đóng bảo hiểm xã hội bắt buộc cao nhất bằng bao nhiêu?",
+      "as_of_date": "2024-03-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 281,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 2
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t06b",
+      "pair_id": "tran_tien_luong_dong_bhxh",
+      "question": "Tiền lương tháng làm căn cứ đóng bảo hiểm xã hội bắt buộc cao nhất bằng bao nhiêu?",
+      "as_of_date": "2025-10-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 285,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 2
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t07a",
+      "pair_id": "che_do_bhxh_tu_nguyen",
+      "question": "Bảo hiểm xã hội tự nguyện gồm những chế độ nào?",
+      "as_of_date": "2024-06-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 260,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t07b",
+      "pair_id": "che_do_bhxh_tu_nguyen",
+      "question": "Bảo hiểm xã hội tự nguyện gồm những chế độ nào?",
+      "as_of_date": "2025-12-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 267,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 5
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t08a",
+      "pair_id": "muc_huong_tro_cap_that_nghiep",
+      "question": "Mức hưởng trợ cấp thất nghiệp hằng tháng được tính thế nào và tối đa là bao nhiêu?",
+      "as_of_date": "2025-05-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 288,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 2
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t08b",
+      "pair_id": "muc_huong_tro_cap_that_nghiep",
+      "question": "Mức hưởng trợ cấp thất nghiệp hằng tháng được tính thế nào và tối đa là bao nhiêu?",
+      "as_of_date": "2026-03-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 286,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t09a",
+      "pair_id": "thoi_diem_huong_tro_cap_that_nghiep",
+      "question": "Thời điểm hưởng trợ cấp thất nghiệp được tính từ ngày nào kể từ ngày nộp đủ hồ sơ?",
+      "as_of_date": "2025-06-15",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 293,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 2
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t09b",
+      "pair_id": "thoi_diem_huong_tro_cap_that_nghiep",
+      "question": "Thời điểm hưởng trợ cấp thất nghiệp được tính từ ngày nào kể từ ngày nộp đủ hồ sơ?",
+      "as_of_date": "2026-04-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 271,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 2
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t10a",
+      "pair_id": "dieu_kien_chua_tim_duoc_viec_lam",
+      "question": "Sau khi nộp hồ sơ hưởng trợ cấp thất nghiệp, người lao động phải chưa tìm được việc làm trong bao lâu thì mới đủ điều kiện hưởng?",
+      "as_of_date": "2025-02-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 295,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 5
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t10b",
+      "pair_id": "dieu_kien_chua_tim_duoc_viec_lam",
+      "question": "Sau khi nộp hồ sơ hưởng trợ cấp thất nghiệp, người lao động phải chưa tìm được việc làm trong bao lâu thì mới đủ điều kiện hưởng?",
+      "as_of_date": "2026-05-01",
+      "temporal_kind": "doc_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 301,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": false,
+            "distractor": false,
+            "clean": false,
+            "n_chunks": 2
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t11a",
+      "pair_id": "nghi_thai_san_thoi_gian",
+      "question": "Lao động nữ được nghỉ thai sản trước và sau khi sinh con bao lâu?",
+      "as_of_date": "2026-05-01",
+      "temporal_kind": "clause_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 265,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 2
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t11b",
+      "pair_id": "nghi_thai_san_thoi_gian",
+      "question": "Lao động nữ được nghỉ thai sản trước và sau khi sinh con bao lâu?",
+      "as_of_date": "2026-09-10",
+      "temporal_kind": "clause_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 268,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 2
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t12a",
+      "pair_id": "nghi_thai_san_con_thu_hai",
+      "question": "Lao động nữ sinh con thứ hai được nghỉ thai sản mấy tháng?",
+      "as_of_date": "2026-03-01",
+      "temporal_kind": "clause_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 296,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t12b",
+      "pair_id": "nghi_thai_san_con_thu_hai",
+      "question": "Lao động nữ sinh con thứ hai được nghỉ thai sản mấy tháng?",
+      "as_of_date": "2026-08-01",
+      "temporal_kind": "clause_version",
+      "expected_behavior": "answer",
+      "retrieve_ms": 296,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t13a",
+      "pair_id": "luong_lam_them_ngay_thuong",
+      "question": "Làm thêm giờ vào ngày thường được trả lương ít nhất bằng bao nhiêu phần trăm?",
+      "as_of_date": "2024-02-01",
+      "temporal_kind": "control",
+      "expected_behavior": "answer",
+      "retrieve_ms": 281,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 5
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t13b",
+      "pair_id": "luong_lam_them_ngay_thuong",
+      "question": "Làm thêm giờ vào ngày thường được trả lương ít nhất bằng bao nhiêu phần trăm?",
+      "as_of_date": "2026-06-01",
+      "temporal_kind": "control",
+      "expected_behavior": "answer",
+      "retrieve_ms": 267,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 5
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t14a",
+      "pair_id": "nghi_hang_nam",
+      "question": "Người lao động làm đủ 12 tháng trong điều kiện bình thường được nghỉ hằng năm bao nhiêu ngày?",
+      "as_of_date": "2024-06-01",
+      "temporal_kind": "control",
+      "expected_behavior": "answer",
+      "retrieve_ms": 318,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 6
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t14b",
+      "pair_id": "nghi_hang_nam",
+      "question": "Người lao động làm đủ 12 tháng trong điều kiện bình thường được nghỉ hằng năm bao nhiêu ngày?",
+      "as_of_date": "2026-06-01",
+      "temporal_kind": "control",
+      "expected_behavior": "answer",
+      "retrieve_ms": 305,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 6
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t15",
+      "pair_id": "ngoai_pham_vi_thoi_gian_luong",
+      "question": "Mức lương tối thiểu vùng I là bao nhiêu?",
+      "as_of_date": "2010-01-01",
+      "temporal_kind": "out_of_range",
+      "expected_behavior": "time_out_of_range",
+      "retrieve_ms": 260,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "ld_t16",
+      "pair_id": "ngoai_pham_vi_thoi_gian_huu_tri",
+      "question": "Điều kiện hưởng lương hưu gồm những gì?",
+      "as_of_date": "2012-06-01",
+      "temporal_kind": "out_of_range",
+      "expected_behavior": "time_out_of_range",
+      "retrieve_ms": 266,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 0
+          }
+        }
+      }
+    }
+  ],
+  "summary": {
+    "overall": {
+      "no_temporal": {
+        "n": 30,
+        "context_gold": 0.8666666666666667,
+        "context_distractor": 0.8333333333333334,
+        "context_clean": 0.16666666666666666,
+        "avg_chunks": 8.0
+      },
+      "prompt_only": {
+        "n": 30,
+        "context_gold": 0.8666666666666667,
+        "context_distractor": 0.8333333333333334,
+        "context_clean": 0.16666666666666666,
+        "avg_chunks": 8.0
+      },
+      "temporal_filter": {
+        "n": 30,
+        "context_gold": 0.9333333333333333,
+        "context_distractor": 0.0,
+        "context_clean": 0.9333333333333333,
+        "avg_chunks": 3.2333333333333334
+      }
+    },
+    "by_kind": {
+      "clause_version": {
+        "no_temporal": {
+          "n": 4,
+          "context_gold": 1.0,
+          "context_distractor": 1.0,
+          "context_clean": 0.0,
+          "avg_chunks": 8.0
+        },
+        "prompt_only": {
+          "n": 4,
+          "context_gold": 1.0,
+          "context_distractor": 1.0,
+          "context_clean": 0.0,
+          "avg_chunks": 8.0
+        },
+        "temporal_filter": {
+          "n": 4,
+          "context_gold": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 2.5
+        }
+      },
+      "control": {
+        "no_temporal": {
+          "n": 4,
+          "context_gold": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 8.0
+        },
+        "prompt_only": {
+          "n": 4,
+          "context_gold": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 8.0
+        },
+        "temporal_filter": {
+          "n": 4,
+          "context_gold": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 5.5
+        }
+      },
+      "doc_version": {
+        "no_temporal": {
+          "n": 20,
+          "context_gold": 0.9,
+          "context_distractor": 0.95,
+          "context_clean": 0.05,
+          "avg_chunks": 8.0
+        },
+        "prompt_only": {
+          "n": 20,
+          "context_gold": 0.9,
+          "context_distractor": 0.95,
+          "context_clean": 0.05,
+          "avg_chunks": 8.0
+        },
+        "temporal_filter": {
+          "n": 20,
+          "context_gold": 0.9,
+          "context_distractor": 0.0,
+          "context_clean": 0.9,
+          "avg_chunks": 3.25
+        }
+      },
+      "out_of_range": {
+        "no_temporal": {
+          "n": 2,
+          "context_gold": 0.0,
+          "context_distractor": 1.0,
+          "context_clean": 0.0,
+          "avg_chunks": 8.0
+        },
+        "prompt_only": {
+          "n": 2,
+          "context_gold": 0.0,
+          "context_distractor": 1.0,
+          "context_clean": 0.0,
+          "avg_chunks": 8.0
+        },
+        "temporal_filter": {
+          "n": 2,
+          "context_gold": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 0.0
+        }
+      }
+    }
+  }
+}

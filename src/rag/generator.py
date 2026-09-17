@@ -114,6 +114,23 @@ def _cited_sources(answer: str, chunks: list[RetrievedChunk]) -> list[dict]:
     ]
 
 
+def _as_of_block(as_of_date: str | None) -> str:
+    """Prompt preamble stating which date the answer must speak for.
+
+    The chunks were already filtered by `versions_in_force`, so the model is not
+    asked to reason about dates — only to name the date it is answering for and
+    to use the figures of that version (minimum wage, contribution rates...).
+    """
+    if not as_of_date:
+        return ""
+    return (
+        f"**Thời điểm tra cứu:** {as_of_date}\n"
+        "Các đoạn dưới đây đã được lọc theo hiệu lực tại ngày này. Khi nêu số liệu "
+        "(mức lương tối thiểu, tỷ lệ đóng, thời gian nghỉ...), dùng đúng con số của bản có "
+        f"hiệu lực tại {as_of_date} và nêu rõ mốc thời điểm này trong câu trả lời.\n\n"
+    )
+
+
 def _build_context(chunks: list[RetrievedChunk]) -> tuple[str, str]:
     """Returns (context_block, citation_list). Truncates to stay within LLM limits."""
     context_parts = []
@@ -252,10 +269,46 @@ def _call_gemini(prompt: str, context: str, history: list[dict] | None = None) -
     raise last_exc  # all pairs exhausted
 
 
+def _call_openai_compat(prompt: str, context: str, history: list[dict] | None = None) -> str | None:
+    """Backup cuối cùng trước extractive: gọi endpoint tương thích OpenAI.
+
+    Kích hoạt khi có OPENAI_API_KEY. OPENAI_API_BASE trống → OpenAI thật;
+    hoặc trỏ tới vLLM / OpenRouter / Together / bất kỳ endpoint OpenAI-compatible.
+    """
+    settings = get_settings()
+    if not settings.openai_api_key:
+        raise RuntimeError("OPENAI_API_KEY not set")
+
+    from openai import OpenAI
+
+    client_kwargs: dict = {"api_key": settings.openai_api_key}
+    if settings.openai_api_base:
+        client_kwargs["base_url"] = settings.openai_api_base
+    client = OpenAI(**client_kwargs)
+
+    messages = [{"role": "system", "content": _SYSTEM_PROMPT}]
+    if history:
+        messages.extend(history)
+    messages.append(
+        {"role": "user", "content": f"**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {prompt}"}
+    )
+    try:
+        response = client.chat.completions.create(
+            model=settings.openai_model,
+            messages=messages,
+            temperature=0.0,
+            max_tokens=1536,
+        )
+        return response.choices[0].message.content
+    except Exception as exc:
+        logger.error("OpenAI-compat API error (type={}, detail={})", type(exc).__name__, str(exc)[:300])
+        raise
+
+
 @_traceable(
     name="rag-generate-answer",
     run_type="llm",
-    tags=["groq", "gemini", "legal-qa", "citations"],
+    tags=["groq", "gemini", "openai-compat", "legal-qa", "citations"],
 )
 def generate_answer(
     query: str,
@@ -263,6 +316,9 @@ def generate_answer(
     use_fallback: bool = False,
     history: list[dict] | None = None,
     min_score: float | None = None,
+    as_of_date: str | None = None,
+    time_out_of_range: bool = False,
+    earliest_covered: str = "",
 ) -> dict:
     """
     Generate answer with citations.
@@ -272,6 +328,23 @@ def generate_answer(
     of the parent 'documind-agent' run, showing the prompt, LLM response, and
     which provider was used (Groq primary / Gemini fallback).
     """
+    if time_out_of_range:
+        # Answering a date the corpus never covered would mean presenting later
+        # law as if it applied then — say what the corpus covers instead.
+        moc = f" ({as_of_date})" if as_of_date else ""
+        tu_ngay = earliest_covered or "mốc sớm nhất của corpus"
+        return {
+            "answer": (
+                f"Câu hỏi về thời điểm{moc} nằm ngoài khoảng thời gian hệ thống phủ. "
+                f"Corpus hiện chỉ phủ từ {tu_ngay} trở đi, nên tôi không có căn cứ để trả lời "
+                "cho mốc thời gian này.\n\n"
+                f"Bạn có thể hỏi lại với một mốc thời điểm từ {tu_ngay} trở đi."
+            ),
+            "sources": [],
+            "used_llm": "none",
+            "chunk_count": 0,
+        }
+
     if not chunks:
         return {
             "answer": "Tôi không tìm thấy văn bản pháp luật liên quan đến câu hỏi này.",
@@ -304,6 +377,7 @@ def generate_answer(
     chunks = relevant_chunks
 
     context, citation_list = _build_context(chunks)
+    context = _as_of_block(as_of_date) + context
     prefer_gemini = get_settings().generator_provider.lower() == "gemini"
     used_llm = "gemini" if prefer_gemini else "groq"
     answer = None
@@ -323,7 +397,15 @@ def generate_answer(
             used_llm = "gemini"
             logger.info("Gemini answered query ({} chars)", len(answer or ""))
         except Exception as exc:
-            logger.error("Both LLMs failed: {}", exc)
+            logger.warning("Gemini failed, trying OpenAI-compatible backup: {}", exc)
+
+    if answer is None:
+        try:
+            answer = _call_openai_compat(query, context, history=history)
+            used_llm = "openai_compat_fallback"
+            logger.info("OpenAI-compat answered query ({} chars)", len(answer or ""))
+        except Exception as exc:
+            logger.error("All LLM providers failed: {}", exc)
             answer = _build_extractive_answer(query, chunks)
             used_llm = "extractive_fallback"
 

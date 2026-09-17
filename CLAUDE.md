@@ -10,15 +10,18 @@ phạm vi tài liệu đã nạp.
 
 **Trạng thái hiện tại:** Đã hoàn thiện toàn diện bộ dữ liệu ngân hàng mẫu, compliance check, và test suite 100% pass:
 - Corpus ngân hàng chuẩn gồm 6 văn bản quy định & nghiệp vụ tại `data/raw/banking_docs/` với `manifest.json`.
-- Đã ingest hoàn chỉnh 36 chunks vào ChromaDB `data/chroma_db/`.
+- ChromaDB `data/chroma_db/` (collection `documind_legal`) hiện chứa **1146 chunks** —
+  corpus lao động của nhánh `feature/labor-pivot`, không phải 36 chunks ngân hàng ban đầu.
 - Tiêu chí kiểm định tuân thủ ngân hàng `data/compliance/criteria.json` với 5 bộ quy tắc định lượng (thu nhập vay tín chấp, trần tỷ lệ DTI, trần hạn mức thẻ tín chấp, trần lãi suất không kỳ hạn và dưới 6 tháng theo NHNN).
 - Bộ câu hỏi benchmark 25 câu tại `data/eval/test_questions.json`.
-- Test suite: 84/84 tests passed (100%).
+- Test suite: 166/166 tests passed (đo 2026-09-16).
 
 **Stack:**
 - Backend: FastAPI + LangGraph agent + vector store qua `VECTOR_STORE_PROVIDER`
   (`chroma` mặc định local, hoặc `qdrant` cho Qdrant Cloud — xem `src/rag/vector_backend.py`)
-- Embedding: `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` (local, `data/hf_cache/`)
+- Embedding: `AITeamVN/Vietnamese_Embedding` (1024-dim, local, `data/hf_cache/`) — đổi từ
+  MiniLM-L12-v2 ngày 2026-09-16 sau A/B trên gold set lao động: final@8 0.821 → 1.000
+  (`reports/embedding_ab.json`). Model đọc từ `EMBEDDING_MODEL`, không hard-code.
 - Retriever: Hybrid BM25 + dense vector + RRF fusion + cross-encoder reranker
 - LLM: Groq Llama-3.3-70B (primary) → Gemini fallback
 - Frontend: React + Vite (port 5174), proxies `/api` → backend port 8081
@@ -120,7 +123,9 @@ logs/
 - `GEMINI_JUDGE_MODELS` — danh sách model cho RAGAS eval (phân cách bằng dấu phẩy)
 - `PRIMARY_LLM=groq/llama-3.3-70b-versatile`
 - `FALLBACK_LLM=gemini/gemini-2.5-flash-lite`
-- `EMBEDDING_MODEL=sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`
+- `EMBEDDING_MODEL=AITeamVN/Vietnamese_Embedding` — nguồn sự thật duy nhất cho model
+  embedding. Đổi giá trị này **bắt buộc** chạy `python scripts/reembed_corpus.py --yes`;
+  collection mang nhãn model đã index, lệch nhãn là `EmbeddingModelMismatch` lúc mở store.
 - `API_PORT=8081`
 - **Không được** thêm `HF_HOME` vào `.env` — pydantic `extra_forbidden` sẽ reject
 
@@ -136,7 +141,11 @@ for k in ("HF_HOME", "HF_HUB_CACHE", "TRANSFORMERS_CACHE", "SENTENCE_TRANSFORMER
 
 **LLM temperature:** `0.0` (không phải 0.1) để citation ổn định giữa các lần chạy.
 
-**ChromaDB:** Dùng local `PersistentClient` (không cần server). HTTP server ở `localhost:8000` thường không chạy — code tự fallback sang local. Corpus hiện đang rỗng — `data/chroma_db/` sẽ được tạo lại khi chạy ingest.
+**ChromaDB:** Dùng local `PersistentClient` (không cần server). HTTP server ở `localhost:8000` thường không chạy — code tự fallback sang local. Collection `documind_legal` đang có 1146 chunks (1024-dim), kèm metadata `embedding_model`/`embedding_dim` để phát hiện lệch model.
+
+**Đổi model embedding:** sửa `EMBEDDING_MODEL` trong `.env` → `python scripts/reembed_corpus.py --yes` (re-embed tại chỗ, giữ nguyên chunk + metadata temporal, tự sao lưu collection cũ sang `documind_legal__backup_<model cũ>`) → `pytest -q` + `python eval/temporal_eval.py`. So sánh ứng viên trước khi đổi: `python eval/embedding_ab.py --models current <model-moi>`.
+
+**Cache HuggingFace:** mọi entrypoint gọi `use_local_hf_cache()` từ `src/hf_env.py` — không tự set biến env HF nữa (trước đây 8 bản sao, 4 biến thể, đã gây lỗi thật). Riêng embedder truyền `cache_folder` thẳng làm tham số vì `huggingface_hub` đóng băng đường dẫn cache ngay lúc import, mọi thao tác env sau đó là quá muộn.
 
 **Vite proxy:** `frontend/vite.config.ts` proxy `/api` → `http://localhost:8081`. Nếu đổi port backend phải cập nhật cả đây. Khi deploy tách domain (Vercel), frontend dùng `VITE_API_URL` thay vì proxy — xem `frontend/.env.example`.
 

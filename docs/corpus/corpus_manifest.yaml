@@ -1,0 +1,616 @@
+# DocuMind AI — Corpus Manifest (DRAFT for review)
+# Vertical: Lao động – Tiền lương – Bảo hiểm xã hội (Việt Nam)
+# Ngày lập: 2026-09-09
+#
+# QUY ƯỚC verify_status:
+#   VERIFIED   = số hiệu + ngày ban hành + ngày hiệu lực đã đối chiếu >=2 nguồn (ưu tiên chinhphu.vn / congbao.chinhphu.vn)
+#   PARTIAL    = số hiệu + tên đúng, nhưng >=1 mốc ngày hoặc quan hệ sửa đổi lấy từ nguồn thứ cấp, CHƯA đối chiếu Công báo
+#   UNVERIFIED = chưa xác minh được văn bản này tồn tại đúng số hiệu / chưa tra được mốc ngày — KHÔNG nạp cho tới khi xác minh
+#
+# LƯU Ý CHUNG (đọc trước khi ingest):
+#   - Không truy cập được "Lược đồ / Văn bản liên quan" trên vbpl.vn (SPA, không fetch được).
+#     MỌI quan hệ sua_doi_boi / thay_the / bi_thay_the_boi dưới đây phải đối chiếu lại
+#     với lược đồ chính thức trên vbpl.vn trước khi đưa vào metadata.
+#   - Cho tính năng point-in-time đầy đủ: cần bản VĂN BẢN HỢP NHẤT (VBHN) của mỗi luật/nghị định
+#     bị sửa nhiều lần, để lấy nội dung điều/khoản theo từng mốc. Nguồn VBHN: vbpl.vn hoặc bộ chủ quản.
+
+meta:
+  vertical: "lao_dong_tien_luong_bhxh"
+  as_of_baseline: "2026-09-09"
+  earliest_point_in_time: "2015-01-01"   # mốc sớm nhất corpus có thể trả lời (Luật Việc làm 2013 hiệu lực)
+  nguon_uu_tien:
+    - "https://vanban.chinhphu.vn"
+    - "https://congbao.chinhphu.vn"
+    - "https://vbpl.vn"
+  scope_out:
+    - "văn bản do HĐND/UBND cấp tỉnh ban hành"
+    - "nội quy / thang bảng lương / TƯLĐTT của doanh nghiệp cụ thể"
+    - "thuế TNCN, BHYT, tiền lương khu vực công (CBCCVC), tiền lương DNNN"
+    - "chế độ với quân nhân / công an / cơ yếu"
+    - "thủ tục tố tụng tranh chấp lao động tại tòa"
+
+documents:
+
+  # ─────────────────────────────────────────────────────────────
+  # A. LÕI LAO ĐỘNG
+  # ─────────────────────────────────────────────────────────────
+  - doc_id: "45-2019-QH14"
+    loai: "Bộ luật"
+    so_hieu: "45/2019/QH14"
+    ten: "Bộ luật Lao động"
+    co_quan: "Quốc hội"
+    ngay_ban_hanh: "2019-11-20"
+    ngay_hieu_luc: "2021-01-01"
+    trang_thai: "con_hieu_luc_mot_phan"   # thân luật còn hiệu lực; một số điều đã / sẽ bị sửa
+    thay_the: ["10/2012/QH13"]
+    bi_thay_the_boi: []
+    sua_doi_boi:
+      # T4 (2026-09-11): đọc TOÀN VĂN GỐC (bản .signed.pdf, chữ ký Chủ tịch Quốc hội) của cả
+      # 3 luật sửa — không dựa vào nguồn thứ cấp (nhiều bài báo/luatvietnam ghi SAI, gán nhầm
+      # nội dung Điều 139 cho 71/2025/QH15 — đã bác bỏ, xem ghi_chu bên dưới).
+      - so_hieu: "71/2025/QH15"            # Luật Công nghiệp công nghệ số, thông qua 14/06/2025
+        hieu_luc_tu: "2026-01-01"
+        pham_vi: "Điều 49 khoản 4: bổ sung khoản 8a vào Điều 154 BLLĐ (Điều 154 = 'Người lao động nước ngoài làm việc tại Việt Nam KHÔNG thuộc diện cấp giấy phép lao động'; khoản 8a mới = 'Nhân lực công nghiệp công nghệ số chất lượng cao theo quy định của pháp luật về công nghiệp công nghệ số' -> nhóm này được miễn giấy phép lao động). KHÔNG liên quan Điều 139/thai sản."
+        verify: "VERIFIED (T4, đọc trực tiếp datafiles.chinhphu.vn/cpp/files/vbpq/2025/7/71qh15.signed.pdf trang 27, Điều 49 khoản 4)"
+      - so_hieu: "113/2025/QH15"           # Luật Dân số, thông qua 10/12/2025
+        hieu_luc_tu: "2026-07-01"
+        pham_vi: "Điều 29 khoản 1: sửa khoản 1 Điều 139 BLLĐ (nghỉ thai sản: nữ 6 tháng; sinh con thứ 2 → 7 tháng, trước sinh không quá 2 tháng; sinh đôi trở lên, từ con thứ 2 mỗi con +1 tháng). Điều 29 khoản 2 CÙNG LUẬT sửa điểm c khoản 2 Điều 53 Luật BHXH 2024 (41/2024/QH15) — nghỉ của lao động NAM khi vợ sinh đôi/con thứ 2 (10 ngày làm việc) — đây là sửa Luật BHXH, KHÔNG phải BLLĐ, ghi chú riêng."
+        verify: "VERIFIED (T4, đọc trực tiếp datafiles.chinhphu.vn/cpp/files/vbpq/2026/01/luat113-2025.pdf trang 13, Điều 29 khoản 1)"
+      - so_hieu: "124/2025/QH15"           # Luật Giáo dục nghề nghiệp, thông qua 10/12/2025
+        hieu_luc_tu: "2026-01-01"
+        pham_vi: "Điều 43 khoản 1: (a) sửa điểm a khoản 2 Điều 59 BLLĐ (quyền NSDLĐ lập cơ sở GDNN/mở lớp đào tạo nghề tại nơi làm việc); (b) sửa khoản 3 Điều 61 BLLĐ (NSDLĐ tuyển người học nghề/tập nghề để làm việc cho mình thì không được thu học phí)."
+        verify: "VERIFIED (T4, đọc trực tiếp datafiles.chinhphu.vn/cpp/files/vbpq/2026/01/luat124-2025.pdf trang 22, Điều 43 khoản 1)"
+      - so_hieu: "41/2024/QH15"            # Luật BHXH 2024 — KHÔNG sửa BLLĐ
+        hieu_luc_tu: "N/A"
+        pham_vi: "KHÔNG sửa BLLĐ 2019. Xác nhận qua VBHN 18/VBHN-VPQH (bản hợp nhất chính thức, National Assembly Office) — lời giới thiệu VBHN chỉ liệt kê ĐÚNG 3 luật sửa BLLĐ: 71/2025/QH15, 113/2025/QH15, 124/2025/QH15. Không có 41/2024/QH15 trong danh sách này."
+        verify: "VERIFIED KHÔNG SỬA (T4, đối chiếu danh sách luật sửa trong lời giới thiệu VBHN 18/VBHN-VPQH)"
+    van_ban_hop_nhat: "18/VBHN-VPQH năm 2026 (VPQH) — bản mới nhất; 125/VBHN-VPQH năm 2025 là bản hợp nhất TRƯỚC"
+    # T7 (2026-09-12): bản MÁY ĐỌC của các quan hệ sửa in-place ở trên.
+    # `pham_vi` phía trên là văn xuôi cho người đọc; khối này là nguồn duy nhất
+    # cho code (src/ingestion/manifest.py) — không parse văn xuôi.
+    file_toan_van: "18-VBHN-VPQH.md"     # text hiện hành = bản hợp nhất (đã gồm 4 sửa đổi)
+    file_ban_goc: "45-2019-QH14.md"      # bản 2019 gốc — chỉ dùng dựng version CŨ
+    consolidated_from: "18/VBHN-VPQH"
+    sua_doi_in_place:
+      - clause_uid: "45-2019-QH14__d139_k1"
+        dieu: 139
+        khoan: 1
+        dieu_tieu_de: "Nghỉ thai sản"
+        effective_from: "2026-07-01"
+        amended_by_doc: "113/2025/QH15"
+        version_cu: "_versions/45-2019-QH14__d139_k1__2021.md"
+        version_moi: "_versions/45-2019-QH14__d139_k1__2026-07-01.md"
+      - clause_uid: "45-2019-QH14__d154_k8a"
+        dieu: 154
+        khoan: 8          # khoản 8a — số hiệu khoản dạng chữ, lưu 8 + hau_to "a"
+        khoan_hau_to: "a"
+        dieu_tieu_de: "Người lao động nước ngoài làm việc tại Việt Nam không thuộc diện cấp giấy phép lao động"
+        effective_from: "2026-01-01"
+        amended_by_doc: "71/2025/QH15"
+        loai_sua: "bo_sung_khoan_moi"   # khoản MỚI, không có bản cũ
+      - clause_uid: "45-2019-QH14__d59_k2_pa"
+        dieu: 59
+        khoan: 2
+        diem: "a"
+        dieu_tieu_de: "Đào tạo nghề nghiệp và phát triển kỹ năng nghề"
+        effective_from: "2026-01-01"
+        amended_by_doc: "124/2025/QH15"
+      - clause_uid: "45-2019-QH14__d61_k3"
+        dieu: 61
+        khoan: 3
+        dieu_tieu_de: "Học nghề, tập nghề để làm việc cho người sử dụng lao động"
+        effective_from: "2026-01-01"
+        amended_by_doc: "124/2025/QH15"
+    cau_truc: "17 chương / 220 điều"
+    nguon: "https://vanban.chinhphu.vn/?pageid=27160&docid=198540"
+    verify_status: "VERIFIED"
+    ghi_chu: "T4 (2026-09-11): N1 THẬT = 4 khoản/điểm bị sửa in-place, xác nhận qua toàn văn gốc 3 luật (71/2025, 113/2025, 124/2025). Xem bảng sua_doi_boi + mục 'BOUND N1 — KẾT QUẢ T4' dưới."
+
+  - doc_id: "145-2020-ND-CP"
+    loai: "Nghị định"
+    so_hieu: "145/2020/NĐ-CP"
+    ten: "Quy định chi tiết và hướng dẫn thi hành một số điều của Bộ luật Lao động về điều kiện lao động và quan hệ lao động"
+    co_quan: "Chính phủ"
+    ngay_ban_hanh: "2020-12-14"
+    ngay_hieu_luc: "2021-02-01"
+    trang_thai: "con_hieu_luc"
+    thay_the: ["44/2013/NĐ-CP", "05/2015/NĐ-CP (một phần)", "148/2018/NĐ-CP", "149/2018/NĐ-CP"]  # PARTIAL — xác minh
+    bi_thay_the_boi: []
+    sua_doi_boi: []                        # chưa phát hiện; PHẢI đối chiếu lược đồ vbpl.vn
+    cau_truc: "11 chương / 115 điều / 3 phụ lục"
+    nguon: "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-145-2020-nd-cp-32732.htm"
+    verify_status: "VERIFIED"
+    ghi_chu: "Nội dung then chốt: trợ cấp thôi việc/mất việc, thời giờ làm việc–nghỉ ngơi, làm thêm giờ, lương ngừng việc, quy chế dân chủ cơ sở."
+
+  - doc_id: "135-2020-ND-CP"
+    loai: "Nghị định"
+    so_hieu: "135/2020/NĐ-CP"
+    ten: "Quy định về tuổi nghỉ hưu"
+    co_quan: "Chính phủ"
+    ngay_ban_hanh: "2020-11-18"
+    ngay_hieu_luc: "2021-01-01"
+    trang_thai: "con_hieu_luc"
+    sua_doi_boi: []
+    nguon: "https://thuvienphapluat.vn/van-ban/Lao-dong-Tien-luong/Nghi-dinh-135-2020-ND-CP-tuoi-nghi-huu-445512.aspx"
+    verify_status: "VERIFIED"
+    ghi_chu: >
+      Lộ trình: điều kiện lao động bình thường — 2021 nam 60t3m / nữ 55t4m;
+      mỗi năm +3 tháng (nam) / +4 tháng (nữ). Năm 2026: nam 61t6m, nữ 57t0m (đã xác minh 2 nguồn).
+      Đích: nam 62 (2028), nữ 60 (2035). => tuổi hưu tự nó là dữ liệu "point-in-time" theo năm nghỉ.
+
+  - doc_id: "10-2020-TT-BLDTBXH"
+    loai: "Thông tư"
+    so_hieu: "10/2020/TT-BLĐTBXH"
+    ten: "Quy định chi tiết một số điều của Bộ luật Lao động về nội dung của hợp đồng lao động, Hội đồng thương lượng tập thể và nghề, công việc có ảnh hưởng xấu tới chức năng sinh sản, nuôi con"
+    co_quan: "Bộ Lao động - Thương binh và Xã hội"
+    ngay_ban_hanh: "2020-11-12"
+    ngay_hieu_luc: "2021-01-01"
+    trang_thai: "con_hieu_luc"
+    thay_the: ["47/2015/TT-BLĐTBXH", "26/2013/TT-BLĐTBXH"]
+    sua_doi_boi: []
+    nguon: "https://vbpl.vn/TW/Pages/vbpq-toanvan.aspx?ItemID=146696"
+    verify_status: "VERIFIED"
+    ghi_chu: "Bộ LĐTBXH đã sáp nhập vào Bộ Nội vụ (2025) — tên cơ quan ban hành giữ nguyên theo thời điểm ban hành."
+
+  # ─────────────────────────────────────────────────────────────
+  # B. TIỀN LƯƠNG TỐI THIỂU VÙNG  (chuỗi version theo thời gian)
+  # ─────────────────────────────────────────────────────────────
+  - doc_id: "293-2025-ND-CP"
+    loai: "Nghị định"
+    so_hieu: "293/2025/NĐ-CP"
+    ten: "Quy định mức lương tối thiểu đối với người lao động làm việc theo hợp đồng lao động"
+    co_quan: "Chính phủ"
+    ngay_ban_hanh: "2025-11-10"
+    ngay_hieu_luc: "2026-01-01"
+    trang_thai: "con_hieu_luc"
+    thay_the: ["74/2024/NĐ-CP"]
+    muc_luong_thang: {vung_I: 5310000, vung_II: 4730000, vung_III: 4140000, vung_IV: 3700000}
+    nguon: "https://congbao.chinhphu.vn/cong-bao-so-1591-1592-ngay-19-11-2025-46566.htm"
+    verify_status: "VERIFIED (T3, 2026-09-11 — Công báo số 1591+1592 ngày 19/11/2025 + vanban.chinhphu.vn/xaydungchinhsach.chinhphu.vn khớp ngày/mức lương)"
+    ghi_chu: "Số hiệu + 4 mức lương xác minh 2 nguồn; ngày ban hành + mức lương giờ CẦN đối chiếu toàn văn Công báo."
+
+  - doc_id: "74-2024-ND-CP"
+    loai: "Nghị định"
+    so_hieu: "74/2024/NĐ-CP"
+    ten: "Quy định mức lương tối thiểu đối với người lao động làm việc theo hợp đồng lao động"
+    co_quan: "Chính phủ"
+    ngay_ban_hanh: "2024-06-30"
+    ngay_hieu_luc: "2024-07-01"
+    trang_thai: "het_hieu_luc"
+    het_hieu_luc_tu: "2026-01-01"
+    bi_thay_the_boi: ["293/2025/NĐ-CP"]
+    thay_the: ["38/2022/NĐ-CP"]
+    muc_luong_thang: {vung_I: 4960000, vung_II: 4410000, vung_III: 3860000, vung_IV: 3450000}
+    muc_luong_gio: {vung_I: 23800, vung_II: 21200, vung_III: 18600, vung_IV: 16600}
+    nguon: "https://xaydungchinhsach.chinhphu.vn/toan-van-nghi-dinh-74-2024-nd-cp-quy-dinh-muc-luong-toi-thieu-vung-119240701122135822.htm"
+    verify_status: "VERIFIED"
+    ghi_chu: "GIỮ trong corpus để trả lời point-in-time cho khoảng 2024-07-01 .. 2025-12-31."
+
+  # D2/Q3 (2026-09-11, Ted): BỎ NĐ 38/2022/NĐ-CP khỏi corpus vòng này — cắt point-in-time
+  # lương tối thiểu ở mốc 2024-07-01 (NĐ 74/2024) để giảm phạm vi verify. Không nạp bản
+  # lương tối thiểu 2022-07-01 .. 2024-06-30.
+
+  # ─────────────────────────────────────────────────────────────
+  # C. BHXH — KHUNG HIỆN HÀNH (từ 2025-07-01)
+  # ─────────────────────────────────────────────────────────────
+  - doc_id: "41-2024-QH15"
+    loai: "Luật"
+    so_hieu: "41/2024/QH15"
+    ten: "Luật Bảo hiểm xã hội"
+    co_quan: "Quốc hội"
+    ngay_ban_hanh: "2024-06-29"
+    ngay_hieu_luc: "2025-07-01"
+    trang_thai: "con_hieu_luc"
+    thay_the: ["58/2014/QH13"]
+    cau_truc: "11 chương / 141 điều"
+    nguon: "https://xaydungchinhsach.chinhphu.vn/toan-van-luat-so-41-2024-qh15-bao-hiem-xa-hoi-119240723163650489.htm"
+    verify_status: "VERIFIED"
+    sua_doi_boi:
+      - so_hieu: "113/2025/QH15"          # Luật Dân số, thông qua 10/12/2025
+        hieu_luc_tu: "2026-07-01"
+        pham_vi: "Điều 29 khoản 2: sửa điểm c khoản 2 Điều 53 Luật BHXH 2024 — lao động NAM khi vợ sinh đôi hoặc sinh con thứ 2 được nghỉ 10 ngày làm việc; sinh ba trở lên +3 ngày/con tính từ con thứ 3. Ghi nhận qua T4 (BLLĐ), không thuộc phạm vi in-place BLLĐ nhưng cùng luật sửa."
+        verify: "VERIFIED (T4, đọc trực tiếp datafiles.chinhphu.vn/cpp/files/vbpq/2026/01/luat113-2025.pdf trang 13-14, Điều 29 khoản 2)"
+    ghi_chu: "Điểm mới demoable: giảm năm đóng tối thiểu hưởng lương hưu 20 -> 15 năm; trợ cấp hưu trí xã hội; siết BHXH một lần. Bản thân Luật BHXH 2024 KHÔNG sửa BLLĐ (xem 45-2019-QH14.sua_doi_boi), nhưng CHÍNH Luật BHXH 2024 bị 113/2025/QH15 sửa 1 điểm (Điều 53 k2 điểm c, nghỉ của lao động nam) — xem sua_doi_boi trên."
+
+  - doc_id: "158-2025-ND-CP"
+    loai: "Nghị định"
+    so_hieu: "158/2025/NĐ-CP"
+    ten: "Quy định chi tiết và hướng dẫn thi hành một số điều của Luật Bảo hiểm xã hội về bảo hiểm xã hội bắt buộc"
+    co_quan: "Chính phủ"
+    ngay_ban_hanh: "2025-06-25"
+    ngay_hieu_luc: "2025-07-01"
+    trang_thai: "con_hieu_luc"
+    sua_doi: ["58/2020/NĐ-CP"]               # NĐ này sửa NĐ 58/2020 (mức đóng TNLĐ-BNN)
+    nguon: "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-158-2025-nd-cp-45240.htm"
+    verify_status: "VERIFIED (T3, 2026-09-11 — congbao.chinhphu.vn Công báo số 851+852 xác nhận ngày ban hành/hiệu lực)"
+
+  - doc_id: "159-2025-ND-CP"
+    loai: "Nghị định"
+    so_hieu: "159/2025/NĐ-CP"
+    ten: "Quy định chi tiết và hướng dẫn thi hành một số điều của Luật Bảo hiểm xã hội về bảo hiểm xã hội tự nguyện"
+    co_quan: "Chính phủ"
+    ngay_ban_hanh: "2025-06-25"
+    ngay_hieu_luc: "2025-07-01"
+    trang_thai: "con_hieu_luc"
+    thay_the: ["134/2015/NĐ-CP"]
+    nguon: "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-159-2025-nd-cp-45253/57094.htm"
+    verify_status: "VERIFIED (T3, 2026-09-11 — congbao.chinhphu.vn + vanban.chinhphu.vn khớp ngày; xác nhận thay thế 134/2015/NĐ-CP)"
+
+  - doc_id: "11-2025-TT-BNV"
+    loai: "Thông tư"
+    so_hieu: "11/2025/TT-BNV"
+    ten: "Hướng dẫn một số điều của Luật Bảo hiểm xã hội về bảo hiểm xã hội tự nguyện"
+    co_quan: "Bộ Nội vụ"
+    ngay_ban_hanh: "2025-06-30"
+    ngay_hieu_luc: "2025-07-01"
+    trang_thai: "con_hieu_luc"
+    huong_dan_cho: ["159/2025/NĐ-CP"]
+    nguon: "https://vbpl.ts24.com.vn/support/solutions/articles/16000218817"
+    verify_status: "VERIFIED (T2, 2026-09-11 — xaydungchinhsach.chinhphu.vn + luatvietnam.vn + thuvienphapluat khớp ngày; thêm vào nhóm C theo dự kiến ở SPEC-corpus-acquisition.md)"
+
+  - doc_id: "12-2025-TT-BNV"
+    loai: "Thông tư"
+    so_hieu: "12/2025/TT-BNV"
+    ten: "Quy định chi tiết một số điều của Luật Bảo hiểm xã hội về bảo hiểm xã hội bắt buộc"
+    co_quan: "Bộ Nội vụ"
+    ngay_ban_hanh: "2025-06-30"
+    ngay_hieu_luc: "2025-07-01"
+    trang_thai: "con_hieu_luc"
+    huong_dan_cho: ["158/2025/NĐ-CP"]
+    nguon: "https://xaydungchinhsach.chinhphu.vn/toan-van-thong-tu-12-2025-tt-bnv-quy-dinh-chi-tiet-mot-so-dieu-cua-luat-bhxh-ve-bhxh-bat-buoc-11925070415595016.htm"
+    verify_status: "VERIFIED (T2, 2026-09-11 — xaydungchinhsach.chinhphu.vn + english.luatvietnam.vn + snv.dongnai.gov.vn khớp ngày; thêm vào nhóm C theo dự kiến ở SPEC-corpus-acquisition.md)"
+
+  # 25/2025/TT-BYT, 18/2021 + 19/2021/TT-BLĐTBXH, 24/2022/TT-BLĐTBXH: KHÔNG tra vòng này —
+  # thuộc nhóm F (TNLĐ-BNN) đã HOÃN sang vòng sau (xem memory documind-labor-pivot).
+  # Không mở rộng corpus ngoài nhóm F chỉ để đóng nốt T2.
+
+  # ─────────────────────────────────────────────────────────────
+  # D. BHXH — KHUNG LỊCH SỬ (point-in-time trước 2025-07-01)
+  # ─────────────────────────────────────────────────────────────
+  - doc_id: "58-2014-QH13"
+    loai: "Luật"
+    so_hieu: "58/2014/QH13"
+    ten: "Luật Bảo hiểm xã hội"
+    co_quan: "Quốc hội"
+    ngay_ban_hanh: "2014-11-20"
+    ngay_hieu_luc: "2016-01-01"              # một số quy định từ 2018-01-01
+    trang_thai: "het_hieu_luc"
+    het_hieu_luc_tu: "2025-07-01"
+    thay_the: ["71/2006/QH11"]
+    bi_thay_the_boi: ["41/2024/QH15"]
+    nguon: "https://thuvienphapluat.vn/van-ban/Bao-hiem/Luat-Bao-hiem-xa-hoi-2014-259700.aspx"
+    verify_status: "VERIFIED"
+
+  - doc_id: "115-2015-ND-CP"
+    loai: "Nghị định"
+    so_hieu: "115/2015/NĐ-CP"
+    ten: "Quy định chi tiết một số điều của Luật Bảo hiểm xã hội về bảo hiểm xã hội bắt buộc"
+    co_quan: "Chính phủ"
+    ngay_ban_hanh: "2015-11-11"
+    ngay_hieu_luc: "2016-01-01"
+    trang_thai: "het_hieu_luc"
+    het_hieu_luc_tu: "2025-07-01"
+    bi_thay_the_boi: ["158/2025/NĐ-CP"]
+    nguon: "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-115-2015-nd-cp-18101.htm"
+    verify_status: "VERIFIED (T3, 2026-09-11 — congbao.chinhphu.vn khớp ngày ban hành)"
+
+  - doc_id: "59-2015-TT-BLDTBXH"
+    loai: "Thông tư"
+    so_hieu: "59/2015/TT-BLĐTBXH"
+    ten: "Quy định chi tiết và hướng dẫn thi hành một số điều của Luật Bảo hiểm xã hội về bảo hiểm xã hội bắt buộc"
+    co_quan: "Bộ Lao động - Thương binh và Xã hội"
+    ngay_ban_hanh: "2015-12-29"
+    ngay_hieu_luc: "2016-02-15"
+    trang_thai: "het_hieu_luc"
+    het_hieu_luc_tu: "2025-07-01"
+    nguon: "https://congbao.chinhphu.vn/van-ban/thong-tu-so-59-2015-tt-bldtbxh-18869.htm"
+    verify_status: "VERIFIED (T3, 2026-09-11 — congbao.chinhphu.vn Công báo số 139+140 khớp ngày ban hành/hiệu lực)"
+    ghi_chu: "Đã bị sửa nhiều lần (TT 06/2021/TT-BLĐTBXH...). Nếu nạp cho point-in-time cần VBHN."
+
+  - doc_id: "134-2015-ND-CP"
+    loai: "Nghị định"
+    so_hieu: "134/2015/NĐ-CP"
+    ten: "Quy định chi tiết một số điều của Luật Bảo hiểm xã hội về bảo hiểm xã hội tự nguyện"
+    co_quan: "Chính phủ"
+    ngay_ban_hanh: "2015-12-29"
+    ngay_hieu_luc: "2016-02-15"
+    trang_thai: "het_hieu_luc"
+    het_hieu_luc_tu: "2025-07-01"
+    bi_thay_the_boi: ["159/2025/NĐ-CP"]
+    nguon: "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-134-2015-nd-cp-18598.htm"
+    verify_status: "VERIFIED (T2, 2026-09-11 — congbao.chinhphu.vn + vanban.chinhphu.vn + thuvienphapluat/luatvietnam khớp ngày; NĐ 159/2025 xác nhận thay thế từ 2025-07-01)"
+
+  # ─────────────────────────────────────────────────────────────
+  # E. BẢO HIỂM THẤT NGHIỆP
+  # ─────────────────────────────────────────────────────────────
+  - doc_id: "74-2025-QH15"
+    loai: "Luật"
+    so_hieu: "74/2025/QH15"
+    ten: "Luật Việc làm"
+    co_quan: "Quốc hội"
+    ngay_ban_hanh: "2025-06-16"
+    ngay_hieu_luc: "2026-01-01"
+    trang_thai: "con_hieu_luc"
+    thay_the: ["38/2013/QH13"]
+    nguon: "https://baohiemxahoi.gov.vn/tintuc/Pages/linh-vuc-bao-hiem-xa-hoi.aspx?ItemID=25791&CateID=168"
+    verify_status: "VERIFIED"
+    ghi_chu: "Trợ cấp thất nghiệp: 60% bình quân tiền lương đóng BHTN 6 tháng liền kề, tối đa 5 lần lương tối thiểu vùng (Điều 39). Xác minh số điều với toàn văn."
+
+  - doc_id: "374-2025-ND-CP"
+    loai: "Nghị định"
+    so_hieu: "374/2025/NĐ-CP"
+    ten: "Quy định chi tiết một số điều của Luật Việc làm về bảo hiểm thất nghiệp"
+    co_quan: "Chính phủ"
+    ngay_ban_hanh: "2025-12-31"
+    ngay_hieu_luc: "2026-01-01"
+    trang_thai: "con_hieu_luc"
+    nguon: "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-374-2025-nd-cp-468724.htm"
+    verify_status: "VERIFIED"
+
+  - doc_id: "38-2013-QH13"
+    loai: "Luật"
+    so_hieu: "38/2013/QH13"
+    ten: "Luật Việc làm"
+    co_quan: "Quốc hội"
+    ngay_ban_hanh: "2013-11-16"
+    ngay_hieu_luc: "2015-01-01"
+    trang_thai: "het_hieu_luc"
+    het_hieu_luc_tu: "2026-01-01"
+    bi_thay_the_boi: ["74/2025/QH15"]
+    verify_status: "VERIFIED"
+
+  - doc_id: "28-2015-ND-CP"
+    loai: "Nghị định"
+    so_hieu: "28/2015/NĐ-CP"
+    ten: "Quy định chi tiết thi hành một số điều của Luật Việc làm về bảo hiểm thất nghiệp"
+    co_quan: "Chính phủ"
+    ngay_ban_hanh: "2015-03-12"
+    ngay_hieu_luc: "2015-05-01"
+    trang_thai: "het_hieu_luc"
+    het_hieu_luc_tu: "2026-01-01"
+    bi_thay_the_boi: ["374/2025/NĐ-CP"]
+    nguon: "https://vanban.chinhphu.vn/?pageid=27160&docid=179249"
+    verify_status: "VERIFIED (T2, 2026-09-11 — vanban.chinhphu.vn + luatvietnam.vn khớp ngày; NĐ 374/2025 xác nhận thay thế từ 2026-01-01)"
+    ghi_chu: "Đã bị sửa bởi NĐ 61/2020/NĐ-CP. Cần VBHN nếu nạp."
+
+  # ─────────────────────────────────────────────────────────────
+  # F. TAI NẠN LAO ĐỘNG – BỆNH NGHỀ NGHIỆP
+  # >>> HOÃN sang vòng sau (Ted chốt 2026-09-09): tần suất hỏi thấp hơn 3 chế độ kia.
+  # >>> Giữ định nghĩa ở đây để không phải tra lại; KHÔNG ingest vòng này.
+  # ─────────────────────────────────────────────────────────────
+  - doc_id: "84-2015-QH13"
+    loai: "Luật"
+    so_hieu: "84/2015/QH13"
+    ten: "Luật An toàn, vệ sinh lao động"
+    co_quan: "Quốc hội"
+    ngay_ban_hanh: "2015-06-25"
+    ngay_hieu_luc: "2016-07-01"
+    trang_thai: "con_hieu_luc"
+    sua_doi_boi:
+      - so_hieu: "41/2024/QH15"
+        hieu_luc_tu: "2025-07-01"
+        pham_vi: "UNVERIFIED — kiểm tra Luật BHXH 2024 có điều khoản sửa chương BH TNLĐ-BNN không"
+        verify: "UNVERIFIED"
+    nguon: "https://vanban.chinhphu.vn/?pageid=27160&docid=180606"
+    verify_status: "VERIFIED"
+    ghi_chu: "Chỉ nạp chương/mục về chế độ BH TNLĐ-BNN + trách nhiệm NSDLĐ khi tai nạn; phần kỹ thuật ATLĐ có thể để ngoài scope."
+
+  - doc_id: "88-2020-ND-CP"
+    loai: "Nghị định"
+    so_hieu: "88/2020/NĐ-CP"
+    ten: "Quy định chi tiết và hướng dẫn thi hành một số điều của Luật An toàn, vệ sinh lao động về bảo hiểm tai nạn lao động, bệnh nghề nghiệp bắt buộc"
+    co_quan: "Chính phủ"
+    ngay_ban_hanh: "UNVERIFIED"               # nguồn chỉ cho ngày hiệu lực
+    ngay_hieu_luc: "2020-09-15"
+    trang_thai: "con_hieu_luc"
+    verify_status: "PARTIAL"
+
+  - doc_id: "58-2020-ND-CP"
+    loai: "Nghị định"
+    so_hieu: "58/2020/NĐ-CP"
+    ten: "Quy định mức đóng bảo hiểm xã hội bắt buộc vào Quỹ bảo hiểm tai nạn lao động, bệnh nghề nghiệp"
+    co_quan: "Chính phủ"
+    ngay_ban_hanh: "2020-05-27"
+    ngay_hieu_luc: "2020-07-01"               # PARTIAL — xác minh
+    trang_thai: "con_hieu_luc"
+    sua_doi_boi:
+      - so_hieu: "158/2025/NĐ-CP"
+        hieu_luc_tu: "2025-07-01"
+        pham_vi: "UNVERIFIED — xác minh điều bị sửa"
+        verify: "PARTIAL"
+    verify_status: "PARTIAL"
+    ghi_chu: "Mức đóng: 0,5% quỹ lương (thường), 0,3% (DN đủ điều kiện, có văn bản chấp thuận)."
+
+  # ─────────────────────────────────────────────────────────────
+  # G. CÔNG ĐOÀN  (biên — quan hệ lao động tập thể)
+  # >>> BỎ khỏi vòng này (Ted chốt 2026-09-09). Hợp lý riêng lẻ nhưng làm corpus phình.
+  # ─────────────────────────────────────────────────────────────
+  - doc_id: "50-2024-QH15"
+    loai: "Luật"
+    so_hieu: "50/2024/QH15"
+    ten: "Luật Công đoàn"
+    co_quan: "Quốc hội"
+    ngay_ban_hanh: "2024-11-27"
+    ngay_hieu_luc: "2025-07-01"
+    trang_thai: "con_hieu_luc"
+    thay_the: ["12/2012/QH13"]
+    nguon: "https://congbao.chinhphu.vn/van-ban/luat-so-50-2024-qh15-43589.htm"
+    verify_status: "VERIFIED"
+    ghi_chu: "Cân nhắc: nếu muốn giữ scope hẹp 'lao động cá nhân + BHXH', có thể để Công đoàn ở nhóm phụ / tắt mặc định."
+
+  # ─────────────────────────────────────────────────────────────
+  # OPTIONAL — HOÃN sang vòng sau (Ted chốt 2026-09-09). Không ingest vòng này.
+  # ─────────────────────────────────────────────────────────────
+  - doc_id: "12-2022-ND-CP"
+    loai: "Nghị định"
+    so_hieu: "12/2022/NĐ-CP"
+    ten: "Quy định xử phạt vi phạm hành chính trong lĩnh vực lao động, bảo hiểm xã hội, người lao động Việt Nam đi làm việc ở nước ngoài theo hợp đồng"
+    co_quan: "Chính phủ"
+    ngay_ban_hanh: "2022-01-17"               # PARTIAL
+    ngay_hieu_luc: "2022-01-17"               # PARTIAL
+    trang_thai: "con_hieu_luc"
+    verify_status: "UNVERIFIED"
+    ghi_chu: "Cho phép trả lời 'mức phạt khi vi phạm ...'. Lưu ý mức phạt tính theo lương cơ sở / khung — dễ lỗi thời."
+
+  - doc_id: "152-2020-ND-CP"
+    loai: "Nghị định"
+    so_hieu: "152/2020/NĐ-CP"
+    ten: "Quy định về người lao động nước ngoài làm việc tại Việt Nam và tuyển dụng, quản lý người lao động Việt Nam làm việc cho tổ chức, cá nhân nước ngoài tại Việt Nam"
+    co_quan: "Chính phủ"
+    ngay_ban_hanh: "2020-12-30"               # PARTIAL
+    ngay_hieu_luc: "2021-02-15"               # PARTIAL
+    trang_thai: "con_hieu_luc"
+    sua_doi_boi: [{so_hieu: "70/2023/NĐ-CP", hieu_luc_tu: "2023-09-18", verify: "UNVERIFIED"}]
+    verify_status: "UNVERIFIED"
+    ghi_chu: "Chỉ thêm nếu muốn cover 'giấy phép lao động cho người nước ngoài'."
+
+# ═════════════════════════════════════════════════════════════
+# CHỐT VÒNG NÀY (Ted 2026-09-09) — scope PRIVATE-SECTOR ONLY
+# ═════════════════════════════════════════════════════════════
+#
+# Lý do chọn private-sector: mục "ngoài phạm vi" #6/#7/#9 đã viết; khu vực công có logic
+# lương/ngạch riêng => là CORPUS KHÁC, không phải phần mở rộng.
+#
+# BỎ HẲN (không xét lại vòng này):
+#   157/2025/NĐ-CP · 50/2022/NĐ-CP · 83/2022/NĐ-CP · 99/2024/NĐ-CP · 111/2022/NĐ-CP  (khu vực công / LLVT)
+#   50/2024/QH15 (Công đoàn) · 164/2025/NĐ-CP (giao dịch điện tử) · 176/2025/NĐ-CP (trợ cấp hưu trí XH)
+#   09/2020/TT-BLĐTBXH (lao động chưa thành niên)
+#   -> từng cái hợp lý riêng lẻ; cộng lại = corpus phình. Không thêm để tránh làm to mẫu số verification.
+#
+# HOÃN sang vòng sau:
+#   Nhóm F (TNLĐ–BNN): 84/2015/QH13 · 88/2020/NĐ-CP · 58/2020/NĐ-CP  (tần suất hỏi thấp hơn 3 chế độ kia)
+#   Optional: 12/2022/NĐ-CP · 152/2020/NĐ-CP + 70/2023/NĐ-CP
+#
+# 6 dòng CHƯA XÁC MINH — KẾT QUẢ T2 (2026-09-11):
+#   11/2025/TT-BNV · 12/2025/TT-BNV  -> RA (nguồn ≥2), thuộc nhóm C, đã thêm vào locked_list_v1 (doc_id 11-2025-TT-BNV, 12-2025-TT-BNV)
+#   25/2025/TT-BYT · 18/2021/TT-BLĐTBXH · 19/2021/TT-BLĐTBXH · 24/2022/TT-BLĐTBXH  -> KHÔNG tra, thuộc nhóm F đã HOÃN sang vòng sau (không mở rộng corpus ngoài nhóm F)
+
+# ─────────────────────────────────────────────────────────────
+# DANH SÁCH CHỐT VÒNG NÀY — 18 văn bản + 4 VBHN
+# ─────────────────────────────────────────────────────────────
+locked_list_v1:
+  con_hieu_luc:                       # bản áp dụng tại as_of 2026-09-09
+    - "45-2019-QH14"                  # BLLĐ 2019 (đã bị sửa in-place — xem VBHN 18/VBHN-VPQH)
+    - "145-2020-ND-CP"
+    - "135-2020-ND-CP"
+    - "10-2020-TT-BLDTBXH"
+    - "293-2025-ND-CP"                # lương tối thiểu HIỆN HÀNH
+    - "41-2024-QH15"                  # Luật BHXH 2024
+    - "158-2025-ND-CP"
+    - "159-2025-ND-CP"
+    - "12-2025-TT-BNV"                 # hướng dẫn 158/2025 (T2, thêm mới)
+    - "11-2025-TT-BNV"                 # hướng dẫn 159/2025 (T2, thêm mới)
+    - "74-2025-QH15"                  # Luật Việc làm 2025 (HL 2026-01-01)
+    - "374-2025-ND-CP"
+  het_hieu_luc_giu_cho_point_in_time:
+    - "74-2024-ND-CP"                 # lương tối thiểu 2024-07-01 .. 2025-12-31 (point-in-time cắt ở đây, D2/Q3)
+    - "58-2014-QH13"                  # Luật BHXH 2014 (.. 2025-06-30)
+    - "115-2015-ND-CP"
+    - "59-2015-TT-BLDTBXH"
+    - "134-2015-ND-CP"               # VERIFIED T2 (2026-09-11)
+    - "38-2013-QH13"                  # Luật Việc làm 2013 (.. 2025-12-31)
+    - "28-2015-ND-CP"               # VERIFIED T2 (2026-09-11)
+  van_ban_hop_nhat:                   # ƯU TIÊN CAO NHẤT với BLLĐ 2019 — không có VBHN thì không reconstruct được version nào
+    - "18/VBHN-VPQH (BLLĐ 2019, 12/02/2026)"       # PARTIAL — 1 nguồn nêu 125/VBHN; xác minh
+    # D2/Q2 (2026-09-11, Ted): nhóm NĐ/TT dưới đây là phụ trợ (không phải BLLĐ chính) — nếu
+    # không tra được số hiệu VBHN thì CHẤP NHẬN dùng bản gốc, ghi rõ hạn chế "không phản ánh
+    # sửa đổi giữa chừng" trong manifest + README (không chặn tiến độ Phase 1).
+    - "VBHN NĐ 145/2020/NĐ-CP"                      # số hiệu VBHN chưa tra — fallback: bản gốc nếu không ra
+    - "VBHN TT 59/2015/TT-BLĐTBXH"                  # bị TT 06/2021 sửa — fallback: bản gốc nếu không ra
+    - "VBHN NĐ 28/2015/NĐ-CP"                       # bị NĐ 61/2020 sửa — fallback: bản gốc nếu không ra
+
+# Luật sửa BLLĐ 2019 in-place — T4 (2026-09-11), xác nhận qua TOÀN VĂN GỐC .signed.pdf (chữ ký CTQH):
+#   71/2025/QH15  (Luật Công nghiệp công nghệ số, HL 2026-01-01) — Điều 154 khoản 8a (mới)
+#   113/2025/QH15 (Luật Dân số, HL 2026-07-01) — Điều 139 khoản 1 (nghỉ thai sản)
+#   124/2025/QH15 (Luật Giáo dục nghề nghiệp, HL 2026-01-01) — Điều 59 khoản 2 điểm a + Điều 61 khoản 3
+#   41/2024/QH15  (Luật BHXH 2024) — KHÔNG sửa BLLĐ (xác nhận qua danh sách luật sửa trong VBHN 18/VBHN-VPQH)
+
+# ─────────────────────────────────────────────────────────────
+# BƯỚC TRƯỚC VERIFY: ĐẾM SỐ KHOẢN ≥2 VERSION — HAI CON SỐ, KHÔNG CỘNG GỘP
+# ─────────────────────────────────────────────────────────────
+#
+# HAI CƠ CHẾ point-in-time KHÔNG CÙNG HẠNG (Ted 2026-09-09):
+#   Cơ chế 2 — chọn đúng thế hệ luật theo ngày: chỉ là doc-level hieu_luc_tu/den filter =
+#     metadata filtering thông thường. KHÔNG phải reconstruction. KHÔNG khác biệt vs P-153
+#     (P-153 đã có "ngày hiệu lực" trong trích dẫn + "mở rộng truy vấn thời gian").
+#   Cơ chế 1 — dựng lại nội dung khoản bị SỬA IN-PLACE (cùng doc, cùng điều/khoản, ráp bản
+#     cũ/mới): đây là phần khó + là điểm bán thật.
+#   => Ngưỡng ~30 áp cho RIÊNG cơ chế 1, TRONG văn bản CÒN hiệu lực. Không cứu bằng cách cộng
+#      con số lịch sử vào.
+#
+# schema clause_uid = <doc_id>__d<dieu>__k<khoan> => "khoản ≥2 version" CHỈ phát sinh khi
+# cùng văn bản cùng điều bị sửa in-place. Luật thay thế (74/2025 thay 38/2013) tạo clause_uid
+# MỚI, không phải version mới.
+#
+# ─────────────────────────────────────────────────────────────
+# BOUND N1 — KẾT QUẢ T4 (2026-09-11, đọc toàn văn gốc .signed.pdf, KHÔNG dựa nguồn thứ cấp)
+# ─────────────────────────────────────────────────────────────
+# N1 = số khoản có ≥2 version qua SỬA IN-PLACE, trong văn bản CÒN hiệu lực (BLLĐ 2019 + NĐ 145/2020).
+#
+# CẢNH BÁO NGUỒN THỨ CẤP: nhiều bài báo/trang luật (kể cả luatvietnam, baochinhphu.vn tổng hợp)
+# GÁN SAI nội dung Điều 139 (thai sản) cho 71/2025/QH15 — SAI. Đọc trực tiếp bản .signed.pdf
+# (chữ ký Chủ tịch Quốc hội) mới thấy 71/2025 sửa Điều 154, không đụng Điều 139. Nguyên nhân
+# nhầm lẫn: điều luật khi trích dẫn BLLĐ đều ghi "đã được sửa đổi, bổ sung theo Luật số
+# 71/2025/QH15" như một cách định danh phiên bản BLLĐ đang dẫn chiếu (thông lệ soạn thảo),
+# KHÔNG có nghĩa luật đó sửa đúng điều đang trích. Bài học corpus: KHÔNG tin nguồn thứ cấp cho
+# quan hệ sửa đổi — luôn đọc điều khoản thi hành trong văn bản GỐC.
+#
+# Kết quả CHỐT (4 khoản/điểm, mỗi khoản 1 nguồn = văn bản gốc, verify: VERIFIED):
+#   71/2025/QH15  (CN công nghệ số, HL 2026-01-01): Điều 154 khoản 8a (MỚI) ............ 1 khoản
+#   113/2025/QH15 (Dân số, HL 2026-07-01): Điều 139 khoản 1 (nghỉ thai sản) ............ 1 khoản
+#   124/2025/QH15 (GDNN, HL 2026-01-01): Điều 59 k2 điểm a + Điều 61 khoản 3 ............ 2 khoản
+#   41/2024/QH15  (Luật BHXH 2024): KHÔNG sửa BLLĐ (xác nhận qua VBHN 18/VBHN-VPQH) ..... 0
+#   145-2020-ND-CP: "chưa phát hiện văn bản sửa đổi" ...................................... 0
+#
+#   => N1 THẬT = 4 khoản/điểm bị sửa in-place. N1 < 30 — XÁC NHẬN, không còn là ước tính.
+#
+# METRIC ĐÚNG (Ted): không phải "bao nhiêu khoản ≥2 version" mà "trong ~50 câu hỏi tần suất
+# cao, bao nhiêu câu ĐỔI ĐÁP ÁN theo as_of_date QUA CƠ CHẾ IN-PLACE".
+#   => Vẫn ~1 câu có giá trị demo cao (nghỉ thai sản, Điều 139, từ 2026-07-01) — đây là thay
+#      đổi trực tiếp ảnh hưởng người lao động, dễ hiểu, đã HIỆU LỰC (hôm nay 2026-09-11 > 2026-07-01).
+#      Điều 154 (khoản 8a, quản lý nhà nước) + Điều 59/61 (đào tạo nghề tại nơi làm việc) là
+#      in-place THẬT nhưng ít giá trị demo UX (không phải câu hỏi tần suất cao của NLĐ phổ thông)
+#      — vẫn nạp đủ cho đúng temporal-retrieval, nhưng KHÔNG dùng làm demo chính.
+#      Các thay đổi lớn khác (lương tối thiểu / BHXH một lần / 20→15 năm / BHTN) đều là
+#      DOC-LEVEL, không tính vào N1.
+
+# ─────────────────────────────────────────────────────────────
+# T5 (2026-09-12) — ĐỐI CHIẾU CHÉO VBHN 18/VBHN-VPQH XÁC NHẬN TOÀN BỘ KẾT QUẢ T4
+# ─────────────────────────────────────────────────────────────
+# Sau khi acquire toàn văn, bản hợp nhất chính thức (VBHN 18/VBHN-VPQH) tự nó ghi cước chú
+# cho từng khoản bị sửa — khớp 4/4 phát hiện của T4, nguồn độc lập với 3 bản .signed.pdf:
+#   Điều 139 k1  -> cước chú 44: "sửa đổi, bổ sung theo khoản 1 Điều 29 Luật Dân số
+#                   113/2025/QH15, hiệu lực 01/7/2026"
+#   Điều 154 k8a -> cước chú 55: "bổ sung theo khoản 4 Điều 49 Luật Công nghiệp công nghệ số
+#                   71/2025/QH15, hiệu lực 01/01/2026"
+#   Điều 61 k3   -> cước chú 33: "sửa đổi, bổ sung theo điểm b khoản 1 Điều 43 Luật Giáo dục
+#                   nghề nghiệp 124/2025/QH15, hiệu lực 01/01/2026"
+#   Điều 59      -> sửa theo Luật GDNN 124/2025 (điểm a khoản 2)
+# Bản gốc 45/2019/QH14 trong corpus KHÔNG chứa các khoản này (đúng — là bản trước khi sửa),
+# nên cặp (45-2019-QH14, 18-VBHN-VPQH) dùng được làm 2 version cho point-in-time ở T9.
+#
+# ═════════════════════════════════════════════════════════════
+# QUYẾT ĐỊNH (N1 < 30) — đề xuất: PHƯƠNG ÁN (a). Chờ Ted xác nhận Y/N.
+# ═════════════════════════════════════════════════════════════
+#   - KHÔNG bán "point-in-time reconstruction" là điểm khác biệt.
+#   - Tính năng thời gian VẪN LÀM (rẻ, đúng, xử lý được các mốc doc-level: lương tối thiểu
+#     theo ngày, BHXH 2014↔2024, BHTN 2013↔2026) — gọi ĐÚNG TÊN:
+#     "temporal-aware retrieval + hiệu lực metadata cấp điều/khoản".
+#   - ĐIỂM BÁN CHÍNH của DocuMind = CORPUS CÓ BIÊN GIỚI (vấn đề gốc):
+#       manifest hiển thị trang chủ · scope classifier cưỡng chế · thư viện câu hỏi theo
+#       tình huống. Đây là thứ P-153 (trợ lý đa phòng ban có phân quyền) KHÔNG có.
+#   - Điều 139 giữ làm demo "nice touch", không phải headline.
+#   - Phương án (b) "bỏ hẳn trục thời gian" = tệ hơn, vứt đi phần metadata gần như free.
+#
+# ─────────────────────────────────────────────────────────────
+# THỨ TỰ VIỆC (cập nhật — bỏ bước đếm VBHN khỏi đường tới hành động)
+#   1. Ted xác nhận phương án (a). ✅
+#   2. ✅ (T2, 2026-09-11) Tra 1 vòng 6 dòng chưa xác minh: 134/2015, 28/2015 -> VERIFIED;
+#      11+12/2025-TT-BNV -> VERIFIED, thêm vào nhóm C; nhóm F (25/2025-BYT, 18+19/2021, 24/2022-BLĐTBXH) -> hoãn, không tra.
+#   3. Đối chiếu Công báo: ngày ban hành/hiệu lực mọi dòng PARTIAL (18 văn bản + 2 TT mới).
+#   4. Đối chiếu lược đồ vbpl.vn: mọi quan hệ sua_doi_boi / thay_the.
+#   5. Acquire text sạch 18 văn bản + VBHN BLLĐ 18/VBHN-VPQH (cho bước implement dựng version Điều 139).
+#   6. Thư viện câu hỏi (40–60 câu, theo tình huống) + gold answers.
+#   7. Implement: schema ingestion → scope_gate → temporal filter.
+#
+# CHẶN INGEST cho tới khi bước 2–4 xong.

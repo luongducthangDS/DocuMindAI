@@ -6,6 +6,7 @@ Strict validation to reject malformed input at the boundary.
 from __future__ import annotations
 
 import re
+from datetime import date
 from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
@@ -17,6 +18,20 @@ class QueryRequest(BaseModel):
     query: str = Field(..., min_length=3, max_length=1000)
     session_id: str = Field(default="default", max_length=64)
     stream: bool = False
+    # Mốc thời điểm tra cứu (ISO YYYY-MM-DD). Thiếu = quy định hiện hành hôm nay.
+    as_of_date: str | None = Field(default=None, max_length=10)
+
+    @field_validator("as_of_date")
+    @classmethod
+    def validate_as_of_date(cls, v: str | None) -> str | None:
+        if v is None or not v.strip():
+            return None
+        v = v.strip()
+        try:
+            date.fromisoformat(v)
+        except ValueError:
+            raise ValueError("as_of_date must be an ISO date (YYYY-MM-DD)") from None
+        return v
 
     @field_validator("query")
     @classmethod
