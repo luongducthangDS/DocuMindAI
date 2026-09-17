@@ -118,7 +118,7 @@ class BM25OnlyRAG:
     def __init__(self, all_nodes):
         self._nodes = all_nodes
 
-    def retrieve_and_answer(self, question: str, retrieve_only: bool = False) -> tuple[str, list[str]]:
+    def retrieve_and_answer(self, question: str, retrieve_only: bool = False) -> tuple[str, list]:
         from llama_index.retrievers.bm25 import BM25Retriever
         from src.rag.generator import generate_answer
         from src.rag.retriever import nodes_to_chunks
@@ -134,16 +134,14 @@ class BM25OnlyRAG:
             return "Tôi không tìm thấy thông tin liên quan.", []
 
         chunks = nodes_to_chunks(nodes)
-        contexts = [c.text for c in chunks]
-
-        if not contexts:
+        if not chunks:
             return "Tôi không tìm thấy thông tin liên quan.", []
 
         if retrieve_only:
-            return "", contexts
+            return "", chunks
         # BM25 raw scores aren't on the cross-encoder 0.05 scale → disable abstain gate
         result = generate_answer(question, chunks, min_score=0.0)
-        return result["answer"], contexts
+        return result["answer"], chunks
 
 
 # ── Strategy ②: Dense-only ───────────────────────────────────────────────────
@@ -160,7 +158,7 @@ class DenseOnlyRAG:
         self._collection = collection
         self._embedder = embedder
 
-    def retrieve_and_answer(self, question: str, retrieve_only: bool = False) -> tuple[str, list[str]]:
+    def retrieve_and_answer(self, question: str, retrieve_only: bool = False) -> tuple[str, list]:
         query_vec = self._embedder.get_query_embedding(question)
 
         results = self._collection.query(
@@ -171,10 +169,6 @@ class DenseOnlyRAG:
 
         docs = results.get("documents", [[]])[0]
         metas = results.get("metadatas", [[]])[0]
-        contexts = [d for d in docs if d]
-
-        if not contexts:
-            return "Tôi không tìm thấy thông tin liên quan.", []
 
         from src.rag.retriever import RetrievedChunk
         from src.rag.generator import generate_answer
@@ -187,11 +181,14 @@ class DenseOnlyRAG:
             )
             for i, (doc, meta) in enumerate(zip(docs, metas)) if doc
         ]
+        if not chunks:
+            return "Tôi không tìm thấy thông tin liên quan.", []
+
         if retrieve_only:
-            return "", contexts
+            return "", chunks
         # Dense cosine sim is 0-1; keep a light floor but not the cross-encoder gate
         result = generate_answer(question, chunks, min_score=0.0)
-        return result["answer"], contexts
+        return result["answer"], chunks
 
 
 # ── Strategy ②: Hybrid (no reranker) ─────────────────────────────────────────
@@ -208,19 +205,18 @@ class HybridRAG:
         from src.rag.retriever import build_hybrid_retriever
         self._retriever = build_hybrid_retriever(index, nodes=all_nodes, rerank=False)
 
-    def retrieve_and_answer(self, question: str, retrieve_only: bool = False) -> tuple[str, list[str]]:
+    def retrieve_and_answer(self, question: str, retrieve_only: bool = False) -> tuple[str, list]:
         from src.rag.generator import generate_answer
         from src.rag.retriever import nodes_to_chunks
 
         nodes = self._retriever.retrieve(question)
         chunks = nodes_to_chunks(nodes)
-        contexts = [c.text for c in chunks]
 
         if retrieve_only:
-            return "", contexts
+            return "", chunks
         # RRF fusion scores are ~0.016 (always < 0.05) → disable cross-encoder gate
         result = generate_answer(question, chunks, min_score=0.0)
-        return result["answer"], contexts
+        return result["answer"], chunks
 
 
 # ── Strategy ③: Hybrid + Reranker ────────────────────────────────────────────
@@ -237,18 +233,17 @@ class HybridRerankRAG:
         from src.rag.retriever import build_hybrid_retriever
         self._retriever = build_hybrid_retriever(index, nodes=all_nodes, rerank=True)
 
-    def retrieve_and_answer(self, question: str, retrieve_only: bool = False) -> tuple[str, list[str]]:
+    def retrieve_and_answer(self, question: str, retrieve_only: bool = False) -> tuple[str, list]:
         from src.rag.generator import generate_answer
         from src.rag.retriever import nodes_to_chunks
 
         nodes = self._retriever.retrieve(question)
         chunks = nodes_to_chunks(nodes)
-        contexts = [c.text for c in chunks]
 
         if retrieve_only:
-            return "", contexts
+            return "", chunks
         result = generate_answer(question, chunks)
-        return result["answer"], contexts
+        return result["answer"], chunks
 
 
 # ── RAGAS evaluation ──────────────────────────────────────────────────────────
@@ -559,6 +554,23 @@ def run_ragas(
 
 # ── Strategy runner ───────────────────────────────────────────────────────────
 
+# Cache format 2 stores retrieved chunk metadata (clause_uid / version_id /
+# doc_id), not just context text: the retrieval metrics match on clause id, so a
+# text-only cache can no longer be scored. Format 1 caches are rejected on load.
+_CACHE_FORMAT = 2
+
+
+def _chunk_record(chunk) -> dict:
+    """RetrievedChunk → the flat record eval/metrics.py scores against."""
+    meta = chunk.metadata or {}
+    return {
+        "clause_uid": str(meta.get("clause_uid", "")),
+        "version_id": str(meta.get("version_id", "")),
+        "doc_id": str(meta.get("doc_id", "")),
+        "text": chunk.text or "",
+    }
+
+
 def _cache_path(cache_dir: Path, strategy_name: str, n_items: int) -> Path:
     return cache_dir / f"{strategy_name}_{n_items}q.json"
 
@@ -571,6 +583,16 @@ def _load_cache(cache_dir: Path | None, strategy_name: str, questions: list[str]
         return None
     try:
         data = json.loads(p.read_text(encoding="utf-8"))
+        if data.get("format") != _CACHE_FORMAT:
+            # Format 1 stored context text only, with no clause_uid — the
+            # clause-level metrics (DEC-0004) cannot be computed from it, and
+            # scoring a v1 cache would silently fall back to a different
+            # measuring instrument. Regenerate instead.
+            logger.warning(
+                "  Cache format {} for {} (need {}) — regenerating",
+                data.get("format", 1), strategy_name, _CACHE_FORMAT,
+            )
+            return None
         if data.get("questions") == questions:
             logger.info("  ↩  Loaded {} cached answers for {}", len(questions), strategy_name)
             return data
@@ -585,7 +607,7 @@ def _save_cache(
     strategy_name: str,
     questions: list[str],
     answers: list[str],
-    contexts_list: list,
+    records_list: list,
     latencies_ms: list[float],
 ) -> None:
     if not cache_dir:
@@ -594,10 +616,11 @@ def _save_cache(
     p = _cache_path(cache_dir, strategy_name, len(questions))
     p.write_text(
         json.dumps({
+            "format": _CACHE_FORMAT,
             "strategy": strategy_name,
             "questions": questions,
             "answers": answers,
-            "contexts_list": contexts_list,
+            "records_list": records_list,
             "latencies_ms": latencies_ms,
         }, ensure_ascii=False, indent=2),
         encoding="utf-8",
@@ -620,7 +643,7 @@ def run_strategy(
     Collects:
       • latency stats
       • RAGAS metrics (faithfulness, answer_relevancy, context_recall, context_precision)
-      • local metrics (hit_rate, mrr, answer_correctness, citation_rate, ooc_refusal_rate)
+      • local metrics (recall@k, mrr@8, citation grounding, answer_correctness, ooc_refusal)
 
     Answer caching: if cache_dir is set, generated answers are saved to
     ``cache_dir/{strategy}_{N}q.json`` and reused on subsequent runs, so
@@ -643,31 +666,34 @@ def run_strategy(
     if cached:
         questions = cached["questions"]
         answers = cached["answers"]
-        contexts_list = cached["contexts_list"]
+        records_list = cached["records_list"]
         latencies_ms = cached["latencies_ms"]
     else:
         latencies_ms: list[float] = []
-        questions, answers, contexts_list = [], [], []
+        questions, answers, records_list = [], [], []
 
         for i, item in enumerate(test_items, 1):
             q = item["question"]
 
             t0 = time.perf_counter()
             try:
-                answer, ctx = strategy.retrieve_and_answer(q, retrieve_only=retrieve_only)
+                answer, chunks = strategy.retrieve_and_answer(q, retrieve_only=retrieve_only)
             except Exception as exc:
                 logger.warning("[{}/{}] {} failed: {}", i, len(test_items), strategy.name, exc)
-                answer, ctx = "", []
+                answer, chunks = "", []
 
             latency = (time.perf_counter() - t0) * 1000
             latencies_ms.append(latency)
             questions.append(q)
             answers.append(answer)
-            contexts_list.append(ctx)
+            records_list.append([_chunk_record(c) for c in chunks])
 
             logger.info("  [{}/{}] {:.0f}ms | Q: {}", i, len(test_items), latency, q[:55])
 
-        _save_cache(cache_dir, strategy.name, questions, answers, contexts_list, latencies_ms)
+        _save_cache(cache_dir, strategy.name, questions, answers, records_list, latencies_ms)
+
+    # RAGAS still wants plain context strings; the metrics want the records.
+    contexts_list = [[r["text"] for r in recs] for recs in records_list]
 
     lat_sorted = sorted(latencies_ms)
     p95_idx = int(len(lat_sorted) * 0.95)
@@ -692,12 +718,12 @@ def run_strategy(
     local_metrics = compute_all(
         test_items=test_items,
         answers=answers,
-        contexts_list=contexts_list,
+        retrieved_list=records_list,
         ground_truths=ground_truths,
         embedder=embedder,
     )
 
-    chunk_counts = [len(c) for c in contexts_list]
+    chunk_counts = [len(r) for r in records_list]
 
     return {
         "strategy": strategy.name,
@@ -705,11 +731,12 @@ def run_strategy(
         "latency": latency_stats,
         "ragas": ragas_metrics,
         "retrieval_local": {
-            "hit_rate": local_metrics["retrieval"]["hit_rate"],
-            "mrr": local_metrics["retrieval"]["mrr"],
+            **local_metrics["retrieval"],
             "avg_chunks": round(statistics.mean(chunk_counts), 1) if chunk_counts else 0,
-            "items_with_context": sum(1 for c in contexts_list if c),
+            "items_with_context": sum(1 for r in records_list if r),
         },
+        "coverage": local_metrics["coverage"],
+        "grounding": {} if retrieve_only else local_metrics["grounding"],
         "generation_local": {} if retrieve_only else local_metrics["generation"],
         "domain": {} if retrieve_only else local_metrics["domain"],
     }
@@ -820,18 +847,29 @@ def print_table(results: list[dict]) -> None:
 
     # ── Local retrieval metrics (no LLM) ──────────────────────────────
     print("=" * w)
-    print("  [Retrieval — local, no LLM] hit_rate / MRR / avg chunks")
+    print("  [Retrieval — local, no LLM] recall@k / MRR — matched on clause_uid")
     print("-" * w)
-    print(_row("hit_rate@K", lambda r: r.get("retrieval_local", {}).get("hit_rate")))
-    print(_row("mrr", lambda r: r.get("retrieval_local", {}).get("mrr")))
+    for k in (1, 5, 8, 20):
+        print(_row(f"recall@{k}", lambda r, k=k: r.get("retrieval_local", {}).get(f"recall@{k}")))
+    print(_row("mrr@8", lambda r: r.get("retrieval_local", {}).get("mrr@8")))
     print(_row("avg_chunks_returned", lambda r: r.get("retrieval_local", {}).get("avg_chunks")))
+    print(_row("questions_scored", lambda r: r.get("coverage", {}).get("n_scored")))
+    print(_row("questions_skipped", lambda r: r.get("coverage", {}).get("n_skipped")))
+
+    # ── Citation grounding (no LLM) ──────────────────────────────────
+    print("=" * w)
+    print("  [Grounding — local, no LLM] citations point at real, gold sources")
+    print("-" * w)
+    print(_row("citation_validity", lambda r: r.get("grounding", {}).get("citation_validity")))
+    print(_row("citation_groundedness", lambda r: r.get("grounding", {}).get("citation_groundedness")))
 
     # ── Local generation metrics (no LLM) ────────────────────────────
     print("=" * w)
     print("  [Generation — local, no LLM] answer_correctness vs ground truth")
     print("-" * w)
     print(_row("correctness_semantic", lambda r: r.get("generation_local", {}).get("answer_correctness_semantic")))
-    print(_row("correctness_token_f1", lambda r: r.get("generation_local", {}).get("answer_correctness_f1")))
+    print(_row("correctness_lexical*", lambda r: r.get("generation_local", {}).get("answer_correctness_lexical")))
+    print("  * lexical = token overlap proxy, not a correctness measure (DEC-0004)")
 
     # ── Domain metrics ────────────────────────────────────────────────
     print("=" * w)
@@ -894,7 +932,7 @@ def main() -> None:
                         help="Xóa answers_cache + ragas_checkpoints trước khi chạy "
                              "(đo lại từ đầu sau khi đổi code/model)")
     parser.add_argument("--retrieval-only", action="store_true",
-                        help="CHỈ đo retrieval (hit_rate/MRR/avg_chunks) — KHÔNG gọi LLM "
+                        help="CHỈ đo retrieval (recall@k/MRR/avg_chunks) — KHÔNG gọi LLM "
                              "generation, không quota, chạy vài giây cho cả 4 strategy")
     args = parser.parse_args()
 

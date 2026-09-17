@@ -2,23 +2,37 @@
 eval/metrics.py — local evaluation metrics for DocuMind AI.
 
 All metrics here run WITHOUT an external LLM judge:
-  • answer_correctness  — cosine similarity(answer, ground_truth) via MiniLM
-  • hit_rate            — fraction where top-K contains a relevant chunk
-  • mrr                 — Mean Reciprocal Rank of first relevant chunk
-  • ooc_refusal_rate    — for out-of-corpus questions, % system correctly declines
-  • citation_rate       — % of answers that cite a source
+  • recall_at_k            — fraction where top-k holds the gold clause, right version
+  • mrr_at_k               — Mean Reciprocal Rank of the first gold clause
+  • citation_validity      — every [N] in an answer points at a source that exists
+  • citation_groundedness  — at least one [N] points at a gold clause
+  • answer_correctness     — cosine similarity(answer, ground_truth) + lexical overlap
+  • ooc_refusal_rate       — for out-of-corpus questions, % system correctly declines
+  • citation_rate          — % of answers that cite a source at all
+
+Retrieval metrics match on `clause_uid` AND reject superseded `version_id`s — see
+docs/decisions/DEC-0004-metric-theo-clause-uid.md. Same rule as
+eval/temporal_eval.py::score_context, which it deliberately mirrors rather than
+re-invents.
 
 These complement RAGAS (which requires an LLM judge) and are cheaper to run.
 Separation of concerns:
-  Retrieval quality  → hit_rate, mrr, context_recall (RAGAS)
+  Retrieval quality  → recall_at_k, mrr_at_k, context_recall (RAGAS)
   Generation quality → faithfulness (RAGAS), answer_correctness (local)
+  Grounding          → citation_validity, citation_groundedness
   Domain robustness  → ooc_refusal_rate, citation_rate
 """
 
 from __future__ import annotations
 
 import re
-from typing import Optional
+import sys
+from pathlib import Path
+from typing import Any, Optional
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from src.guardrails import cited_indices  # noqa: E402, I001
 
 
 # ── Token-overlap helpers ─────────────────────────────────────────────────────
@@ -30,8 +44,17 @@ def _token_set(text: str) -> set[str]:
     return set(text.split())
 
 
-def _f1_overlap(a: str, b: str) -> float:
-    """Token-level F1 between two strings (standard SQuAD-style)."""
+def lexical_overlap(a: str, b: str) -> float:
+    """Token-level F1 between two strings (standard SQuAD-style).
+
+    This is a PROXY, not a correctness measure: it counts shared words and knows
+    nothing about meaning, negation, or which version of a clause a text states.
+    Two versions of the same article that differ only in the figure they name
+    score near 1.0 against each other. Use it to compare an answer against a
+    ground truth as a rough signal — never to decide whether a retrieved chunk
+    is the right one (that is what recall_at_k is for), and never as a headline
+    number in README or a DEC.
+    """
     a_toks, b_toks = _token_set(a), _token_set(b)
     if not a_toks or not b_toks:
         return 0.0
@@ -68,8 +91,8 @@ def answer_correctness(
 
     ans_list, gt_list = zip(*pairs)
 
-    # Token-F1 (always computed)
-    f1_scores = [_f1_overlap(a, g) for a, g in zip(ans_list, gt_list)]
+    # Lexical overlap (always computed)
+    f1_scores = [lexical_overlap(a, g) for a, g in zip(ans_list, gt_list)]
     token_f1 = round(sum(f1_scores) / len(f1_scores), 4)
 
     # Semantic cosine similarity via embedder
@@ -94,66 +117,147 @@ def answer_correctness(
     return {"semantic": semantic, "token_f1": token_f1}
 
 
-# ── hit_rate & MRR ────────────────────────────────────────────────────────────
+# ── Gold lookup ───────────────────────────────────────────────────────────────
 
-def _chunk_relevant(chunk_text: str, ground_truth: str, threshold: float = 0.15) -> bool:
-    """
-    A retrieved chunk is 'relevant' if its token-F1 overlap with the ground
-    truth exceeds threshold.  0.15 is deliberately low — we're checking
-    whether the retriever at least retrieved a chunk from the right ballpark,
-    not whether it found the exact sentence.
-    """
-    return _f1_overlap(chunk_text, ground_truth) >= threshold
+Record = dict[str, Any]  # {"clause_uid", "version_id", "doc_id", "text"}
 
 
-def hit_rate(
-    contexts_list: list[list[str]],
-    ground_truths: list[str],
-    threshold: float = 0.15,
-) -> float:
-    """
-    Fraction of questions where at least one retrieved chunk is relevant.
-    Measures retriever coverage independently of the LLM.
-    """
-    if not contexts_list:
-        return 0.0
+def gold_clause_uids(item: dict) -> list[str]:
+    """Clause ids a question must retrieve, or [] when the question has none.
 
-    hits = 0
+    Reads the v2 gold field first, then falls back to the single `source_clause`
+    of the temporal gold set. A question with neither is not scoreable here and
+    the caller must skip it — never silently fall back to a text-similarity
+    proxy, which would change the measuring instrument mid-run.
+    """
+    uids = item.get("gold_clause_uids")
+    if uids:
+        return [str(u) for u in uids if u]
+    single = item.get("source_clause")
+    return [str(single)] if single else []
+
+
+def _superseded_versions(item: dict) -> set[str]:
+    return {str(v) for v in (item.get("distractor_versions") or []) if v}
+
+
+def _is_gold(rec: Record, gold: set[str], bad_versions: set[str]) -> bool:
+    """The right clause, in a version that is still the right one."""
+    return (
+        str(rec.get("clause_uid", "")) in gold
+        and str(rec.get("version_id", "")) not in bad_versions
+    )
+
+
+def _first_gold_rank(records: list[Record], item: dict, k: int) -> Optional[int]:
+    """1-based rank of the first record that is the gold clause in a version
+    that is still the right one, or None. Both halves matter: the right article
+    in a superseded version is a miss, because that is exactly the failure the
+    temporal filter exists to prevent."""
+    gold = set(gold_clause_uids(item))
+    if not gold:
+        return None
+    bad_versions = _superseded_versions(item)
+    for rank, rec in enumerate(records[:k], start=1):
+        if _is_gold(rec, gold, bad_versions):
+            return rank
+    return None
+
+
+def _scoreable(items: list[dict]) -> list[int]:
+    """Indices of questions that carry a gold clause id."""
+    return [i for i, item in enumerate(items) if gold_clause_uids(item)]
+
+
+# ── recall@k & MRR@k ──────────────────────────────────────────────────────────
+
+def recall_at_k(
+    items: list[dict],
+    retrieved_list: list[list[Record]],
+    k: int = 8,
+) -> Optional[float]:
+    """Fraction of scoreable questions whose top-k holds the gold clause.
+
+    Returns None when no question in the set carries a gold clause id.
+    """
+    idxs = _scoreable(items)
+    if not idxs:
+        return None
+    hits = sum(
+        1 for i in idxs
+        if _first_gold_rank(retrieved_list[i], items[i], k) is not None
+    )
+    return round(hits / len(idxs), 4)
+
+
+def mrr_at_k(
+    items: list[dict],
+    retrieved_list: list[list[Record]],
+    k: int = 8,
+) -> Optional[float]:
+    """Mean Reciprocal Rank of the gold clause within top-k (0 when absent)."""
+    idxs = _scoreable(items)
+    if not idxs:
+        return None
+    total = 0.0
+    for i in idxs:
+        rank = _first_gold_rank(retrieved_list[i], items[i], k)
+        if rank is not None:
+            total += 1.0 / rank
+    return round(total / len(idxs), 4)
+
+
+# ── Citation grounding ────────────────────────────────────────────────────────
+
+def citation_validity(
+    answers: list[str],
+    retrieved_list: list[list[Record]],
+) -> Optional[float]:
+    """Fraction of citing answers where every [N] points at a source that exists.
+
+    Only answers that cite something are counted — an answer with no citation
+    is not invalid, it is a different case (see citation_rate). Returns None
+    when nothing in the set cites.
+    """
+    scored = 0
     valid = 0
-    for contexts, gt in zip(contexts_list, ground_truths):
-        if _is_ooc_question_answer(gt):
+    for answer, records in zip(answers, retrieved_list):
+        indices = cited_indices(answer)
+        if not indices:
             continue
-        valid += 1
-        if any(_chunk_relevant(c, gt, threshold) for c in contexts):
-            hits += 1
+        scored += 1
+        if all(1 <= n <= len(records) for n in indices):
+            valid += 1
+    return round(valid / scored, 4) if scored else None
 
-    return round(hits / valid, 4) if valid else 0.0
 
+def citation_groundedness(
+    items: list[dict],
+    answers: list[str],
+    retrieved_list: list[list[Record]],
+) -> Optional[float]:
+    """Fraction of citing answers where at least one [N] points at a gold clause.
 
-def mrr(
-    contexts_list: list[list[str]],
-    ground_truths: list[str],
-    threshold: float = 0.15,
-) -> float:
+    Deliberately "at least one", not "all": a correct answer may also cite a
+    supporting chunk outside the gold set, and penalising that would measure
+    style rather than grounding.
     """
-    Mean Reciprocal Rank — reciprocal of the rank of the first relevant chunk.
-    MRR = 1.0 means the first chunk is always relevant; 0.5 means it's usually rank 2.
-    """
-    if not contexts_list:
-        return 0.0
-
-    rr_scores = []
-    for contexts, gt in zip(contexts_list, ground_truths):
-        if _is_ooc_question_answer(gt):
+    scored = 0
+    grounded = 0
+    for item, answer, records in zip(items, answers, retrieved_list):
+        gold = set(gold_clause_uids(item))
+        indices = cited_indices(answer)
+        if not gold or not indices:
             continue
-        rr = 0.0
-        for rank, chunk in enumerate(contexts, start=1):
-            if _chunk_relevant(chunk, gt, threshold):
-                rr = 1.0 / rank
+        scored += 1
+        bad_versions = _superseded_versions(item)
+        for n in indices:
+            if not 1 <= n <= len(records):
+                continue
+            if _is_gold(records[n - 1], gold, bad_versions):
+                grounded += 1
                 break
-        rr_scores.append(rr)
-
-    return round(sum(rr_scores) / len(rr_scores), 4) if rr_scores else 0.0
+    return round(grounded / scored, 4) if scored else None
 
 
 # ── OOC refusal rate ──────────────────────────────────────────────────────────
@@ -236,31 +340,52 @@ def citation_rate(answers: list[str]) -> float:
 def compute_all(
     test_items: list[dict],
     answers: list[str],
-    contexts_list: list[list[str]],
+    retrieved_list: list[list[Record]],
     ground_truths: list[str],
     embedder=None,
+    ks: tuple[int, ...] = (1, 5, 8, 20),
 ) -> dict:
     """
     Compute all local metrics in one call.
+
+    `retrieved_list` holds one list of records per question, in rank order —
+    see Record. Questions without a gold clause id are skipped by the retrieval
+    metrics and counted in "coverage", so a run can never look complete while
+    silently scoring nothing.
+
     Returns a nested dict grouped by layer:
 
     {
-      "retrieval": {"hit_rate": ..., "mrr": ...},
-      "generation": {"answer_correctness_semantic": ..., "answer_correctness_f1": ...},
+      "retrieval":  {"recall@1": ..., "recall@8": ..., "mrr@8": ...},
+      "coverage":   {"n_questions": ..., "n_scored": ..., "n_skipped": ...},
+      "grounding":  {"citation_validity": ..., "citation_groundedness": ...},
+      "generation": {"answer_correctness_semantic": ..., "answer_correctness_lexical": ...},
       "domain":     {"citation_rate": ..., "ooc_refusal_rate": ...},
     }
     """
     ac = answer_correctness(answers, ground_truths, embedder)
     ooc = ooc_refusal_rate(test_items, answers)
+    n_scored = len(_scoreable(test_items))
+
+    retrieval: dict[str, Optional[float]] = {
+        f"recall@{k}": recall_at_k(test_items, retrieved_list, k) for k in ks
+    }
+    retrieval["mrr@8"] = mrr_at_k(test_items, retrieved_list, 8)
 
     return {
-        "retrieval": {
-            "hit_rate": hit_rate(contexts_list, ground_truths),
-            "mrr": mrr(contexts_list, ground_truths),
+        "retrieval": retrieval,
+        "coverage": {
+            "n_questions": len(test_items),
+            "n_scored": n_scored,
+            "n_skipped": len(test_items) - n_scored,
+        },
+        "grounding": {
+            "citation_validity": citation_validity(answers, retrieved_list),
+            "citation_groundedness": citation_groundedness(test_items, answers, retrieved_list),
         },
         "generation": {
             "answer_correctness_semantic": ac["semantic"],
-            "answer_correctness_f1": ac["token_f1"],
+            "answer_correctness_lexical": ac["token_f1"],
         },
         "domain": {
             "citation_rate": citation_rate(answers),

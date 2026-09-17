@@ -95,9 +95,31 @@ def check_prompt_injection(query: str) -> GuardResult:
 # Matches [N] or [NN] but NOT [Khoản 1] or [Điều 5] style text
 _CITATION_RE = re.compile(r"(?<!\w)\[(\d{1,2})\](?!\w)")
 
+# Same markers, plus the combined "[1, 2]" form the LLM sometimes emits.
+# Kept separate from _CITATION_RE on purpose: validate_citations' stripping
+# behaviour is calibrated for single-index markers, and widening it there would
+# change what production answers look like. This one is read-only — it reports
+# which sources an answer claims, for evaluation.
+_CITED_INDICES_RE = re.compile(r"(?<!\w)\[(\d{1,2}(?:\s*,\s*\d{1,2})*)\](?!\w)")
+
 _CITATION_WARNING_VI = (
     "\n\n_(Lưu ý: một số trích dẫn không khớp với nguồn được truy xuất và đã được xóa.)_"
 )
+
+
+def cited_indices(answer: str) -> list[int]:
+    """Source indices an answer claims, in order of first appearance.
+
+    Read-only counterpart to validate_citations: it reports what the answer
+    cites without judging or rewriting it. Handles both "[1]" and "[1, 2]".
+    """
+    seen: list[int] = []
+    for bracket in _CITED_INDICES_RE.findall(answer or ""):
+        for piece in bracket.split(","):
+            n = int(piece.strip())
+            if n not in seen:
+                seen.append(n)
+    return seen
 
 
 def validate_citations(answer: str, chunk_count: int) -> tuple[str, list[int]]:
