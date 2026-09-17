@@ -8,20 +8,32 @@ máy dev đang thiếu RAM, và đó chính là lý do script này tồn tại (
 Sau khi chạy, commit file cache; `eval/scoring_ab.py --query-embeddings <file>`
 chạy được toàn bộ eval retrieval mà không load model nào.
 
-Dùng trên Colab:
+Dùng trên Colab (chép nguyên 4 ô dưới đây):
 
-    !git clone https://github.com/luongducthangDS/DocuMindAI.git
-    %cd DocuMindAI
+    # [1] cài đặt — chỉ cần sentence-transformers; truyền --model tường minh thì
+    #     script không import src.config, nên không cần .env và không cần pydantic
     !pip install -q sentence-transformers
-    !python scripts/build_query_embedding_cache.py \
-        --gold data/eval/temporal_questions.json \
-        --output data/eval/query_embeddings/temporal_30q.json
+
+    # [2] clone ĐÚNG nhánh chứa script này (nó chưa có trên main/develop)
+    !git clone -b feature/eval-metric-clause-uid --depth 1 https://github.com/luongducthangDS/DocuMindAI.git
+    %cd DocuMindAI
+
+    # [3] embed — ghi ra /content cho dễ tải. Thêm --dtype fp16 khi đo phương án F1
+    #     của DEC-0006 (chạy lần nữa, đổi tên file output).
+    !python scripts/build_query_embedding_cache.py --model AITeamVN/Vietnamese_Embedding --dtype fp32 --output /content/temporal_30q_fp32.json
+
+    # [4] tải file về máy
+    from google.colab import files
+    files.download('/content/temporal_30q_fp32.json')
+
+Sau đó **commit từ máy local**: chép file đã tải vào `data/eval/query_embeddings/`
+rồi commit như bình thường. KHÔNG push từ Colab.
 
 Dùng tại chỗ (máy đủ RAM):
 
     python scripts/build_query_embedding_cache.py
 
-Script này KHÔNG đọc ChromaDB và KHÔNG ghi gì vào corpus.
+Script này KHÔNG đọc ChromaDB, KHÔNG ghi gì vào corpus, KHÔNG push gì lên git.
 """
 
 from __future__ import annotations
@@ -87,6 +99,12 @@ def main() -> None:
         help="mặc định lấy từ EMBEDDING_MODEL trong .env / settings",
     )
     parser.add_argument("--batch-size", type=int, default=8)
+    parser.add_argument(
+        "--dtype", choices=("fp32", "fp16"), default="fp32",
+        help="độ chính xác trọng số lúc embed. fp16 phục vụ đo phương án F1 trong "
+             "DEC-0006 (~1.1GB thay vì ~2.2GB); vector fp16 phải đối chiếu cosine "
+             "với fp32 trước khi tin, vì corpus đã index bằng fp32",
+    )
     args = parser.parse_args()
 
     model_name = args.model
@@ -101,6 +119,11 @@ def main() -> None:
     from sentence_transformers import SentenceTransformer
 
     model = SentenceTransformer(model_name)
+    if args.dtype == "fp16":
+        # Nửa độ chính xác: trọng số ~1.1GB thay vì ~2.2GB. Vector sinh ra KHÔNG
+        # bit-identical với fp32 — đó chính là thứ phép đo F1 cần định lượng, nên
+        # dtype được ghi vào cache để không ai trộn hai loại vào cùng một báo cáo.
+        model = model.half()
     embeddings = model.encode(
         questions,
         batch_size=args.batch_size,
@@ -117,6 +140,7 @@ def main() -> None:
             "gold_set": str(args.gold.relative_to(_REPO_ROOT)).replace("\\", "/"),
             "git_commit": _git_commit(),
             "weights_sha256_32": _weights_fingerprint(model),
+            "dtype": args.dtype,
             "normalize_embeddings": False,
         },
     )
@@ -124,7 +148,14 @@ def main() -> None:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     size_kb = args.output.stat().st_size // 1024
-    print(f"Đã ghi {len(questions)} vector {payload['dim']} chiều → {args.output} ({size_kb} KB)")
+    print()
+    print(f"Đã ghi {len(questions)} vector {payload['dim']} chiều ({args.dtype})")
+    print(f"  đường dẫn : {args.output.resolve()}")
+    print(f"  kích thước: {size_kb} KB")
+    print(f"  model     : {model_name}")
+    print(f"  vân tay   : {payload['weights_sha256_32']}")
+    print()
+    print("Tải file này về máy rồi commit từ local — đừng push từ Colab.")
 
 
 if __name__ == "__main__":
