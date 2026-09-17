@@ -10,17 +10,21 @@ chạy được toàn bộ eval retrieval mà không load model nào.
 
 Dùng trên Colab (chép nguyên 4 ô dưới đây):
 
-    # [1] cài đặt — chỉ cần sentence-transformers; truyền --model tường minh thì
-    #     script không import src.config, nên không cần .env và không cần pydantic
+    # [1] cài đặt — chỉ cần sentence-transformers. Script đọc EMBEDDING_MODEL từ
+    #     .env của repo, không qua pydantic, nên Colab không cần cài gì thêm.
     !pip install -q sentence-transformers
 
     # [2] clone ĐÚNG nhánh chứa script này (nó chưa có trên main/develop)
-    !git clone -b feature/eval-metric-clause-uid --depth 1 https://github.com/luongducthangDS/DocuMindAI.git
+    !git clone -b feature/eval-metric-clause-uid --depth 1 \
+        https://github.com/luongducthangDS/DocuMindAI.git
     %cd DocuMindAI
 
     # [3] embed — ghi ra /content cho dễ tải. Thêm --dtype fp16 khi đo phương án F1
     #     của DEC-0006 (chạy lần nữa, đổi tên file output).
-    !python scripts/build_query_embedding_cache.py --model AITeamVN/Vietnamese_Embedding --dtype fp32 --output /content/temporal_30q_fp32.json
+    !python scripts/build_query_embedding_cache.py \
+        --model AITeamVN/Vietnamese_Embedding \
+        --dtype fp32 \
+        --output /content/temporal_30q_fp32.json
 
     # [4] tải file về máy
     from google.colab import files
