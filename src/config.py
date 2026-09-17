@@ -41,9 +41,10 @@ class Settings(BaseSettings):
     # final@8 = 1.000 so với 0.821 của paraphrase-multilingual-MiniLM-L12-v2.
     embedding_model: str = "AITeamVN/Vietnamese_Embedding"
     # embedding_provider: "local" (mặc định, load model vào RAM qua sentence-transformers/
-    # torch) hoặc "hf_api" (gọi HuggingFace Inference API, không load model — dùng cho
-    # host RAM thấp). Cùng model, cùng số chiều, corpus không cần re-index khi đổi
-    # provider. Cần HF_TOKEN khi dùng "hf_api".
+    # torch) hoặc "hf_api" (gọi HuggingFace Serverless Inference API, không load model).
+    # CẢNH BÁO: "hf_api" hiện KHÔNG chạy với AITeamVN/Vietnamese_Embedding — API chỉ mở
+    # task model khai báo ('sentence-similarity', trả điểm) chứ không mở 'feature-extraction'
+    # (trả vector), nên mọi lần gọi đều ValueError. Xem DEC-0006 trước khi bật.
     embedding_provider: str = "local"
 
     # LangSmith

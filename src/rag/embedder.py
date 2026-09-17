@@ -51,12 +51,24 @@ class EmbeddingModelMismatch(RuntimeError):
 
 class _HFInferenceAPIEmbedding(BaseEmbedding):
     """LlamaIndex embedder that calls HuggingFace's Inference API instead of loading
-    the model in-process. Same model, same 384-dim pooled vectors (verified to match
-    the local SentenceTransformer output byte-for-byte via cosine similarity) — used
-    so torch/transformers/model weights (~700MB combined) never load into RAM on
-    memory-constrained hosts like Render's free 512MB tier. Importing this class
-    does NOT import llama_index.embeddings.huggingface (torch-based), only
-    llama_index.core (no torch dependency).
+    the model in-process, so torch/transformers/model weights never occupy RAM on
+    memory-constrained hosts. Importing this class does NOT import
+    llama_index.embeddings.huggingface (torch-based), only llama_index.core.
+
+    BROKEN for the current model — do not enable without reading DEC-0006.
+    `feature_extraction` below hits the SERVERLESS Inference API, which only
+    exposes the task a model declares. AITeamVN/Vietnamese_Embedding declares
+    `sentence-similarity` (a score between texts), not `feature-extraction`
+    (a vector), so every call raises:
+
+        ValueError: Model '...' doesn't support task 'feature-extraction'.
+                    Supported tasks: 'sentence-similarity'
+
+    The parity claim this docstring used to carry ("same 384-dim vectors,
+    verified byte-for-byte") was measured against paraphrase-multilingual-
+    MiniLM-L12-v2 and says nothing about the 1024-dim model in use since
+    2026-09-16. Any replacement path must re-prove parity per DEC-0006 §4
+    (cosine >= 0.9999 on 20 fixed questions) before it is trusted.
     """
 
     _client: "InferenceClient" = PrivateAttr()

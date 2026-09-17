@@ -49,13 +49,23 @@ services:
       # ~2.2GB — bắt buộc phải tắt trên free tier; bật lại nếu nâng plan có nhiều RAM hơn.
       - key: ENABLE_RERANKER
         value: "false"
-      # Model embedding local (AITeamVN/Vietnamese_Embedding, 2.2GB trên đĩa)
-      # cộng baseline torch+transformers+llama_index tự nó đã vượt 512MB — tắt reranker
-      # thôi KHÔNG đủ. EMBEDDING_PROVIDER=hf_api gọi HuggingFace Inference API thay vì
-      # load model vào RAM (đã verify: cùng model, vector giống hệt local, không cần
-      # re-index corpus). Cần HF_TOKEN (free, tạo tại huggingface.co/settings/tokens).
+      # ⚠️ CHUA CO DUONG LAY VECTOR NAO CHAY DUOC TREN FREE TIER — xem DEC-0006.
+      #
+      # EMBEDDING_PROVIDER=hf_api KHONG dung duoc voi model hien tai: HF Serverless
+      # Inference API chi mo task ma model khai bao, va AITeamVN/Vietnamese_Embedding
+      # khai 'sentence-similarity' (tra diem), khong phai 'feature-extraction' (tra
+      # vector) — moi lan goi deu ValueError. Cau "da verify vector giong het local"
+      # o day truoc day noi ve model MiniLM 384 chieu cu, khong phai model 1024 chieu
+      # dang dung. Da go.
+      #
+      # EMBEDDING_PROVIDER=local thi can ~2.4GB RAM cho trong so (bge-m3, 0.6B tham so)
+      # cong torch — free tier 512MB khong du, tat reranker thoi KHONG du.
+      #
+      # De 'local' o day de service fail-fast luc khoi dong thay vi chay nua voi va
+      # hong im lang o moi query. Doi gia tri nay sau khi Ted chot phuong an trong
+      # DEC-0006 (self-host FPT / HF Dedicated Endpoint + TEI / doi model + re-index).
       - key: EMBEDDING_PROVIDER
-        value: hf_api
+        value: local
       - key: HF_TOKEN
         sync: false
       # Bỏ comment 4 dòng dưới sau khi chạy scripts/migrate_chroma_to_qdrant.py
