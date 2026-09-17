@@ -41,6 +41,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import subprocess
 import sys
 from datetime import date
@@ -73,6 +74,41 @@ def _git_commit() -> str:
         return "unknown"
 
 
+def _default_model_name() -> str:
+    """Tên model khi không truyền `--model`.
+
+    Thứ tự: biến môi trường → `.env` của repo → `src.config` (pydantic).
+
+    Không đi thẳng vào `src.config`: nó import `pydantic_settings`, thứ KHÔNG có
+    sẵn trên Colab/Kaggle (ở đó chỉ cài `sentence-transformers`). Trước đây bỏ
+    `--model` trên Colab là gặp `ModuleNotFoundError: No module named
+    'pydantic_settings'` — một lỗi chẳng nói gì về việc thiếu tên model.
+
+    Vẫn không hard-code tên model ở đây: `EMBEDDING_MODEL` là nguồn sự thật duy
+    nhất, nên nếu không đọc được ở đâu cả thì báo lỗi và yêu cầu `--model`.
+    """
+    from_env = os.getenv("EMBEDDING_MODEL", "").strip()
+    if from_env:
+        return from_env
+
+    dotenv = _REPO_ROOT / ".env"
+    if dotenv.exists():
+        for line in dotenv.read_text(encoding="utf-8").splitlines():
+            key, _, value = line.partition("=")
+            if key.strip() == "EMBEDDING_MODEL" and value.strip():
+                return value.strip().strip('"').strip("'")
+
+    try:
+        from src.config import get_settings
+
+        return get_settings().embedding_model
+    except Exception as exc:
+        raise SystemExit(
+            f"Không xác định được model ({type(exc).__name__}). Truyền tường minh:\n"
+            f"  python {Path(__file__).name} --model AITeamVN/Vietnamese_Embedding ..."
+        ) from None
+
+
 def _weights_fingerprint(model) -> str:
     """SHA-256 rút gọn của trọng số đã load.
 
@@ -96,7 +132,8 @@ def main() -> None:
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument(
         "--model", default="",
-        help="mặc định lấy từ EMBEDDING_MODEL trong .env / settings",
+        help="mặc định đọc EMBEDDING_MODEL từ biến môi trường / .env / settings. "
+             "Trên Colab nên truyền tường minh cho chắc",
     )
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument(
@@ -107,10 +144,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    model_name = args.model
-    if not model_name:
-        from src.config import get_settings
-        model_name = get_settings().embedding_model
+    model_name = args.model or _default_model_name()
 
     questions = [q["question"] for q in json.loads(args.gold.read_text(encoding="utf-8"))]
     print(f"Gold: {args.gold.name} — {len(questions)} câu")
