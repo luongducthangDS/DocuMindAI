@@ -66,7 +66,7 @@ lời* với *ground_truth* là việc khác so với chọn chunk. Nó bị c�
 | token-F1 ≥ 0.15 (cũ) | | | | |
 | `clause_uid` + version (mới) | | | | |
 
-- Nguồn số: `reports/scoring_ab.json` — lệnh tái tạo: `python eval/scoring_ab.py`
+- Nguồn số: `reports/scoring_ab.json` — lệnh tái tạo: `python eval/scoring_ab.py --query-embeddings data/eval/query_embeddings/temporal_30q.json`
 - Số này đo **retrieval**, trên 30 câu gold temporal, không gọi LLM.
 - Số này **không** đo chất lượng câu trả lời, không đo faithfulness.
 
@@ -83,6 +83,21 @@ số trên máy hiện tại — cả hai đường lấy embedding đều tắc
 Xem mục 0e trong kế hoạch Phase 0. Docstring `_HFInferenceAPIEmbedding` nói vector "đã được
 verify khớp local" và ghi 384 chiều — đó là kiểm chứng cho model MiniLM cũ, không phải model
 1024 chiều hiện tại.
+
+**Đường đi để có số (đã dựng xong, chờ chạy).** Không chờ DEC-0006: corpus trong ChromaDB đã có
+sẵn 1146 vector, thứ duy nhất thiếu là vector của 30 **câu hỏi**. Nên:
+
+1. Ở nơi đủ RAM (Colab / Kaggle / VM FPT):
+   `python scripts/build_query_embedding_cache.py --output data/eval/query_embeddings/temporal_30q.json`
+2. Commit file cache (~700KB, kèm tên model, số chiều, hash từng câu, commit hash, vân tay trọng số).
+3. Ở máy bất kỳ, không cần model:
+   `python eval/scoring_ab.py --query-embeddings data/eval/query_embeddings/temporal_30q.json`
+
+Cache từ chối phục vụ nếu tên model lệch `EMBEDDING_MODEL`, và embedder chạy bằng cache ném lỗi nếu
+có gì đó đòi embed văn bản mới — hai chốt để không ai lỡ chấm điểm bằng vector của model khác.
+Đường ống này đã được chạy thử end-to-end bằng vector giả (lấy từ chính ChromaDB): retrieval ra
+8 chunk/câu, cả hai thước chấm được, không model nào được load. Số của lần chạy thử đó **vô nghĩa**
+(vector không thuộc về câu hỏi) nên không được ghi ở đâu cả.
 
 **DEC này giữ trạng thái `Proposed`** cho tới khi bảng trên có số. Theo `docs/decisions/README.md`:
 DEC không có số là DEC chưa xong. Code đi kèm đã merge được vì nó có test riêng chứng minh

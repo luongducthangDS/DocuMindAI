@@ -67,10 +67,15 @@ from src.config import get_settings
 
 # ── RAG initialisation ────────────────────────────────────────────────────────
 
-def _init_rag_shared() -> tuple:
+def _init_rag_shared(embedder=None) -> tuple:
     """
     Bootstrap shared RAG components used by all strategies.
     Returns (index, chroma_collection, all_nodes, embedder).
+
+    `embedder=None` (mặc định) load model qua get_embedder(). Truyền embedder có
+    sẵn để chạy eval ở nơi không load nổi model — ví dụ embedder đọc vector câu
+    hỏi từ cache (eval/query_cache.py). Corpus đã có vector trong store nên không
+    có gì cần embed lại.
     """
     from llama_index.core import Settings as LlamaSettings, VectorStoreIndex
     from llama_index.core import StorageContext
@@ -79,7 +84,8 @@ def _init_rag_shared() -> tuple:
 
     from src.rag.embedder import get_chroma_collection, get_embedder
 
-    embedder = get_embedder()
+    if embedder is None:
+        embedder = get_embedder()
     LlamaSettings.embed_model = embedder
     LlamaSettings.llm = None
 

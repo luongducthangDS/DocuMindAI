@@ -97,16 +97,46 @@ def legacy_mrr_at_k(items: list[dict], retrieved: list[list[dict]], k: int) -> f
 
 # ── Retrieval (một lần cho cả hai thước) ──────────────────────────────────────
 
-def collect_records(questions: list[dict]) -> list[list[dict]]:
-    from eval.rag_comparison import _chunk_record
-    from eval.temporal_eval import _build_retriever
-    from src.rag.retriever import nodes_to_chunks
+def collect_records(
+    questions: list[dict],
+    query_cache_path: Path | None = None,
+) -> list[list[dict]]:
+    """Chạy retrieval một lần cho mỗi câu hỏi, trả bản ghi chunk theo thứ tự rank.
 
-    # Cả hai module trên đều gọi use_local_hf_cache(offline=True) lúc import,
-    # ghi đè quyết định ở đầu file này. Đặt lại sau khi import xong.
+    `query_cache_path` trỏ tới file vector câu hỏi đã embed sẵn: khi có, không
+    model nào được load và eval chạy được trên máy thiếu RAM (DEC-0006). Khi
+    không có, đi đường bình thường qua get_embedder().
+    """
+    from eval.rag_comparison import _chunk_record, _init_rag_shared
+    from src.config import get_settings as _settings
+    from src.rag.retriever import build_hybrid_retriever, nodes_to_chunks
+
+    # Các module eval khác gọi use_local_hf_cache(offline=True) lúc import, ghi đè
+    # quyết định ở đầu file này. Đặt lại sau khi import xong.
     use_local_hf_cache(offline=get_settings().embedding_provider.strip().lower() != "hf_api")
 
-    retriever = _build_retriever()
+    settings = _settings()
+    embedder = None
+    if query_cache_path:
+        from eval.query_cache import QueryEmbeddingCache, make_cached_embedder
+
+        cache = QueryEmbeddingCache.load(query_cache_path, expected_model=settings.embedding_model)
+        missing = cache.covers([q["question"] for q in questions])
+        if missing:
+            raise SystemExit(
+                f"Cache thiếu {len(missing)} câu hỏi, ví dụ: {missing[0][:60]!r}. "
+                f"Sinh lại: python scripts/build_query_embedding_cache.py"
+            )
+        embedder = make_cached_embedder(cache)
+        logger.info(
+            "Dùng cache vector câu hỏi: {} câu, {} chiều, model {}",
+            len(cache), cache.dim, cache.model,
+        )
+
+    index, _collection, all_nodes, _embedder = _init_rag_shared(embedder=embedder)
+    retriever = build_hybrid_retriever(index, nodes=all_nodes, rerank=settings.enable_reranker)
+    logger.info("Retriever: rerank={}", settings.enable_reranker)
+
     out: list[list[dict]] = []
     for i, q in enumerate(questions, 1):
         chunks = nodes_to_chunks(retriever.retrieve(q["question"]))
@@ -117,7 +147,11 @@ def collect_records(questions: list[dict]) -> list[list[dict]]:
 
 # ── Báo cáo ───────────────────────────────────────────────────────────────────
 
-def build_report(questions: list[dict], retrieved: list[list[dict]]) -> dict[str, Any]:
+def build_report(
+    questions: list[dict],
+    retrieved: list[list[dict]],
+    embedding_source: str = "local model",
+) -> dict[str, Any]:
     from src.config import get_settings
 
     settings = get_settings()
@@ -155,6 +189,7 @@ def build_report(questions: list[dict], retrieved: list[list[dict]]) -> dict[str
             "n_scored_by_clause_metric": n_scored,
             "n_skipped_by_clause_metric": len(questions) - n_scored,
             "embedding_model": settings.embedding_model,
+            "embedding_source": embedding_source,
             "enable_reranker": settings.enable_reranker,
             "reranker_model": settings.reranker_model if settings.enable_reranker else "",
             "llm_calls": 0,
@@ -198,14 +233,20 @@ def main() -> None:
     parser.add_argument("--gold", type=Path, default=DEFAULT_GOLD)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--limit", type=int, default=0, help="chỉ chạy N câu đầu")
+    parser.add_argument(
+        "--query-embeddings", type=Path, default=None,
+        help="file vector câu hỏi đã embed sẵn (scripts/build_query_embedding_cache.py) — "
+             "chạy được khi máy không load nổi model",
+    )
     args = parser.parse_args()
 
     questions = json.loads(args.gold.read_text(encoding="utf-8"))
     if args.limit:
         questions = questions[: args.limit]
 
-    retrieved = collect_records(questions)
-    report = build_report(questions, retrieved)
+    retrieved = collect_records(questions, query_cache_path=args.query_embeddings)
+    source = f"cache {args.query_embeddings.name}" if args.query_embeddings else "local model"
+    report = build_report(questions, retrieved, embedding_source=source)
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")

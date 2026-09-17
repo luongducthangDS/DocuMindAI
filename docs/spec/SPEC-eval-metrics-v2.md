@@ -92,6 +92,10 @@ phạt hành vi hợp lệ.
 4. **`eval/scoring_ab.py`** (mới): chạy retrieval một lần trên gold temporal, chấm **song song**
    hai cách (token-F1 cũ vs clause_uid mới), in bảng chênh lệch → số cho DEC-0004.
 5. **`tests/test_eval_metrics.py`** (mới): phủ toàn bộ hàm trên, gồm ca sai-bản-hiệu-lực.
+6. **`eval/query_cache.py`** + **`scripts/build_query_embedding_cache.py`** (mới): vector câu hỏi
+   embed sẵn ở nơi đủ RAM, để eval retrieval chạy được trên máy không load nổi model. Corpus đã
+   có vector nên không embed lại gì. `_init_rag_shared(embedder=...)` nhận embedder truyền vào
+   (mặc định giữ nguyên hành vi cũ).
 
 ## Success Criteria
 
