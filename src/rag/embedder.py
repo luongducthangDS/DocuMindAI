@@ -117,6 +117,7 @@ class _GeminiAPIEmbedding(BaseEmbedding):
 
     _keys: List[str] = PrivateAttr()
     _sent: List[deque] = PrivateAttr()  # mỗi key một bucket (timestamp, tokens) đã gửi
+    _exhausted: set = PrivateAttr()  # key đã cạn quota NGÀY, bỏ khỏi vòng xoay
 
     def __init__(self, model_name: str, api_keys: List[str], **kwargs):
         # 50 là mức đã đo được với chunk thật của corpus (~900 ký tự/chunk): 100
@@ -128,6 +129,7 @@ class _GeminiAPIEmbedding(BaseEmbedding):
             raise ValueError("EMBEDDING_PROVIDER=gemini cần GOOGLE_API_KEY trong .env")
         self._keys = keys
         self._sent = [deque() for _ in keys]
+        self._exhausted = set()
 
     def _reserve_key(self, texts: List[str]) -> str:
         """Chọn key còn chỗ trong phút cho lô sắp gửi, chờ nếu mọi key đều đầy.
@@ -145,6 +147,8 @@ class _GeminiAPIEmbedding(BaseEmbedding):
             now = time.monotonic()
             waits = []
             for key, bucket in zip(self._keys, self._sent):
+                if key in self._exhausted:
+                    continue
                 while bucket and now - bucket[0][0] >= 60:
                     bucket.popleft()
                 if not bucket or (
@@ -154,8 +158,13 @@ class _GeminiAPIEmbedding(BaseEmbedding):
                     bucket.extend((now, per_text) for _ in texts)
                     return key
                 waits.append(60 - (now - bucket[0][0]) + 1)
-            logger.info("Gemini embed: cả {} key đều chạm trần phút, chờ {:.0f}s ({} content / ~{} token)",
-                        len(self._keys), min(waits), len(texts), tokens)
+            if not waits:
+                raise RuntimeError(
+                    f"Cả {len(self._keys)} key Gemini đều cạn quota NGÀY (1000 embed/project). "
+                    "Thêm key ở project khác vào GOOGLE_API_KEY_2/_3, bật billing, hoặc chờ quota reset."
+                )
+            logger.info("Gemini embed: cả {} key còn dùng được đều chạm trần phút, chờ {:.0f}s ({} content / ~{} token)",
+                        len(self._keys) - len(self._exhausted), min(waits), len(texts), tokens)
             time.sleep(min(waits))
 
     # Lưới an toàn cho 429 còn lọt qua throttle (đồng hồ lệch, quota dùng chung nơi khác).
@@ -163,11 +172,20 @@ class _GeminiAPIEmbedding(BaseEmbedding):
     def _embed(self, texts: List[str], task_type: str) -> List[List[float]]:
         import google.generativeai as genai
 
-        genai.configure(api_key=self._reserve_key(texts))
+        key = self._reserve_key(texts)
+        genai.configure(api_key=key)
         name = self.model_name if self.model_name.startswith("models/") else f"models/{self.model_name}"
         # API từ chối chuỗi rỗng; get_embedding_dim() lại dò chiều bằng đúng chuỗi đó.
         payload = [t if t.strip() else " " for t in texts]
-        result = genai.embed_content(model=name, content=payload, task_type=task_type)
+        try:
+            result = genai.embed_content(model=name, content=payload, task_type=task_type)
+        except Exception as exc:
+            # Trần NGÀY (limit 1000/project) không chờ vài giây là hết; giữ key này
+            # trong vòng xoay chỉ khiến mọi lần retry sau đó rơi lại đúng vào nó.
+            if "limit: 1000" in str(exc):
+                self._exhausted.add(key)
+                logger.warning("Key Gemini ...{} cạn quota ngày, chuyển sang key còn lại", key[-6:])
+            raise
         emb = result["embedding"]
         return emb if isinstance(emb[0], list) else [emb]
 
