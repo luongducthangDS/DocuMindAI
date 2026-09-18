@@ -21,6 +21,8 @@ A/B trên gold set lao động 28 câu, 1146 chunks (reports/embedding_ab.json, 
 
 from __future__ import annotations
 
+import time
+from collections import deque
 from functools import lru_cache
 from typing import TYPE_CHECKING, List
 
@@ -91,6 +93,103 @@ class _HFInferenceAPIEmbedding(BaseEmbedding):
         return self._get_text_embeddings(texts)
 
 
+# Free tier Gemini Embedding chặn ở HAI trần cùng lúc, đo thực tế 2026-09-18:
+#   - số CONTENT, không phải số HTTP request (5 request × 20 content = 100 rồi 429),
+#     nên gộp batch to không giảm mức tiêu thụ, chỉ giảm số lần đi mạng;
+#   - số TOKEN mỗi phút — corpus này chunk ~900 ký tự nên 50 chunk/request đã chạm
+#     trần token dù mới 50/100 content.
+# Hai ngưỡng dưới đặt dưới trần thật để chừa biên, vì server đếm theo cửa sổ riêng
+# của nó chứ không phải cửa sổ trượt của tiến trình này.
+_GEMINI_CONTENTS_PER_MIN = 90
+_GEMINI_TOKENS_PER_MIN = 20_000
+# Tiếng Việt có dấu tốn token hơn tiếng Anh; 3 ký tự/token là ước lượng thận trọng.
+_CHARS_PER_TOKEN = 3
+
+
+class _GeminiAPIEmbedding(BaseEmbedding):
+    """Embedder gọi Gemini Embedding API thay vì nạp model vào RAM.
+
+    Khác _HFInferenceAPIEmbedding ở một điểm không được quên: Gemini sinh vector
+    KHÁC NHAU cho cùng một chuỗi tuỳ task_type — retrieval_document lúc index,
+    retrieval_query lúc hỏi. Dùng lẫn hai loại vẫn chạy, vẫn xếp hạng được, chỉ là
+    kém đi âm thầm; nên hai đường text/query ở dưới tách bạch có chủ đích.
+    """
+
+    _keys: List[str] = PrivateAttr()
+    _sent: List[deque] = PrivateAttr()  # mỗi key một bucket (timestamp, tokens) đã gửi
+
+    def __init__(self, model_name: str, api_keys: List[str], **kwargs):
+        # 50 là mức đã đo được với chunk thật của corpus (~900 ký tự/chunk): 100
+        # chunk/request bị 429 ngay request đầu dù quota phút còn nguyên, 50 thì qua.
+        kwargs.setdefault("embed_batch_size", 50)
+        super().__init__(model_name=model_name, **kwargs)
+        keys = [k for k in api_keys if k]
+        if not keys:
+            raise ValueError("EMBEDDING_PROVIDER=gemini cần GOOGLE_API_KEY trong .env")
+        self._keys = keys
+        self._sent = [deque() for _ in keys]
+
+    def _reserve_key(self, texts: List[str]) -> str:
+        """Chọn key còn chỗ trong phút cho lô sắp gửi, chờ nếu mọi key đều đầy.
+
+        Quota tính theo project chứ không theo key, nên nhiều key ở nhiều project
+        cộng dồn được trần — mỗi key vì thế cần bucket riêng. Chủ động chờ thay vì
+        để 429 bắn ra: re-embed cả corpus chạm trần liên tục, mà retry mù thì mỗi
+        lần hỏng lại đốt thêm quota của phút sau.
+        """
+        # ponytail: bucket in-process. Nhiều worker song song thì cần bucket chia sẻ
+        # — chưa có nhu cầu đó.
+        tokens = sum(max(len(t) // _CHARS_PER_TOKEN, 1) for t in texts)
+        per_text = tokens // max(len(texts), 1)
+        while True:
+            now = time.monotonic()
+            waits = []
+            for key, bucket in zip(self._keys, self._sent):
+                while bucket and now - bucket[0][0] >= 60:
+                    bucket.popleft()
+                if not bucket or (
+                    len(bucket) + len(texts) <= _GEMINI_CONTENTS_PER_MIN
+                    and sum(t for _, t in bucket) + tokens <= _GEMINI_TOKENS_PER_MIN
+                ):
+                    bucket.extend((now, per_text) for _ in texts)
+                    return key
+                waits.append(60 - (now - bucket[0][0]) + 1)
+            logger.info("Gemini embed: cả {} key đều chạm trần phút, chờ {:.0f}s ({} content / ~{} token)",
+                        len(self._keys), min(waits), len(texts), tokens)
+            time.sleep(min(waits))
+
+    # Lưới an toàn cho 429 còn lọt qua throttle (đồng hồ lệch, quota dùng chung nơi khác).
+    @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=2, min=15, max=70))
+    def _embed(self, texts: List[str], task_type: str) -> List[List[float]]:
+        import google.generativeai as genai
+
+        genai.configure(api_key=self._reserve_key(texts))
+        name = self.model_name if self.model_name.startswith("models/") else f"models/{self.model_name}"
+        # API từ chối chuỗi rỗng; get_embedding_dim() lại dò chiều bằng đúng chuỗi đó.
+        payload = [t if t.strip() else " " for t in texts]
+        result = genai.embed_content(model=name, content=payload, task_type=task_type)
+        emb = result["embedding"]
+        return emb if isinstance(emb[0], list) else [emb]
+
+    def _get_query_embedding(self, query: str) -> List[float]:
+        return self._embed([query], "retrieval_query")[0]
+
+    def _get_text_embedding(self, text: str) -> List[float]:
+        return self._embed([text], "retrieval_document")[0]
+
+    def _get_text_embeddings(self, texts: List[str]) -> List[List[float]]:
+        return self._embed(texts, "retrieval_document")
+
+    async def _aget_query_embedding(self, query: str) -> List[float]:
+        return self._get_query_embedding(query)
+
+    async def _aget_text_embedding(self, text: str) -> List[float]:
+        return self._get_text_embedding(text)
+
+    async def _aget_text_embeddings(self, texts: List[str]) -> List[List[float]]:
+        return self._get_text_embeddings(texts)
+
+
 @lru_cache(maxsize=1)
 def get_embedder() -> "BaseEmbedding":
     """
@@ -103,6 +202,11 @@ def get_embedder() -> "BaseEmbedding":
     """
     settings = get_settings()
     model_name = settings.embedding_model
+
+    if settings.embedding_provider == "gemini":
+        logger.info("Using Gemini Embedding API (no local model load): {}", model_name)
+        keys = [settings.google_api_key, settings.google_api_key_2, settings.google_api_key_3]
+        return _GeminiAPIEmbedding(model_name=model_name, api_keys=keys)
 
     if settings.embedding_provider == "hf_api":
         logger.info("Using HF Inference API for embeddings (no local model load): {}", model_name)

@@ -51,12 +51,12 @@ ENV TRANSFORMERS_CACHE=/app/.cache/huggingface
 
 RUN mkdir -p data/raw data/processed data/eval data/chroma_db logs reports .cache/huggingface
 
-# Pre-download embedding model at build time
-RUN python -c "\
-from sentence_transformers import SentenceTransformer; \
-print('Downloading embedding model (~120MB)...'); \
-SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'); \
-print('Model cached.')"
+# KHONG pre-download model embedding nao. Production chay EMBEDDING_PROVIDER=gemini
+# (xem render.yaml): vector do Gemini Embedding API sinh, khong co model nao nap vao
+# RAM — Render free chi co 512MB. Dong cu o day tai san paraphrase-multilingual-
+# MiniLM-L12-v2 (384-dim), khong con la model cua corpus nay tu 2026-09-16, nen chi
+# lam image nang them ~120MB ma khong ai dung toi.
+# Doi sang EMBEDDING_PROVIDER=local thi model se tai luc chay (cham lan dau).
 
 RUN chown -R appuser:appgroup /app
 USER appuser
