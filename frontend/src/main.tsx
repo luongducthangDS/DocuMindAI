@@ -133,12 +133,25 @@ function bookmarkId(question: string, answer: string): string {
   return "bm-" + h;
 }
 
+// Phạm vi sản phẩm — đối ứng của DOMAIN_* trong src/config.py. Đổi corpus thì
+// sửa cả hai chỗ; mọi nhãn hiển thị phải lấy từ đây, không viết lại rải rác.
+const PRODUCT = {
+  tagline: "Trợ lý tra cứu pháp luật lao động & BHXH",
+  scope: "pháp luật lao động và bảo hiểm xã hội",
+  chatTitle: "Hỏi đáp pháp luật lao động & BHXH",
+  emptySub:
+    "Đặt câu hỏi về hợp đồng lao động, tiền lương, thời giờ làm việc, BHXH, bảo hiểm thất nghiệp — trả lời kèm trích dẫn điều khoản",
+  disclaimer:
+    "Câu trả lời chỉ mang tính tham khảo, không thay thế tư vấn pháp lý chính thức.",
+  sourceFallback: "Văn bản pháp luật",
+};
+
 const SUGGESTED = [
-  "Điều kiện để được vay tín chấp là gì?",
-  "Cách tính lãi suất trả góp như thế nào?",
-  "Hạn mức thẻ tín dụng tối đa là bao nhiêu?",
-  "Phí thường niên áp dụng trong trường hợp nào?",
-  "Quy trình mở tài khoản doanh nghiệp gồm những bước gì?",
+  "Thời gian thử việc tối đa là bao lâu?",
+  "Làm thêm giờ tối đa bao nhiêu giờ trong một năm?",
+  "Mức lương tối thiểu vùng I hiện nay là bao nhiêu?",
+  "Điều kiện hưởng trợ cấp thất nghiệp là gì?",
+  "Nghỉ việc đúng luật cần báo trước bao nhiêu ngày?",
 ];
 
 // ── Citation helpers ──────────────────────────────────────────────────────────
@@ -334,7 +347,7 @@ function SourceCard({ src, msgIndex }: { src: Source; msgIndex: number }) {
         <span className="source-index">[{src.index}]</span>
         {src.dieu_header && <span className="source-dieu">{src.dieu_header}</span>}
       </div>
-      <div className="source-title">{src.title || "Văn bản ngân hàng"}</div>
+      <div className="source-title">{src.title || PRODUCT.sourceFallback}</div>
       {src.source_url && (
         <a href={src.source_url} target="_blank" rel="noreferrer" className="source-link">
           Xem nguồn →
@@ -490,14 +503,14 @@ function App() {
   const healthLabel = health === "ok" ? "Hệ thống bình thường" : health === "degraded" ? "Suy giảm" : health === "unknown" ? "Đang kiểm tra…" : "Lỗi kết nối";
 
   const NAV_DEFS: { id: typeof tab; icon: string; label: string; badge?: string }[] = [
-    { id: "chat", icon: "💬", label: "Hỏi đáp tài liệu ngân hàng" },
+    { id: "chat", icon: "💬", label: PRODUCT.chatTitle },
     { id: "docs", icon: "📚", label: "Văn bản đã lập chỉ mục", badge: docsLoaded ? String(docs.length) : undefined },
     { id: "bookmarks", icon: "🔖", label: "Đã lưu", badge: bookmarks.length > 0 ? String(bookmarks.length) : undefined },
     { id: "upload", icon: "📤", label: "Tải lên văn bản" },
   ];
 
   const HEADERS: Record<typeof tab, [string, string]> = {
-    chat: ["Hỏi đáp tài liệu ngân hàng", "Trả lời kèm trích dẫn nguồn cụ thể"],
+    chat: [PRODUCT.chatTitle, "Trả lời kèm trích dẫn điều khoản cụ thể"],
     docs: ["Văn bản đã lập chỉ mục", `${docs.length} văn bản`],
     bookmarks: ["Câu trả lời đã lưu", `${bookmarks.length} mục`],
     upload: ["Tải lên văn bản", "PDF được tách theo Điều / Khoản"],
@@ -526,7 +539,7 @@ function App() {
           </svg>
           <div>
             <div className="brand-name">DocuMind</div>
-            <div className="brand-sub">Trợ lý tra cứu tài liệu ngân hàng</div>
+            <div className="brand-sub">{PRODUCT.tagline}</div>
           </div>
           <button className="sidebar-close" onClick={() => setSidebarOpen(false)} aria-label="Đóng menu">
             ✕
@@ -607,10 +620,10 @@ function App() {
             <div className="messages">
               {messages.length === 0 && (
                 <div className="empty">
-                  <div className="empty-icon">🏦</div>
-                  <div className="empty-title">Hỏi đáp tài liệu ngân hàng</div>
+                  <div className="empty-icon">⚖️</div>
+                  <div className="empty-title">{PRODUCT.chatTitle}</div>
                   <div className="empty-sub">
-                    Đặt câu hỏi về lãi suất, hạn mức, phí dịch vụ, quy trình nghiệp vụ — trả lời kèm trích dẫn quy định
+                    {PRODUCT.emptySub}
                   </div>
                 </div>
               )}
@@ -685,7 +698,7 @@ function App() {
               <div className="input-bar-inner">
                 <textarea
                   rows={2}
-                  placeholder="Đặt câu hỏi về tài liệu ngân hàng… (Enter để gửi)"
+                  placeholder={`Đặt câu hỏi về ${PRODUCT.scope}… (Enter để gửi)`}
                   value={question}
                   disabled={busy}
                   onChange={(e) => setQuestion(e.target.value)}
@@ -705,7 +718,7 @@ function App() {
                 </button>
               </div>
               <div className="input-disclaimer">
-                Câu trả lời chỉ mang tính tham khảo, không thay thế tư vấn nghiệp vụ ngân hàng chính thức.
+                {PRODUCT.disclaimer}
               </div>
             </div>
           </div>
@@ -806,7 +819,7 @@ function App() {
               <div className="upload-text">
                 {busy ? "Đang xử lý…" : "Kéo thả PDF hoặc click để chọn"}
               </div>
-              <div className="upload-sub">Hỗ trợ: Quy định, Biểu phí, Thông tư, Quyết định — tối đa 20MB</div>
+              <div className="upload-sub">Hỗ trợ: Luật, Nghị định, Thông tư, Quyết định — tối đa 20MB</div>
             </div>
             {uploadStatus && (
               <div className={`upload-status ${uploadStatus.startsWith("✅") ? "success" : uploadStatus.startsWith("❌") ? "error" : "info"}`}>

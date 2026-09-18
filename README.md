@@ -1,6 +1,6 @@
-# DocuMind AI 🏦
+# DocuMind AI ⚖️
 
-> **Enterprise Agentic RAG & Automated Compliance Platform for Vietnamese Banking Regulations**  
+> **Agentic RAG & Automated Compliance Platform for Vietnamese Labour & Social-Insurance Law**  
 > *Production-Grade AI Portfolio Project — Senior / Staff AI Engineer Showcase*
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB.svg?logo=python&logoColor=white)](https://python.org)
@@ -9,14 +9,16 @@
 [![ChromaDB](https://img.shields.io/badge/ChromaDB-0.6-FF6F00.svg)](https://www.trychroma.com)
 [![React 19](https://img.shields.io/badge/React-19.0-61DAFB.svg?logo=react&logoColor=black)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-6.0-646CFF.svg?logo=vite&logoColor=white)](https://vitejs.dev)
-[![Test Suite](https://img.shields.io/badge/Tests-84%2F84%20Passing%20(100%25)-brightgreen.svg)](tests/)
+[![Test Suite](https://img.shields.io/badge/Tests-227%2F227%20Passing%20(100%25)-brightgreen.svg)](tests/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ---
 
 ## 🌟 Executive Overview
 
-**DocuMind AI** is an enterprise-grade AI assistant and regulatory compliance auditor tailored for the Vietnamese commercial banking and financial services sector. Built to solve high-stakes compliance and information retrieval challenges, DocuMind AI provides precise, statutory-grounded answers with paragraph-level legal citations, rejecting questions outside its regulatory domain and deterministically auditing credit conditions against State Bank of Vietnam (SBV) regulations.
+**DocuMind AI** answers questions about Vietnamese **labour and social-insurance law** — the Labour Code, the Social Insurance Law, the Employment Law and the decrees and circulars that implement them. It gives clause-level cited answers, refuses questions outside the indexed corpus, and deterministically audits concrete workplace situations (overtime caps, probation terms, minimum wage) against the statutory thresholds.
+
+The corpus is **20 documents / 1,146 chunks**, indexed down to `Điều`/`Khoản` with validity dates, so the same question can be asked *as of* a given date and answered from the version in force then — several of these documents have been amended (minimum wage, the 2024 Social Insurance Law, the 2025 Employment Law).
 
 ### Key Capabilities
 
@@ -25,19 +27,19 @@
    - Deterministic multi-turn state preservation and session memory.
 2. **Dual-Pass Hybrid Retrieval & Neural Reranking**:
    - **Sparse Retrieval**: Okapi BM25 for exact statutory term matching (e.g., *"Điều 14 Thông tư 18/2024"*).
-   - **Dense Retrieval**: `paraphrase-multilingual-MiniLM-L12-v2` (384-dim) for semantic paraphrase understanding.
+   - **Dense Retrieval**: `AITeamVN/Vietnamese_Embedding` (1024-dim) for semantic paraphrase understanding.
    - **Fusion & Reranking**: Reciprocal Rank Fusion (RRF) pool (top-20) re-scored by cross-encoder (`BAAI/bge-reranker-v2-m3`) to select the top-8 highest-precision chunks.
 3. **Automated Statutory Compliance Engine (`compliance_check`)**:
    - Hybrid regex and LLM parameter extraction for quantifiable audit thresholds.
-   - Verifiable pass/fail evaluations against curated regulatory standards:
-     - **Debt-To-Income (DTI)** ceiling: $\le 60\%$ (Circular 39/2016/TT-NHNN).
-     - **Unsecured Credit Card limit**: $\le 100$ million VNĐ (Circular 18/2024/TT-NHNN).
-     - **Demand Deposit Rate cap**: $\le 0.5\%/\text{year}$ (Decision 1124/QĐ-NHNN).
-     - **Short-Term Deposit Rate cap (1 to <6 months)**: $\le 4.75\%/\text{year}$ (Decision 1124/QĐ-NHNN).
-     - **Unsecured Consumer Loan minimum income**: $\ge 5.0$ million VNĐ/month (Regulation QC CV-05/2023/NH).
+   - Verifiable pass/fail evaluations against curated statutory thresholds:
+     - **Overtime cap**: $\le 200$ h/year and $\le 40$ h/month (Điều 107, Labour Code 45/2019/QH14).
+     - **Probation period**: $\le 60$ days for roles requiring a college degree or above (Điều 25).
+     - **Probation pay**: $\ge 85\%$ of the job's wage (Điều 26).
+     - **Annual leave**: $\ge 12$ working days under normal conditions (Điều 113).
+     - **Region I minimum wage**: $\ge 5,310,000$ VNĐ/month (Điều 3, Decree 293/2025/NĐ-CP).
 4. **Resilient Multi-LLM Routing**:
    - **Primary**: Ultra-low latency Groq LLaMA-3.3-70B Versatile (~300 tokens/sec).
-   - **Automatic Failover**: Google Gemini 2.0 Flash Lite when rate limits, quotas, or timeouts occur.
+   - **Automatic Failover**: Google Gemini Flash Lite when rate limits, quotas, or timeouts occur.
 5. **Strict Grounding & Hallucination Prevention**:
    - Compulsory inline statutory citations `[N]` referencing Article, Circular number, and issuing institution.
    - Confident abstention: automatic domain boundary check and refusal when queries lack documentary support.
@@ -72,7 +74,7 @@ User Query (HTTP / WebSocket)
 │  [3A] Hybrid Retrieval Pipeline   │   │  [3B] Compliance Engine         │
 │  ┌──────────────┐ ┌─────────────┐ │   │  • Regex/LLM parameter extract  │
 │  │ Okapi BM25   │ │ Dense Vector│ │   │  • Threshold condition evaluate │
-│  │ (Exact Lexical)│ (MiniLM-L12)│ │   │    (e.g., DTI <= 60%, cap <= 0.5)│
+│  │ (Exact Lexical)│ (VN-Embed) │ │   │    (e.g., OT <= 200h/năm)       │
 │  └──────┬───────┘ └──────┬──────┘ │   │  • Verified statutory citation  │
 │         └─────── RRF ────┘        │   │    (pass / fail / missing data) │
 │            Pool: top-20           │   └────────────────┬────────────────┘
@@ -126,44 +128,55 @@ graph TD
 
 ---
 
-## 📚 Vietnamese Banking Regulatory Corpus
+## 📚 Vietnamese Labour & Social-Insurance Corpus
 
-The bundled dataset consists of official statutory regulations and internal credit policies processed by our specialized legal chunker (`src/ingestion/chunker.py`), dividing documents at exact `Điều` (Article) and `Khoản` (Clause) boundaries:
+20 official documents (~1,146 chunks) split by our legal chunker (`src/ingestion/chunker.py`)
+at exact `Điều` (Article) / `Khoản` (Clause) boundaries, each chunk carrying the validity
+dates of the version it belongs to. Source files: [`data/raw/lao_dong/`](data/raw/lao_dong/).
 
-| STT | Văn bản / Quyết định | Số hiệu | Cơ quan ban hành | Nội dung chính |
-|:---:|---|---|---|---|
-| 1 | **Quy định cho vay TCTD** | `39/2016/TT-NHNN` | Ngân hàng Nhà nước VN | Điều kiện cấp tín dụng, phương thức cho vay, lãi suất nợ quá hạn (tối đa 150%), lãi chậm trả (tối đa 10%). |
-| 2 | **Quy định hoạt động thẻ ngân hàng** | `18/2024/TT-NHNN` | Ngân hàng Nhà nước VN | Điều kiện mở thẻ, phân loại thẻ, trần hạn mức thẻ tín dụng tín chấp (100 triệu VNĐ), hạn mức rút tiền mặt (tối đa 50%). |
-| 3 | **Quy định tiền gửi tiết kiệm** | `48/2018/TT-NHNN` | Ngân hàng Nhà nước VN | Đối tượng gửi tiền, quy trình gửi/rút, quy tắc rút trước hạn một phần hưởng lãi suất không kỳ hạn, cơ chế tái tục tự động. |
-| 4 | **Trần lãi suất tiền gửi & cho vay ưu tiên** | `1124/QĐ-NHNN` | Ngân hàng Nhà nước VN | Trần lãi suất VND không kỳ hạn & dưới 1 tháng (0.5%/năm), 1 đến dưới 6 tháng (4.75%/năm), trần cho vay ngắn hạn ưu tiên (4.0%/năm). |
-| 5 | **Quy chế cho vay tiêu dùng tín chấp** | `CV-05/2023/NH` | Ngân hàng Thương mại | Điều kiện khách hàng cá nhân (20-60 tuổi), thu nhập tối thiểu 5 triệu VNĐ/tháng, trần tỷ lệ DTI $\le 60\%$, phê duyệt 24-48h. |
-| 6 | **Biểu phí tài khoản, thẻ & ngân hàng số** | `88/2024/QĐ-NH` | Ngân hàng Thương mại | Miễn phí chuyển tiền 24/7, điều kiện miễn phí quản lý tài khoản (số dư $\ge 2$ triệu), chính sách miễn lãi thẻ tín dụng lên đến 45 ngày. |
+| Nhóm | Văn bản tiêu biểu | Nội dung chính |
+|---|---|---|
+| **Lao động** | `45/2019/QH14` (Bộ luật Lao động), `18/VBHN-VPQH`, `145/2020/NĐ-CP`, `10/2020/TT-BLĐTBXH` | Hợp đồng lao động, thử việc, tiền lương, thời giờ làm việc & làm thêm giờ, kỷ luật lao động, chấm dứt hợp đồng. |
+| **Tiền lương tối thiểu** | `293/2025/NĐ-CP` (hiệu lực 01/01/2026), `74/2024/NĐ-CP` | Mức lương tối thiểu tháng/giờ theo 4 vùng — hai phiên bản cùng tồn tại trong index để tra cứu theo thời điểm. |
+| **Bảo hiểm xã hội** | `41/2024/QH15` (Luật BHXH 2024), `58/2014/QH13`, `158/2025/NĐ-CP`, `159/2025/NĐ-CP`, `115/2015/NĐ-CP`, `134/2015/NĐ-CP`, `59/2015/TT-BLĐTBXH`, `11–12/2025/TT-BNV` | BHXH bắt buộc & tự nguyện, chế độ ốm đau, thai sản, hưu trí, tử tuất. |
+| **Việc làm & BHTN** | `74/2025/QH15` (Luật Việc làm 2025), `38/2013/QH13`, `374/2025/NĐ-CP`, `28/2015/NĐ-CP` | Bảo hiểm thất nghiệp, trợ cấp thất nghiệp, hỗ trợ học nghề, dịch vụ việc làm. |
+| **Hưu trí & khác** | `135/2020/NĐ-CP`, `293/2025/NĐ-CP` | Lộ trình tuổi nghỉ hưu, điều kiện nghỉ hưu sớm. |
+
+Several of these supersede one another (Luật BHXH 2024 thay 2014, Luật Việc làm 2025 thay
+2013, NĐ 293/2025 thay NĐ 74/2024). Both versions stay indexed, which is what makes the
+`as_of_date` lookup meaningful rather than cosmetic.
 
 ---
+
 
 ## ⚖️ Automated Compliance Engine
 
 Unlike standard RAG systems that rely solely on probabilistic generation, DocuMind AI features a **hybrid deterministic-symbolic compliance auditor**:
 
 ```python
-# Example compliance check verification
+# Real output — src/rag/compliance.py, criteria in data/compliance/criteria.json
 from src.rag.compliance import check_compliance
 
-# Case 1: Income verification for unsecured consumer loan
-result = check_compliance("Khách hàng có mức thu nhập 8 triệu đồng/tháng có đủ điều kiện vay tín chấp không?")
-# Output:
+# Case 1: yearly overtime cap
+check_compliance("Công ty cho làm thêm 250 giờ trong 01 năm có đúng luật không?")
 # {
 #   "matched": True,
-#   "criterion_id": "vay_tin_chap_thu_nhap",
-#   "verdict": "pass",
-#   "extracted_value": 8.0,
-#   "explanation": "Khách hàng có mức thu nhập đạt điều kiện tối thiểu để xét duyệt hồ sơ vay tín chấp tiêu dùng theo Điều 6 Quy chế CV-05/2023/NH.",
-#   "citation": {"so_hieu": "Quy chế CV-05/2023/NH", "dieu_khoan": "Điều 6"}
+#   "criterion_id": "lam_them_gio_trong_nam",
+#   "verdict": "fail",
+#   "extracted_value": 250.0,
+#   "explanation": "Số giờ làm thêm vượt trần 200 giờ trong 01 năm theo Điều 107 khoản 2
+#                   điểm c Bộ luật Lao động 45/2019/QH14. Chỉ các ngành, nghề thuộc khoản 3
+#                   Điều 107 mới được làm thêm đến 300 giờ/năm.",
+#   "citation": {"so_hieu": "Bộ luật Lao động 45/2019/QH14",
+#                "dieu_khoan": "Điều 107 khoản 2 điểm c"}
 # }
 
-# Case 2: Interest rate ceiling violation check
-result = check_compliance("Áp dụng lãi suất 0.8% cho tiền gửi không kỳ hạn có hợp lệ không?")
-# Output: verdict = "fail" (Exceeds SBV ceiling 0.5%/year according to Điều 1 Quyết định 1124/QĐ-NHNN)
+# Case 2: Region I minimum wage — "4.500.000 đồng" is normalised to 4.5 triệu before compare
+check_compliance("Công ty trả lương 4.500.000 đồng/tháng ở vùng I có đúng luật không?")
+# verdict = "fail" (below 5.310.000 đồng/tháng — Điều 3 khoản 1 Nghị định 293/2025/NĐ-CP)
+
+# Out of scope → no verdict is invented
+check_compliance("Giá vàng SJC hôm nay bao nhiêu?")   # verdict = "no_match"
 ```
 
 ---
@@ -174,13 +187,13 @@ The evaluation harness ([`eval/`](eval/)) runs a 4-strategy retrieval ablation
 (BM25 · dense · hybrid+RRF · hybrid+reranker) plus RAGAS generation metrics against a
 hand-built question set with ground-truth answers and source chunk ids.
 
-**Retrieval benchmark for the banking corpus is being rebuilt.** The current banking
-question set ([`data/eval/test_questions.json`](data/eval/test_questions.json), 25 Q on
-Thông tư 39/2016/TT-NHNN) was run against a 36-chunk pilot corpus where *every* strategy
-saturates at hit-rate 1.0 / MRR 1.0 ([`reports/benchmark_results.json`](reports/benchmark_results.json))
-— too small to discriminate configurations, so those figures are **not** reported as
-evidence. A larger corpus and a harder question set (adversarial paraphrases, near-miss
-negatives) are in progress.
+**No retrieval baseline is published for this corpus yet.** The pre-pivot banking question
+set has been archived to [`data/eval/_archive/test_questions_banking.json`](data/eval/_archive/)
+— it measures nothing against a labour-law corpus. The gold set in use is
+[`data/eval/temporal_questions.json`](data/eval/temporal_questions.json) (30 hand-written
+questions with `source_clause` ids, committed before the system was run against them);
+a consolidated ≥50-question set covering in-scope / out-of-scope / point-in-time is in progress.
+No headline accuracy number is claimed until it is measured on this corpus.
 
 **Historical benchmark (previous corpus).** The methodology and engineering findings
 carry over — see [`EVALUATION.md`](EVALUATION.md). On a self-built 110-question set
@@ -193,7 +206,7 @@ over-refusal.
 | Stage | Mechanism |
 |---|---|
 | Sparse retrieval | Okapi BM25 — exact statutory term / article-ID matching |
-| Dense retrieval | `paraphrase-multilingual-MiniLM-L12-v2` — semantic paraphrase matching |
+| Dense retrieval | `AITeamVN/Vietnamese_Embedding` (1024-dim) — semantic paraphrase matching |
 | Fusion | Reciprocal Rank Fusion over both candidate lists (top-20) |
 | Reranking | `BAAI/bge-reranker-v2-m3` cross-encoder → top-8 |
 | Generation guardrails | out-of-corpus refusal · paragraph-level citation enforcement |
@@ -207,12 +220,12 @@ over-refusal.
 | **Agent Orchestration** | LangGraph 0.2 + LlamaIndex 0.14 | Explicit typed state transitions, modular unit-testability of nodes, and deterministic (non-LLM) intent routing. |
 | **Primary LLM** | Groq (Llama 3.3 70B Versatile) | ~300 tokens/second generation speed on LPUs; ideal for responsive real-time streaming. |
 | **Fallback LLM** | Google Gemini 2.0 Flash Lite | High concurrency, large context window, zero cold-start fallback when Groq hits TPM/RPM ceilings. |
-| **Embeddings** | `paraphrase-multilingual-MiniLM-L12-v2` | Compact (120MB), CPU-optimized, high multilingual semantic fidelity for Vietnamese text. |
+| **Embeddings** | `AITeamVN/Vietnamese_Embedding` (1024-dim) | Vietnamese-specific; replaced MiniLM-L12 after an A/B on the labour gold set (final@8 0.821 → 1.000, `reports/embedding_ab.json`). |
 | **Vector Store** | ChromaDB (Local Persistent) / Qdrant | Pluggable backend via `VECTOR_STORE_PROVIDER` without rewriting ingestion or retrieval queries. |
 | **Reranker** | `BAAI/bge-reranker-v2-m3` | State-of-the-art multilingual cross-encoder reranker for high-precision legal clause ranking. |
 | **Backend Web API** | FastAPI + WebSockets + Pydantic v2 | Full async I/O, bidirectional streaming, automatic OpenAPI schema generation. |
-| **Frontend UI** | React 19 + TypeScript + Vite | Dark-mode banking console, source preview drawer, compliance testing dashboard. |
-| **Testing** | Pytest + Pytest-Cov + Pytest-Asyncio | 84/84 tests passing (verified offline) across units, integrations, and guardrails. |
+| **Frontend UI** | React 19 + TypeScript + Vite | Dark-mode console, source preview drawer, compliance testing dashboard. |
+| **Testing** | Pytest + Pytest-Cov + Pytest-Asyncio | 227/227 tests passing (verified offline) across units, integrations, and guardrails. |
 
 ---
 
@@ -243,10 +256,10 @@ EMBEDDING_PROVIDER=local
 VECTOR_STORE_PROVIDER=chroma
 ```
 
-### 2. Ingest Banking Corpus
-Populate the ChromaDB vector database with the curated banking documents:
+### 2. Ingest the Corpus
+Populate the ChromaDB vector database with the curated legal documents:
 ```powershell
-python scripts/ingest_documents.py --source-dir data/raw/banking_docs --manifest data/raw/manifest.json --reset
+python scripts/ingest_documents.py --source-dir data/raw/lao_dong --reset
 ```
 
 ### 3. Run the Application

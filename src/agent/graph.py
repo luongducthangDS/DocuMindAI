@@ -21,7 +21,7 @@ from loguru import logger
 
 from src.agent.memory import LongTermMemory, ShortTermMemory
 from src.agent.tools import ALL_TOOLS
-from src.config import get_settings
+from src.config import DOMAIN_NAME, get_settings
 from src.rag.generator import _cited_sources, generate_answer, stream_answer
 from src.rag.grader import grade_chunks
 from src.ingestion.manifest import corpus_earliest_point_in_time
@@ -101,13 +101,13 @@ def _get_llm():
     raise RuntimeError("No LLM API key configured. Set GROQ_API_KEY or GOOGLE_API_KEY.")
 
 
-_ROUTER_PROMPT = """Phân loại ý định câu hỏi sau vào MỘT trong các loại:
+_ROUTER_PROMPT = f"""Phân loại ý định câu hỏi sau vào MỘT trong các loại:
 - simple_qa: câu hỏi đơn giản, tra cứu một quy định
 - compare: so sánh hai văn bản hoặc hai quy định
 - summarize: yêu cầu tóm tắt một văn bản
 - report: yêu cầu tạo báo cáo PDF hoặc tổng hợp nhiều văn bản
-- compliance_check: kiểm tra một tình huống cụ thể có đáp ứng điều kiện/quy định hay không (ví dụ: "thu nhập 15 triệu/tháng có đủ điều kiện vay tín chấp không?", "hạn mức thẻ 50 triệu có cần chứng minh thu nhập không?")
-- unknown: không liên quan đến tài liệu ngân hàng
+- compliance_check: kiểm tra một tình huống cụ thể có đáp ứng điều kiện/quy định hay không (ví dụ: "công ty cho làm thêm 250 giờ/năm có đúng luật không?", "thử việc 3 tháng cho vị trí kế toán có hợp lệ không?")
+- unknown: không liên quan đến {DOMAIN_NAME}
 
 Chỉ trả về một từ duy nhất (không giải thích)."""
 
@@ -667,7 +667,7 @@ async def compliance_check_node(state: AgentState) -> dict:
         # out-of-corpus questions, since match_criteria only checks keyword
         # overlap, not whether the question is even in-scope. In both cases
         # normal RAG has a better shot: it can either answer a legitimate
-        # no-number question (e.g. "điều kiện mở thẻ tín dụng là gì?" doesn't
+        # no-number question (e.g. "điều kiện hưởng trợ cấp thất nghiệp là gì?" doesn't
         # need a number) or correctly refuse via the system prompt's own
         # out-of-corpus rule — better than this node's generic "vui lòng nêu
         # rõ con số" message either way.

@@ -3,6 +3,21 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# ── Phạm vi sản phẩm ──────────────────────────────────────────────────────────
+# NGUỒN SỰ THẬT DUY NHẤT cho "DocuMind AI trả lời về cái gì". Mọi prompt, message
+# từ chối và nhãn UI phải lấy từ đây — trước đây 5 nơi tự khai báo scope riêng và
+# cả 5 đều nói "tài liệu ngân hàng" sau khi corpus đã pivot sang lao động/BHXH.
+# Đổi phạm vi corpus ⇒ sửa 3 hằng số này + frontend/src/main.tsx (PRODUCT).
+DOMAIN_NAME = "pháp luật lao động và bảo hiểm xã hội Việt Nam"
+DOMAIN_SCOPE = (
+    "Bộ luật Lao động, Luật Bảo hiểm xã hội, Luật Việc làm cùng các nghị định, "
+    "thông tư hướng dẫn"
+)
+DOMAIN_TOPICS = (
+    "hợp đồng lao động, tiền lương, thời giờ làm việc, kỷ luật lao động, "
+    "bảo hiểm xã hội, bảo hiểm thất nghiệp, hưu trí"
+)
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -41,9 +56,11 @@ class Settings(BaseSettings):
     # final@8 = 1.000 so với 0.821 của paraphrase-multilingual-MiniLM-L12-v2.
     embedding_model: str = "AITeamVN/Vietnamese_Embedding"
     # embedding_provider: "local" (mặc định, load model vào RAM qua sentence-transformers/
-    # torch) hoặc "hf_api" (gọi HuggingFace Inference API, không load model — dùng cho
-    # host RAM thấp). Cùng model, cùng số chiều, corpus không cần re-index khi đổi
-    # provider. Cần HF_TOKEN khi dùng "hf_api".
+    # torch), "hf_api" (gọi HuggingFace Inference API, không load model — dùng cho
+    # host RAM thấp) hoặc "gemini" (Gemini Embedding API, cần GOOGLE_API_KEY).
+    # local ↔ hf_api là cùng model cùng số chiều nên đổi qua lại không cần re-index;
+    # "gemini" là KHÔNG GIAN VECTOR KHÁC — đổi sang nó phải đổi luôn EMBEDDING_MODEL
+    # và chạy scripts/reembed_corpus.py, nếu không sẽ dính EmbeddingModelMismatch.
     embedding_provider: str = "local"
 
     # LangSmith

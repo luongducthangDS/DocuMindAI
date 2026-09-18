@@ -15,6 +15,7 @@ from loguru import logger
 from src.agent.graph import run_agent
 from src.agent.memory import ShortTermMemory, get_long_term_memory
 from src.api.schemas import ComplianceVerdict, QueryRequest, QueryResponse, SourceItem, ThinkingStep
+from src.config import DOMAIN_NAME
 from src.guardrails import check_prompt_injection, validate_citations
 from src.rag.generator import stream_answer
 
@@ -88,7 +89,7 @@ async def query_endpoint(request: Request, body: QueryRequest) -> QueryResponse:
         logger.warning("Guard blocked query session={} reason={}", body.session_id, guard.reason)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Query không hợp lệ. Vui lòng đặt câu hỏi về tài liệu ngân hàng.",
+            detail=f"Query không hợp lệ. Vui lòng đặt câu hỏi về {DOMAIN_NAME}.",
         )
 
     error_detail: str | None = None
@@ -229,7 +230,7 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
             if guard.blocked:
                 logger.warning("WS guard blocked session={} reason={}", session_id, guard.reason)
                 await websocket.send_json({
-                    "error": "Query không hợp lệ. Vui lòng đặt câu hỏi về tài liệu ngân hàng.",
+                    "error": f"Query không hợp lệ. Vui lòng đặt câu hỏi về {DOMAIN_NAME}.",
                     "guard_triggered": True,
                 })
                 continue

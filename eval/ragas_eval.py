@@ -2,7 +2,7 @@
 RAGAS evaluation harness for DocuMind AI.
 Usage:
   python eval/ragas_eval.py \
-    --test-set data/eval/test_questions.json \
+    --test-set data/eval/temporal_questions.json \
     --output reports/ragas_report.json
 
 Test set format:
@@ -158,7 +158,7 @@ def main() -> None:
     parser.add_argument(
         "--test-set",
         type=Path,
-        default=Path("data/eval/test_questions.json"),
+        default=Path("data/eval/temporal_questions.json"),
     )
     parser.add_argument(
         "--output",

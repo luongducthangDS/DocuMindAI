@@ -1,127 +1,155 @@
 [
   {
-    "id": "vay_tin_chap_thu_nhap",
-    "topic": "Điều kiện thu nhập tối thiểu vay tín chấp",
+    "id": "lam_them_gio_trong_nam",
+    "topic": "Trần số giờ làm thêm trong 01 năm",
     "keywords": [
-      "vay tín chấp",
-      "thu nhập tối thiểu",
-      "thu nhập hàng tháng",
-      "thu nhập",
-      "điều kiện vay tín chấp"
+      "làm thêm",
+      "tăng ca",
+      "trong 01 năm",
+      "trong 1 năm",
+      "mỗi năm",
+      "một năm",
+      "cả năm",
+      "/năm",
+      "hằng năm",
+      "trong năm"
     ],
     "condition": {
-      "field": "thu nhập",
-      "operator": ">=",
-      "value": 5.0,
-      "unit": "triệu VNĐ/tháng"
+      "field": "giờ làm thêm",
+      "operator": "<=",
+      "value": 200.0,
+      "unit": "giờ/năm"
     },
-    "so_hieu": "Quy chế CV-05/2023/NH",
-    "dieu_khoan": "Điều 6",
-    "source_url": "https://banking.example.vn/quy-che-cho-vay-tieu-dung",
+    "so_hieu": "Bộ luật Lao động 45/2019/QH14",
+    "dieu_khoan": "Điều 107 khoản 2 điểm c",
+    "source_url": "https://congbao.chinhphu.vn/tai-ve-van-ban-so-45-2019-qh14-30232-29070?format=pdf",
     "verdict_template": {
-      "pass": "Khách hàng có mức thu nhập đạt điều kiện tối thiểu để xét duyệt hồ sơ vay tín chấp tiêu dùng theo {dieu_khoan} {so_hieu}.",
-      "fail": "Mức thu nhập chưa đạt ngưỡng tối thiểu (5.0 triệu VNĐ/tháng) để xét duyệt hồ sơ vay tín chấp theo {dieu_khoan} {so_hieu}."
+      "pass": "Số giờ làm thêm nằm trong trần 200 giờ/năm theo {dieu_khoan} {so_hieu}. Lưu ý: một số ngành, nghề được làm thêm tới 300 giờ/năm theo khoản 3 Điều 107 — cần đối chiếu danh mục ngành nghề.",
+      "fail": "Số giờ làm thêm vượt trần 200 giờ trong 01 năm theo {dieu_khoan} {so_hieu}. Chỉ các ngành, nghề thuộc khoản 3 Điều 107 mới được làm thêm đến 300 giờ/năm."
     }
   },
   {
-    "id": "ty_le_dti_cho_vay",
-    "topic": "Tỷ lệ nợ trên thu nhập (DTI) tối đa khi cấp tín dụng",
+    "id": "lam_them_gio_trong_thang",
+    "topic": "Trần số giờ làm thêm trong 01 tháng",
     "keywords": [
-      "tỷ lệ nợ",
-      "dti",
-      "nghĩa vụ nợ",
-      "tổng thu nhập",
-      "khả năng trả nợ"
+      "làm thêm",
+      "tăng ca",
+      "trong 01 tháng",
+      "trong 1 tháng",
+      "mỗi tháng",
+      "một tháng",
+      "trong tháng",
+      "tháng này"
     ],
     "condition": {
-      "field": "tỷ lệ nợ",
+      "field": "giờ làm thêm",
+      "operator": "<=",
+      "value": 40.0,
+      "unit": "giờ/tháng"
+    },
+    "so_hieu": "Bộ luật Lao động 45/2019/QH14",
+    "dieu_khoan": "Điều 107 khoản 2 điểm b",
+    "source_url": "https://congbao.chinhphu.vn/tai-ve-van-ban-so-45-2019-qh14-30232-29070?format=pdf",
+    "verdict_template": {
+      "pass": "Số giờ làm thêm nằm trong trần 40 giờ trong 01 tháng theo {dieu_khoan} {so_hieu}.",
+      "fail": "Số giờ làm thêm vượt trần 40 giờ trong 01 tháng theo {dieu_khoan} {so_hieu}."
+    }
+  },
+  {
+    "id": "thoi_gian_thu_viec",
+    "topic": "Thời gian thử việc tối đa với công việc cần trình độ từ cao đẳng trở lên",
+    "keywords": [
+      "thử việc",
+      "ngày",
+      "tháng",
+      "bao lâu",
+      "kéo dài",
+      "thời gian thử việc"
+    ],
+    "condition": {
+      "field": "thời gian thử việc",
       "operator": "<=",
       "value": 60.0,
+      "unit": "ngày"
+    },
+    "so_hieu": "Bộ luật Lao động 45/2019/QH14",
+    "dieu_khoan": "Điều 25 khoản 2",
+    "source_url": "https://congbao.chinhphu.vn/tai-ve-van-ban-so-45-2019-qh14-30232-29070?format=pdf",
+    "verdict_template": {
+      "pass": "Thời gian thử việc nằm trong giới hạn 60 ngày áp dụng cho công việc có chức danh nghề nghiệp cần trình độ chuyên môn, kỹ thuật từ cao đẳng trở lên theo {dieu_khoan} {so_hieu}.",
+      "fail": "Thời gian thử việc vượt giới hạn 60 ngày theo {dieu_khoan} {so_hieu}. Mức 180 ngày chỉ áp dụng cho công việc của người quản lý doanh nghiệp (khoản 1 Điều 25)."
+    }
+  },
+  {
+    "id": "tien_luong_thu_viec",
+    "topic": "Tỷ lệ tiền lương tối thiểu trong thời gian thử việc",
+    "keywords": [
+      "thử việc",
+      "lương thử việc",
+      "tiền lương thử việc",
+      "%",
+      "phần trăm"
+    ],
+    "condition": {
+      "field": "tiền lương thử việc",
+      "operator": ">=",
+      "value": 85.0,
       "unit": "%"
     },
-    "so_hieu": "Thông tư 39/2016/TT-NHNN",
-    "dieu_khoan": "Điều 7",
-    "source_url": "https://sbv.gov.vn/thong-tu-39-2016",
+    "so_hieu": "Bộ luật Lao động 45/2019/QH14",
+    "dieu_khoan": "Điều 26",
+    "source_url": "https://congbao.chinhphu.vn/tai-ve-van-ban-so-45-2019-qh14-30232-29070?format=pdf",
     "verdict_template": {
-      "pass": "Tỷ lệ nợ trên thu nhập (DTI) nằm trong ngưỡng an toàn cho phép theo {dieu_khoan} {so_hieu}.",
-      "fail": "Tỷ lệ nợ trên thu nhập (DTI) vượt quá giới hạn an toàn tối đa 60% theo {dieu_khoan} {so_hieu}."
+      "pass": "Mức lương thử việc đạt tối thiểu 85% mức lương của công việc theo {dieu_khoan} {so_hieu}.",
+      "fail": "Mức lương thử việc thấp hơn 85% mức lương của công việc — trái với {dieu_khoan} {so_hieu}."
     }
   },
   {
-    "id": "han_muc_the_tin_dung_tin_chap",
-    "topic": "Hạn mức tối đa phát hành thẻ tín dụng không tài sản bảo đảm",
+    "id": "nghi_hang_nam_dieu_kien_binh_thuong",
+    "topic": "Số ngày nghỉ hằng năm hưởng nguyên lương trong điều kiện làm việc bình thường",
     "keywords": [
-      "hạn mức thẻ",
-      "thẻ tín dụng",
-      "thẻ tín dụng tín chấp",
-      "hạn mức phát hành"
+      "nghỉ hằng năm",
+      "nghỉ phép",
+      "ngày phép",
+      "phép năm",
+      "ngày nghỉ"
     ],
     "condition": {
-      "field": "hạn mức",
-      "operator": "<=",
-      "value": 100.0,
-      "unit": "triệu VNĐ"
+      "field": "ngày nghỉ hằng năm",
+      "operator": ">=",
+      "value": 12.0,
+      "unit": "ngày làm việc/năm"
     },
-    "so_hieu": "Thông tư 18/2024/TT-NHNN",
-    "dieu_khoan": "Điều 14",
-    "source_url": "https://sbv.gov.vn/thong-tu-18-2024",
+    "so_hieu": "Bộ luật Lao động 45/2019/QH14",
+    "dieu_khoan": "Điều 113 khoản 1 điểm a",
+    "source_url": "https://congbao.chinhphu.vn/tai-ve-van-ban-so-45-2019-qh14-30232-29070?format=pdf",
     "verdict_template": {
-      "pass": "Hạn mức thẻ tín dụng tuân thủ quy định tối đa cho khách hàng cá nhân không tài sản bảo đảm theo {dieu_khoan} {so_hieu}.",
-      "fail": "Hạn mức đề xuất vượt trần 100 triệu VNĐ đối với thẻ tín dụng tín chấp theo {dieu_khoan} {so_hieu}."
+      "pass": "Số ngày nghỉ hằng năm đạt mức tối thiểu 12 ngày làm việc đối với người làm việc đủ 12 tháng trong điều kiện bình thường theo {dieu_khoan} {so_hieu}.",
+      "fail": "Số ngày nghỉ hằng năm thấp hơn mức tối thiểu 12 ngày làm việc theo {dieu_khoan} {so_hieu}. Công việc nặng nhọc, độc hại, nguy hiểm còn được 14 hoặc 16 ngày (điểm b, c khoản 1)."
     }
   },
   {
-    "id": "lai_suat_tien_gui_khong_ky_han",
-    "topic": "Trần lãi suất tiền gửi không kỳ hạn và dưới 1 tháng",
+    "id": "luong_toi_thieu_thang_vung_1",
+    "topic": "Mức lương tối thiểu tháng vùng I",
     "keywords": [
-      "tiền gửi không kỳ hạn",
-      "lãi suất không kỳ hạn",
-      "dưới 1 tháng",
-      "trần lãi suất không kỳ hạn"
+      "lương tối thiểu",
+      "vùng i",
+      "vùng 1",
+      "mức lương tối thiểu",
+      "thấp hơn lương tối thiểu"
     ],
     "condition": {
-      "field": "lãi suất",
-      "operator": "<=",
-      "value": 0.5,
-      "unit": "%/năm"
+      "field": "mức lương",
+      "operator": ">=",
+      "value": 5.31,
+      "unit": "triệu đồng/tháng"
     },
-    "so_hieu": "Quyết định 1124/QĐ-NHNN",
-    "dieu_khoan": "Điều 1",
-    "source_url": "https://sbv.gov.vn/quyet-dinh-1124",
+    "so_hieu": "Nghị định 293/2025/NĐ-CP",
+    "dieu_khoan": "Điều 3 khoản 1",
+    "source_url": "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-293-2025-nd-cp-46568/59713.htm",
     "verdict_template": {
-      "pass": "Mức lãi suất tiền gửi không kỳ hạn tuân thủ trần lãi suất do Ngân hàng Nhà nước quy định theo {dieu_khoan} {so_hieu}.",
-      "fail": "Mức lãi suất vượt trần tối đa 0.5%/năm áp dụng cho tiền gửi không kỳ hạn và kỳ hạn dưới 1 tháng theo {dieu_khoan} {so_hieu}."
-    }
-  },
-  {
-    "id": "lai_suat_tien_gui_duoi_6_thang",
-    "topic": "Trần lãi suất tiền gửi có kỳ hạn từ 1 tháng đến dưới 6 tháng",
-    "keywords": [
-      "tiền gửi kỳ hạn dưới 6 tháng",
-      "lãi suất dưới 6 tháng",
-      "kỳ hạn 1 tháng đến dưới 6 tháng",
-      "trần lãi suất 6 tháng",
-      "kỳ hạn dưới 6 tháng",
-      "kỳ hạn 1 tháng",
-      "kỳ hạn 2 tháng",
-      "kỳ hạn 3 tháng",
-      "kỳ hạn 4 tháng",
-      "kỳ hạn 5 tháng",
-      "lãi suất 3 tháng",
-      "lãi suất 1 tháng"
-    ],
-    "condition": {
-      "field": "lãi suất",
-      "operator": "<=",
-      "value": 4.75,
-      "unit": "%/năm"
-    },
-    "so_hieu": "Quyết định 1124/QĐ-NHNN",
-    "dieu_khoan": "Điều 1",
-    "source_url": "https://sbv.gov.vn/quyet-dinh-1124",
-    "verdict_template": {
-      "pass": "Mức lãi suất tiền gửi kỳ hạn 1 đến dưới 6 tháng tuân thủ trần lãi suất quy định theo {dieu_khoan} {so_hieu}.",
-      "fail": "Mức lãi suất vượt trần tối đa 4.75%/năm đối với tiền gửi có kỳ hạn từ 1 tháng đến dưới 6 tháng theo {dieu_khoan} {so_hieu}."
+      "pass": "Mức lương đạt mức lương tối thiểu tháng vùng I là 5.310.000 đồng/tháng theo {dieu_khoan} {so_hieu} (hiệu lực từ 01/01/2026). Với thời điểm trước 01/01/2026, mức áp dụng là 4.960.000 đồng/tháng theo Nghị định 74/2024/NĐ-CP.",
+      "fail": "Mức lương thấp hơn mức lương tối thiểu tháng vùng I là 5.310.000 đồng/tháng theo {dieu_khoan} {so_hieu} (hiệu lực từ 01/01/2026). Với thời điểm trước 01/01/2026, mức áp dụng là 4.960.000 đồng/tháng theo Nghị định 74/2024/NĐ-CP."
     }
   }
 ]

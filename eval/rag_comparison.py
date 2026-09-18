@@ -19,7 +19,7 @@ Usage:
 
   # Full evaluation (all 4 strategies)
   python eval/run_evals.py \\
-    --test-set data/eval/test_questions.json \\
+    --test-set data/eval/temporal_questions.json \\
     --output reports/benchmark_results.json
 
   # Run only specific strategies
@@ -873,7 +873,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="DocuMind AI — Retrieval Strategy Benchmark (dense vs hybrid vs hybrid+rerank)"
     )
-    parser.add_argument("--test-set", type=Path, default=Path("data/eval/test_questions.json"))
+    # Gold set lao động hiện có. Bộ 25 câu ngân hàng tiền-pivot nằm ở
+    # data/eval/_archive/test_questions_banking.json — không đo được trên corpus này.
+    parser.add_argument("--test-set", type=Path, default=Path("data/eval/temporal_questions.json"))
     parser.add_argument("--output", type=Path, default=Path("reports/benchmark_results.json"))
     parser.add_argument("--limit", type=int, default=None, help="Limit items for quick smoke test")
     parser.add_argument(

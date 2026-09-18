@@ -6,8 +6,8 @@ brackets, income conditions, etc.).
 This is a companion to the RAG pipeline, NOT a replacement or general rule
 engine — it only covers the small set of criteria hand-curated in
 data/compliance/criteria.json, each cross-referenced against the source
-banking document at authoring time. Anything not matched falls back to
-normal RAG (see compliance_check_node in src/agent/graph.py).
+labour/social-insurance document at authoring time. Anything not matched falls
+back to normal RAG (see compliance_check_node in src/agent/graph.py).
 """
 
 from __future__ import annotations
@@ -31,20 +31,27 @@ _OPERATORS = {
 
 # Tried in order: number immediately near a known label keyword, then a number
 # followed by a unit marker (%/triệu/đồng), then any number at all.
-# NOTE: these labels are placeholders for the banking domain — update to match
-# the actual fields used in data/compliance/criteria.json once real criteria
-# are authored (e.g. specific product names, rate types).
+# Labels mirror `condition.field` in data/compliance/criteria.json (labour /
+# social-insurance domain). Adding a criterion with a new field means adding
+# its label here, otherwise extraction falls through to the generic patterns.
 _NUMBER_NEAR_LABEL_RE = re.compile(
-    r"(?:lãi suất|hạn mức|thu nhập|tỷ lệ nợ|số dư|kỳ hạn|phí thường niên|phí)"
+    r"(?:giờ làm thêm|làm thêm|tăng ca|thử việc|mức lương|tiền lương|lương|"
+    r"ngày nghỉ|nghỉ hằng năm|nghỉ phép|thời gian đóng|tỷ lệ đóng|tuổi nghỉ hưu)"
     r"\D{0,20}?(\d+(?:[.,]\d+)?)",
     re.IGNORECASE,
 )
-_TRAILING_UNIT_NUMBER_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:%|triệu|đồng)")
+_TRAILING_UNIT_NUMBER_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:%|giờ|ngày|tháng|năm|triệu|đồng)")
 _ANY_NUMBER_RE = re.compile(r"(\d+(?:[.,]\d+)?)")
 
 # Below this cosine similarity, an embedding match is considered noise rather
 # than a real match — situation is unrelated to any known criterion.
 _EMBEDDING_MATCH_THRESHOLD = 0.45
+
+# Minimum _keyword_score (total matched keyword length) to decide on keywords
+# alone. A single generic word — "%", "ngày", "tháng" — is not evidence that the
+# situation is about a given criterion, and this engine emits a ✅/❌ verdict with
+# a citation, so a weak match must fall through to embeddings rather than guess.
+_MIN_KEYWORD_SCORE = 6
 
 
 @lru_cache
@@ -58,8 +65,15 @@ def load_criteria() -> list[dict]:
 
 
 def _keyword_score(situation: str, criterion: dict) -> int:
+    """Total length of the matched keywords, not their count.
+
+    Criteria in the same family share short keywords ("thử việc", "làm thêm")
+    and are told apart by a longer, more specific one ("lương thử việc",
+    "trong 01 năm"). Counting matches ties those pairs and drops the decision on
+    the embedding fallback; weighting by length lets the specific phrase win.
+    """
     situation_lower = situation.lower()
-    return sum(1 for kw in criterion.get("keywords", []) if kw.lower() in situation_lower)
+    return sum(len(kw) for kw in criterion.get("keywords", []) if kw.lower() in situation_lower)
 
 
 def _cosine_similarity(a: list[float], b: list[float]) -> float:
@@ -106,7 +120,7 @@ def match_criteria(situation: str, criteria: list[dict]) -> dict | None:
     best, best_score = scored[0]
     second_score = scored[1][1] if len(scored) > 1 else 0
 
-    if best_score > 0 and best_score > second_score:
+    if best_score >= _MIN_KEYWORD_SCORE and best_score > second_score:
         return best
 
     return _match_by_embedding(situation, criteria)
@@ -142,17 +156,46 @@ def _extract_value_via_llm(situation: str, condition: dict) -> float | None:
         return None
 
 
+def _to_millions(raw: str) -> float:
+    """"5.310.000" / "5,310,000" -> 5.31 (triệu đồng)."""
+    return float(re.sub(r"[.,]", "", raw)) / 1_000_000
+
+
 def extract_situation_value(situation: str, condition: dict) -> float | None:
     """Pull the numeric value relevant to `condition['field']` out of
     free-form Vietnamese phrasing. Regex first (deterministic, cheapest);
-    escalates to one LLM extraction call only if regex finds nothing."""
+    escalates to one LLM extraction call only if regex finds nothing.
+
+    Money criteria are stored in "triệu đồng" but people write the amount both
+    ways ("4,5 triệu" and "4.500.000 đồng"), so a full amount is matched first
+    and converted — otherwise the generic patterns read "4.500.000 đồng" as the
+    trailing group "000".
+    """
+    money = "đồng" in condition.get("unit", "")
+    if money:
+        # "5.310.000" / "5310000" — a raw amount in đồng, converted to triệu.
+        # Tried before the label patterns, which would otherwise read the "1"
+        # out of "lương tối thiểu vùng 1" as the amount.
+        full_amount = re.search(r"(\d{1,3}(?:[.,]\d{3}){2,})|(\d{7,})", situation)
+        if full_amount:
+            return _to_millions(full_amount.group(0))
+        in_millions = re.search(
+            r"(\d+(?:[.,]\d+)?)\s*(?:triệu|tr(?![a-zà-ỹ]))", situation, re.IGNORECASE
+        )
+        if in_millions:
+            return float(in_millions.group(1).replace(",", "."))
+
     for pattern in (_NUMBER_NEAR_LABEL_RE, _TRAILING_UNIT_NUMBER_RE, _ANY_NUMBER_RE):
         match = pattern.search(situation)
         if match:
             try:
-                return float(match.group(1).replace(",", "."))
+                value = float(match.group(1).replace(",", "."))
             except ValueError:
                 continue
+            # "lương 4500000" written without separators — still đồng, not triệu.
+            if money and value >= 1000:
+                value /= 1_000_000
+            return value
     return _extract_value_via_llm(situation, condition)
 
 

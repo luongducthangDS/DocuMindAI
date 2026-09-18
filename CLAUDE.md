@@ -4,17 +4,27 @@ Project hướng dẫn cho Claude Code. Đọc file này trước khi làm bất
 
 ## Project overview
 
-AI agent RAG nội bộ tra cứu tài liệu ngân hàng — quy định, biểu phí, sản phẩm (vay, thẻ,
-tiền gửi), quy trình nghiệp vụ. Trả lời kèm trích dẫn nguồn, từ chối khi câu hỏi ngoài
-phạm vi tài liệu đã nạp.
+AI agent RAG tra cứu **pháp luật lao động và bảo hiểm xã hội Việt Nam** — Bộ luật Lao động,
+Luật BHXH, Luật Việc làm cùng nghị định/thông tư hướng dẫn. Trả lời kèm trích dẫn điều khoản,
+từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứu được **theo thời điểm**
+(`as_of_date`) vì nhiều văn bản trong corpus đã bị thay thế.
 
-**Trạng thái hiện tại:** Đã hoàn thiện toàn diện bộ dữ liệu ngân hàng mẫu, compliance check, và test suite 100% pass:
-- Corpus ngân hàng chuẩn gồm 6 văn bản quy định & nghiệp vụ tại `data/raw/banking_docs/` với `manifest.json`.
-- ChromaDB `data/chroma_db/` (collection `documind_legal`) hiện chứa **1146 chunks** —
-  corpus lao động của nhánh `feature/labor-pivot`, không phải 36 chunks ngân hàng ban đầu.
-- Tiêu chí kiểm định tuân thủ ngân hàng `data/compliance/criteria.json` với 5 bộ quy tắc định lượng (thu nhập vay tín chấp, trần tỷ lệ DTI, trần hạn mức thẻ tín chấp, trần lãi suất không kỳ hạn và dưới 6 tháng theo NHNN).
-- Bộ câu hỏi benchmark 25 câu tại `data/eval/test_questions.json`.
-- Test suite: 166/166 tests passed (đo 2026-09-16).
+> **Phạm vi sản phẩm là nguồn sự thật, không phải văn bản tự do.** Khai báo ở
+> `src/config.py` (`DOMAIN_NAME` / `DOMAIN_SCOPE` / `DOMAIN_TOPICS`) và
+> `frontend/src/main.tsx` (`PRODUCT`). Mọi prompt, message từ chối, nhãn UI phải lấy từ đó —
+> đừng viết lại chuỗi mô tả phạm vi ở chỗ khác.
+
+**Trạng thái hiện tại:**
+- Corpus lao động/BHXH: 20 văn bản tại `data/raw/lao_dong/` (+ `_versions/` cho bản sửa đổi
+  cấp khoản). Corpus ngân hàng cũ đã bỏ — `data/raw/banking_docs/` không còn tồn tại.
+- ChromaDB `data/chroma_db/` (collection `documind_legal`): **1146 chunks**, 1024-dim.
+- `data/compliance/criteria.json`: 6 tiêu chí định lượng lao động (trần làm thêm giờ
+  năm/tháng, thời gian thử việc, lương thử việc 85%, nghỉ hằng năm, lương tối thiểu vùng I).
+  Mọi tiêu chí phải trích dẫn văn bản CÓ trong `data/raw/lao_dong/` — có test chặn
+  (`tests/test_compliance.py::TestCriteriaDataIntegrity`).
+- Gold set: `data/eval/temporal_questions.json` (30 câu, viết tay trước khi chạy hệ thống).
+  Bộ 25 câu ngân hàng tiền-pivot đã archive sang `data/eval/_archive/`.
+- Test suite: 227/227 tests passed (đo 2026-09-18).
 
 **Stack:**
 - Backend: FastAPI + LangGraph agent + vector store qua `VECTOR_STORE_PROVIDER`
@@ -36,24 +46,32 @@ phạm vi tài liệu đã nạp.
 
 ## Corpus & Compliance
 
-Corpus ngân hàng hiện có 6 văn bản chuẩn hoá cấu trúc `Điều ...`:
-1. `01_thong_tu_39_2016_cho_vay.md`: Quy định cho vay & điều kiện cấp tín dụng.
-2. `02_thong_tu_18_2024_the_ngan_hang.md`: Nghiệp vụ thẻ & hạn mức tín chấp tối đa 100tr.
-3. `03_thong_tu_48_2018_tien_gui_tiet_kiem.md`: Tiền gửi tiết kiệm & quy tắc rút trước hạn.
-4. `04_quyet_dinh_lai_suat_nhnn.md`: Trần lãi suất huy động và cho vay ưu tiên (QĐ 1124/1125).
-5. `05_quy_che_cho_vay_tieu_dung_tin_chap.md`: Vay tiêu dùng tín chấp, thu nhập tối thiểu 5tr, DTI <= 60%.
-6. `06_bieu_phi_dich_vu_tai_khoan_va_the.md`: Biểu phí duy trì tài khoản, thẻ, chính sách miễn lãi 45 ngày.
+Corpus tại `data/raw/lao_dong/` — 20 văn bản, frontmatter YAML (`doc_id`, `so_hieu`, `ten`,
+`ngay_hieu_luc`, `trang_thai`), thân bài chuẩn hoá theo `Điều ...`; `_versions/` chứa bản
+sửa đổi ở cấp khoản. Bốn nhóm:
+1. **Lao động**: `45-2019-QH14` (Bộ luật Lao động), `18-VBHN-VPQH`, `145-2020-ND-CP`, `10-2020-TT-BLDTBXH`.
+2. **Lương tối thiểu**: `293-2025-ND-CP` (hiệu lực 01/01/2026, vùng I 5.310.000đ) thay `74-2024-ND-CP` (4.960.000đ).
+3. **BHXH**: `41-2024-QH15` thay `58-2014-QH13`; nghị định/thông tư `115-2015`, `134-2015`, `158-2025`, `159-2025`, `59-2015-TT-BLDTBXH`, `11`/`12-2025-TT-BNV`.
+4. **Việc làm & BHTN**: `74-2025-QH15` thay `38-2013-QH13`; `374-2025-ND-CP`, `28-2015-ND-CP`. Thêm `135-2020-ND-CP` (tuổi nghỉ hưu).
+
+Cả bản cũ lẫn bản mới đều nằm trong index — đó là điều làm `as_of_date` có ý nghĩa.
 
 Lệnh ingest tài liệu:
 ```powershell
-# Ingest tài liệu ngân hàng cùng manifest vào ChromaDB
-python scripts/ingest_documents.py --source-dir data/raw/banking_docs --manifest data/raw/manifest.json --reset
+# Ingest corpus lao động vào ChromaDB
+python scripts/ingest_documents.py --source-dir data/raw/lao_dong --reset
 
 # Xem trước số chunk mà không ghi vào DB
-python scripts/ingest_documents.py --source-dir data/raw/banking_docs --dry-run
+python scripts/ingest_documents.py --source-dir data/raw/lao_dong --dry-run
 ```
 
-`data/compliance/criteria.json` định nghĩa các tiêu chí kiểm định tuân thủ định lượng (pass/fail) cho agent node `compliance_check`.
+`data/compliance/criteria.json` định nghĩa 6 tiêu chí kiểm định tuân thủ định lượng
+(pass/fail) cho agent node `compliance_check`. Engine này phát ✅/❌ kèm trích dẫn nên là
+đường đi thẳng tới "câu trả lời sai có thẩm quyền" — khi thêm tiêu chí:
+- Số liệu phải tra từ chính văn bản trong `data/raw/lao_dong/`, không lấy từ trí nhớ.
+- `so_hieu` phải trỏ tới văn bản CÓ trong corpus (test `TestCriteriaDataIntegrity` chặn).
+- `keywords` chấm theo tổng ĐỘ DÀI cụm khớp, ngưỡng `_MIN_KEYWORD_SCORE = 6`. Tránh cụm
+  quá rộng (`"trả lương"`, `"/tháng"`) — chúng kéo nhầm tiêu chí khác.
 Đánh giá retrieval benchmark:
 ```powershell
 python eval/run_evals.py --strategies dense rerank --retrieval-only --limit 5
@@ -153,13 +171,14 @@ for k in ("HF_HOME", "HF_HUB_CACHE", "TRANSFORMERS_CACHE", "SENTENCE_TRANSFORMER
 `python scripts/migrate_chroma_to_qdrant.py --verify`, rồi set `VECTOR_STORE_PROVIDER=qdrant`
 + `QDRANT_URL` + `QDRANT_API_KEY` trong `.env`. Toàn bộ code retrieval (main.py init, BM25
 corpus load, health check, direct-query fallback) đi qua `src/rag/vector_backend.py` nên
-không cần sửa gì thêm — nhưng cần chạy migrate lại sau khi có corpus ngân hàng thật (script
+không cần sửa gì thêm — nhưng cần chạy migrate lại mỗi khi corpus đổi (script
 đọc embeddings có sẵn trong Chroma, không re-embed).
 
 ## Eval (RAGAS)
 
-Chỉ chạy khi cần benchmark, không phải production. `data/eval/test_questions.json` đang rỗng
-(bộ câu hỏi UNETI cũ đã xoá) — cần soạn lại bộ câu hỏi ngân hàng trước khi eval có ý nghĩa:
+Chỉ chạy khi cần benchmark, không phải production. Gold set đang dùng:
+`data/eval/temporal_questions.json` (30 câu lao động, có `source_clause`). Bộ 25 câu ngân
+hàng tiền-pivot nằm ở `data/eval/_archive/` — không đo được gì trên corpus này:
 ```powershell
 python eval/run_evals.py --strategies dense hybrid --output reports/ragas_50q.json
 ```
