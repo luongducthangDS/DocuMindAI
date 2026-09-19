@@ -336,7 +336,7 @@ def retrieve_node(state: AgentState) -> dict:
             # nên đây là dấu vết DUY NHẤT cho biết retriever chính đã hỏng.
             "steps": steps + [{
                 "label": "Tìm kiếm tài liệu",
-                "detail": f"Fallback ({type(exc).__name__}: {str(exc)[:150]}): {len(chunks)} đoạn",
+                "detail": f"Fallback ({type(exc).__name__}): {len(chunks)} đoạn",
                 "ms": ms,
             }],
         }

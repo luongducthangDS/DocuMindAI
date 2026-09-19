@@ -119,11 +119,11 @@ async def query_endpoint(request: Request, body: QueryRequest) -> QueryResponse:
             "user_agent": ua,
             "latency_ms": int((time.time() - t0) * 1000),
         })
-        # Kèm loại lỗi + 200 ký tự đầu: 503 trần không nói được gì khi chỉ truy cập
-        # được qua HTTP (Render free không cho đọc log qua API).
+        # Chỉ tên lớp lỗi, không kèm nội dung: đủ để định vị khi chẩn đoán từ xa
+        # mà không đẩy đường dẫn/cấu hình nội bộ ra ngoài. Chi tiết nằm ở log.
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=f"Agent temporarily unavailable ({type(exc).__name__}: {error_detail[:200]})",
+            detail=f"Agent temporarily unavailable ({type(exc).__name__}). Please retry.",
         ) from exc
 
     # Guardrail: citation hallucination validation
