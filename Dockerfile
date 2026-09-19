@@ -44,6 +44,15 @@ COPY src/ ./src/
 COPY scripts/ ./scripts/
 COPY ingest.py ./
 
+# Hai thu muc du lieu ma RUNTIME doc, khong phai chi script ingest:
+#   docs/corpus/     -> corpus_manifest.yaml, graph.py goi corpus_earliest_point_in_time()
+#                       ngay trong moi luot chat; thieu file = FileNotFoundError -> 503.
+#   data/compliance/ -> criteria.json cho node compliance_check (thieu thi khong crash,
+#                       nhung moi cau hoi kiem dinh tuan thu deu tra ve rong).
+# Tong cong ~72KB.
+COPY docs/corpus/ ./docs/corpus/
+COPY data/compliance/ ./data/compliance/
+
 # Cache dirs
 ENV HOME=/app
 ENV HF_HOME=/app/.cache/huggingface
