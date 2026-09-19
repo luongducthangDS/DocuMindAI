@@ -332,7 +332,13 @@ def retrieve_node(state: AgentState) -> dict:
         return {
             "retrieved_chunks": chunks,
             "error": str(exc) if not chunks else None,
-            "steps": steps + [{"label": "Tìm kiếm tài liệu", "detail": f"Fallback: {len(chunks)} đoạn", "ms": ms}],
+            # Kèm loại lỗi: khi fallback vẫn ra chunks thì "error" ở trên là None,
+            # nên đây là dấu vết DUY NHẤT cho biết retriever chính đã hỏng.
+            "steps": steps + [{
+                "label": "Tìm kiếm tài liệu",
+                "detail": f"Fallback ({type(exc).__name__}: {str(exc)[:150]}): {len(chunks)} đoạn",
+                "ms": ms,
+            }],
         }
 
 

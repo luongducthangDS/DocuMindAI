@@ -29,10 +29,10 @@ services:
         generateValue: true
       - key: ENVIRONMENT
         value: production
-      # Điền domain Vercel thật sau khi deploy frontend, vd:
-      # https://documind-ai.vercel.app
+      # Domain frontend thật trên Vercel (project docu-mind-ai). Sai giá trị này
+      # => preflight CORS trả 400, UI không gọi được API dù backend khoẻ.
       - key: ALLOWED_ORIGINS
-        value: https://your-frontend.vercel.app
+        value: https://docu-mind-ai-blue.vercel.app
       # Phai khop model da index corpus (nhan ghi trong metadata collection).
       # Lech nhan => EmbeddingModelMismatch luc khoi dong, khong chay tiep.
       - key: EMBEDDING_MODEL
