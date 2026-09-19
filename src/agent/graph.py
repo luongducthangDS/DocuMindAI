@@ -21,7 +21,7 @@ from loguru import logger
 
 from src.agent.memory import LongTermMemory, ShortTermMemory
 from src.agent.tools import ALL_TOOLS
-from src.config import DOMAIN_NAME, get_settings
+from src.config import DOMAIN_NAME, DOMAIN_SCOPE, DOMAIN_TOPICS, get_settings
 from src.rag.generator import _cited_sources, generate_answer, stream_answer
 from src.rag.grader import grade_chunks
 from src.ingestion.manifest import corpus_earliest_point_in_time
@@ -30,7 +30,10 @@ from src.rag.temporal import is_out_of_range, today_iso, versions_in_force
 
 # Hard cap on retrieval retries — bounds the only cycle in the graph so
 # genuinely out-of-corpus questions still terminate instead of looping.
-MAX_RETRIES = 2
+# 1 lần thử lại, không phải 2: mỗi vòng grade->reformulate->retrieve tốn 2 lượt gọi
+# Gemini, mà free tier chặn theo phút và code chủ động NGỦ chờ quota — đo 2026-09-19:
+# 5 truy vấn liên tiếp, độ trễ leo 7.5s -> 80s, riêng một lượt grade mất 64.5s.
+MAX_RETRIES = 1
 
 # LangSmith tracing — optional; no-ops gracefully if langsmith not installed
 # or LANGCHAIN_TRACING_V2 is not set.
@@ -52,7 +55,9 @@ class AgentState(TypedDict):
     messages: Annotated[list, add_messages]
     query: str
     original_query: str
-    intent: Literal["simple_qa", "compare", "summarize", "report", "compliance_check", "unknown"]
+    intent: Literal[
+        "simple_qa", "compare", "summarize", "report", "compliance_check", "unknown", "smalltalk"
+    ]
     retrieved_chunks: list
     answer: str
     sources: list
@@ -89,6 +94,24 @@ def _get_llm():
         return llm.bind_tools(ALL_TOOLS)
 
     raise RuntimeError("No LLM API key configured. Set GOOGLE_API_KEY.")
+
+
+# Lời chào / lời cảm ơn đứng một mình: trả lời thẳng, KHÔNG tốn lượt gọi LLM nào.
+# Trước đây "chào b" vẫn chạy trọn pipeline RAG 13 bước (~55s) để cuối cùng nói
+# "không tìm thấy quy định" — vừa chậm vừa sai thông điệp.
+# Chỉ khớp khi cả câu là lời chào: "chào bạn, cho tôi hỏi thử việc..." không khớp
+# vì phần đuôi vượt quá giới hạn ký tự.
+_SMALLTALK_RE = re.compile(
+    r"^\s*(chao|chào|hi|hello|hey|alo|xin chào|xin chao|cảm ơn|cam on|thanks?|"
+    r"thank you|bye|tạm biệt|tam biet|ok|oke|okay)[\s\w]{0,12}[.!?]*\s*$",
+    re.IGNORECASE,
+)
+
+# Phạm vi lấy từ src/config.py — không viết lại chuỗi mô tả ở đây.
+_SMALLTALK_ANSWER = (
+    f"Chào bạn. Tôi tra cứu {DOMAIN_NAME} — {DOMAIN_SCOPE}.\n\n"
+    f"Bạn có thể hỏi về: {DOMAIN_TOPICS}."
+)
 
 
 _ROUTER_PROMPT = f"""Phân loại ý định câu hỏi sau vào MỘT trong các loại:
@@ -211,6 +234,18 @@ def router_node(state: AgentState) -> dict:
     t0 = time.time()
     settings = get_settings()
     query = state["query"]
+
+    if _SMALLTALK_RE.match(query):
+        return {
+            "intent": "smalltalk",
+            "answer": _SMALLTALK_ANSWER,
+            "sources": [],
+            "retrieved_chunks": [],
+            "used_llm": "none",
+            "steps": (state.get("steps") or []) + [
+                {"label": "Phân loại câu hỏi", "detail": "Chào hỏi — không cần tra cứu", "ms": 0}
+            ],
+        }
 
     keyword_intent = _keyword_classify(query)
     word_count = len(query.split())
@@ -714,6 +749,7 @@ def route_by_intent(state: AgentState) -> str:
         "report": "do_report",
         "compliance_check": "do_compliance",
         "unknown": "do_retrieve",
+        "smalltalk": "do_persist",   # đã có câu trả lời, không cần retrieval
     }
     return mapping.get(intent, "do_retrieve")
 

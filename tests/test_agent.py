@@ -213,10 +213,15 @@ class TestGradingRetryRouting:
         assert route_after_grade({"grade": "relevant", "retry_count": 0}) == "do_answer"
 
     def test_route_after_grade_irrelevant_retries(self):
-        from src.agent.graph import route_after_grade
+        from src.agent.graph import MAX_RETRIES, route_after_grade
 
+        # Bám MAX_RETRIES chứ không phải số cứng: điều cần giữ là "còn lượt thì thử
+        # lại", không phải "hằng số bằng 2" — nó đã đổi 2 -> 1 vì lý do rate limit.
         assert route_after_grade({"grade": "irrelevant", "retry_count": 0}) == "do_reformulate"
-        assert route_after_grade({"grade": "irrelevant", "retry_count": 1}) == "do_reformulate"
+        assert (
+            route_after_grade({"grade": "irrelevant", "retry_count": MAX_RETRIES - 1})
+            == "do_reformulate"
+        )
 
     def test_route_after_grade_exhausted_retries_gives_up(self):
         from src.agent.graph import MAX_RETRIES, route_after_grade
