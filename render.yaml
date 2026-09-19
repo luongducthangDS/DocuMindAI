@@ -50,11 +50,13 @@ services:
       # Khong dung 2.5-flash/2.5-flash-lite: Google da dong cho API key tao moi (404).
       - key: GEMINI_GENERATION_MODELS
         value: gemini-3.5-flash,gemini-3.1-flash-lite
-      # Bỏ comment 4 dòng dưới sau khi chạy scripts/migrate_chroma_to_qdrant.py
-      # để chuyển từ ChromaDB local (ephemeral disk) sang Qdrant Cloud (persistent):
-      # - key: VECTOR_STORE_PROVIDER
-      #   value: qdrant
-      # - key: QDRANT_URL
-      #   sync: false
-      # - key: QDRANT_API_KEY
-      #   sync: false
+      # Corpus nằm ở Qdrant Cloud (migrate 2026-09-19: 1149 chunks, 3072-dim,
+      # verify top-1 khớp ChromaDB nguồn). Disk Render ephemeral nên ChromaDB local
+      # trong container luôn rỗng — đừng quay lại provider chroma ở production.
+      # QDRANT_URL/QDRANT_API_KEY sync:false => điền tay ở dashboard.
+      - key: VECTOR_STORE_PROVIDER
+        value: qdrant
+      - key: QDRANT_URL
+        sync: false
+      - key: QDRANT_API_KEY
+        sync: false

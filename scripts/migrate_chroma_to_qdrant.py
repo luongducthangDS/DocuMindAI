@@ -40,7 +40,8 @@ def load_chroma_corpus():
     chroma_path = str((settings.data_dir / "chroma_db").resolve())
     client = chromadb.PersistentClient(path=chroma_path)
 
-    names = client.list_collections()
+    # ChromaDB >=0.6.0 trả list[str] (tên); bản cũ trả list object có .name
+    names = [c if isinstance(c, str) else c.name for c in client.list_collections()]
     if settings.chroma_collection not in names:
         raise RuntimeError(
             f"Collection '{settings.chroma_collection}' không tồn tại trong {chroma_path}. "
