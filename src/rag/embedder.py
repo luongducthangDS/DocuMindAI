@@ -318,6 +318,23 @@ def get_chroma_collection(*, verify: bool = True):
     return local_client, collection
 
 
+def get_async_qdrant_client():
+    """AsyncQdrantClient cho LlamaIndex.
+
+    QdrantVectorStore giữ client sync và async tách biệt: thiếu `aclient` thì mọi
+    lời gọi aretrieve() ném ValueError("Async client is not initialized!") — retriever
+    im lặng rơi xuống fallback, câu trả lời tụt chất lượng mà không báo lỗi.
+    """
+    from qdrant_client import AsyncQdrantClient
+
+    settings = get_settings()
+    if not settings.qdrant_url:
+        raise RuntimeError(
+            "VECTOR_STORE_PROVIDER=qdrant nhưng QDRANT_URL chưa được set trong .env"
+        )
+    return AsyncQdrantClient(url=settings.qdrant_url, api_key=settings.qdrant_api_key or None)
+
+
 def get_qdrant_client_and_collection() -> tuple:
     """
     Return (QdrantClient, collection_name). Creates the collection if it doesn't

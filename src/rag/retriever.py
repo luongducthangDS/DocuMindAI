@@ -86,7 +86,13 @@ def build_hybrid_retriever(
         similarity_top_k=top_k,   # keep full pool — reranker will filter to top_n
         num_queries=1,             # no query expansion at retriever level
         mode="reciprocal_rerank",
-        use_async=True,
+        # Sync: retrieve_node gọi đường đồng bộ, nhưng use_async=True vẫn đẩy các
+        # sub-retriever qua event loop dùng-một-lần. Với Qdrant điều đó nghĩa là
+        # "Async client is not initialized" (chưa có aclient) rồi "Event loop is
+        # closed" ở lượt sau — retriever im lặng rơi xuống fallback, câu trả lời
+        # tụt chất lượng mà không báo lỗi. num_queries=1 nên chạy song song cũng
+        # chẳng lợi gì: chỉ có dense + BM25, tuần tự là đủ.
+        use_async=False,
     )
 
     if rerank:

@@ -51,7 +51,13 @@ def make_llamaindex_vector_store(backend: Backend):
     if backend.provider == "qdrant":
         from llama_index.vector_stores.qdrant import QdrantVectorStore
 
-        return QdrantVectorStore(client=backend.client, collection_name=backend.collection)
+        from src.rag.embedder import get_async_qdrant_client
+
+        return QdrantVectorStore(
+            client=backend.client,
+            aclient=get_async_qdrant_client(),
+            collection_name=backend.collection,
+        )
 
     from llama_index.vector_stores.chroma import ChromaVectorStore
 
