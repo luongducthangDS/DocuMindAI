@@ -321,6 +321,48 @@ class TestClauseChunking:
         assert "Khoản này được sửa đổi, bổ sung theo quy định tại" not in joined
 
 
+@pytest.fixture(scope="module")
+def luat_bhxh_chunks(manifest):
+    """Chunks of Luật BHXH 2024 — amended in place but with no VBHN to index from."""
+    from scripts.ingest_documents import build_clause_chunks
+
+    return build_clause_chunks(manifest["41-2024-QH15"], CORPUS_DIR, "2026-09-19")
+
+
+class TestAmendedClauseWithoutVBHN:
+    """Điểm c khoản 2 Điều 53 Luật BHXH 2024, sửa bởi Luật Dân số 113/2025/QH15.
+
+    Mirror image of Bộ luật Lao động: no consolidated text exists, so the corpus
+    file holds the *old* wording and `_versions/` supplies the new one.
+    """
+
+    def test_both_versions_of_the_amended_clause_exist(self, luat_bhxh_chunks):
+        versions = {c.metadata["effective_from"] for c in luat_bhxh_chunks
+                    if c.metadata["clause_uid"] == "41-2024-QH15__d53_k2_pc"}
+        assert versions == {"2025-07-01", "2026-07-01"}
+
+    def test_corpus_text_is_the_superseded_version(self, luat_bhxh_chunks):
+        old = next(c.metadata for c in luat_bhxh_chunks
+                   if c.metadata["version_id"] == "41-2024-QH15__d53_k2_pc__v2025-07-01")
+        assert old["effective_to"] == "2026-07-01"
+        assert old["status"] == "superseded"
+        assert old["superseded_by"] == "41-2024-QH15__d53_k2_pc__v2026-07-01"
+
+    def test_new_version_is_in_force_and_open_ended(self, luat_bhxh_chunks):
+        new = next(c.metadata for c in luat_bhxh_chunks
+                   if c.metadata["version_id"] == "41-2024-QH15__d53_k2_pc__v2026-07-01")
+        assert new["status"] == "in_force"
+        assert new["effective_to"] == "9999-12-31"
+        assert new["superseded_by"] == ""
+        assert "113/2025/QH15" in new["amended_by_doc"]
+
+    def test_only_the_new_version_mentions_con_thu_hai(self, luat_bhxh_chunks):
+        texts = {c.metadata["effective_from"]: c.text for c in luat_bhxh_chunks
+                 if c.metadata["clause_uid"] == "41-2024-QH15__d53_k2_pc"}
+        assert "vợ sinh con thứ hai" in texts["2026-07-01"]
+        assert "vợ sinh con thứ hai" not in texts["2025-07-01"]
+
+
 class TestClauseStatus:
     def test_status_depends_on_as_of(self):
         from src.ingestion.chunker import clause_status

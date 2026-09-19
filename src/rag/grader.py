@@ -6,7 +6,7 @@ Two-tier grading, cheapest check first:
 1. Heuristic: best chunk score well above the generator's abstain threshold
    -> short-circuit "relevant", no LLM call.
 2. LLM-as-judge: score is ambiguous (near threshold) or reranker disabled
-   -> ask Groq/Gemini for a Yes/No + reason. Fails open (relevant=True) on
+   -> ask Gemini for a Yes/No + reason. Fails open (relevant=True) on
    any LLM error so a grader outage never blocks answering.
 """
 
@@ -81,43 +81,13 @@ def _call_judge_llm(query: str, chunks: list[RetrievedChunk]) -> dict | None:
     prompt = _JUDGE_PROMPT.format(query=query, excerpts=excerpts)
     settings = get_settings()
 
-    if settings.groq_api_key:
-        try:
-            from src.rag.generator import _get_groq_client
-
-            client = _get_groq_client()
-            resp = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.0,
-                max_tokens=120,
-            )
-            parsed = _parse_judge_response(resp.choices[0].message.content)
-            if parsed is not None:
-                return parsed
-        except Exception as exc:
-            logger.warning("Grader Groq judge failed: {}", exc)
-
     try:
-        import google.generativeai as genai
+        from src.rag.generator import gemini_generate
 
-        from src.rag.generator import _gemini_keys
-
-        keys = _gemini_keys()
-        if not keys:
-            return None
         models = [m.strip() for m in settings.gemini_judge_models.split(",") if m.strip()]
-        for model_name in models:
-            for api_key in keys:
-                try:
-                    genai.configure(api_key=api_key)
-                    response = genai.GenerativeModel(model_name).generate_content(prompt)
-                    parsed = _parse_judge_response(response.text)
-                    if parsed is not None:
-                        return parsed
-                except Exception as exc:
-                    logger.debug("Grader Gemini judge {} failed: {}", model_name, str(exc)[:100])
-                    continue
+        parsed = _parse_judge_response(gemini_generate(prompt, models=models))
+        if parsed is not None:
+            return parsed
     except Exception as exc:
         logger.warning("Grader Gemini judge unavailable: {}", exc)
 

@@ -131,7 +131,7 @@ def _init_rag_sync() -> None:
 
     embedder = get_embedder()
     LlamaSettings.embed_model = embedder
-    LlamaSettings.llm = None  # We call LLM directly via Groq SDK
+    LlamaSettings.llm = None  # We call Gemini directly, not through LlamaIndex
 
     backend = get_backend()
     collection_name = backend.collection.name if backend.provider == "chroma" else backend.collection

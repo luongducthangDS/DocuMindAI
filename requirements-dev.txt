@@ -1,0 +1,11 @@
+# Deps chỉ dùng cho test + eval — KHÔNG cài vào image production
+# (ragas kéo theo langchain-openai/openai, datasets kéo pyarrow: ~vài trăm MB,
+#  và pin openai của ragas từng làm pip resolver fail lúc build Render).
+-r requirements.txt
+
+ragas==0.1.21
+datasets>=2.14.0
+
+pytest==8.3.3
+pytest-asyncio==0.24.0
+pytest-cov==5.0.0

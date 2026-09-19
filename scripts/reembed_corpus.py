@@ -21,6 +21,7 @@ Chạy:
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import sys
 import time
@@ -117,15 +118,39 @@ def main() -> None:
         )
         logger.info("Đã sao lưu collection cũ → {} ({} chunks)", backup_name, len(old["ids"]))
 
-    t0 = time.time()
-    vectors: list[list[float]] = []
-    for start in range(0, len(keep), args.batch_size):
-        batch = keep[start:start + args.batch_size]
-        vectors.extend(embedder.get_text_embedding_batch([d for _, d, _ in batch]))
-        done = min(start + args.batch_size, len(keep))
-        if done % 160 == 0 or done == len(keep):
-            logger.info("Embed {}/{} chunks ({:.0f}s)", done, len(keep), time.time() - t0)
+    # Checkpoint: API embedding có trần quota theo ngày, corpus lớn hơn hạn mức một
+    # ngày thì không lần chạy nào đi hết được. Không có checkpoint thì mỗi lần hỏng
+    # là đốt lại toàn bộ quota mà không tiến thêm chunk nào — vòng lặp không lối ra.
+    ckpt_path = Path(settings.data_dir) / f"reembed_checkpoint_{_slug(target_model)}.json"
+    cache: dict[str, list[float]] = {}
+    if ckpt_path.exists():
+        cache = json.loads(ckpt_path.read_text(encoding="utf-8"))
+        logger.info("Checkpoint: đã có sẵn {}/{} vector từ lần chạy trước", len(cache), len(keep))
 
+    def _save_checkpoint() -> None:
+        ckpt_path.parent.mkdir(parents=True, exist_ok=True)
+        ckpt_path.write_text(json.dumps(cache), encoding="utf-8")
+
+    t0 = time.time()
+    todo = [c for c in keep if c[0] not in cache]
+    try:
+        for start in range(0, len(todo), args.batch_size):
+            batch = todo[start:start + args.batch_size]
+            got = embedder.get_text_embedding_batch([d for _, d, _ in batch])
+            for (cid, _, _), vec in zip(batch, got):
+                cache[cid] = vec
+            _save_checkpoint()
+            done = min(start + args.batch_size, len(todo))
+            if done % 100 == 0 or done == len(todo):
+                logger.info("Embed {}/{} chunks con lai ({:.0f}s)", done, len(todo), time.time() - t0)
+    except (KeyboardInterrupt, Exception) as exc:
+        _save_checkpoint()
+        raise SystemExit(
+            f"Dung o {len(cache)}/{len(keep)} chunk: {type(exc).__name__}. "
+            f"Vector da embed duoc giu tai {ckpt_path} — chay lai lenh nay de di tiep."
+        ) from exc
+
+    vectors = [cache[cid] for cid, _, _ in keep]
     if len(vectors) != len(keep):
         raise SystemExit(f"Số vector ({len(vectors)}) không khớp số chunk ({len(keep)}) — huỷ, không ghi.")
     if len(vectors[0]) != dim:
@@ -151,6 +176,7 @@ def main() -> None:
             embeddings=vectors[start:start + 256],
         )
 
+    ckpt_path.unlink(missing_ok=True)  # ghi xong thì checkpoint hết việc
     logger.info(
         "Xong: {} chunks, {} chiều, {:.0f}s — collection đã gắn nhãn {}",
         new_collection.count(), dim, time.time() - t0, target_model,

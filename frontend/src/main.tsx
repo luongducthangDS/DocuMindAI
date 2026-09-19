@@ -668,7 +668,7 @@ function App() {
                         <div className="msg-meta">
                           {msg.used_llm && msg.used_llm !== "none" && (
                             <span className="llm-badge">
-                              {msg.used_llm === "groq" ? "Llama 3.3 70B" : msg.used_llm === "gemini" ? "Gemini" : msg.used_llm === "extractive_fallback" ? "Trích xuất trực tiếp" : msg.used_llm}
+                              {msg.used_llm === "gemini" ? "Gemini" : msg.used_llm === "extractive_fallback" ? "Trích xuất trực tiếp" : msg.used_llm}
                             </span>
                           )}
                           {msg.latency_ms && (

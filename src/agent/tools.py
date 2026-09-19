@@ -76,23 +76,12 @@ async def summarize_document(
     context = "\n\n".join(r.get("text", "") for r in results)
     focus_note = f" Tập trung vào: {focus}." if focus else ""
 
-    from src.rag.generator import _get_groq_client, _SYSTEM_PROMPT
+    from src.rag.generator import _SYSTEM_PROMPT, gemini_generate
 
     try:
-        client = _get_groq_client()
-        resp = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": _SYSTEM_PROMPT},
-                {
-                    "role": "user",
-                    "content": f"Tóm tắt văn bản sau.{focus_note}\n\n{context}",
-                },
-            ],
-            temperature=0.1,
-            max_tokens=512,
+        return gemini_generate(
+            f"{_SYSTEM_PROMPT}\n\nTóm tắt văn bản sau.{focus_note}\n\n{context}"
         )
-        return resp.choices[0].message.content
     except Exception as exc:
         logger.error("summarize_document LLM call failed: {}", exc)
         return f"Lỗi khi tóm tắt: {exc}"
@@ -118,7 +107,7 @@ async def compare_documents(
     if not ctx_a and not ctx_b:
         return "Không tìm thấy nội dung để so sánh."
 
-    from src.rag.generator import _get_groq_client, _SYSTEM_PROMPT
+    from src.rag.generator import _SYSTEM_PROMPT, gemini_generate
 
     prompt = (
         f"So sánh {doc_a} và {doc_b} về khía cạnh: {aspect}\n\n"
@@ -128,17 +117,7 @@ async def compare_documents(
     )
 
     try:
-        client = _get_groq_client()
-        resp = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": _SYSTEM_PROMPT},
-                {"role": "user", "content": prompt},
-            ],
-            temperature=0.1,
-            max_tokens=768,
-        )
-        return resp.choices[0].message.content
+        return gemini_generate(f"{_SYSTEM_PROMPT}\n\n{prompt}")
     except Exception as exc:
         logger.error("compare_documents failed: {}", exc)
         return f"Lỗi khi so sánh: {exc}"

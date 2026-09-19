@@ -176,6 +176,11 @@ def _split_amended_dieu(
                 dieu_tieu_de=dieu_tieu_de,
             )
         else:
+            # With a VBHN the file already carries the amended wording, so this
+            # chunk *is* the new version. Without one the file is still the old
+            # wording — it ends where the amendment starts, and the new text
+            # comes from `version_moi` (see versions.build_version_chunks).
+            corpus_text_is_old = amendment.corpus_text_is_superseded
             version = _version_meta(
                 doc_meta,
                 clause_uid=amendment.clause_uid,
@@ -183,9 +188,17 @@ def _split_amended_dieu(
                 dieu_tieu_de=dieu_tieu_de or amendment.dieu_tieu_de,
                 khoan=amendment.khoan if amendment.khoan is not None else "",
                 diem=amendment.diem,
-                effective_from=amendment.effective_from,
+                effective_from="" if corpus_text_is_old else amendment.effective_from,
                 amended_by_doc=amendment.amended_by_doc,
             )
+            if corpus_text_is_old:
+                version["effective_to"] = amendment.effective_from
+                version["status"] = clause_status(
+                    version["effective_from"],
+                    amendment.effective_from,
+                    doc_meta.get("as_of") or date.today().isoformat(),
+                )
+                version["superseded_by"] = f"{amendment.clause_uid}__v{amendment.effective_from}"
         meta = {**_legacy_meta(doc_meta, dieu_text), **version, "char_count": len(text)}
         chunks.append(LegalChunk(text=text, metadata=meta))
     return chunks

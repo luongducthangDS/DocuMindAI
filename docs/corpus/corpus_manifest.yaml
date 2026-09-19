@@ -210,6 +210,20 @@ documents:
         hieu_luc_tu: "2026-07-01"
         pham_vi: "Điều 29 khoản 2: sửa điểm c khoản 2 Điều 53 Luật BHXH 2024 — lao động NAM khi vợ sinh đôi hoặc sinh con thứ 2 được nghỉ 10 ngày làm việc; sinh ba trở lên +3 ngày/con tính từ con thứ 3. Ghi nhận qua T4 (BLLĐ), không thuộc phạm vi in-place BLLĐ nhưng cùng luật sửa."
         verify: "VERIFIED (T4, đọc trực tiếp datafiles.chinhphu.vn/cpp/files/vbpq/2026/01/luat113-2025.pdf trang 13-14, Điều 29 khoản 2)"
+    # 2026-09-19: bản MÁY ĐỌC của sửa đổi trên. Luật BHXH 2024 KHÔNG có VBHN, nên
+    # 41-2024-QH15.md giữ nguyên bản gốc (= bản CŨ của khoản này) và bản MỚI nằm ở
+    # `version_moi` — ngược chiều với BLLĐ (text chính là VBHN, bản cũ ở `version_cu`).
+    # Đó là ý nghĩa của loai_sua: "sua_doi_khong_co_vbhn".
+    sua_doi_in_place:
+      - clause_uid: "41-2024-QH15__d53_k2_pc"
+        dieu: 53
+        khoan: 2
+        diem: "c"
+        dieu_tieu_de: "Thời gian nghỉ việc hưởng chế độ thai sản khi sinh con"
+        effective_from: "2026-07-01"
+        amended_by_doc: "113/2025/QH15"
+        loai_sua: "sua_doi_khong_co_vbhn"
+        version_moi: "_versions/41-2024-QH15__d53_k2_pc__2026-07-01.md"
     ghi_chu: "Điểm mới demoable: giảm năm đóng tối thiểu hưởng lương hưu 20 -> 15 năm; trợ cấp hưu trí xã hội; siết BHXH một lần. Bản thân Luật BHXH 2024 KHÔNG sửa BLLĐ (xem 45-2019-QH14.sua_doi_boi), nhưng CHÍNH Luật BHXH 2024 bị 113/2025/QH15 sửa 1 điểm (Điều 53 k2 điểm c, nghỉ của lao động nam) — xem sua_doi_boi trên."
 
   - doc_id: "158-2025-ND-CP"

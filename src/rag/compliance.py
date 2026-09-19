@@ -127,26 +127,16 @@ def match_criteria(situation: str, criteria: list[dict]) -> dict | None:
 
 
 def _extract_value_via_llm(situation: str, condition: dict) -> float | None:
-    settings = get_settings()
-    if not settings.groq_api_key:
-        return None
     try:
-        from src.rag.generator import _get_groq_client
+        from src.rag.generator import gemini_generate
 
-        client = _get_groq_client()
         prompt = (
             f"Trích xuất giá trị số liên quan đến '{condition.get('field')}' "
             f"({condition.get('unit', '')}) từ câu sau. Chỉ trả về một số duy nhất, "
             "không giải thích, không kèm chữ nào khác. Nếu không có số nào liên quan, "
             f"trả về đúng chữ 'none'.\n\nCâu: {situation}"
         )
-        resp = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.0,
-            max_tokens=20,
-        )
-        raw = (resp.choices[0].message.content or "").strip()
+        raw = (gemini_generate(prompt) or "").strip()
         if raw.lower() == "none":
             return None
         match = _ANY_NUMBER_RE.search(raw)

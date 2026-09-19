@@ -1,6 +1,11 @@
 """
 A/B harness: đo tác động của model embedding lên retrieval, giữ mọi thứ khác cố định.
 
+LƯU Ý (2026-09-19): script này nạp model bằng sentence-transformers nên chỉ so được
+các model CHẠY LOCAL. Dự án đã chuyển hẳn sang `gemini-embedding-001` qua API, nên
+nó là công cụ lịch sử — muốn A/B model API thì phải viết arm gọi qua
+`src.rag.embedder.get_embedder()`.
+
 Biến duy nhất thay đổi giữa các arm là model embedding. Chunking, corpus, BM25,
 reranker, gold set — tất cả giữ nguyên:
   • Chunk text + metadata đọc thẳng từ collection ChromaDB đang chạy (không re-chunk,

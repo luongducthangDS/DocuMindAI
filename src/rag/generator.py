@@ -1,6 +1,6 @@
 """
 LLM generation with mandatory citations.
-Primary: Groq Llama-3.3-70B | Fallback: Gemini 2.0 Flash Lite
+Nhà cung cấp duy nhất: Gemini (xoay vòng key × model, xem _call_gemini).
 """
 
 from __future__ import annotations
@@ -177,26 +177,18 @@ def _build_extractive_answer(query: str, chunks: list[RetrievedChunk]) -> str:
     return "\n".join(lines).strip()
 
 
-def _get_groq_client():
-    from groq import Groq
-
-    settings = get_settings()
-    if not settings.groq_api_key:
-        raise RuntimeError("GROQ_API_KEY not set")
-    return Groq(api_key=settings.groq_api_key)
-
-
 def _gemini_keys() -> list[str]:
     s = get_settings()
     return [k for k in (s.google_api_key, s.google_api_key_2, s.google_api_key_3) if k]
 
 
-def _gemini_pairs() -> list[tuple[str, str]]:
+def _gemini_pairs(models: list[str] | None = None) -> list[tuple[str, str]]:
     """(api_key, model) pairs, model-major: try all 3 keys for a model before
     moving on. Spreads generation load across keys + models so we don't exhaust
     one key's daily RPD (the old bug — generation only ever hit key #1)."""
     s = get_settings()
-    models = [m.strip() for m in s.gemini_generation_models.split(",") if m.strip()]
+    if models is None:
+        models = [m.strip() for m in s.gemini_generation_models.split(",") if m.strip()]
     keys = _gemini_keys()
     return [(k, m) for m in models for k in keys]
 
@@ -207,40 +199,16 @@ def _gemini_pairs() -> list[tuple[str, str]]:
 _GEMINI_PAIR_CURSOR = 0
 
 
-def _call_groq(prompt: str, context: str, history: list[dict] | None = None) -> str | None:
-    client = _get_groq_client()
-    messages = [{"role": "system", "content": _SYSTEM_PROMPT}]
-    if history:
-        messages.extend(history)
-    messages.append({"role": "user", "content": f"**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {prompt}"})
-    try:
-        response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=messages,
-            temperature=0.0,
-            max_tokens=1536,
-        )
-        return response.choices[0].message.content
-    except Exception as exc:
-        logger.error("Groq API error (type={}, detail={})", type(exc).__name__, str(exc)[:300])
-        raise
+def gemini_generate(prompt: str, models: list[str] | None = None) -> str:
+    """Sinh văn bản qua Gemini, xoay vòng (key, model) cho tới khi một cặp trả lời.
 
-
-def _call_gemini(prompt: str, context: str, history: list[dict] | None = None) -> str | None:
-    """Rotate across (key, model) pairs until one succeeds — spreads load over all
-    3 API keys and the configured models to dodge per-key/per-model daily limits."""
+    Điểm vào DUY NHẤT cho mọi nơi cần LLM (generator, grader, compliance, agent)
+    kể từ khi Gemini là nhà cung cấp duy nhất — một cursor chung giữ cho các lần
+    gọi liên tiếp không dồn hết vào cặp đầu tiên.
+    """
     import google.generativeai as genai
 
-    history_block = ""
-    if history:
-        lines = [f"{'Người dùng' if m['role'] == 'user' else 'Trợ lý'}: {m['content'][:500]}"
-                 for m in history]
-        history_block = "\n**Lịch sử hội thoại:**\n" + "\n".join(lines) + "\n\n"
-    full_prompt = (
-        f"{_SYSTEM_PROMPT}\n\n{history_block}**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {prompt}"
-    )
-
-    pairs = _gemini_pairs()
+    pairs = _gemini_pairs(models)
     if not pairs:
         raise RuntimeError("No GOOGLE_API_KEY configured for Gemini generation")
 
@@ -252,7 +220,7 @@ def _call_gemini(prompt: str, context: str, history: list[dict] | None = None) -
         api_key, model_name = pairs[(start + offset) % n]
         try:
             genai.configure(api_key=api_key)
-            response = genai.GenerativeModel(model_name).generate_content(full_prompt)
+            response = genai.GenerativeModel(model_name).generate_content(prompt)
             if response.text:
                 # Advance cursor so the NEXT call starts at the following pair —
                 # round-robin keeps any single (key, model) under its RPM limit.
@@ -266,54 +234,34 @@ def _call_gemini(prompt: str, context: str, history: list[dict] | None = None) -
                 last_exc = exc
                 continue
             raise  # non-quota error — propagate immediately
-    raise last_exc  # all pairs exhausted
-
-
-def _call_openai_compat(prompt: str, context: str, history: list[dict] | None = None) -> str | None:
-    """Backup cuối cùng trước extractive: gọi endpoint tương thích OpenAI.
-
-    Kích hoạt khi có OPENAI_API_KEY. OPENAI_API_BASE trống → OpenAI thật;
-    hoặc trỏ tới vLLM / OpenRouter / Together / bất kỳ endpoint OpenAI-compatible.
-    """
-    settings = get_settings()
-    if not settings.openai_api_key:
-        raise RuntimeError("OPENAI_API_KEY not set")
-
-    from openai import OpenAI
-
-    client_kwargs: dict = {"api_key": settings.openai_api_key}
-    if settings.openai_api_base:
-        client_kwargs["base_url"] = settings.openai_api_base
-    client = OpenAI(**client_kwargs)
-
-    messages = [{"role": "system", "content": _SYSTEM_PROMPT}]
-    if history:
-        messages.extend(history)
-    messages.append(
-        {"role": "user", "content": f"**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {prompt}"}
+    # Mọi cặp im lặng (response.text rỗng) thì last_exc vẫn None — `raise None`
+    # sẽ ném TypeError che mất nguyên nhân thật.
+    raise last_exc or RuntimeError(
+        f"Gemini: cả {n} cặp (key, model) đều không trả về nội dung"
     )
-    try:
-        response = client.chat.completions.create(
-            model=settings.openai_model,
-            messages=messages,
-            temperature=0.0,
-            max_tokens=1536,
-        )
-        return response.choices[0].message.content
-    except Exception as exc:
-        logger.error("OpenAI-compat API error (type={}, detail={})", type(exc).__name__, str(exc)[:300])
-        raise
+
+
+def _call_gemini(prompt: str, context: str, history: list[dict] | None = None) -> str | None:
+    """Câu trả lời có trích dẫn cho một câu hỏi, qua vòng xoay của gemini_generate."""
+    history_block = ""
+    if history:
+        lines = [f"{'Người dùng' if m['role'] == 'user' else 'Trợ lý'}: {m['content'][:500]}"
+                 for m in history]
+        history_block = "\n**Lịch sử hội thoại:**\n" + "\n".join(lines) + "\n\n"
+    return gemini_generate(
+        f"{_SYSTEM_PROMPT}\n\n{history_block}**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {prompt}"
+    )
 
 
 @_traceable(
     name="rag-generate-answer",
     run_type="llm",
-    tags=["groq", "gemini", "openai-compat", "legal-qa", "citations"],
+    tags=["gemini", "legal-qa", "citations"],
 )
 def generate_answer(
     query: str,
     chunks: list[RetrievedChunk],
-    use_fallback: bool = False,
+    use_fallback: bool = False,   # giữ cho call site cũ; chỉ còn một nhà cung cấp
     history: list[dict] | None = None,
     min_score: float | None = None,
     as_of_date: str | None = None,
@@ -326,7 +274,7 @@ def generate_answer(
 
     Decorated with @traceable: each call appears in LangSmith as a child span
     of the parent 'documind-agent' run, showing the prompt, LLM response, and
-    which provider was used (Groq primary / Gemini fallback).
+    which (key, model) pair of Gemini answered.
     """
     if time_out_of_range:
         # Answering a date the corpus never covered would mean presenting later
@@ -378,36 +326,18 @@ def generate_answer(
 
     context, citation_list = _build_context(chunks)
     context = _as_of_block(as_of_date) + context
-    prefer_gemini = get_settings().generator_provider.lower() == "gemini"
-    used_llm = "gemini" if prefer_gemini else "groq"
-    answer = None
 
-    # Skip Groq entirely when provider=gemini (e.g. Groq daily TPD exhausted).
-    if not use_fallback and not prefer_gemini:
-        try:
-            answer = _call_groq(query, context, history=history)
-            logger.info("Groq answered query ({} chars)", len(answer or ""))
-        except Exception as exc:
-            logger.warning("Groq failed, switching to Gemini: {}", exc)
-            used_llm = "gemini_fallback"
-
-    if answer is None:
-        try:
-            answer = _call_gemini(query, context, history=history)
-            used_llm = "gemini"
-            logger.info("Gemini answered query ({} chars)", len(answer or ""))
-        except Exception as exc:
-            logger.warning("Gemini failed, trying OpenAI-compatible backup: {}", exc)
-
-    if answer is None:
-        try:
-            answer = _call_openai_compat(query, context, history=history)
-            used_llm = "openai_compat_fallback"
-            logger.info("OpenAI-compat answered query ({} chars)", len(answer or ""))
-        except Exception as exc:
-            logger.error("All LLM providers failed: {}", exc)
-            answer = _build_extractive_answer(query, chunks)
-            used_llm = "extractive_fallback"
+    # Gemini là nhà cung cấp DUY NHẤT (2026-09-19). Chịu lỗi nằm ở vòng xoay
+    # (key × model) bên trong _call_gemini; hết mọi cặp thì rơi về trích dẫn
+    # nguyên văn, không gọi nhà cung cấp nào khác.
+    try:
+        answer = _call_gemini(query, context, history=history)
+        used_llm = "gemini"
+        logger.info("Gemini answered query ({} chars)", len(answer or ""))
+    except Exception as exc:
+        logger.error("Gemini failed on every (key, model) pair: {}", exc)
+        answer = _build_extractive_answer(query, chunks)
+        used_llm = "extractive_fallback"
 
     return {
         "answer": answer,
@@ -422,8 +352,8 @@ async def stream_answer(
     chunks: list[RetrievedChunk],
 ) -> AsyncIterator[str]:
     """
-    Stream tokens from Groq (primary) with Gemini fallback.
-    Yields text chunks for WebSocket/SSE streaming.
+    Stream tokens from Gemini, rotating over (key, model) pairs like the
+    non-streaming path. Yields text chunks for WebSocket/SSE streaming.
     """
     if not chunks:
         yield "Tôi không tìm thấy văn bản pháp luật liên quan đến câu hỏi này."
@@ -446,35 +376,39 @@ async def stream_answer(
     chunks = relevant_chunks
 
     context, citation_list = _build_context(chunks)
-    settings = get_settings()
 
-    if not settings.groq_api_key:
+    pairs = _gemini_pairs()
+    if not pairs:
         yield _build_extractive_answer(query, chunks)
         return
 
-    try:
-        from groq import Groq
+    import google.generativeai as genai
 
-        client = Groq(api_key=settings.groq_api_key)
-        stream = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": _SYSTEM_PROMPT},
-                {"role": "user", "content": f"**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {query}"},
-            ],
-            temperature=0.0,  # match non-streaming path for consistent output
-            max_tokens=1536,
-            stream=True,
-        )
+    full_prompt = (
+        f"{_SYSTEM_PROMPT}\n\n**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {query}"
+    )
+    # Cùng vòng xoay (key, model) như đường không streaming; chỉ đổi cặp khi lỗi
+    # xảy ra TRƯỚC token đầu tiên — đổi giữa chừng thì client đã nhận nửa câu trả
+    # lời của cặp trước, nối tiếp bằng cặp khác sẽ ra văn bản chắp vá.
+    for api_key, model_name in pairs:
+        streamed = False
+        try:
+            genai.configure(api_key=api_key)
+            stream = genai.GenerativeModel(model_name).generate_content(
+                full_prompt, stream=True
+            )
+            for chunk in stream:
+                if chunk.text:
+                    streamed = True
+                    yield chunk.text
+                    await asyncio.sleep(0)  # yield control to event loop
+            if streamed:
+                return
+        except Exception as exc:
+            logger.warning("Gemini stream {} (key…{}) failed: {}",
+                           model_name, api_key[-4:], str(exc)[:150])
+            if streamed:
+                return  # nửa câu trả lời đã ra — không nối thêm từ cặp khác
 
-        for chunk in stream:
-            delta = chunk.choices[0].delta.content
-            if delta:
-                yield delta
-                await asyncio.sleep(0)  # yield control to event loop
-
-    except Exception as exc:
-        logger.error("Streaming failed: {}", exc)
-        # Fallback to non-streaming Gemini
-        result = generate_answer(query, chunks, use_fallback=True)
-        yield result["answer"]
+    logger.error("Gemini streaming failed on every (key, model) pair")
+    yield _build_extractive_answer(query, chunks)

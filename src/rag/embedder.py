@@ -14,9 +14,15 @@ Lệch model ⇒ báo lỗi to và dừng, vì kết quả retrieval khi đó l�
   2. python scripts/reembed_corpus.py --yes     (re-embed tại chỗ, giữ nguyên chunk)
   3. pytest -q && python eval/temporal_eval.py  (xác nhận không vỡ)
 
-A/B trên gold set lao động 28 câu, 1146 chunks (reports/embedding_ab.json, 2026-09-16):
+Nhà cung cấp DUY NHẤT là Gemini Embedding API (2026-09-19) — không còn nhánh
+model local (sentence-transformers) lẫn HF Inference API. Reranker thì vẫn chạy
+local, xem src/rag/retriever.py.
+
+A/B lịch sử trên gold set lao động 28 câu, 1146 chunks (reports/embedding_ab.json,
+2026-09-16), đo khi còn chạy model local:
   paraphrase-multilingual-MiniLM-L12-v2 (384d) → final@8 = 0.821
   AITeamVN/Vietnamese_Embedding        (1024d) → final@8 = 1.000
+Chưa đo lại cho gemini-embedding-001.
 """
 
 from __future__ import annotations
@@ -24,7 +30,7 @@ from __future__ import annotations
 import time
 from collections import deque
 from functools import lru_cache
-from typing import TYPE_CHECKING, List
+from typing import List
 
 from loguru import logger
 from llama_index.core.embeddings import BaseEmbedding
@@ -32,10 +38,6 @@ from pydantic import PrivateAttr
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from src.config import get_settings
-from src.hf_env import HF_CACHE_DIR, use_local_hf_cache
-
-if TYPE_CHECKING:
-    from huggingface_hub import InferenceClient
 
 # Khoá metadata ghi kèm collection để biết vector trong đó sinh từ model nào.
 STORE_META_MODEL = "embedding_model"
@@ -51,48 +53,6 @@ class EmbeddingModelMismatch(RuntimeError):
     """
 
 
-class _HFInferenceAPIEmbedding(BaseEmbedding):
-    """LlamaIndex embedder that calls HuggingFace's Inference API instead of loading
-    the model in-process. Same model, same 384-dim pooled vectors (verified to match
-    the local SentenceTransformer output byte-for-byte via cosine similarity) — used
-    so torch/transformers/model weights (~700MB combined) never load into RAM on
-    memory-constrained hosts like Render's free 512MB tier. Importing this class
-    does NOT import llama_index.embeddings.huggingface (torch-based), only
-    llama_index.core (no torch dependency).
-    """
-
-    _client: "InferenceClient" = PrivateAttr()
-
-    def __init__(self, model_name: str, hf_token: str, **kwargs):
-        super().__init__(model_name=model_name, **kwargs)
-        from huggingface_hub import InferenceClient
-
-        self._client = InferenceClient(token=hf_token or None)
-
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=20))
-    def _embed_batch(self, texts: List[str]) -> List[List[float]]:
-        result = self._client.feature_extraction(texts, model=self.model_name)
-        return result.tolist() if hasattr(result, "tolist") else result
-
-    def _get_query_embedding(self, query: str) -> List[float]:
-        return self._embed_batch([query])[0]
-
-    def _get_text_embedding(self, text: str) -> List[float]:
-        return self._embed_batch([text])[0]
-
-    def _get_text_embeddings(self, texts: List[str]) -> List[List[float]]:
-        return self._embed_batch(texts)
-
-    async def _aget_query_embedding(self, query: str) -> List[float]:
-        return self._get_query_embedding(query)
-
-    async def _aget_text_embedding(self, text: str) -> List[float]:
-        return self._get_text_embedding(text)
-
-    async def _aget_text_embeddings(self, texts: List[str]) -> List[List[float]]:
-        return self._get_text_embeddings(texts)
-
-
 # Free tier Gemini Embedding chặn ở HAI trần cùng lúc, đo thực tế 2026-09-18:
 #   - số CONTENT, không phải số HTTP request (5 request × 20 content = 100 rồi 429),
 #     nên gộp batch to không giảm mức tiêu thụ, chỉ giảm số lần đi mạng;
@@ -104,12 +64,14 @@ _GEMINI_CONTENTS_PER_MIN = 90
 _GEMINI_TOKENS_PER_MIN = 20_000
 # Tiếng Việt có dấu tốn token hơn tiếng Anh; 3 ký tự/token là ước lượng thận trọng.
 _CHARS_PER_TOKEN = 3
+# Chờ lâu hơn mức này nghĩa là quota NGÀY đã hết — báo lỗi thay vì ngủ tiếp.
+_MAX_QUOTA_WAIT = 300
 
 
 class _GeminiAPIEmbedding(BaseEmbedding):
     """Embedder gọi Gemini Embedding API thay vì nạp model vào RAM.
 
-    Khác _HFInferenceAPIEmbedding ở một điểm không được quên: Gemini sinh vector
+    Một điểm không được quên: Gemini sinh vector
     KHÁC NHAU cho cùng một chuỗi tuỳ task_type — retrieval_document lúc index,
     retrieval_query lúc hỏi. Dùng lẫn hai loại vẫn chạy, vẫn xếp hạng được, chỉ là
     kém đi âm thầm; nên hai đường text/query ở dưới tách bạch có chủ đích.
@@ -117,7 +79,8 @@ class _GeminiAPIEmbedding(BaseEmbedding):
 
     _keys: List[str] = PrivateAttr()
     _sent: List[deque] = PrivateAttr()  # mỗi key một bucket (timestamp, tokens) đã gửi
-    _exhausted: set = PrivateAttr()  # key đã cạn quota NGÀY, bỏ khỏi vòng xoay
+    _cooldown: dict = PrivateAttr()  # key -> thời điểm được dùng lại sau khi dính 429
+    _strikes: dict = PrivateAttr()   # key -> số lần 429 liên tiếp
 
     def __init__(self, model_name: str, api_keys: List[str], **kwargs):
         # 50 là mức đã đo được với chunk thật của corpus (~900 ký tự/chunk): 100
@@ -126,10 +89,11 @@ class _GeminiAPIEmbedding(BaseEmbedding):
         super().__init__(model_name=model_name, **kwargs)
         keys = [k for k in api_keys if k]
         if not keys:
-            raise ValueError("EMBEDDING_PROVIDER=gemini cần GOOGLE_API_KEY trong .env")
+            raise ValueError("Embedding qua Gemini cần GOOGLE_API_KEY trong .env")
         self._keys = keys
         self._sent = [deque() for _ in keys]
-        self._exhausted = set()
+        self._cooldown = {}
+        self._strikes = {}
 
     def _reserve_key(self, texts: List[str]) -> str:
         """Chọn key còn chỗ trong phút cho lô sắp gửi, chờ nếu mọi key đều đầy.
@@ -145,9 +109,11 @@ class _GeminiAPIEmbedding(BaseEmbedding):
         per_text = tokens // max(len(texts), 1)
         while True:
             now = time.monotonic()
-            waits = []
+            minute_waits = []   # chạm trần phút — chờ vài chục giây là qua
+            cooldowns = []      # đang bị phạt sau 429
             for key, bucket in zip(self._keys, self._sent):
-                if key in self._exhausted:
+                if self._cooldown.get(key, 0.0) > now:
+                    cooldowns.append(self._cooldown[key] - now)
                     continue
                 while bucket and now - bucket[0][0] >= 60:
                     bucket.popleft()
@@ -157,38 +123,61 @@ class _GeminiAPIEmbedding(BaseEmbedding):
                 ):
                     bucket.extend((now, per_text) for _ in texts)
                     return key
-                waits.append(60 - (now - bucket[0][0]) + 1)
-            if not waits:
+                minute_waits.append(60 - (now - bucket[0][0]) + 1)
+            waits = minute_waits + cooldowns
+            # Không key nào chỉ chờ trần phút, và cooldown ngắn nhất cũng dài hơn
+            # _MAX_QUOTA_WAIT → đã cạn quota NGÀY. Ngủ tiếp là treo tiến trình cả
+            # tiếng mà log không nói vì sao; báo lỗi để người chạy quyết định.
+            if not waits or (not minute_waits and min(cooldowns) > _MAX_QUOTA_WAIT):
                 raise RuntimeError(
-                    f"Cả {len(self._keys)} key Gemini đều cạn quota NGÀY (1000 embed/project). "
+                    f"Cả {len(self._keys)} key Gemini đều cạn quota (mỗi project 1000 embed/ngày). "
                     "Thêm key ở project khác vào GOOGLE_API_KEY_2/_3, bật billing, hoặc chờ quota reset."
                 )
-            logger.info("Gemini embed: cả {} key còn dùng được đều chạm trần phút, chờ {:.0f}s ({} content / ~{} token)",
-                        len(self._keys) - len(self._exhausted), min(waits), len(texts), tokens)
+            logger.info("Gemini embed: mọi key đều đang chờ quota, chờ {:.0f}s ({} content / ~{} token)",
+                        min(waits), len(texts), tokens)
             time.sleep(min(waits))
 
-    # Lưới an toàn cho 429 còn lọt qua throttle (đồng hồ lệch, quota dùng chung nơi khác).
+    # Lưới an toàn cho 429 còn lọt qua cả vòng xoay key (trần phút của mọi key).
     @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=2, min=15, max=70))
     def _embed(self, texts: List[str], task_type: str) -> List[List[float]]:
+        """Thử lần lượt từng key khả dụng trước khi chịu thua.
+
+        Đổi key là việc tức thì, còn backoff của tenacity chờ hàng chục giây; để
+        tenacity lo việc xoay key thì một tiến trình mới (bucket rỗng, chưa biết key
+        nào đã cạn) đốt sạch lượt retry chỉ để đi qua các key chết.
+        """
+        last_exc: Exception | None = None
+        for _ in range(len(self._keys)):
+            key = self._reserve_key(texts)
+            try:
+                return self._call_api(key, texts, task_type)
+            except Exception as exc:  # noqa: BLE001 — phân loại ngay bên dưới
+                if not ("429" in str(exc) or "quota" in str(exc).lower()):
+                    raise
+                last_exc = exc
+                strikes = self._strikes.get(key, 0) + 1
+                self._strikes[key] = strikes
+                # Cạn quota NGÀY thì mọi lần thử lại đều hỏng; sau 3 lần liên tiếp
+                # coi như hết ngày và cho nghỉ dài, khỏi phí lượt của các key khác.
+                self._cooldown[key] = time.monotonic() + (3600 if strikes >= 3 else 65)
+                logger.warning("Key Gemini ...{} dính 429 (lần {}), nghỉ {}s",
+                               key[-6:], strikes, 3600 if strikes >= 3 else 65)
+        raise last_exc  # type: ignore[misc]
+
+    def _call_api(self, key: str, texts: List[str], task_type: str) -> List[List[float]]:
         import google.generativeai as genai
 
-        key = self._reserve_key(texts)
         genai.configure(api_key=key)
         name = self.model_name if self.model_name.startswith("models/") else f"models/{self.model_name}"
         # API từ chối chuỗi rỗng; get_embedding_dim() lại dò chiều bằng đúng chuỗi đó.
         payload = [t if t.strip() else " " for t in texts]
-        try:
-            result = genai.embed_content(model=name, content=payload, task_type=task_type)
-        except Exception as exc:
-            # Trần NGÀY (limit 1000/project) không chờ vài giây là hết; giữ key này
-            # trong vòng xoay chỉ khiến mọi lần retry sau đó rơi lại đúng vào nó.
-            if "limit: 1000" in str(exc):
-                self._exhausted.add(key)
-                logger.warning("Key Gemini ...{} cạn quota ngày, chuyển sang key còn lại", key[-6:])
-            raise
+        result = genai.embed_content(model=name, content=payload, task_type=task_type)
+        self._strikes[key] = 0
         emb = result["embedding"]
         return emb if isinstance(emb[0], list) else [emb]
 
+    # task_type tách bạch có chủ đích: Gemini sinh vector KHÁC NHAU cho cùng một
+    # chuỗi tuỳ retrieval_query (lúc hỏi) hay retrieval_document (lúc index).
     def _get_query_embedding(self, query: str) -> List[float]:
         return self._embed([query], "retrieval_query")[0]
 
@@ -210,53 +199,17 @@ class _GeminiAPIEmbedding(BaseEmbedding):
 
 @lru_cache(maxsize=1)
 def get_embedder() -> "BaseEmbedding":
-    """
-    Returns a cached LlamaIndex-compatible embedder.
+    """Embedder duy nhat cua du an: Gemini Embedding API.
 
-    embedding_provider="local" (default): loads the model in-process via
-    sentence-transformers/torch — offline, fast, ~700MB RAM.
-    embedding_provider="hf_api": calls HuggingFace's Inference API instead —
-    no local model load, for RAM-constrained hosts (see _HFInferenceAPIEmbedding).
+    Khong nap model nao vao RAM — khong con nhanh local (sentence-transformers)
+    lan HF Inference API (2026-09-19, quyet dinh cua Ted). Reranker van chay
+    local, xem src/rag/retriever.py.
     """
     settings = get_settings()
     model_name = settings.embedding_model
-
-    if settings.embedding_provider == "gemini":
-        logger.info("Using Gemini Embedding API (no local model load): {}", model_name)
-        keys = [settings.google_api_key, settings.google_api_key_2, settings.google_api_key_3]
-        return _GeminiAPIEmbedding(model_name=model_name, api_keys=keys)
-
-    if settings.embedding_provider == "hf_api":
-        logger.info("Using HF Inference API for embeddings (no local model load): {}", model_name)
-        return _HFInferenceAPIEmbedding(model_name=model_name, hf_token=settings.hf_token)
-
-    logger.info("Loading embedding model: {}", model_name)
-
-    # low_cpu_mem_usage: load weights tensor-by-tensor instead of all at once,
-    # halving peak RAM.  Critical on machines with limited pagefile (Windows).
-    _model_kwargs = {"low_cpu_mem_usage": True}
-
-    # Truyền cache_folder TƯỜNG MINH thay vì trông vào biến môi trường:
-    # huggingface_hub đọc HF_HOME/HF_HUB_CACHE đúng một lần lúc import và đóng băng
-    # giá trị đó. Module này import llama_index (kéo theo huggingface_hub) ở đầu file,
-    # nên mọi thao tác os.environ bên trong hàm đều đã muộn — cache vẫn trỏ về
-    # HF_HOME của máy (G:\, thường offline) và model nằm sẵn trong repo bị coi như
-    # không tồn tại. Tham số thì không có vấn đề thời điểm đó.
-    cache_folder = str(HF_CACHE_DIR) if HF_CACHE_DIR.exists() else None
-    if cache_folder:
-        use_local_hf_cache(offline=True)  # cho các thư viện đọc env muộn (sentence_transformers)
-
-    from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-
-    embedder = HuggingFaceEmbedding(
-        model_name=model_name,
-        max_length=512,
-        trust_remote_code=False,  # security: never trust remote code by default
-        cache_folder=cache_folder,
-        model_kwargs=_model_kwargs,
-    )
-    logger.info("Embedder ready: {} (cache: {})", model_name, cache_folder or "mặc định HF")
-    return embedder
+    logger.info("Using Gemini Embedding API (no local model load): {}", model_name)
+    keys = [settings.google_api_key, settings.google_api_key_2, settings.google_api_key_3]
+    return _GeminiAPIEmbedding(model_name=model_name, api_keys=keys)
 
 
 @lru_cache(maxsize=1)

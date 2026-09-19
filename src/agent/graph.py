@@ -78,16 +78,6 @@ def _get_llm():
     """Return a LangChain-compatible LLM bound with tools."""
     settings = get_settings()
 
-    if settings.groq_api_key:
-        from langchain_groq import ChatGroq
-
-        llm = ChatGroq(
-            model="llama-3.3-70b-versatile",
-            api_key=settings.groq_api_key,
-            temperature=0.1,
-        )
-        return llm.bind_tools(ALL_TOOLS)
-
     if settings.google_api_key:
         from langchain_google_genai import ChatGoogleGenerativeAI
 
@@ -98,7 +88,7 @@ def _get_llm():
         )
         return llm.bind_tools(ALL_TOOLS)
 
-    raise RuntimeError("No LLM API key configured. Set GROQ_API_KEY or GOOGLE_API_KEY.")
+    raise RuntimeError("No LLM API key configured. Set GOOGLE_API_KEY.")
 
 
 _ROUTER_PROMPT = f"""Phân loại ý định câu hỏi sau vào MỘT trong các loại:
@@ -153,31 +143,12 @@ def _build_history_from_messages(state: AgentState) -> list[dict]:
 
 def _contextualize_query(query: str, history: list[dict]) -> str:
     """Rewrite a context-dependent follow-up into a standalone question.
-    Tries Groq first, then Gemini (mirroring generate_answer's Groq→Gemini
-    chain) — a Groq-only outage must not silently disable contextualization,
-    since that's exactly the failure mode this node exists to fix. Falls
-    back to the original query unchanged only if both providers fail."""
-    settings = get_settings()
+
+    Falls back to the original query unchanged when Gemini is unavailable."""
     history_block = "\n".join(
         f"{'Người dùng' if m['role'] == 'user' else 'Trợ lý'}: {m['content'][:300]}" for m in history
     )
     prompt = _CONTEXTUALIZE_PROMPT.format(history_block=history_block, query=query)
-
-    if settings.groq_api_key:
-        try:
-            from groq import Groq
-            client = Groq(api_key=settings.groq_api_key)
-            resp = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.0,
-                max_tokens=150,
-            )
-            rewritten = (resp.choices[0].message.content or "").strip().strip('"')
-            if rewritten:
-                return rewritten
-        except Exception as exc:
-            logger.warning("contextualize_node Groq failed, trying Gemini: {}", exc)
 
     try:
         import google.generativeai as genai
@@ -188,11 +159,11 @@ def _contextualize_query(query: str, history: list[dict]) -> str:
         # for every follow-up turn — unlike generate_answer (the terminal step,
         # where a long fallback chain is an acceptable cost), stalling here
         # delays everything downstream. Cap attempts instead of exhausting all
-        # (key, model) pairs (up to 9 with 3 keys × 3 models) so a bad-provider
+        # (key, model) pairs (up to 9 with 3 keys x 3 models) so a bad-provider
         # day adds bounded latency, not a multi-call pileup, before giving up
         # and returning the original query.
-        _MAX_GEMINI_FALLBACK_ATTEMPTS = 3
-        for api_key, model_name in _gemini_pairs()[:_MAX_GEMINI_FALLBACK_ATTEMPTS]:
+        _MAX_GEMINI_ATTEMPTS = 3
+        for api_key, model_name in _gemini_pairs()[:_MAX_GEMINI_ATTEMPTS]:
             try:
                 genai.configure(api_key=api_key)
                 response = genai.GenerativeModel(model_name).generate_content(prompt)
@@ -203,9 +174,9 @@ def _contextualize_query(query: str, history: list[dict]) -> str:
                 logger.debug("contextualize_node Gemini {} failed: {}", model_name, str(exc)[:100])
                 continue
     except Exception as exc:
-        logger.warning("contextualize_node Gemini fallback unavailable: {}", exc)
+        logger.warning("contextualize_node Gemini unavailable: {}", exc)
 
-    logger.warning("contextualize_node: both Groq and Gemini failed, using original query")
+    logger.warning("contextualize_node: Gemini failed, using original query")
     return query
 
 
@@ -248,19 +219,12 @@ def router_node(state: AgentState) -> dict:
         intent = keyword_intent
     else:
         try:
-            if settings.groq_api_key:
-                from groq import Groq
-                client = Groq(api_key=settings.groq_api_key)
-                resp = client.chat.completions.create(
-                    model="llama-3.3-70b-versatile",
-                    messages=[
-                        {"role": "system", "content": _ROUTER_PROMPT},
-                        {"role": "user", "content": query},
-                    ],
-                    temperature=0,
-                    max_tokens=10,
-                )
-                intent_raw = resp.choices[0].message.content.strip().lower()
+            if settings.google_api_key:
+                from src.rag.generator import gemini_generate
+
+                intent_raw = gemini_generate(
+                    f"{_ROUTER_PROMPT}\n\nCâu hỏi: {query}"
+                ).strip().lower()
             else:
                 intent_raw = keyword_intent
         except Exception as exc:
@@ -454,18 +418,12 @@ def reformulate_node(state: AgentState) -> dict:
 
     new_query = None
     try:
-        if settings.groq_api_key:
-            from groq import Groq
-            client = Groq(api_key=settings.groq_api_key)
-            resp = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[{"role": "user", "content": _REFORMULATE_PROMPT.format(
-                    query=query, tried="; ".join(tried),
-                )}],
-                temperature=0.0,
-                max_tokens=100,
-            )
-            candidate = (resp.choices[0].message.content or "").strip().strip('"')
+        if settings.google_api_key:
+            from src.rag.generator import gemini_generate
+
+            candidate = (gemini_generate(_REFORMULATE_PROMPT.format(
+                query=query, tried="; ".join(tried),
+            )) or "").strip().strip('"')
             if candidate and candidate not in tried:
                 new_query = candidate
     except Exception as exc:
@@ -500,7 +458,8 @@ def answer_node(state: AgentState) -> dict:
     )
     latency = int((time.time() - t0) * 1000)
 
-    llm_label = {"groq": "Llama 3.3 70B", "gemini": "Gemini", "none": "Không cần LLM"}.get(
+    llm_label = {"gemini": "Gemini", "extractive_fallback": "Trích nguyên văn (không LLM)",
+                 "none": "Không cần LLM"}.get(
         result["used_llm"], result["used_llm"]
     )
     steps = state.get("steps") or []

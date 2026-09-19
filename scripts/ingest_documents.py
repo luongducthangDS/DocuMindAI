@@ -37,7 +37,8 @@ import sys
 from datetime import date
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+_repo_root = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(_repo_root))
 
 from src.hf_env import use_local_hf_cache
 
@@ -47,10 +48,9 @@ use_local_hf_cache(offline=False, create=True)
 
 import chromadb
 from loguru import logger
-from sentence_transformers import SentenceTransformer
 
 from src.config import get_settings
-from src.rag.embedder import STORE_META_DIM, STORE_META_MODEL
+from src.rag.embedder import STORE_META_DIM, STORE_META_MODEL, get_embedder, get_embedding_dim
 from src.ingestion.chunker import LegalChunk, chunk_by_dieu
 from src.ingestion.cleaner import strip_consolidated_footnotes, strip_consolidated_quotations
 from src.ingestion.manifest import DocEntry, load_manifest
@@ -237,9 +237,13 @@ def main() -> None:
         except Exception:
             pass
 
+    # Dùng chung embedder với đường truy vấn (src.rag.embedder) — trước đây script
+    # tự dựng SentenceTransformer, nên khi EMBEDDING_MODEL trỏ tới model API
+    # (gemini-embedding-001) nó đi tải "sentence-transformers/gemini-embedding-001"
+    # trên HuggingFace và chết với 401.
     model_name = settings.embedding_model
-    model = SentenceTransformer(model_name)
-    logger.info("Model loaded: {}", model_name)
+    embedder = get_embedder()
+    embedding_dim = get_embedding_dim()
 
     collection = client.get_or_create_collection(
         name=settings.chroma_collection,
@@ -247,7 +251,7 @@ def main() -> None:
             "hnsw:space": "cosine",
             # Nhãn để lần mở store sau đối chiếu được với EMBEDDING_MODEL đang cấu hình.
             STORE_META_MODEL: model_name,
-            STORE_META_DIM: model.get_sentence_embedding_dimension(),
+            STORE_META_DIM: embedding_dim,
         },
     )
 
@@ -260,7 +264,7 @@ def main() -> None:
         nonlocal ids, docs, metas, total
         if not docs:
             return
-        embeddings = model.encode(docs, batch_size=8, normalize_embeddings=True).tolist()
+        embeddings = embedder.get_text_embedding_batch(docs)
         collection.upsert(ids=ids, documents=docs, metadatas=metas, embeddings=embeddings)
         total += len(docs)
         logger.info("Indexed {} chunks so far", total)

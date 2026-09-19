@@ -56,12 +56,12 @@ class TestLongTermMemory:
             query="Điều kiện thành lập công ty?",
             answer_snippet="Cần ít nhất 2 thành viên",
             latency_ms=250,
-            used_llm="groq",
+            used_llm="gemini",
         )
 
         rows = self._fetch_query_log(mem, "s1")
         assert len(rows) == 1
-        assert rows[0]["used_llm"] == "groq"
+        assert rows[0]["used_llm"] == "gemini"
         assert rows[0]["latency_ms"] == 250
 
     def test_long_query_is_truncated(self, tmp_path):
@@ -69,7 +69,7 @@ class TestLongTermMemory:
         mem = LongTermMemory(db_path=db)
 
         very_long_query = "A" * 1000
-        mem.log_query("s1", very_long_query, "short answer", 100, "groq")
+        mem.log_query("s1", very_long_query, "short answer", 100, "gemini")
 
         rows = self._fetch_query_log(mem, "s1")
         assert len(rows[0]["query"]) <= 500
@@ -79,7 +79,7 @@ class TestLongTermMemory:
         mem = LongTermMemory(db_path=db)
         malicious = "'; DROP TABLE query_log; --"
         # Should not raise, logs to query_log with parameterized query
-        mem.log_query("s1", malicious, "answer", 100, "groq")
+        mem.log_query("s1", malicious, "answer", 100, "gemini")
         rows = self._fetch_query_log(mem, "s1")
         assert isinstance(rows, list) and len(rows) == 1
 
@@ -163,7 +163,7 @@ class TestContextualizeNode:
 
     def test_rewrite_llm_failure_falls_back_to_original(self, monkeypatch):
         from src.config import get_settings
-        for key in ("GROQ_API_KEY", "GOOGLE_API_KEY", "GOOGLE_API_KEY_2", "GOOGLE_API_KEY_3"):
+        for key in ("GOOGLE_API_KEY", "GOOGLE_API_KEY_2", "GOOGLE_API_KEY_3"):
             monkeypatch.setenv(key, "")
         get_settings.cache_clear()
 
@@ -173,11 +173,9 @@ class TestContextualizeNode:
         assert result == "câu hỏi gốc"
         get_settings.cache_clear()
 
-    def test_rewrite_falls_back_to_gemini_when_groq_fails(self, monkeypatch):
-        """Groq raising must not short-circuit to the original query — Gemini
-        should get a chance first, matching generate_answer's fallback chain."""
+    def test_rewrite_uses_gemini(self, monkeypatch):
+        """Gemini là nhà cung cấp duy nhất — phải được gọi trước khi trả lại câu gốc."""
         from src.config import get_settings
-        monkeypatch.setenv("GROQ_API_KEY", "fake-groq-key")
         monkeypatch.setenv("GOOGLE_API_KEY", "fake-google-key")
         monkeypatch.setenv("GOOGLE_API_KEY_2", "")
         monkeypatch.setenv("GOOGLE_API_KEY_3", "")
@@ -185,14 +183,10 @@ class TestContextualizeNode:
 
         from src.agent.graph import _contextualize_query
 
-        mock_groq_client = MagicMock()
-        mock_groq_client.chat.completions.create.side_effect = RuntimeError("groq down")
-
         mock_gemini_response = MagicMock()
         mock_gemini_response.text = "câu hỏi đã viết lại bởi Gemini"
 
-        with patch("groq.Groq", return_value=mock_groq_client), \
-             patch("google.generativeai.configure"), \
+        with patch("google.generativeai.configure"), \
              patch("google.generativeai.GenerativeModel") as mock_model_cls:
             mock_model_cls.return_value.generate_content.return_value = mock_gemini_response
             result = _contextualize_query("câu hỏi gốc", [{"role": "user", "content": "gì đó"}])
@@ -249,9 +243,10 @@ class TestGradeNode:
 
 
 class TestReformulateNode:
-    def test_reformulate_node_cheap_fallback_no_groq_key(self, monkeypatch):
+    def test_reformulate_node_cheap_fallback_without_api_key(self, monkeypatch):
         from src.config import get_settings
-        monkeypatch.setenv("GROQ_API_KEY", "")
+        for key in ("GOOGLE_API_KEY", "GOOGLE_API_KEY_2", "GOOGLE_API_KEY_3"):
+            monkeypatch.setenv(key, "")
         get_settings.cache_clear()
 
         from src.agent.graph import reformulate_node
@@ -268,12 +263,8 @@ class TestReformulateNode:
     def test_reformulate_node_uses_llm_when_available(self):
         from src.agent.graph import reformulate_node
 
-        mock_resp = MagicMock()
-        mock_resp.choices[0].message.content = "Điều kiện dự thi khi vắng mặt"
-        mock_client = MagicMock()
-        mock_client.chat.completions.create.return_value = mock_resp
-
-        with patch("groq.Groq", return_value=mock_client):
+        with patch("src.rag.generator.gemini_generate",
+                   return_value="Điều kiện dự thi khi vắng mặt"):
             state = {"query": "Sinh viên nghỉ học có được thi không", "tried_queries": ["Sinh viên nghỉ học có được thi không"], "steps": []}
             result = reformulate_node(state)
 
@@ -301,7 +292,6 @@ class TestRetryLoopIntegration:
                  }), \
                  patch("src.agent.graph.get_settings") as mock_settings, \
                  patch("src.agent.memory.LongTermMemory.log_query"):
-                mock_settings.return_value.groq_api_key = ""
                 initial_state = {
                     "messages": [], "query": "câu hỏi mơ hồ", "original_query": "câu hỏi mơ hồ",
                     "intent": "simple_qa", "retrieved_chunks": [], "answer": "", "sources": [],
@@ -334,10 +324,9 @@ class TestRetryLoopIntegration:
                  patch("src.agent.graph._cheap_reformulate", return_value="câu hỏi khác"), \
                  patch("src.agent.graph.get_settings") as mock_settings, \
                  patch("src.agent.graph.generate_answer", return_value={
-                     "answer": "Trả lời [1]", "sources": [{"index": 1}], "used_llm": "groq", "chunk_count": 1,
+                     "answer": "Trả lời [1]", "sources": [{"index": 1}], "used_llm": "gemini", "chunk_count": 1,
                  }), \
                  patch("src.agent.memory.LongTermMemory.log_query"):
-                mock_settings.return_value.groq_api_key = ""
                 initial_state = {
                     "messages": [], "query": "câu hỏi ban đầu", "original_query": "câu hỏi ban đầu",
                     "intent": "simple_qa", "retrieved_chunks": [], "answer": "", "sources": [],

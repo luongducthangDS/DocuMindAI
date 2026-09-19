@@ -94,7 +94,6 @@ class TestExtractSituationValue:
         from src.config import get_settings
         from src.rag.compliance import extract_situation_value
 
-        monkeypatch.setenv("GROQ_API_KEY", "")
         get_settings.cache_clear()
         condition = {"field": "thời gian thử việc", "unit": "ngày"}
         assert extract_situation_value("Thử việc như vậy có hợp lệ không?", condition) is None
@@ -203,7 +202,6 @@ class TestCheckCompliance:
         from src.config import get_settings
         from src.rag.compliance import check_compliance
 
-        monkeypatch.setenv("GROQ_API_KEY", "")
         get_settings.cache_clear()
         result = check_compliance("Công ty cho nghỉ phép năm như vậy có đúng không?")
         assert result["matched"] is True

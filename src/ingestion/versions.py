@@ -17,7 +17,7 @@ from pathlib import Path
 from loguru import logger
 
 from src.ingestion.chunker import LegalChunk, clause_status
-from src.ingestion.manifest import DocEntry
+from src.ingestion.manifest import EFFECTIVE_TO_OPEN, DocEntry
 
 _FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
 
@@ -55,16 +55,24 @@ def build_version_chunks(
     for amendment in entry.in_place_amended_clauses:
         if not amendment.has_old_version:
             continue  # newly inserted clause — nothing existed before
-        if not amendment.version_cu:
+
+        # Which side of the amendment this file holds depends on the document:
+        # with a VBHN the corpus text is already the new wording and `_versions/`
+        # supplies the old one; without a VBHN it is the other way round.
+        corpus_text_is_old = amendment.corpus_text_is_superseded
+        version_file = amendment.version_moi if corpus_text_is_old else amendment.version_cu
+        if not version_file:
             logger.warning(
-                "No superseded text configured for {} — point-in-time before {} "
-                "will fall back to the current wording",
+                "No {} text configured for {} — point-in-time {} {} "
+                "will fall back to the wording in the corpus file",
+                "amended" if corpus_text_is_old else "superseded",
                 amendment.clause_uid,
+                "from" if corpus_text_is_old else "before",
                 amendment.effective_from,
             )
             continue
 
-        path = corpus_dir / amendment.version_cu
+        path = corpus_dir / version_file
         if not path.exists():
             logger.error("Missing version file {} for {}", path, amendment.clause_uid)
             continue
@@ -74,9 +82,14 @@ def build_version_chunks(
             logger.error("Empty version file {}", path)
             continue
 
-        effective_from = meta.get("effective_from") or entry.ngay_hieu_luc
-        effective_to = meta.get("effective_to") or amendment.effective_from
-        new_version_id = f"{amendment.clause_uid}__v{amendment.effective_from}"
+        if corpus_text_is_old:
+            effective_from = meta.get("effective_from") or amendment.effective_from
+            effective_to = meta.get("effective_to") or EFFECTIVE_TO_OPEN
+            new_version_id = ""  # this *is* the newest version — nothing supersedes it
+        else:
+            effective_from = meta.get("effective_from") or entry.ngay_hieu_luc
+            effective_to = meta.get("effective_to") or amendment.effective_from
+            new_version_id = f"{amendment.clause_uid}__v{amendment.effective_from}"
 
         chunks.append(
             LegalChunk(

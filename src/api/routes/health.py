@@ -106,11 +106,9 @@ async def _check_chroma() -> ServiceStatus:
 
 def _check_llm() -> ServiceStatus:
     settings = get_settings()
-    if settings.groq_api_key:
-        return ServiceStatus(name="llm_groq", healthy=True, detail="API key configured")
     if settings.google_api_key:
         return ServiceStatus(name="llm_gemini", healthy=True, detail="API key configured")
-    return ServiceStatus(name="llm", healthy=False, detail="No LLM API key configured")
+    return ServiceStatus(name="llm", healthy=False, detail="GOOGLE_API_KEY chưa cấu hình")
 
 
 def _check_sqlite() -> ServiceStatus:

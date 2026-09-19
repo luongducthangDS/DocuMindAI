@@ -1,7 +1,7 @@
 # DocuMind AI ⚖️
 
-> **Agentic RAG & Automated Compliance Platform for Vietnamese Labour & Social-Insurance Law**  
-> *Production-Grade AI Portfolio Project — Senior / Staff AI Engineer Showcase*
+> **Nền tảng RAG tác tử & kiểm tra tuân thủ tự động cho pháp luật lao động và bảo hiểm xã hội Việt Nam**  
+> *Dự án portfolio AI mức production — hồ sơ năng lực Senior / Staff AI Engineer*
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB.svg?logo=python&logoColor=white)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
@@ -14,125 +14,125 @@
 
 ---
 
-## 🌟 Executive Overview
+## 🌟 Tổng quan
 
-**DocuMind AI** answers questions about Vietnamese **labour and social-insurance law** — the Labour Code, the Social Insurance Law, the Employment Law and the decrees and circulars that implement them. It gives clause-level cited answers, refuses questions outside the indexed corpus, and deterministically audits concrete workplace situations (overtime caps, probation terms, minimum wage) against the statutory thresholds.
+**DocuMind AI** trả lời câu hỏi về **pháp luật lao động và bảo hiểm xã hội Việt Nam** — Bộ luật Lao động, Luật Bảo hiểm xã hội, Luật Việc làm cùng các nghị định, thông tư hướng dẫn. Hệ thống trả lời kèm trích dẫn tới từng điều khoản, từ chối câu hỏi nằm ngoài kho tài liệu đã nạp, và kiểm tra tình huống lao động cụ thể (trần làm thêm giờ, thời gian thử việc, lương tối thiểu) đối chiếu với ngưỡng luật định bằng logic tất định.
 
-The corpus is **20 documents / 1,146 chunks**, indexed down to `Điều`/`Khoản` with validity dates, so the same question can be asked *as of* a given date and answered from the version in force then — several of these documents have been amended (minimum wage, the 2024 Social Insurance Law, the 2025 Employment Law).
+Kho tài liệu gồm **20 văn bản / 1.146 chunk**, đánh chỉ mục tới cấp `Điều`/`Khoản` kèm mốc hiệu lực, nên cùng một câu hỏi có thể tra *tại một thời điểm* cho trước và được trả lời theo bản còn hiệu lực khi đó — nhiều văn bản trong số này đã bị sửa đổi, thay thế (lương tối thiểu, Luật BHXH 2024, Luật Việc làm 2025).
 
-### Key Capabilities
+### Năng lực chính
 
-1. **State-Machine Agentic Workflow (LangGraph)**:
-   - Dynamic intent routing (`simple_qa`, `compare`, `summarize`, `compliance_check`).
-   - Deterministic multi-turn state preservation and session memory.
-2. **Dual-Pass Hybrid Retrieval & Neural Reranking**:
-   - **Sparse Retrieval**: Okapi BM25 for exact statutory term matching (e.g., *"Điều 14 Thông tư 18/2024"*).
-   - **Dense Retrieval**: `AITeamVN/Vietnamese_Embedding` (1024-dim) for semantic paraphrase understanding.
-   - **Fusion & Reranking**: Reciprocal Rank Fusion (RRF) pool (top-20) re-scored by cross-encoder (`BAAI/bge-reranker-v2-m3`) to select the top-8 highest-precision chunks.
-3. **Automated Statutory Compliance Engine (`compliance_check`)**:
-   - Hybrid regex and LLM parameter extraction for quantifiable audit thresholds.
-   - Verifiable pass/fail evaluations against curated statutory thresholds:
-     - **Overtime cap**: $\le 200$ h/year and $\le 40$ h/month (Điều 107, Labour Code 45/2019/QH14).
-     - **Probation period**: $\le 60$ days for roles requiring a college degree or above (Điều 25).
-     - **Probation pay**: $\ge 85\%$ of the job's wage (Điều 26).
-     - **Annual leave**: $\ge 12$ working days under normal conditions (Điều 113).
-     - **Region I minimum wage**: $\ge 5,310,000$ VNĐ/month (Điều 3, Decree 293/2025/NĐ-CP).
-4. **Resilient Multi-LLM Routing**:
-   - **Primary**: Ultra-low latency Groq LLaMA-3.3-70B Versatile (~300 tokens/sec).
-   - **Automatic Failover**: Google Gemini Flash Lite when rate limits, quotas, or timeouts occur.
-5. **Strict Grounding & Hallucination Prevention**:
-   - Compulsory inline statutory citations `[N]` referencing Article, Circular number, and issuing institution.
-   - Confident abstention: automatic domain boundary check and refusal when queries lack documentary support.
-6. **Modern Full-Stack Experience**:
-   - Reactive Dark-Mode React/Vite interface featuring WebSocket streaming, interactive citation drawers, compliance testing sandbox, and document explorer.
+1. **Luồng tác tử dạng máy trạng thái (LangGraph)**:
+   - Định tuyến ý định động (`simple_qa`, `compare`, `summarize`, `compliance_check`).
+   - Giữ trạng thái nhiều lượt hội thoại một cách tất định, có bộ nhớ phiên.
+2. **Truy hồi lai hai pha + rerank bằng mạng nơ-ron**:
+   - **Truy hồi thưa (sparse)**: Okapi BM25 để khớp chính xác thuật ngữ luật (ví dụ *"Điều 14 Thông tư 18/2024"*).
+   - **Truy hồi dày (dense)**: `gemini-embedding-001` (3072 chiều, gọi qua API — không nạp model vào RAM) để hiểu câu hỏi diễn đạt lại theo ngữ nghĩa.
+   - **Hợp nhất & rerank**: gộp bằng Reciprocal Rank Fusion (RRF) lấy top-20, chấm điểm lại bằng cross-encoder (`BAAI/bge-reranker-v2-m3`) để chọn top-8 chunk có độ chính xác cao nhất.
+3. **Bộ kiểm tra tuân thủ tự động (`compliance_check`)**:
+   - Trích tham số bằng regex kết hợp LLM cho các ngưỡng kiểm tra định lượng.
+   - Kết luận đạt/không đạt có thể kiểm chứng, đối chiếu ngưỡng luật định đã được tuyển chọn thủ công:
+     - **Trần làm thêm giờ**: $\le 200$ giờ/năm và $\le 40$ giờ/tháng (Điều 107, Bộ luật Lao động 45/2019/QH14).
+     - **Thời gian thử việc**: $\le 60$ ngày với công việc cần trình độ cao đẳng trở lên (Điều 25).
+     - **Lương thử việc**: $\ge 85\%$ mức lương của công việc đó (Điều 26).
+     - **Nghỉ hằng năm**: $\ge 12$ ngày làm việc trong điều kiện bình thường (Điều 113).
+     - **Lương tối thiểu vùng I**: $\ge 5.310.000$ VNĐ/tháng (Điều 3, Nghị định 293/2025/NĐ-CP).
+4. **Một nhà cung cấp LLM, chịu lỗi bằng vòng xoay khoá**:
+   - **Gemini** lo cả embedding lẫn sinh câu trả lời — không còn nhà cung cấp nào khác.
+   - Mỗi lời gọi xoay vòng qua các cặp (API key × model); hết mọi cặp thì trả lời bằng cách trích nguyên văn nguồn đã truy hồi, không bịa.
+5. **Bám nguồn nghiêm ngặt, chống bịa đặt**:
+   - Bắt buộc trích dẫn nội dòng `[N]` chỉ rõ điều, số hiệu văn bản và cơ quan ban hành.
+   - Từ chối có cơ sở: tự kiểm tra ranh giới phạm vi và từ chối khi câu hỏi không có tài liệu chống lưng.
+6. **Trải nghiệm full-stack hiện đại**:
+   - Giao diện React/Vite nền tối, có streaming qua WebSocket, ngăn trích dẫn tương tác, khu thử nghiệm kiểm tra tuân thủ và trình duyệt tài liệu.
 
 ---
 
-## 🏛️ System Architecture
+## 🏛️ Kiến trúc hệ thống
 
-### 1. Request Pipeline
+### 1. Đường đi của một request
 
 ```
-User Query (HTTP / WebSocket)
+Câu hỏi người dùng (HTTP / WebSocket)
      │
      ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  [1] FastAPI Gateway                                                    │
-│      Rate limiting (10 req/min) · CORS allowlist · GZip compression     │
+│  [1] Cổng FastAPI                                                       │
+│      Giới hạn 10 request/phút · CORS allowlist · nén GZip               │
 └────────────────────────────────────┬────────────────────────────────────┘
                                      │
                                      ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  [2] LangGraph Intent Router Node                                       │
-│      LLM Classification (temp=0) → simple_qa │ compare │ summarize      │
-│                                    │ compliance_check                  │
+│  [2] Node định tuyến ý định (LangGraph)                                 │
+│      LLM phân loại (temp=0) → simple_qa │ compare │ summarize           │
+│                                         │ compliance_check              │
 └────────────────────────────────────┬────────────────────────────────────┘
                                      │
          ┌───────────────────────────┴───────────────────────────┐
          ▼                                                       ▼
 ┌───────────────────────────────────┐   ┌─────────────────────────────────┐
-│  [3A] Hybrid Retrieval Pipeline   │   │  [3B] Compliance Engine         │
-│  ┌──────────────┐ ┌─────────────┐ │   │  • Regex/LLM parameter extract  │
-│  │ Okapi BM25   │ │ Dense Vector│ │   │  • Threshold condition evaluate │
-│  │ (Exact Lexical)│ (VN-Embed) │ │   │    (e.g., OT <= 200h/năm)       │
-│  └──────┬───────┘ └──────┬──────┘ │   │  • Verified statutory citation  │
-│         └─────── RRF ────┘        │   │    (pass / fail / missing data) │
-│            Pool: top-20           │   └────────────────┬────────────────┘
-│                 │                 │                    │
+│  [3A] Pipeline truy hồi lai       │   │  [3B] Bộ kiểm tra tuân thủ      │
+│  ┌───────────────┐ ┌────────────┐ │   │  • Trích tham số regex/LLM      │
+│  │ Okapi BM25    │ │ Vector dày │ │   │  • Đối chiếu ngưỡng luật định   │
+│  │ (khớp từ khoá)│ │ (VN-Embed) │ │   │    (vd: làm thêm <= 200h/năm)   │
+│  └──────┬────────┘ └─────┬──────┘ │   │  • Trích dẫn đã được kiểm chứng │
+│         └─────── RRF ────┘        │   │    (đạt / không đạt / thiếu dữ  │
+│         Nhóm ứng viên: top-20     │   │     liệu)                       │
+│                 │                 │   └────────────────┬────────────────┘
 │                 ▼                 │                    │
 │  ┌──────────────────────────────┐ │                    │
-│  │ Cross-Encoder Neural Rerank  │ │                    │
+│  │ Rerank bằng cross-encoder    │ │                    │
 │  │ BAAI/bge-reranker-v2-m3      │ │                    │
-│  │ Select: top-8 high-precision │ │                    │
+│  │ Chọn: top-8 chính xác nhất   │ │                    │
 │  └──────────────┬───────────────┘ │                    │
 └─────────────────┼─────────────────┘                    │
                   ▼                                      │
 ┌──────────────────────────────────────────────────┐     │
-│  [4] Generator Node + Citation Verification      │     │
-│      Primary: Groq LLaMA-3.3-70B (~300 tok/s)    │     │
-│      Fallback: Gemini 2.0 Flash Lite (auto)      │     │
-│      Grounding prompt: mandatory [N] citation    │     │
+│  [4] Node sinh câu trả lời + kiểm trích dẫn      │     │
+│      Gemini (xoay vòng key × model)              │     │
+│      Hết cặp → trích nguyên văn nguồn, không LLM │     │
+│      Prompt bám nguồn: bắt buộc trích dẫn [N]    │     │
 └─────────────────┬────────────────────────────────┘     │
                   │                                      │
                   └──────────────────┬───────────────────┘
                                      ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  [5] Delivery & Streaming Layer                                         │
-│      Async WebSocket Generator (token-by-token) or REST JSON Response   │
+│  [5] Tầng trả kết quả & streaming                                       │
+│      WebSocket bất đồng bộ (từng token) hoặc REST trả JSON              │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 2. LangGraph State Machine Architecture
+### 2. Máy trạng thái LangGraph
 
 ```mermaid
 graph TD
-    Start([User Input]) --> RouterNode[Router Node: Classify Intent]
-    
-    RouterNode -->|compliance_check| ComplianceNode[Compliance Engine: Rule Check]
-    RouterNode -->|simple_qa / compare / summarize| RetrieveNode[Retrieve Node: Hybrid + Rerank]
-    
-    RetrieveNode --> GraderNode{Grader: Relevance Check}
-    GraderNode -->|Relevant| GenerateNode[Generate Node: LLaMA-3.3-70B]
-    GraderNode -->|Irrelevant / Out-of-Corpus| RefusalNode[Abstain Node: Domain Refusal]
-    
-    GenerateNode --> FailoverCheck{LLM Success?}
-    FailoverCheck -->|Success| FormatNode[Format & Citations Node]
-    FailoverCheck -->|Timeout / Quota| FallbackNode[Fallback Node: Gemini 2.0 Flash Lite]
+    Start([Người dùng nhập]) --> RouterNode[Node định tuyến: phân loại ý định]
+
+    RouterNode -->|compliance_check| ComplianceNode[Bộ tuân thủ: kiểm tra theo tiêu chí]
+    RouterNode -->|simple_qa / compare / summarize| RetrieveNode[Node truy hồi: lai + rerank]
+
+    RetrieveNode --> GraderNode{Chấm điểm: có liên quan không}
+    GraderNode -->|Liên quan| GenerateNode[Node sinh: Gemini]
+    GraderNode -->|Không liên quan / ngoài kho| RefusalNode[Node từ chối: ngoài phạm vi]
+
+    GenerateNode --> FailoverCheck{Gemini trả lời được}
+    FailoverCheck -->|Có| FormatNode[Node định dạng & trích dẫn]
+    FailoverCheck -->|Hết mọi cặp key/model| FallbackNode[Trích nguyên văn nguồn, không LLM]
     FallbackNode --> FormatNode
-    
-    ComplianceNode --> PersistNode[Memory Persist: SQLite Session Log]
+
+    ComplianceNode --> PersistNode[Ghi bộ nhớ: log phiên SQLite]
     FormatNode --> PersistNode
     RefusalNode --> PersistNode
-    PersistNode --> End([Client Response])
+    PersistNode --> End([Trả về client])
 ```
 
 ---
 
-## 📚 Vietnamese Labour & Social-Insurance Corpus
+## 📚 Kho văn bản lao động & bảo hiểm xã hội
 
-20 official documents (~1,146 chunks) split by our legal chunker (`src/ingestion/chunker.py`)
-at exact `Điều` (Article) / `Khoản` (Clause) boundaries, each chunk carrying the validity
-dates of the version it belongs to. Source files: [`data/raw/lao_dong/`](data/raw/lao_dong/).
+20 văn bản chính thức (~1.146 chunk) được cắt bằng bộ chunker pháp lý riêng
+(`src/ingestion/chunker.py`) đúng ranh giới `Điều` / `Khoản`, mỗi chunk mang theo mốc hiệu lực
+của phiên bản nó thuộc về. File nguồn: [`data/raw/lao_dong/`](data/raw/lao_dong/).
 
 | Nhóm | Văn bản tiêu biểu | Nội dung chính |
 |---|---|---|
@@ -142,22 +142,23 @@ dates of the version it belongs to. Source files: [`data/raw/lao_dong/`](data/ra
 | **Việc làm & BHTN** | `74/2025/QH15` (Luật Việc làm 2025), `38/2013/QH13`, `374/2025/NĐ-CP`, `28/2015/NĐ-CP` | Bảo hiểm thất nghiệp, trợ cấp thất nghiệp, hỗ trợ học nghề, dịch vụ việc làm. |
 | **Hưu trí & khác** | `135/2020/NĐ-CP`, `293/2025/NĐ-CP` | Lộ trình tuổi nghỉ hưu, điều kiện nghỉ hưu sớm. |
 
-Several of these supersede one another (Luật BHXH 2024 thay 2014, Luật Việc làm 2025 thay
-2013, NĐ 293/2025 thay NĐ 74/2024). Both versions stay indexed, which is what makes the
-`as_of_date` lookup meaningful rather than cosmetic.
+Một số văn bản thay thế lẫn nhau (Luật BHXH 2024 thay bản 2014, Luật Việc làm 2025 thay bản
+2013, NĐ 293/2025 thay NĐ 74/2024). Cả hai phiên bản đều nằm trong index — đó là điều khiến
+việc tra cứu theo `as_of_date` có ý nghĩa thật chứ không phải để trang trí.
 
 ---
 
 
-## ⚖️ Automated Compliance Engine
+## ⚖️ Bộ kiểm tra tuân thủ tự động
 
-Unlike standard RAG systems that rely solely on probabilistic generation, DocuMind AI features a **hybrid deterministic-symbolic compliance auditor**:
+Khác với các hệ RAG thông thường chỉ dựa vào sinh văn bản theo xác suất, DocuMind AI có thêm
+một **bộ kiểm tra tuân thủ lai giữa tất định và ký hiệu**:
 
 ```python
-# Real output — src/rag/compliance.py, criteria in data/compliance/criteria.json
+# Kết quả thật — src/rag/compliance.py, tiêu chí trong data/compliance/criteria.json
 from src.rag.compliance import check_compliance
 
-# Case 1: yearly overtime cap
+# Trường hợp 1: trần làm thêm giờ trong năm
 check_compliance("Công ty cho làm thêm 250 giờ trong 01 năm có đúng luật không?")
 # {
 #   "matched": True,
@@ -171,106 +172,105 @@ check_compliance("Công ty cho làm thêm 250 giờ trong 01 năm có đúng lu�
 #                "dieu_khoan": "Điều 107 khoản 2 điểm c"}
 # }
 
-# Case 2: Region I minimum wage — "4.500.000 đồng" is normalised to 4.5 triệu before compare
+# Trường hợp 2: lương tối thiểu vùng I — "4.500.000 đồng" được chuẩn hoá về 4,5 triệu trước khi so sánh
 check_compliance("Công ty trả lương 4.500.000 đồng/tháng ở vùng I có đúng luật không?")
-# verdict = "fail" (below 5.310.000 đồng/tháng — Điều 3 khoản 1 Nghị định 293/2025/NĐ-CP)
+# verdict = "fail" (thấp hơn 5.310.000 đồng/tháng — Điều 3 khoản 1 Nghị định 293/2025/NĐ-CP)
 
-# Out of scope → no verdict is invented
+# Ngoài phạm vi → không bịa ra kết luận
 check_compliance("Giá vàng SJC hôm nay bao nhiêu?")   # verdict = "no_match"
 ```
 
 ---
 
-## 📊 Evaluation
+## 📊 Đánh giá
 
-The evaluation harness ([`eval/`](eval/)) runs a 4-strategy retrieval ablation
-(BM25 · dense · hybrid+RRF · hybrid+reranker) plus RAGAS generation metrics against a
-hand-built question set with ground-truth answers and source chunk ids.
+Bộ khung đánh giá ([`eval/`](eval/)) chạy ablation truy hồi trên 4 chiến lược
+(BM25 · dense · hybrid+RRF · hybrid+reranker) cùng các chỉ số sinh văn bản của RAGAS, đối chiếu
+với bộ câu hỏi tự xây có sẵn đáp án chuẩn và id chunk nguồn.
 
-**No retrieval baseline is published for this corpus yet.** The pre-pivot banking question
-set has been archived to [`data/eval/_archive/test_questions_banking.json`](data/eval/_archive/)
-— it measures nothing against a labour-law corpus. The gold set in use is
-[`data/eval/temporal_questions.json`](data/eval/temporal_questions.json) (30 hand-written
-questions with `source_clause` ids, committed before the system was run against them);
-a consolidated ≥50-question set covering in-scope / out-of-scope / point-in-time is in progress.
-No headline accuracy number is claimed until it is measured on this corpus.
+**Chưa công bố baseline truy hồi cho kho tài liệu hiện tại.** Bộ gold set đang dùng là
+[`data/eval/temporal_questions.json`](data/eval/temporal_questions.json) — 30 câu viết tay kèm
+id `source_clause`, đã commit trước khi chạy hệ thống trên chúng, toàn bộ trích từ chính các văn
+bản trong [`data/raw/lao_dong/`](data/raw/lao_dong/) (kể cả các bản sửa đổi cấp khoản trong
+`_versions/`). Bộ hợp nhất ≥50 câu phủ cả trong phạm vi / ngoài phạm vi / tra theo thời điểm
+đang được xây. Chưa tuyên bố con số độ chính xác nào cho tới khi đo được trên chính kho tài
+liệu này.
 
-**Historical benchmark (previous corpus).** The methodology and engineering findings
-carry over — see [`EVALUATION.md`](EVALUATION.md). On a self-built 110-question set
-(prior domain: university regulations): hybrid+reranker reached **hit_rate@K 0.95,
-MRR 0.87, 100% out-of-corpus refusal**; RAGAS faithfulness ≈ 0.9 (5-question pilot).
-That eval also drove real fixes — a language-mismatched reranker
-(context_precision 0.66 → 0.83), a score-scale abstain bug, and ~15% generation
-over-refusal.
+**Benchmark lịch sử (kho tài liệu trước đây).** Phương pháp luận và các phát hiện kỹ thuật vẫn
+giữ nguyên giá trị — xem [`EVALUATION.md`](EVALUATION.md). Trên bộ 110 câu hỏi tự xây (lĩnh vực
+cũ: quy chế đào tạo đại học): hybrid+reranker đạt **hit_rate@K 0,95, MRR 0,87, tỉ lệ từ chối câu
+ngoài kho 100%**; RAGAS faithfulness ≈ 0,9 (thử nghiệm 5 câu). Lần đánh giá đó cũng dẫn tới
+những bản vá thật — reranker lệch ngôn ngữ (context_precision 0,66 → 0,83), lỗi thang điểm
+khiến hệ thống từ chối nhầm, và ~15% câu bị từ chối thừa ở khâu sinh.
 
-| Stage | Mechanism |
+| Khâu | Cơ chế |
 |---|---|
-| Sparse retrieval | Okapi BM25 — exact statutory term / article-ID matching |
-| Dense retrieval | `AITeamVN/Vietnamese_Embedding` (1024-dim) — semantic paraphrase matching |
-| Fusion | Reciprocal Rank Fusion over both candidate lists (top-20) |
-| Reranking | `BAAI/bge-reranker-v2-m3` cross-encoder → top-8 |
-| Generation guardrails | out-of-corpus refusal · paragraph-level citation enforcement |
+| Truy hồi thưa | Okapi BM25 — khớp chính xác thuật ngữ luật / số hiệu điều khoản |
+| Truy hồi dày | `gemini-embedding-001` (3072 chiều, qua API) — khớp theo ngữ nghĩa |
+| Hợp nhất | Reciprocal Rank Fusion trên cả hai danh sách ứng viên (top-20) |
+| Rerank | Cross-encoder `BAAI/bge-reranker-v2-m3` → top-8 |
+| Rào chắn khi sinh | Từ chối câu ngoài kho · bắt buộc trích dẫn ở từng đoạn |
 
 ---
 
-## 🛠️ Technology Stack
+## 🛠️ Ngăn xếp công nghệ
 
-| Layer | Technology | Justification |
+| Tầng | Công nghệ | Lý do chọn |
 |---|---|---|
-| **Agent Orchestration** | LangGraph 0.2 + LlamaIndex 0.14 | Explicit typed state transitions, modular unit-testability of nodes, and deterministic (non-LLM) intent routing. |
-| **Primary LLM** | Groq (Llama 3.3 70B Versatile) | ~300 tokens/second generation speed on LPUs; ideal for responsive real-time streaming. |
-| **Fallback LLM** | Google Gemini 2.0 Flash Lite | High concurrency, large context window, zero cold-start fallback when Groq hits TPM/RPM ceilings. |
-| **Embeddings** | `AITeamVN/Vietnamese_Embedding` (1024-dim) | Vietnamese-specific; replaced MiniLM-L12 after an A/B on the labour gold set (final@8 0.821 → 1.000, `reports/embedding_ab.json`). |
-| **Vector Store** | ChromaDB (Local Persistent) / Qdrant | Pluggable backend via `VECTOR_STORE_PROVIDER` without rewriting ingestion or retrieval queries. |
-| **Reranker** | `BAAI/bge-reranker-v2-m3` | State-of-the-art multilingual cross-encoder reranker for high-precision legal clause ranking. |
-| **Backend Web API** | FastAPI + WebSockets + Pydantic v2 | Full async I/O, bidirectional streaming, automatic OpenAPI schema generation. |
-| **Frontend UI** | React 19 + TypeScript + Vite | Dark-mode console, source preview drawer, compliance testing dashboard. |
-| **Testing** | Pytest + Pytest-Cov + Pytest-Asyncio | 227/227 tests passing (verified offline) across units, integrations, and guardrails. |
+| **Điều phối tác tử** | LangGraph 0.2 + LlamaIndex 0.14 | Chuyển trạng thái tường minh có kiểu, test đơn vị được từng node, định tuyến ý định tất định (không phụ thuộc LLM). |
+| **LLM** | Google Gemini (các model flash-lite, khai trong `GEMINI_GENERATION_MODELS`) | Nhà cung cấp duy nhất: quota cộng dồn qua nhiều key, không cold-start, không cần GPU. Xoay vòng (key × model) thay cho fallback nhiều nhà cung cấp. |
+| **Embedding** | `gemini-embedding-001` (3072 chiều, qua API) | Không nạp model nào vào RAM nên chạy được trên host 512MB; dùng chung key với phần sinh câu trả lời. |
+| **Vector store** | ChromaDB (local persistent) / Qdrant | Backend cắm-rút qua `VECTOR_STORE_PROVIDER` mà không phải viết lại phần ingest hay truy vấn. |
+| **Reranker** | `BAAI/bge-reranker-v2-m3` | Cross-encoder đa ngữ hàng đầu, xếp hạng điều khoản luật với độ chính xác cao. |
+| **API backend** | FastAPI + WebSockets + Pydantic v2 | I/O bất đồng bộ hoàn toàn, streaming hai chiều, tự sinh schema OpenAPI. |
+| **Giao diện** | React 19 + TypeScript + Vite | Console nền tối, ngăn xem trước nguồn, bảng thử nghiệm kiểm tra tuân thủ. |
+| **Kiểm thử** | Pytest + Pytest-Cov + Pytest-Asyncio | 227/227 test pass (đã chạy offline) gồm unit, tích hợp và rào chắn. |
 
 ---
 
-## 🚀 Quickstart Guide
+## 🚀 Bắt đầu nhanh
 
-### Prerequisites
-- Python 3.10 or 3.11 installed.
-- Node.js 18+ (for frontend dev server).
-- API Keys: At least one of `GROQ_API_KEY` or `GOOGLE_API_KEY`.
+### Yêu cầu trước
+- Đã cài Python 3.10 hoặc 3.11.
+- Node.js 18+ (cho dev server của frontend).
+- API key: `GOOGLE_API_KEY` (nên khai thêm `GOOGLE_API_KEY_2`, `GOOGLE_API_KEY_3` ở project khác để cộng dồn quota).
 
-### 1. Environment Setup
-Clone the repository and install backend dependencies:
+### 1. Dựng môi trường
+Clone repo và cài phụ thuộc backend:
 ```powershell
 git clone https://github.com/luongducthangDS/DocuMindAI.git
 cd DocuMindAI
 
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+pip install -r requirements-dev.txt   # prod-only: requirements.txt
 ```
 
-Create your `.env` file:
+Tạo file `.env`:
 ```ini
-GROQ_API_KEY=gsk_your_groq_key_here
 GOOGLE_API_KEY=AIza_your_google_gemini_key_here
-GENERATOR_PROVIDER=groq
-EMBEDDING_PROVIDER=local
+GOOGLE_API_KEY_2=
+GOOGLE_API_KEY_3=
+EMBEDDING_MODEL=gemini-embedding-001
 VECTOR_STORE_PROVIDER=chroma
 ```
 
-### 2. Ingest the Corpus
-Populate the ChromaDB vector database with the curated legal documents:
+### 2. Nạp kho tài liệu
+Đổ các văn bản pháp luật đã tuyển chọn vào vector database ChromaDB:
 ```powershell
-python scripts/ingest_documents.py --source-dir data/raw/lao_dong --reset
+python scripts/ingest_documents.py --source-dir data/raw/lao_dong `
+  --manifest docs/corpus/corpus_manifest.yaml --reset
 ```
 
-### 3. Run the Application
+### 3. Chạy ứng dụng
 
-#### Option A: One-Click PowerShell Launcher
+#### Cách A: chạy một lệnh bằng PowerShell
 ```powershell
 .\start.ps1
 ```
-This launches both FastAPI on `http://localhost:8081` and Vite frontend on `http://localhost:5174`.
+Lệnh này bật cả FastAPI ở `http://localhost:8081` lẫn frontend Vite ở `http://localhost:5174`.
 
-#### Option B: Manual Launch
+#### Cách B: chạy thủ công
 ```powershell
 # Terminal 1 — Backend
 uvicorn src.api.main:app --host 0.0.0.0 --port 8081 --reload
@@ -281,44 +281,44 @@ npm install
 npm run dev
 ```
 
-Visit the interactive web console at **`http://localhost:5174`**.  
-Interactive API Swagger Docs: **`http://localhost:8081/docs`**.
+Mở console web tại **`http://localhost:5174`**.  
+Tài liệu API (Swagger) tương tác: **`http://localhost:8081/docs`**.
 
 ---
 
-## 🧪 Testing & Verification
+## 🧪 Kiểm thử & xác minh
 
-Run the full automated test suite:
+Chạy toàn bộ test tự động:
 ```powershell
-# Run all tests with coverage report
+# Chạy tất cả test kèm báo cáo coverage
 pytest -v
 
-# Run compliance-specific unit tests
+# Chạy riêng test đơn vị của bộ kiểm tra tuân thủ
 pytest tests/test_compliance.py -v
 
-# Run retrieval benchmark evaluation (smoke test)
+# Chạy benchmark truy hồi (smoke test)
 python eval/run_evals.py --strategies dense rerank --retrieval-only --limit 5
 ```
 
 ---
 
-## 📐 Architecture Decision Records (ADRs)
+## 📐 Hồ sơ quyết định kiến trúc (ADR)
 
-- **ADR-001: LangGraph State Machine over Chain-based Orchestrators**:
-  - *Context*: Financial regulations require deterministic error recovery and auditable branching between informational QA and compliance audits.
-  - *Decision*: Adopted LangGraph `StateGraph` with explicit typed state (`AgentState`).
-  - *Outcome*: Enables granular node-level unit testing and transparent LangSmith trace logging.
-- **ADR-002: Reciprocal Rank Fusion (RRF) Hybrid Retrieval**:
-  - *Context*: User queries oscillate between natural language questions (*"vay tiền mua xe cần thu nhập bao nhiêu"*) and exact statutory lookups (*"Khoản 2 Điều 13 TT 39"*).
-  - *Decision*: Implemented dual-pass Okapi BM25 + dense vector retrieval fused with reciprocal rank fusion prior to cross-encoder reranking.
-  - *Outcome*: Recovers both exact statutory lookups and paraphrased natural-language queries in one path; the reranker then promotes the exact article toward rank 1. Retrieval ablation numbers: see [`EVALUATION.md`](EVALUATION.md).
-- **ADR-003: Multi-Provider LLM Automatic Failover**:
-  - *Context*: Free/standard tier LLM APIs occasionally return 429 rate limits or network timeouts.
-  - *Decision*: Implemented primary execution on Groq LLaMA-3.3-70B with automatic fallback to Google Gemini 2.0 Flash Lite on 429/timeout.
-  - *Outcome*: Rate-limit and transient-failure errors are absorbed by the fallback path instead of surfacing to the user.
+- **ADR-001: Chọn máy trạng thái LangGraph thay vì điều phối kiểu chain**:
+  - *Bối cảnh*: tra cứu quy định đòi hỏi khôi phục lỗi tất định và nhánh rẽ kiểm toán được giữa hỏi đáp thông tin và kiểm tra tuân thủ.
+  - *Quyết định*: dùng `StateGraph` của LangGraph với trạng thái có kiểu tường minh (`AgentState`).
+  - *Kết quả*: test đơn vị được tới từng node và trace LangSmith đọc được rõ ràng.
+- **ADR-002: Truy hồi lai hợp nhất bằng Reciprocal Rank Fusion (RRF)**:
+  - *Bối cảnh*: câu hỏi người dùng dao động giữa ngôn ngữ tự nhiên (*"làm thêm bao nhiêu giờ một năm thì vượt luật"*) và tra cứu điều khoản chính xác (*"Khoản 2 Điều 107 Bộ luật Lao động"*).
+  - *Quyết định*: chạy song song Okapi BM25 + truy hồi vector dày rồi hợp nhất bằng RRF trước khi rerank bằng cross-encoder.
+  - *Kết quả*: một đường đi duy nhất phục vụ được cả tra cứu điều khoản chính xác lẫn câu hỏi diễn đạt tự do; reranker sau đó đẩy đúng điều khoản lên hạng 1. Số liệu ablation truy hồi: xem [`EVALUATION.md`](EVALUATION.md).
+- **ADR-003: Một nhà cung cấp LLM, chịu lỗi bằng vòng xoay khoá**:
+  - *Bối cảnh*: API LLM ở gói miễn phí thỉnh thoảng trả 429 vì giới hạn tần suất; nhưng nuôi nhiều nhà cung cấp cũng nhân lên số đường code phải kiểm thử và số cách hệ thống hỏng.
+  - *Quyết định* (2026-09-19): chỉ dùng Gemini cho cả embedding lẫn sinh câu trả lời; chịu lỗi bằng cách xoay vòng qua các cặp (API key × model) thay vì chuyển sang nhà cung cấp khác. Đã gỡ Groq, endpoint tương thích OpenAI và mọi nhánh embedding local.
+  - *Kết quả*: một đường code duy nhất cho mọi lời gọi LLM (`gemini_generate`); 429 được hấp thụ bằng cặp kế tiếp; hết mọi cặp thì trả lời bằng trích nguyên văn nguồn đã truy hồi thay vì im lặng hỏng.
 
 ---
 
-## 📄 License
+## 📄 Giấy phép
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+Dự án phát hành theo giấy phép MIT — xem chi tiết tại file [LICENSE](LICENSE).

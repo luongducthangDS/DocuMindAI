@@ -50,6 +50,18 @@ class InPlaceAmendment:
         """False for clauses that were newly inserted (no superseded text)."""
         return self.loai_sua != "bo_sung_khoan_moi"
 
+    @property
+    def corpus_text_is_superseded(self) -> bool:
+        """True when the corpus file still holds the *old* wording of this clause.
+
+        Bộ luật Lao động is indexed from its VBHN, so its file already carries
+        the amended text and `_versions/` holds the superseded one. A document
+        with no VBHN (Luật BHXH 2024, amended by Luật Dân số 113/2025/QH15) is
+        the mirror image: the corpus file is the pre-amendment text and the new
+        wording lives in `version_moi`.
+        """
+        return self.loai_sua == "sua_doi_khong_co_vbhn"
+
 
 @dataclass(frozen=True)
 class DocEntry:

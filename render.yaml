@@ -19,8 +19,6 @@ services:
     plan: free
     healthCheckPath: /api/v1/health
     envVars:
-      - key: GROQ_API_KEY
-        sync: false
       - key: GOOGLE_API_KEY
         sync: false
       - key: GOOGLE_API_KEY_2
@@ -35,10 +33,6 @@ services:
       # https://documind-ai.vercel.app
       - key: ALLOWED_ORIGINS
         value: https://your-frontend.vercel.app
-      - key: PRIMARY_LLM
-        value: groq/llama-3.3-70b-versatile
-      - key: FALLBACK_LLM
-        value: gemini/gemini-2.5-flash-lite
       # Phai khop model da index corpus (nhan ghi trong metadata collection).
       # Lech nhan => EmbeddingModelMismatch luc khoi dong, khong chay tiep.
       - key: EMBEDDING_MODEL
@@ -49,18 +43,11 @@ services:
       # ~2.2GB — bắt buộc phải tắt trên free tier; bật lại nếu nâng plan có nhiều RAM hơn.
       - key: ENABLE_RERANKER
         value: "false"
-      # Model embedding local (2.2GB trên đĩa) cộng baseline torch+transformers+
-      # llama_index tự nó đã vượt 512MB — tắt reranker thôi KHÔNG đủ.
-      # EMBEDDING_PROVIDER=gemini gọi Gemini Embedding API nên không có model nào nạp
-      # vào RAM; dùng chung GOOGLE_API_KEY với phần generation, không cần HF_TOKEN.
+      # Embedding đi qua Gemini Embedding API nên không model nào nạp vào RAM;
+      # dùng chung GOOGLE_API_KEY với phần generation, không cần HF_TOKEN.
       # Free tier chặn ~100 content + ~20k token/phút: đủ cho truy vấn lẻ, còn
       # re-embed cả corpus thì chạy ở máy dev rồi migrate, đừng chạy trên Render.
-      - key: EMBEDDING_PROVIDER
-        value: gemini
-      # Generation cung di qua Gemini; Groq chi la duong du phong.
       # Khong dung 2.5-flash/2.5-flash-lite: Google da dong cho API key tao moi (404).
-      - key: GENERATOR_PROVIDER
-        value: gemini
       - key: GEMINI_GENERATION_MODELS
         value: gemini-3.5-flash,gemini-3.1-flash-lite
       # Bỏ comment 4 dòng dưới sau khi chạy scripts/migrate_chroma_to_qdrant.py

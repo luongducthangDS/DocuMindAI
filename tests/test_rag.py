@@ -50,70 +50,35 @@ class TestGenerator:
         assert result["used_llm"] == "none"
         assert result["chunk_count"] == 0
 
-    @patch("src.rag.generator._call_groq")
-    def test_generate_answer_calls_groq_first(self, mock_groq):
-        from src.rag.generator import generate_answer
-
-        mock_groq.return_value = "Câu trả lời từ Groq"
-        chunks = [
-            RetrievedChunk(
-                text="Điều 1 nội dung",
-                score=0.9,
-                metadata={"title": "Test Law", "dieu_header": "Điều 1", "source_url": ""},
-            )
-        ]
-        result = generate_answer("câu hỏi", chunks)
-        assert result["used_llm"] == "groq"
-        assert "Câu trả lời từ Groq" in result["answer"]
-
-    @patch("src.rag.generator._call_groq", side_effect=Exception("Timeout"))
     @patch("src.rag.generator._call_gemini")
-    def test_generate_answer_falls_back_to_gemini(self, mock_gemini, mock_groq):
+    def test_generate_answer_uses_gemini(self, mock_gemini):
         from src.rag.generator import generate_answer
 
-        mock_gemini.return_value = "Câu trả lời từ Gemini"
+        mock_gemini.return_value = "Cau tra loi tu Gemini [1]"
         chunks = [
             RetrievedChunk(
-                text="nội dung",
-                score=0.8,
-                metadata={"title": "Law", "dieu_header": "", "source_url": ""},
+                text="Dieu 1 noi dung",
+                score=0.9,
+                metadata={"title": "Test Law", "dieu_header": "Dieu 1", "source_url": ""},
             )
         ]
-        result = generate_answer("câu hỏi", chunks)
-        assert "gemini" in result["used_llm"]
+        result = generate_answer("cau hoi", chunks)
+        assert result["used_llm"] == "gemini"
+        assert "Gemini" in result["answer"]
 
-    @patch("src.rag.generator._call_groq", side_effect=Exception("Timeout"))
     @patch("src.rag.generator._call_gemini", side_effect=Exception("quota exhausted"))
-    @patch("src.rag.generator._call_openai_compat")
-    def test_generate_answer_falls_back_to_openai_compat(self, mock_openai, mock_gemini, mock_groq):
-        from src.rag.generator import generate_answer
-
-        mock_openai.return_value = "Câu trả lời từ OpenAI-compatible [1]"
-        chunks = [
-            RetrievedChunk(
-                text="nội dung",
-                score=0.8,
-                metadata={"title": "Law", "dieu_header": "", "source_url": ""},
-            )
-        ]
-        result = generate_answer("câu hỏi", chunks)
-        assert result["used_llm"] == "openai_compat_fallback"
-        assert "OpenAI-compatible" in result["answer"]
-
-    @patch("src.rag.generator._call_groq", side_effect=Exception("Timeout"))
-    @patch("src.rag.generator._call_gemini", side_effect=Exception("quota"))
-    @patch("src.rag.generator._call_openai_compat", side_effect=Exception("no key"))
-    def test_generate_answer_all_llms_fail_uses_extractive(self, mock_o, mock_g, mock_gr):
+    def test_generate_answer_falls_back_to_extractive(self, mock_gemini):
+        """Gemini la nha cung cap duy nhat: het cap (key, model) thi trich nguyen van."""
         from src.rag.generator import generate_answer
 
         chunks = [
             RetrievedChunk(
-                text="nội dung điều luật",
+                text="noi dung dieu luat",
                 score=0.8,
-                metadata={"title": "Law", "dieu_header": "Điều 5", "source_url": ""},
+                metadata={"title": "Law", "dieu_header": "Dieu 5", "source_url": ""},
             )
         ]
-        result = generate_answer("câu hỏi", chunks)
+        result = generate_answer("cau hoi", chunks)
         assert result["used_llm"] == "extractive_fallback"
 
     def test_build_context_includes_all_chunks(self):
@@ -132,13 +97,11 @@ class TestGenerator:
         assert "[1]" in citations
 
     @pytest.mark.asyncio
-    @patch("src.rag.generator._get_groq_client")
-    async def test_stream_answer_handles_no_api_key(self, mock_client):
+    async def test_stream_answer_handles_no_api_key(self):
         from src.rag.generator import stream_answer
 
-        # simulate empty API key
-        with patch("src.rag.generator.get_settings") as mock_settings:
-            mock_settings.return_value.groq_api_key = ""
+        # không có key Gemini nào ⇒ không cặp (key, model) nào để gọi
+        with patch("src.rag.generator._gemini_pairs", return_value=[]):
             tokens = []
             async for token in stream_answer("q", []):
                 tokens.append(token)
@@ -169,3 +132,65 @@ class TestNodesConversion:
 
         chunks = nodes_to_chunks([mock_node])
         assert chunks[0].score == 0.0
+
+
+# ── Gemini embedder: key rotation & quota handling ─────────────────────────────
+
+class TestGeminiEmbedderKeyRotation:
+    """_GeminiAPIEmbedding must rotate keys itself instead of burning retries.
+
+    Regression guard: the class used to be defined twice in embedder.py, so the
+    stale single-key copy silently won.
+    """
+
+    @staticmethod
+    def _make(keys=("k1", "k2")):
+        from src.rag.embedder import _GeminiAPIEmbedding
+
+        return _GeminiAPIEmbedding(model_name="gemini-embedding-001", api_keys=list(keys))
+
+    def test_class_is_defined_once(self):
+        import inspect
+
+        import src.rag.embedder as mod
+
+        source = inspect.getsource(mod)
+        assert source.count("class _GeminiAPIEmbedding(BaseEmbedding):") == 1
+
+    def test_429_moves_on_to_the_next_key(self):
+        embedder = self._make()
+        used = []
+
+        def fake_call(key, texts, task_type):
+            used.append(key)
+            if key == "k1":
+                raise RuntimeError("429 quota exceeded")
+            return [[0.1, 0.2]]
+
+        with patch.object(type(embedder), "_call_api", staticmethod(fake_call)):
+            assert embedder._embed(["xin chào"], "retrieval_document") == [[0.1, 0.2]]
+        assert used == ["k1", "k2"]          # đổi key ngay, không chờ backoff
+
+    def test_exhausted_daily_quota_raises_instead_of_sleeping(self):
+        import time as time_mod
+
+        embedder = self._make()
+        # 3 strikes = cạn quota ngày -> cooldown 1 giờ trên cả hai key
+        for key in ("k1", "k2"):
+            embedder._cooldown[key] = time_mod.monotonic() + 3600
+
+        with patch("src.rag.embedder.time.sleep") as slept:
+            with pytest.raises(RuntimeError, match="cạn quota"):
+                embedder._reserve_key(["xin chào"])
+        slept.assert_not_called()
+
+    def test_minute_ceiling_still_waits(self):
+        import time as time_mod
+
+        embedder = self._make(keys=("k1",))
+        embedder._cooldown["k1"] = time_mod.monotonic() + 30   # ngắn -> chờ, không lỗi
+
+        with patch("src.rag.embedder.time.sleep") as slept:
+            slept.side_effect = lambda _: embedder._cooldown.update(k1=0.0)
+            assert embedder._reserve_key(["xin chào"]) == "k1"
+        slept.assert_called_once()

@@ -14,10 +14,14 @@ use_local_hf_cache(offline=False, create=True)
 
 import chromadb  # noqa: E402
 from loguru import logger  # noqa: E402
-from sentence_transformers import SentenceTransformer  # noqa: E402
 
 from src.config import get_settings  # noqa: E402
-from src.rag.embedder import STORE_META_DIM, STORE_META_MODEL  # noqa: E402
+from src.rag.embedder import (  # noqa: E402
+    STORE_META_DIM,
+    STORE_META_MODEL,
+    get_embedder,
+    get_embedding_dim,
+)
 from src.ingestion.chunker import chunk_by_dieu
 from src.ingestion.cleaner import clean_legal_text
 
@@ -57,15 +61,17 @@ def main() -> None:
         except Exception as exc:
             logger.info("Collection reset skipped: {}", exc)
 
+    # Dùng chung embedder với đường truy vấn — không tự dựng model ở script.
     model_name = settings.embedding_model
-    model = SentenceTransformer(model_name)
+    embedder = get_embedder()
+    embedding_dim = get_embedding_dim()
 
     collection = client.get_or_create_collection(
         name=settings.chroma_collection,
         metadata={
             "hnsw:space": "cosine",
             STORE_META_MODEL: model_name,
-            STORE_META_DIM: model.get_sentence_embedding_dimension(),
+            STORE_META_DIM: embedding_dim,
         },
     )
     ids: list[str] = []
@@ -77,7 +83,7 @@ def main() -> None:
         nonlocal ids, docs, metas, total
         if not docs:
             return
-        embeddings = model.encode(docs, batch_size=8, normalize_embeddings=True).tolist()
+        embeddings = embedder.get_text_embedding_batch(docs)
         collection.upsert(ids=ids, documents=docs, metadatas=metas, embeddings=embeddings)
         total += len(docs)
         logger.info("Indexed {} chunks", total)

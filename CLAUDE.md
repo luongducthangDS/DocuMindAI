@@ -29,11 +29,15 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
 **Stack:**
 - Backend: FastAPI + LangGraph agent + vector store qua `VECTOR_STORE_PROVIDER`
   (`chroma` mặc định local, hoặc `qdrant` cho Qdrant Cloud — xem `src/rag/vector_backend.py`)
-- Embedding: `AITeamVN/Vietnamese_Embedding` (1024-dim, local, `data/hf_cache/`) — đổi từ
-  MiniLM-L12-v2 ngày 2026-09-16 sau A/B trên gold set lao động: final@8 0.821 → 1.000
-  (`reports/embedding_ab.json`). Model đọc từ `EMBEDDING_MODEL`, không hard-code.
+- Embedding: `gemini-embedding-001` (3072-dim) qua Gemini Embedding API — **không nạp
+  model nào vào RAM**. Model đọc từ `EMBEDDING_MODEL`, không hard-code. Lịch sử: chạy
+  model local `AITeamVN/Vietnamese_Embedding` (1024-dim) tới 2026-09-19.
 - Retriever: Hybrid BM25 + dense vector + RRF fusion + cross-encoder reranker
-- LLM: Groq Llama-3.3-70B (primary) → Gemini fallback
+  (reranker `BAAI/bge-reranker-v2-m3` vẫn chạy LOCAL — ngoại lệ duy nhất)
+- LLM: **chỉ Gemini** (2026-09-19). Mọi lời gọi đi qua
+  `src.rag.generator.gemini_generate`, xoay vòng (3 key × các model trong
+  `GEMINI_GENERATION_MODELS`); hết mọi cặp thì trích nguyên văn nguồn, không LLM.
+  Đã gỡ tuyệt đối Groq, OpenAI-compatible, embedding local và HF Inference API.
 - Frontend: React + Vite (port 5174), proxies `/api` → backend port 8081
 
 **Deploy (2026-07, theo default-tech-stack skill):**
@@ -58,11 +62,15 @@ Cả bản cũ lẫn bản mới đều nằm trong index — đó là điều l
 
 Lệnh ingest tài liệu:
 ```powershell
-# Ingest corpus lao động vào ChromaDB
-python scripts/ingest_documents.py --source-dir data/raw/lao_dong --reset
+# Ingest corpus lao động vào ChromaDB.
+# BẮT BUỘC có --manifest: thiếu cờ này script rơi về chế độ quét thư mục, nuốt luôn
+# _versions/ thành tài liệu độc lập (1365 chunk rác thay vì 1149).
+python scripts/ingest_documents.py --source-dir data/raw/lao_dong `
+  --manifest docs/corpus/corpus_manifest.yaml --reset
 
 # Xem trước số chunk mà không ghi vào DB
-python scripts/ingest_documents.py --source-dir data/raw/lao_dong --dry-run
+python scripts/ingest_documents.py --source-dir data/raw/lao_dong `
+  --manifest docs/corpus/corpus_manifest.yaml --dry-run
 ```
 
 `data/compliance/criteria.json` định nghĩa 6 tiêu chí kiểm định tuân thủ định lượng
@@ -107,7 +115,7 @@ src/
     vector_backend.py Provider-agnostic vector store access (count/fetch/query) —
                        đổi VECTOR_STORE_PROVIDER không cần sửa call site nào khác
     retriever.py      Hybrid retriever + reranker, RetrievedChunk dataclass
-    generator.py      LLM generation (Groq primary / Gemini fallback), score filtering
+    generator.py      LLM generation (chỉ Gemini, xoay key×model), score filtering
     compliance.py     Compliance-check engine (pass/fail theo tiêu chí JSON hand-curated)
   agent/
     graph.py      LangGraph agent graph
@@ -139,9 +147,8 @@ logs/
 
 - `GOOGLE_API_KEY`, `GOOGLE_API_KEY_2`, `GOOGLE_API_KEY_3` — 3 Gemini keys
 - `GEMINI_JUDGE_MODELS` — danh sách model cho RAGAS eval (phân cách bằng dấu phẩy)
-- `PRIMARY_LLM=groq/llama-3.3-70b-versatile`
-- `FALLBACK_LLM=gemini/gemini-2.5-flash-lite`
-- `EMBEDDING_MODEL=AITeamVN/Vietnamese_Embedding` — nguồn sự thật duy nhất cho model
+- `GEMINI_GENERATION_MODELS` — danh sách model Gemini cho generation (xoay vòng với 3 key)
+- `EMBEDDING_MODEL=gemini-embedding-001` — nguồn sự thật duy nhất cho model
   embedding. Đổi giá trị này **bắt buộc** chạy `python scripts/reembed_corpus.py --yes`;
   collection mang nhãn model đã index, lệch nhãn là `EmbeddingModelMismatch` lúc mở store.
 - `API_PORT=8081`

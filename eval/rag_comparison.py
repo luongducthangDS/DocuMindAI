@@ -29,7 +29,7 @@ Requirements (eval-only, not in main requirements.txt):
   pip install ragas==0.1.21 datasets>=2.14.0
 
 LLM for RAGAS judge:
-  - Uses GROQ_API_KEY (primary) or GOOGLE_API_KEY (fallback) from .env
+  - Uses GOOGLE_API_KEY from .env
   - RAGAS needs an LLM to score faithfulness & answer_relevancy
 """
 
@@ -426,18 +426,8 @@ def _configure_ragas_llm() -> tuple:
             n_models = len([m for m in settings.gemini_judge_models.split(",") if m.strip()])
             n_pairs = n_keys * n_models
             logger.info(f"RAGAS judge: {n_pairs} pairs ({n_keys} keys × {n_models} models), ~{n_pairs * _DirectGeminiRagasLLM._MAX_PER_WINDOW} req/min")
-        elif settings.groq_api_key:
-            from langchain_groq import ChatGroq
-            from ragas.llms import LangchainLLMWrapper
-            llm = ChatGroq(
-                model="llama-3.3-70b-versatile",
-                api_key=settings.groq_api_key,
-                temperature=0,
-            )
-            ragas_llm = LangchainLLMWrapper(llm)
-            logger.info("RAGAS judge LLM: Groq llama-3.3-70b (fallback)")
         else:
-            raise RuntimeError("No GOOGLE_API_KEY or GROQ_API_KEY for RAGAS judge")
+            raise RuntimeError("No GOOGLE_API_KEY for RAGAS judge")
 
         from ragas.embeddings import LangchainEmbeddingsWrapper
 

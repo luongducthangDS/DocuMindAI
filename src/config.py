@@ -26,42 +26,23 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
-    # LLM
-    groq_api_key: str = ""
+    # LLM — Gemini là nhà cung cấp DUY NHẤT (2026-09-19, quyết định của Ted).
+    # Không còn Groq / OpenAI-compatible / model local: mọi lời gọi LLM đi qua
+    # src.rag.generator.gemini_generate, xoay vòng (key x model).
     google_api_key: str = ""
     google_api_key_2: str = ""
     google_api_key_3: str = ""
     gemini_judge_models: str = "gemini-3.1-flash-lite,gemini-3.5-flash-lite"
-    primary_llm: str = "groq/llama-3.3-70b-versatile"
-    fallback_llm: str = "gemini/gemini-3.1-flash-lite"
-    # Lớp backup cuối (trước extractive): endpoint tương thích OpenAI.
-    # Để trống openai_api_base = OpenAI thật; hoặc trỏ tới vLLM/OpenRouter/Together...
-    # Chuỗi generation: Groq → Gemini → OpenAI-compatible → extractive (không LLM).
-    openai_api_key: str = ""
-    openai_api_base: str = ""
-    openai_model: str = "gpt-4o-mini"
-    # generator_provider: nhà cung cấp sinh câu trả lời. "groq" (mặc định, llama-3.3-70b)
-    # hoặc "gemini" (bỏ qua Groq, dùng thẳng Gemini — hữu ích khi Groq cạn TPD/ngày).
-    generator_provider: str = "groq"
-    # gemini_generation_models: danh sách model Gemini cho generation, phân cách dấu phẩy.
-    # Generation sẽ xoay vòng 3 key × các model này. Ưu tiên model RPD cao.
+    # gemini_generation_models: danh sach model Gemini cho generation, phan cach dau phay.
+    # Generation se xoay vong 3 key x cac model nay. Uu tien model RPD cao.
     # Free tier RPD/RPM (Ted 2026-09-10): 3.1-flash-lite=500/15, 3.5-flash-lite=500/15,
-    # 2.5-flash-lite=20/10. Các "flash" thường (2.5/3/3.5/3.6/3.7/3.8) chỉ RPD 20.
-    # gemini-2.0-* / 1.5-* / 2.5-pro / 3.1-pro = KHÔNG có quota trên key này.
+    # 2.5-flash-lite=20/10. Cac "flash" thuong (2.5/3/3.5/3.6/3.7/3.8) chi RPD 20.
+    # gemini-2.0-* / 1.5-* / 2.5-pro / 3.1-pro = KHONG co quota tren key nay.
     gemini_generation_models: str = "gemini-3.1-flash-lite,gemini-3.5-flash-lite,gemini-2.5-flash-lite"
-    # embedding_model: nguồn sự thật DUY NHẤT cho model embedding (index lẫn query).
-    # Đổi giá trị này thì phải re-embed corpus: python scripts/reembed_corpus.py --yes
-    # Collection mang nhãn model đã index; lệch nhãn ⇒ EmbeddingModelMismatch lúc mở store.
-    # A/B trên gold set lao động (reports/embedding_ab.json): model dưới đây đạt
-    # final@8 = 1.000 so với 0.821 của paraphrase-multilingual-MiniLM-L12-v2.
-    embedding_model: str = "AITeamVN/Vietnamese_Embedding"
-    # embedding_provider: "local" (mặc định, load model vào RAM qua sentence-transformers/
-    # torch), "hf_api" (gọi HuggingFace Inference API, không load model — dùng cho
-    # host RAM thấp) hoặc "gemini" (Gemini Embedding API, cần GOOGLE_API_KEY).
-    # local ↔ hf_api là cùng model cùng số chiều nên đổi qua lại không cần re-index;
-    # "gemini" là KHÔNG GIAN VECTOR KHÁC — đổi sang nó phải đổi luôn EMBEDDING_MODEL
-    # và chạy scripts/reembed_corpus.py, nếu không sẽ dính EmbeddingModelMismatch.
-    embedding_provider: str = "local"
+    # Embedding chạy qua Gemini Embedding API — không nạp model nào vào RAM.
+    # Collection mang nhãn model đã index; lệch nhãn ⇒ EmbeddingModelMismatch lúc mở
+    # store, nên đổi giá trị này BẮT BUỘC chạy: python scripts/reembed_corpus.py --yes
+    embedding_model: str = "gemini-embedding-001"
 
     # LangSmith
     langchain_tracing_v2: bool = False
