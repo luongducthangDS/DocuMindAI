@@ -203,6 +203,58 @@ def _contextualize_query(query: str, history: list[dict]) -> str:
     return query
 
 
+# Câu hỏi gõ không dấu ("Ty le dong BHXH bat buoc cua nguoi lao dong la bao
+# nhieu?") trượt cả hai nhánh retrieval: BM25 không khớp token nào, dense
+# embedding cũng lệch — đo được 4 chunk lấy về nhưng generator vẫn abstain.
+# Trước đây dấu chỉ được khôi phục TÌNH CỜ, khi câu hỏi có lịch sử hội thoại nên
+# đi qua _contextualize_query; lượt đầu tiên thì không.
+_VN_DIACRITIC_RE = re.compile(
+    "[àáảãạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđ]",
+    re.IGNORECASE,
+)
+
+_RESTORE_DIACRITICS_PROMPT = """Thêm dấu tiếng Việt cho câu hỏi sau. Giữ nguyên thứ tự \
+và số lượng từ, giữ nguyên chữ số và từ viết tắt (BHXH, BHTN, ND-CP, QH14...).
+Chỉ trả về câu đã thêm dấu, không giải thích.
+
+Câu hỏi: {query}"""
+
+
+def _needs_diacritics(query: str) -> bool:
+    """True khi câu hỏi viết không dấu. Yêu cầu ≥3 từ để không đụng vào chuỗi
+    ngắn ('test') hay số hiệu văn bản ('45/2019/QH14') — những thứ mà thêm dấu
+    chỉ làm hỏng."""
+    return len(query.split()) >= 3 and not _VN_DIACRITIC_RE.search(query)
+
+
+def _restore_diacritics(query: str) -> str:
+    """Trả lại câu có dấu. Giữ nguyên câu gốc nếu Gemini không dùng được hoặc
+    trả về câu lệch số từ (dấu hiệu model diễn giải lại thay vì thêm dấu)."""
+    try:
+        import google.generativeai as genai
+
+        from src.rag.generator import _gemini_pairs
+
+        # Cùng lý do với contextualize_node: node này nằm trên critical path
+        # trước retrieval, nên chặn ở 2 lần thử thay vì quét hết mọi cặp.
+        for api_key, model_name in _gemini_pairs()[:2]:
+            try:
+                genai.configure(api_key=api_key)
+                response = genai.GenerativeModel(model_name).generate_content(
+                    _RESTORE_DIACRITICS_PROMPT.format(query=query)
+                )
+                restored = (response.text or "").strip().strip('"')
+                if restored and abs(len(restored.split()) - len(query.split())) <= 1:
+                    return restored
+            except Exception as exc:
+                logger.debug("restore_diacritics Gemini {} failed: {}", model_name, str(exc)[:100])
+                continue
+    except Exception as exc:
+        logger.warning("restore_diacritics Gemini unavailable: {}", exc)
+
+    return query
+
+
 def contextualize_node(state: AgentState) -> dict:
     """Resolve context-dependent follow-ups (e.g. 'các trường hợp khác là gì?')
     into standalone questions before intent routing/retrieval, using prior
@@ -210,22 +262,39 @@ def contextualize_node(state: AgentState) -> dict:
     no history (first turn), which is the common case."""
     t0 = time.time()
     history = _build_history_from_messages(state)
-    query = state["query"]
+    original = state["query"]
+    query = original
+    new_steps: list[dict] = []
 
-    if not history:
+    if _needs_diacritics(query):
+        restored = _restore_diacritics(query)
+        if restored != query:
+            logger.info("Khôi phục dấu: '{}' -> '{}'", query[:60], restored[:60])
+            new_steps.append({
+                "label": "Khôi phục dấu tiếng Việt",
+                "detail": restored,
+                "ms": int((time.time() - t0) * 1000),
+            })
+            query = restored
+
+    if history:
+        rewritten = _contextualize_query(query, history)
+        if rewritten != query:
+            logger.info("Contextualized follow-up: '{}' -> '{}'", query[:60], rewritten[:60])
+            new_steps.append({
+                "label": "Diễn giải câu hỏi theo ngữ cảnh",
+                "detail": rewritten,
+                "ms": int((time.time() - t0) * 1000),
+            })
+            query = rewritten
+
+    if query == original:
         return {"tried_queries": [query]}
 
-    rewritten = _contextualize_query(query, history)
-    if rewritten == query:
-        return {"tried_queries": [query]}
-
-    ms = int((time.time() - t0) * 1000)
-    steps = state.get("steps") or []
-    logger.info("Contextualized follow-up: '{}' -> '{}'", query[:60], rewritten[:60])
     return {
-        "query": rewritten,
-        "tried_queries": [rewritten],
-        "steps": steps + [{"label": "Diễn giải câu hỏi theo ngữ cảnh", "detail": rewritten, "ms": ms}],
+        "query": query,
+        "tried_queries": [query],
+        "steps": (state.get("steps") or []) + new_steps,
     }
 
 

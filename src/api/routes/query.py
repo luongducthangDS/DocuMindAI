@@ -104,6 +104,10 @@ async def query_endpoint(request: Request, body: QueryRequest) -> QueryResponse:
             history=session.as_messages(),
             as_of_date=body.as_of_date,
         )
+    except HTTPException:
+        # ensure_rag_initialized() đã trả sẵn 503 kèm loại lỗi — giữ nguyên,
+        # đừng bọc lại thành "Agent temporarily unavailable (HTTPException)".
+        raise
     except Exception as exc:
         error_detail = str(exc)
         logger.error("Agent failed for query '{}': {}", body.query[:60], exc)
@@ -241,17 +245,32 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
             # contextualization the REST /query path gets via run_agent's
             # do_contextualize node, otherwise WS follow-ups reproduce the
             # "90 điểm thì sao" false-negative bug.
-            history = session.as_messages()
-            if history:
-                from src.agent.graph import _contextualize_query
+            # Kiểm tra RAG trước khi viết lại câu hỏi: hai bước rewrite đều gọi
+            # Gemini, không có lý do đốt chúng khi retrieval chắc chắn hỏng.
+            from src.api.main import ensure_rag_initialized
 
+            try:
+                await ensure_rag_initialized()
+            except HTTPException as exc:
+                # RAG hỏng: nói thẳng thay vì stream ra "không tìm thấy văn bản"
+                # — client không phân biệt được hỏng với ngoài phạm vi.
+                await websocket.send_json({"error": exc.detail, "done": True})
+                continue
+
+            history = session.as_messages()
+            from src.agent.graph import (
+                _contextualize_query,
+                _needs_diacritics,
+                _restore_diacritics,
+            )
+
+            if _needs_diacritics(query):
+                query = _restore_diacritics(query)
+            if history:
                 query = _contextualize_query(query, history[-6:])
 
             # Import retriever to get chunks
             try:
-                from src.api.main import ensure_rag_initialized
-
-                await ensure_rag_initialized()
                 import src.rag.retriever as r_module
 
                 retriever = getattr(r_module, "_active_retriever", None)

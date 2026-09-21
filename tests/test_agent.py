@@ -542,3 +542,54 @@ class TestQueryRouteForwardsAsOfDate:
             asyncio.run(query_route.query_endpoint(request, body))
 
         assert seen["as_of_date"] == "2025-03-01"
+
+
+class TestDiacriticRestore:
+    """Câu hỏi gõ không dấu trượt cả BM25 lẫn dense retrieval — phải được
+    khôi phục dấu trước khi vào router/retrieval."""
+
+    def test_detects_missing_diacritics(self):
+        from src.agent.graph import _needs_diacritics
+
+        assert _needs_diacritics("Ty le dong BHXH bat buoc la bao nhieu")
+        assert not _needs_diacritics("Tỷ lệ đóng BHXH bắt buộc là bao nhiêu")
+
+    def test_ignores_short_strings_and_doc_numbers(self):
+        from src.agent.graph import _needs_diacritics
+
+        assert not _needs_diacritics("test")
+        assert not _needs_diacritics("45/2019/QH14")
+
+    def test_rejects_rewrite_that_changes_word_count(self):
+        """Model diễn giải lại câu thay vì thêm dấu -> giữ nguyên câu gốc."""
+        import src.agent.graph as g
+
+        class _Resp:
+            text = "Tỷ lệ đóng bảo hiểm xã hội bắt buộc của người lao động là bao nhiêu phần trăm"
+
+        fake_genai = MagicMock()
+        fake_genai.GenerativeModel.return_value.generate_content.return_value = _Resp()
+        with patch.dict("sys.modules", {"google.generativeai": fake_genai}), \
+             patch("src.rag.generator._gemini_pairs", return_value=[("k", "m")]):
+            out = g._restore_diacritics("Ty le dong BHXH bat buoc")
+        assert out == "Ty le dong BHXH bat buoc"
+
+    def test_node_restores_before_routing(self):
+        from langchain_core.messages import HumanMessage
+
+        from src.agent.graph import contextualize_node
+
+        state = {
+            "messages": [HumanMessage(content="Thoi gian thu viec toi da la bao lau")],
+            "query": "Thoi gian thu viec toi da la bao lau",
+            "steps": [],
+        }
+        with patch(
+            "src.agent.graph._restore_diacritics",
+            return_value="Thời gian thử việc tối đa là bao lâu",
+        ) as mock_restore:
+            result = contextualize_node(state)
+
+        mock_restore.assert_called_once()
+        assert result["query"] == "Thời gian thử việc tối đa là bao lâu"
+        assert result["steps"][-1]["label"] == "Khôi phục dấu tiếng Việt"

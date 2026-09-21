@@ -10,7 +10,7 @@ import asyncio
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -18,10 +18,11 @@ from fastapi.staticfiles import StaticFiles
 from loguru import logger
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
+from slowapi.middleware import SlowAPIMiddleware
 
 import src.logger  # noqa: F401 — initializes loguru
 from src.api.routes import documents, health, query, reports
+from src.api.routes.query import _get_client_ip
 from src.config import get_settings
 
 # React build output (frontend/vite.config.ts → outDir: "../dist")
@@ -49,7 +50,12 @@ async def lifespan(app: FastAPI):
         logger.info("LangSmith tracing enabled for project: {}", settings.langchain_project)
 
     if settings.initialize_rag_on_startup:
-        await ensure_rag_initialized()
+        try:
+            await ensure_rag_initialized()
+        except Exception as exc:
+            # Startup vẫn lên: /health cần sống để nói được là hỏng ở đâu.
+            # Request đầu tiên sẽ thử lại, và trả 503 nếu vẫn hỏng.
+            logger.error("RAG init failed at startup, retrying on first request: {}", exc)
     else:
         logger.info("RAG startup initialization skipped; it will load on first query")
 
@@ -82,7 +88,16 @@ async def ensure_rag_initialized() -> None:
             await asyncio.to_thread(_init_rag_sync)
             _rag_initialized = True
         except Exception as exc:
-            logger.error("RAG init failed (system will run in degraded mode): {}", exc)
+            # Nuốt lỗi ở đây từng làm mọi câu hỏi trả HTTP 200 kèm "không tìm
+            # thấy văn bản pháp luật" suốt 45 phút (2026-09-21, KeyError
+            # '_type') — nhìn từ ngoài không phân biệt được với câu hỏi ngoài
+            # phạm vi, nên không ai biết hệ thống đang hỏng. Ném ra để route
+            # trả 503. _rag_initialized vẫn False nên request sau tự thử lại.
+            logger.error("RAG init failed: {}", exc)
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=f"RAG stack unavailable ({type(exc).__name__}). Please retry.",
+            ) from exc
 
 
 _BM25_NODE_CAP = 10_000  # cap BM25 corpus to avoid memory blowup on large collections
@@ -170,8 +185,11 @@ def _init_rag_sync() -> None:
 
 settings = get_settings()
 
+# key_func dùng _get_client_ip (đọc X-Forwarded-For) chứ không phải
+# get_remote_address: sau proxy của Render/Cloudflare mọi request mang cùng IP
+# proxy, cả site sẽ chia chung một bucket và chặn nhầm người dùng thật.
 limiter = Limiter(
-    key_func=get_remote_address,
+    key_func=_get_client_ip,
     default_limits=[f"{settings.rate_limit_per_minute}/minute"],
 )
 
@@ -210,6 +228,9 @@ async def log_requests(request: Request, call_next):
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+# Thiếu dòng này thì Limiter chỉ là object nằm không: RATE_LIMIT_PER_MINUTE
+# không có tác dụng gì, /upload và /query nhận request không giới hạn.
+app.add_middleware(SlowAPIMiddleware)
 
 
 # ── Global Exception Handler ──────────────────────────────────────────────────

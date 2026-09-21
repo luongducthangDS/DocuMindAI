@@ -188,7 +188,10 @@ async def generate_pdf_report(
         chunks=chunks,
         filename=safe_name,
     )
-    return f"Báo cáo đã tạo: {path}"
+    # Trả URL tải chứ không phải đường dẫn tuyệt đối trên server: client không
+    # mở được "D:\...\reports\x.pdf", và trên Render nó còn lộ layout filesystem.
+    # Route tải đã có sẵn: GET /api/v1/reports/{filename}.
+    return f"Báo cáo đã tạo: /api/v1/reports/{path.name}"
 
 
 # ── Tool 6: Document Metadata ─────────────────────────────────────────────────
