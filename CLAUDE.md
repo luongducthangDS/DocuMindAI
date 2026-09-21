@@ -17,14 +17,16 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
 **Trạng thái hiện tại:**
 - Corpus lao động/BHXH: 20 văn bản tại `data/raw/lao_dong/` (+ `_versions/` cho bản sửa đổi
   cấp khoản). Corpus ngân hàng cũ đã bỏ — `data/raw/banking_docs/` không còn tồn tại.
-- ChromaDB `data/chroma_db/` (collection `documind_legal`): **1146 chunks**, 1024-dim.
+- ChromaDB `data/chroma_db/` (collection `documind_legal`): **1149 chunks**, 3072-dim.
+  Qdrant Cloud giữ đúng 1149 chunk đó — xem `scripts/restore_chroma_from_qdrant.py`.
 - `data/compliance/criteria.json`: 6 tiêu chí định lượng lao động (trần làm thêm giờ
   năm/tháng, thời gian thử việc, lương thử việc 85%, nghỉ hằng năm, lương tối thiểu vùng I).
   Mọi tiêu chí phải trích dẫn văn bản CÓ trong `data/raw/lao_dong/` — có test chặn
   (`tests/test_compliance.py::TestCriteriaDataIntegrity`).
 - Gold set: `data/eval/temporal_questions.json` (30 câu, viết tay trước khi chạy hệ thống).
   Bộ 25 câu ngân hàng tiền-pivot đã archive sang `data/eval/_archive/`.
-- Test suite: 227/227 tests passed (đo 2026-09-18).
+- Test suite: 230/230 tests passed (đo 2026-09-21 bằng `.venv` của repo, sau khi gộp
+  các nhánh fix guardrails/health/fail-fast; riêng `main` là 197).
 
 **Stack:**
 - Backend: FastAPI + LangGraph agent + vector store qua `VECTOR_STORE_PROVIDER`
@@ -166,7 +168,9 @@ for k in ("HF_HOME", "HF_HUB_CACHE", "TRANSFORMERS_CACHE", "SENTENCE_TRANSFORMER
 
 **LLM temperature:** `0.0` (không phải 0.1) để citation ổn định giữa các lần chạy.
 
-**ChromaDB:** Dùng local `PersistentClient` (không cần server). HTTP server ở `localhost:8000` thường không chạy — code tự fallback sang local. Collection `documind_legal` đang có 1146 chunks (1024-dim), kèm metadata `embedding_model`/`embedding_dim` để phát hiện lệch model.
+**ChromaDB:** Dùng local `PersistentClient` (không cần server). HTTP server ở `localhost:8000` thường không chạy — `get_chroma_collection()` probe TCP 0.5s rồi đi thẳng xuống local, thay vì chờ `heartbeat()` hết 4.2s. Collection `documind_legal` đang có 1149 chunks (3072-dim), kèm metadata `embedding_model`/`embedding_dim` để phát hiện lệch model.
+
+**Pin chromadb là 0.6.3 — chạy đúng `.venv` của repo:** Python global của máy có chromadb 1.5.9; chỉ cần mở `data/chroma_db/` một lần bằng bản đó là store bị migrate tại chỗ (thêm cột `schema_str`, `config_json_str` về `{}`, `index_metadata.pickle` của HNSW thành dict) và 0.6.3 hết mở nổi — mọi truy vấn trả 0 chunk. Khôi phục: `python scripts/repair_chroma_config.py` để vá config, `python scripts/restore_chroma_from_qdrant.py --yes` để dựng lại chunk+vector từ Qdrant (không re-embed, ~15 phút vì Qdrant free tier ở sa-east-1).
 
 **Đổi model embedding:** sửa `EMBEDDING_MODEL` trong `.env` → `python scripts/reembed_corpus.py --yes` (re-embed tại chỗ, giữ nguyên chunk + metadata temporal, tự sao lưu collection cũ sang `documind_legal__backup_<model cũ>`) → `pytest -q` + `python eval/temporal_eval.py`. So sánh ứng viên trước khi đổi: `python eval/embedding_ab.py --models current <model-moi>`.
 
