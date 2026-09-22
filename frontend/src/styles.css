@@ -292,7 +292,11 @@ nav { display: flex; flex-direction: column; gap: 3px; }
 .noanswer-icon { font-size: 14px; }
 
 /* Typing */
-.typing { display: flex; align-items: center; gap: 5px; padding: 14px 18px !important; }
+/* flex-direction: row bắt buộc — .msg-row.assistant .bubble (3 class, specificity
+   cao hơn .typing 1 class) đặt sẵn flex-direction: column để xếp dọc câu trả
+   lời/nguồn/action; .typing không tự ghi đè nên bị kế thừa cột dọc, xếp dọc
+   luôn cả 3 chấm + giờ đếm thay vì nằm ngang. */
+.typing { display: flex; flex-direction: row; align-items: center; gap: 5px; padding: 14px 18px !important; }
 .typing span {
   width: 7px; height: 7px; border-radius: 50%;
   background: var(--text3);
@@ -301,6 +305,10 @@ nav { display: flex; flex-direction: column; gap: 3px; }
 .typing span:nth-child(2) { animation-delay: .2s; }
 .typing span:nth-child(3) { animation-delay: .4s; }
 .elapsed-timer {
+  /* Reset lại toàn bộ style chấm tròn nhấp nháy của ".typing span" — cùng là
+     <span> nên bị dính width/height/border-radius/background/animation của
+     selector đó, chữ số bị nhồi vào 1 vòng tròn 7px không đọc được. */
+  width: auto; height: auto; border-radius: 0; background: none; animation: none;
   margin-left: 6px; font-size: 12px; color: var(--text3);
   font-variant-numeric: tabular-nums;
 }
