@@ -24,6 +24,8 @@ interface Message {
   latency_ms?: number;
   used_llm?: string;
   steps?: ThinkingStep[];
+  streaming?: boolean; // true trong lúc chờ/nhận token qua WebSocket
+  error?: boolean; // true nếu đây là thông báo lỗi hệ thống, không phải câu trả lời
 }
 
 interface Bookmark {
@@ -46,7 +48,30 @@ interface Document {
 // ── API ────────────────────────────────────────────────────────────────────────
 // VITE_API_URL: set khi frontend và backend deploy tách domain (vd. Vercel + Render).
 // Không set -> mặc định "/api/v1" (dev local qua Vite proxy, hoặc same-origin).
-const BASE = `${import.meta.env.VITE_API_URL ?? ""}/api/v1`;
+const API_URL = import.meta.env.VITE_API_URL ?? "";
+const BASE = `${API_URL}/api/v1`;
+// Cùng origin (API_URL rỗng, dev local qua Vite proxy) -> lấy origin hiện tại;
+// khác domain (production, Vercel gọi Render) -> đổi scheme của chính API_URL.
+// "https"→"wss", "http"→"ws" (regex chỉ khớp 4 ký tự "http" ở đầu, phần "s"
+// còn lại của "https" giữ nguyên).
+const WS_BASE = `${(API_URL || (typeof window !== "undefined" ? window.location.origin : "")).replace(/^http/, "ws")}/api/v1`;
+
+// FastAPI trả `detail` string khi lỗi tự viết (HTTPException), nhưng mảng
+// [{loc, msg, type}, ...] khi lỗi validate Pydantic tự động (422) — ném thẳng
+// mảng/object vào `new Error(...)` từng ra "[object Object]" (String(array)
+// nối .toString() của từng phần tử) thay vì lý do lỗi đọc được, vd. câu "hi"
+// (2 ký tự) từng bị 422 trước khi kịp tới nhánh chào hỏi.
+function extractErrorMessage(detail: unknown, fallback: string): string {
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail)) {
+    return detail
+      .map((d) => (d && typeof d === "object" && "msg" in d ? String((d as { msg: unknown }).msg) : String(d)))
+      .join("; ") || fallback;
+  }
+  if (detail && typeof detail === "object") return JSON.stringify(detail);
+  return fallback;
+}
+
 const api = {
   async query(query: string, session_id: string) {
     const r = await fetch(`${BASE}/query`, {
@@ -54,14 +79,14 @@ const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query, session_id }),
     });
-    if (!r.ok) throw new Error((await r.json()).detail ?? "Query failed");
+    if (!r.ok) throw new Error(extractErrorMessage((await r.json()).detail, "Query failed"));
     return r.json();
   },
   async upload(file: File) {
     const form = new FormData();
     form.append("file", file);
     const r = await fetch(`${BASE}/upload`, { method: "POST", body: form });
-    if (!r.ok) throw new Error((await r.json()).detail ?? "Upload failed");
+    if (!r.ok) throw new Error(extractErrorMessage((await r.json()).detail, "Upload failed"));
     return r.json();
   },
   async documents(): Promise<{ total: number; documents: Document[] }> {
@@ -98,6 +123,23 @@ function loadStoredMessages(): Message[] {
   } catch {
     return [];
   }
+}
+
+// Đoán nhanh phía client để CHỌN ĐƯỜNG TRUYỀN (REST đủ tính năng nhưng chờ
+// xong mới hiện, hay WS stream từng chữ nhưng chỉ trả lời hỏi-đáp thường) —
+// không phải quyết định định tuyến thật, cái đó vẫn ở
+// src/agent/graph.py::_keyword_classify (giữ đúng cùng bộ từ khoá, đừng sửa
+// lệch 2 bên). Đoán sai không hỏng gì: WS vẫn trả lời được bằng RAG chung,
+// chỉ là không dùng tool chuyên biệt so sánh/tóm tắt/báo cáo/tuân thủ.
+const _COMPLIANCE_PHRASES = ["có được", "có đủ điều kiện", "có bị", "có đạt", "quá", "vượt quá"];
+
+function needsRest(query: string): boolean {
+  const q = query.toLowerCase();
+  if (["so sánh", "khác nhau", "giống nhau", "phân biệt"].some((w) => q.includes(w))) return true;
+  if (["tóm tắt", "tóm lược", "nội dung chính"].some((w) => q.includes(w))) return true;
+  if (["báo cáo", "xuất pdf", "tổng hợp"].some((w) => q.includes(w))) return true;
+  if (_COMPLIANCE_PHRASES.some((p) => q.includes(p)) && /\d/.test(q)) return true;
+  return false;
 }
 
 const LS_BOOKMARKS_KEY = "documind_bookmarks";
@@ -363,6 +405,7 @@ function App() {
   const [messages, setMessages] = useState<Message[]>(loadStoredMessages);
   const [question, setQuestion] = useState("");
   const [busy, setBusy] = useState(false);
+  const [elapsedMs, setElapsedMs] = useState(0); // đếm giờ sống trong lúc chờ/stream câu trả lời
   const [tab, setTab] = useState<"chat" | "docs" | "upload" | "bookmarks">("chat");
   const [bookmarks, setBookmarks] = useState<Bookmark[]>(loadStoredBookmarks);
   const [docs, setDocs] = useState<Document[]>([]);
@@ -377,6 +420,19 @@ function App() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Đếm giờ sống trong lúc chờ (REST) hoặc đang stream (WS) — vd. "12.3s"
+  // cạnh chấm "..." thay vì im lặng không biết còn đang chạy hay đứng hình.
+  useEffect(() => {
+    if (!busy) {
+      setElapsedMs(0);
+      return;
+    }
+    const startedAt = Date.now();
+    setElapsedMs(0);
+    const id = window.setInterval(() => setElapsedMs(Date.now() - startedAt), 100);
+    return () => window.clearInterval(id);
+  }, [busy]);
 
   useEffect(() => {
     document.body.setAttribute("data-theme", theme);
@@ -451,11 +507,10 @@ function App() {
     }
   }
 
-  async function send(q: string) {
-    if (!q.trim() || busy) return;
-    setMessages((m) => [...m, { role: "user", content: q }]);
-    setQuestion("");
-    setBusy(true);
+  // Đường cũ: chờ toàn bộ pipeline xong mới hiện 1 cục câu trả lời. Vẫn dùng
+  // cho so sánh/tóm tắt/báo cáo/tuân thủ (chỉ REST làm được), và làm fallback
+  // khi WS lỗi/không mở được.
+  async function sendViaRest(q: string) {
     try {
       const d = await api.query(q, sessionId);
       setMessages((m) => [
@@ -472,10 +527,125 @@ function App() {
     } catch (e: unknown) {
       setMessages((m) => [
         ...m,
-        { role: "assistant", content: `❌ ${(e as Error).message}` },
+        { role: "assistant", content: `❌ ${(e as Error).message}`, error: true },
       ]);
     } finally {
       setBusy(false);
+    }
+  }
+
+  // Đường mới: mở 1 WebSocket riêng cho câu hỏi này (không giữ kết nối sống
+  // xuyên suốt phiên — lịch sử hội thoại đã nằm ở server theo session_id, mở
+  // mới mỗi câu tránh hẳn việc phải tự dựng cơ chế reconnect khi Render free
+  // tier ngủ/rớt kết nối). Server gửi token thô (text frame) xen giữa 2 JSON
+  // control message ({"error":...} hoặc {"done":true,"sources":[...]}) — xem
+  // src/api/routes/query.py::websocket_stream.
+  function sendViaStream(q: string) {
+    setMessages((m) => [...m, { role: "assistant", content: "", streaming: true }]);
+
+    const startedAt = Date.now();
+    let settled = false; // true khi đã có done/error, hoặc đã fallback sang REST
+    let gotToken = false;
+
+    const updateLast = (patch: Partial<Message>) => {
+      setMessages((m) => {
+        const next = [...m];
+        next[next.length - 1] = { ...next[next.length - 1], ...patch };
+        return next;
+      });
+    };
+
+    const fallbackToRest = () => {
+      if (settled) return;
+      settled = true;
+      setMessages((m) => m.slice(0, -1)); // bỏ placeholder rỗng
+      sendViaRest(q);
+    };
+
+    let ws: WebSocket;
+    try {
+      ws = new WebSocket(`${WS_BASE}/ws/${sessionId}`);
+    } catch {
+      fallbackToRest();
+      return;
+    }
+
+    // Render free tier ngủ sau 15 phút không dùng -> request đầu chờ ~50s;
+    // cho đủ thời gian trước khi bỏ cuộc và chuyển sang REST.
+    const openTimeout = setTimeout(() => {
+      if (ws.readyState !== WebSocket.OPEN) {
+        ws.close();
+        fallbackToRest();
+      }
+    }, 60000);
+
+    ws.onopen = () => {
+      clearTimeout(openTimeout);
+      ws.send(JSON.stringify({ query: q }));
+    };
+
+    ws.onmessage = (ev) => {
+      const data = ev.data as string;
+      let control: { done?: boolean; error?: string; sources?: Source[] } | null = null;
+      try {
+        const parsed = JSON.parse(data);
+        if (parsed && typeof parsed === "object" && ("done" in parsed || "error" in parsed)) {
+          control = parsed;
+        }
+      } catch {
+        // Không parse được JSON => token trả lời thô, không phải control message.
+      }
+
+      if (control) {
+        settled = true;
+        if (control.error) {
+          updateLast({ content: `❌ ${control.error}`, streaming: false, error: true });
+        } else {
+          updateLast({
+            sources: control.sources ?? [],
+            streaming: false,
+            latency_ms: Date.now() - startedAt,
+          });
+        }
+        setBusy(false);
+        ws.close();
+        return;
+      }
+
+      gotToken = true;
+      setMessages((m) => {
+        const next = [...m];
+        const last = next[next.length - 1];
+        next[next.length - 1] = { ...last, content: (last.content ?? "") + data };
+        return next;
+      });
+    };
+
+    ws.onclose = () => {
+      clearTimeout(openTimeout);
+      if (settled) return;
+      // Rớt kết nối trước khi có done/error. Đã có chữ hiện ra thì giữ lại
+      // (chuyển sang REST sẽ hỏi lại từ đầu, mất ngữ cảnh phần đã trả lời);
+      // chưa có chữ nào thì coi như thử WS thất bại, chuyển REST.
+      if (gotToken) {
+        settled = true;
+        updateLast({ streaming: false, latency_ms: Date.now() - startedAt });
+        setBusy(false);
+      } else {
+        fallbackToRest();
+      }
+    };
+  }
+
+  async function send(q: string) {
+    if (!q.trim() || busy) return;
+    setMessages((m) => [...m, { role: "user", content: q }]);
+    setQuestion("");
+    setBusy(true);
+    if (needsRest(q)) {
+      await sendViaRest(q);
+    } else {
+      sendViaStream(q);
     }
   }
 
@@ -630,22 +800,33 @@ function App() {
 
               {messages.map((msg, i) => {
                 const noAnswer =
-                  msg.role === "assistant" && (!msg.sources || msg.sources.length === 0);
+                  msg.role === "assistant" && !msg.streaming && !msg.error &&
+                  (!msg.sources || msg.sources.length === 0);
+                const emptyWhileStreaming = msg.streaming && !msg.content;
                 return (
                 <div key={i} className={`msg-row ${msg.role}`}>
-                  <div className={`bubble ${noAnswer ? "bubble-noanswer" : ""}`}>
+                  <div className={`bubble ${noAnswer ? "bubble-noanswer" : ""} ${emptyWhileStreaming ? "typing" : ""}`}>
                     {msg.role === "assistant" ? (
                       <>
-                        {noAnswer && (
-                          <div className="noanswer-flag">
-                            <span className="noanswer-icon">🔍</span>
-                            <span>Không tìm thấy trong dữ liệu hiện có</span>
-                          </div>
+                        {emptyWhileStreaming ? (
+                          <>
+                            <span /><span /><span />
+                            <span className="elapsed-timer">{(elapsedMs / 1000).toFixed(1)}s</span>
+                          </>
+                        ) : (
+                          <>
+                            {noAnswer && (
+                              <div className="noanswer-flag">
+                                <span className="noanswer-icon">🔍</span>
+                                <span>Không tìm thấy trong dữ liệu hiện có</span>
+                              </div>
+                            )}
+                            {msg.steps && msg.steps.length > 0 && (
+                              <ThinkingPanel steps={msg.steps} />
+                            )}
+                            <MdText text={msg.content} msgIndex={i} />
+                          </>
                         )}
-                        {msg.steps && msg.steps.length > 0 && (
-                          <ThinkingPanel steps={msg.steps} />
-                        )}
-                        <MdText text={msg.content} msgIndex={i} />
                         {msg.sources && msg.sources.length > 0 && (
                           <div className="sources-section">
                             <div className="sources-label">Nguồn trích dẫn</div>
@@ -656,7 +837,7 @@ function App() {
                             </div>
                           </div>
                         )}
-                        {!noAnswer && (
+                        {!noAnswer && !msg.streaming && (
                           <AnswerActions
                             bookmarked={isBookmarked(messages[i - 1]?.content ?? "", msg.content)}
                             onCopy={() => copyAnswer(msg.content)}
@@ -684,10 +865,11 @@ function App() {
                 );
               })}
 
-              {busy && tab === "chat" && (
+              {busy && tab === "chat" && !messages[messages.length - 1]?.streaming && (
                 <div className="msg-row assistant">
                   <div className="bubble typing">
                     <span /><span /><span />
+                    <span className="elapsed-timer">{(elapsedMs / 1000).toFixed(1)}s</span>
                   </div>
                 </div>
               )}

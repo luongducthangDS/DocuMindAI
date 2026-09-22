@@ -119,7 +119,8 @@ src/
     compliance.py     Compliance-check engine (pass/fail theo tiêu chí JSON hand-curated)
   agent/
     graph.py      LangGraph agent graph
-    memory.py     ShortTermMemory (in-process, max 10 turns)
+    memory.py     ShortTermMemory (cache in-process, max 10 turns, persist SQLite
+                  qua session_id — sống qua được restart/redeploy)
   config.py       Pydantic settings — đọc từ .env
   logger.py       Loguru setup
 

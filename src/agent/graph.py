@@ -174,6 +174,9 @@ def _contextualize_query(query: str, history: list[dict]) -> str:
         f"{'Người dùng' if m['role'] == 'user' else 'Trợ lý'}: {m['content'][:300]}" for m in history
     )
     prompt = _CONTEXTUALIZE_PROMPT.format(history_block=history_block, query=query)
+    # Phần biến đổi thực sự — bỏ khối rules/ví dụ tĩnh (~20 dòng, giống hệt mỗi
+    # lần gọi) khỏi input ghi lên Langfuse, không thì trace toàn chữ không đổi.
+    log_input = f"Câu hỏi: {query}\n\nLịch sử:\n{history_block or '(không có)'}"
 
     try:
         import google.generativeai as genai
@@ -197,7 +200,7 @@ def _contextualize_query(query: str, history: list[dict]) -> str:
                 if rewritten:
                     usage = getattr(response, "usage_metadata", None)
                     record_generation(
-                        "contextualize-query", model_name, prompt, rewritten,
+                        "contextualize-query", model_name, log_input, rewritten,
                         t0, datetime.now(timezone.utc),
                         prompt_tokens=getattr(usage, "prompt_token_count", 0) if usage else 0,
                         completion_tokens=getattr(usage, "candidates_token_count", 0) if usage else 0,
@@ -257,7 +260,7 @@ def _restore_diacritics(query: str) -> str:
                 if restored and abs(len(restored.split()) - len(query.split())) <= 1:
                     usage = getattr(response, "usage_metadata", None)
                     record_generation(
-                        "restore-diacritics", model_name, prompt, restored,
+                        "restore-diacritics", model_name, query, restored,
                         t0, datetime.now(timezone.utc),
                         prompt_tokens=getattr(usage, "prompt_token_count", 0) if usage else 0,
                         completion_tokens=getattr(usage, "candidates_token_count", 0) if usage else 0,
@@ -344,7 +347,8 @@ def router_node(state: AgentState) -> dict:
                 from src.rag.generator import gemini_generate
 
                 intent_raw = gemini_generate(
-                    f"{_ROUTER_PROMPT}\n\nCâu hỏi: {query}"
+                    f"{_ROUTER_PROMPT}\n\nCâu hỏi: {query}",
+                    log_input=f"[Phân loại ý định] {query}",
                 ).strip().lower()
             else:
                 intent_raw = keyword_intent
@@ -552,9 +556,10 @@ def reformulate_node(state: AgentState) -> dict:
         if settings.google_api_key:
             from src.rag.generator import gemini_generate
 
-            candidate = (gemini_generate(_REFORMULATE_PROMPT.format(
-                query=query, tried="; ".join(tried),
-            )) or "").strip().strip('"')
+            candidate = (gemini_generate(
+                _REFORMULATE_PROMPT.format(query=query, tried="; ".join(tried)),
+                log_input=f"Gốc: {query} | Đã thử: {'; '.join(tried) or '(chưa thử lần nào)'}",
+            ) or "").strip().strip('"')
             if candidate and candidate not in tried:
                 new_query = candidate
     except Exception as exc:
@@ -965,7 +970,8 @@ async def run_agent(
     }
 
     ctx, token = start_trace(
-        "documind-agent-query", session_id=session_id, tags=["legal-qa"]
+        "documind-agent-query", session_id=session_id,
+        tags=["legal-qa", f"env:{get_settings().environment}"],
     )
     result: AgentState | dict = {}
     try:

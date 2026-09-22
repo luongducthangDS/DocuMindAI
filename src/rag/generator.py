@@ -6,7 +6,9 @@ Nhà cung cấp duy nhất: Gemini (xoay vòng key × model, xem _call_gemini).
 from __future__ import annotations
 
 import asyncio
+import queue
 import re
+import threading
 from datetime import datetime, timezone
 from typing import AsyncIterator
 
@@ -237,13 +239,20 @@ def _gemini_pairs(models: list[str] | None = None) -> list[tuple[str, str]]:
 _GEMINI_PAIR_CURSOR = 0
 
 
-def gemini_generate(prompt: str, models: list[str] | None = None) -> str:
+def gemini_generate(
+    prompt: str, models: list[str] | None = None, log_input: str | None = None
+) -> str:
     """Sinh văn bản qua Gemini, xoay vòng (key, model) cho tới khi một cặp trả lời.
 
     Điểm vào DUY NHẤT cho mọi nơi cần LLM (generator, grader, compliance, agent)
     kể từ khi Gemini là nhà cung cấp duy nhất — một cursor chung giữ cho các lần
     gọi liên tiếp không dồn hết vào cặp đầu tiên.
-    """
+
+    `log_input`: phần được GHI LÊN LANGFUSE thay cho `prompt` đầy đủ, khi caller
+    có prompt template tĩnh (rules, hướng dẫn định dạng...) ghép với phần biến
+    đổi thực sự (câu hỏi, lịch sử). Không có nó, mọi lần gọi đều lộ nguyên văn
+    template tĩnh trong "input" — làm trace không đọc được (phần thay đổi chìm
+    giữa hàng chục dòng rules không đổi). `prompt` gửi cho Gemini KHÔNG đổi."""
     import google.generativeai as genai
 
     pairs = _gemini_pairs(models)
@@ -266,7 +275,7 @@ def gemini_generate(prompt: str, models: list[str] | None = None) -> str:
                 record_generation(
                     "gemini-generate",
                     model_name,
-                    prompt,
+                    log_input if log_input is not None else prompt,
                     response.text,
                     t0,
                     t1,
@@ -304,9 +313,13 @@ def _call_gemini(
         lines = [f"{'Người dùng' if m['role'] == 'user' else 'Trợ lý'}: {m['content'][:500]}"
                  for m in history]
         history_block = "\n**Lịch sử hội thoại:**\n" + "\n".join(lines) + "\n\n"
+    # Phần biến đổi thực sự mỗi lần gọi — KHÔNG gồm _SYSTEM_PROMPT (~50 dòng rules
+    # cố định, luôn giống hệt nhau) để log lên Langfuse còn đọc được.
+    variable_part = f"{history_block}**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {prompt}"
     return gemini_generate(
-        f"{_SYSTEM_PROMPT}\n\n{history_block}**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {prompt}",
+        f"{_SYSTEM_PROMPT}\n\n{variable_part}",
         models=models,
+        log_input=variable_part,
     )
 
 
@@ -408,6 +421,31 @@ def generate_answer(
     }
 
 
+def _stream_chunks_in_thread(model_name: str, api_key: str, prompt: str, q: queue.Queue) -> None:
+    """Chạy trong thread riêng, KHÔNG phải trong event loop asyncio.
+
+    genai `generate_content(..., stream=True)` trả về iterator ĐỒNG BỘ — lặp
+    `for chunk in stream` trực tiếp bên trong 1 hàm async thì mỗi lần chờ
+    chunk kế tiếp từ mạng sẽ đứng hình TOÀN BỘ event loop (mọi WS/REST khác
+    trên cùng process, không chỉ kết nối đang stream) cho tới khi chunk đó về
+    — đo được thật: 1 request WS treo là kéo theo 1 request REST hoàn toàn
+    không liên quan chờ tới hơn 1 phút. Đẩy từng chunk qua queue để phía async
+    chỉ `await asyncio.to_thread(q.get)` — nhường lại event loop trong lúc chờ."""
+    import google.generativeai as genai
+
+    try:
+        genai.configure(api_key=api_key)
+        stream = genai.GenerativeModel(model_name).generate_content(prompt, stream=True)
+        for chunk in stream:
+            if chunk.text:
+                q.put(("token", chunk.text))
+        q.put(("usage", getattr(stream, "usage_metadata", None)))
+    except Exception as exc:
+        q.put(("error", exc))
+    finally:
+        q.put(("end", None))
+
+
 async def stream_answer(
     query: str,
     chunks: list[RetrievedChunk],
@@ -447,47 +485,57 @@ async def stream_answer(
         yield _build_extractive_answer(query, chunks)
         return
 
-    import google.generativeai as genai
-
-    full_prompt = (
-        f"{_SYSTEM_PROMPT}\n\n**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {query}"
-    )
+    variable_part = f"**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {query}"
+    full_prompt = f"{_SYSTEM_PROMPT}\n\n{variable_part}"
     # Cùng vòng xoay (key, model) như đường không streaming; chỉ đổi cặp khi lỗi
     # xảy ra TRƯỚC token đầu tiên — đổi giữa chừng thì client đã nhận nửa câu trả
     # lời của cặp trước, nối tiếp bằng cặp khác sẽ ra văn bản chắp vá.
     for api_key, model_name in pairs:
         streamed = False
         answer_parts: list[str] = []
+        usage = None
+        stream_exc: Exception | None = None
         t0 = datetime.now(timezone.utc)
-        try:
-            genai.configure(api_key=api_key)
-            stream = genai.GenerativeModel(model_name).generate_content(
-                full_prompt, stream=True
-            )
-            for chunk in stream:
-                if chunk.text:
-                    streamed = True
-                    answer_parts.append(chunk.text)
-                    yield chunk.text
-                    await asyncio.sleep(0)  # yield control to event loop
-            if streamed:
-                usage = getattr(stream, "usage_metadata", None)
-                record_generation(
-                    "gemini-generate-stream",
-                    model_name,
-                    full_prompt,
-                    "".join(answer_parts),
-                    t0,
-                    datetime.now(timezone.utc),
-                    prompt_tokens=getattr(usage, "prompt_token_count", 0) if usage else 0,
-                    completion_tokens=getattr(usage, "candidates_token_count", 0) if usage else 0,
-                )
-                return
-        except Exception as exc:
+
+        q: queue.Queue = queue.Queue()
+        threading.Thread(
+            target=_stream_chunks_in_thread,
+            args=(model_name, api_key, full_prompt, q),
+            daemon=True,
+        ).start()
+
+        while True:
+            kind, payload = await asyncio.to_thread(q.get)
+            if kind == "token":
+                streamed = True
+                answer_parts.append(payload)
+                yield payload
+            elif kind == "usage":
+                usage = payload
+            elif kind == "error":
+                stream_exc = payload
+            elif kind == "end":
+                break
+
+        if stream_exc is not None:
             logger.warning("Gemini stream {} (key…{}) failed: {}",
-                           model_name, api_key[-4:], str(exc)[:150])
+                           model_name, api_key[-4:], str(stream_exc)[:150])
             if streamed:
                 return  # nửa câu trả lời đã ra — không nối thêm từ cặp khác
+            continue  # chưa có chữ nào ra — thử cặp (key, model) kế tiếp
+
+        if streamed:
+            record_generation(
+                "gemini-generate-stream",
+                model_name,
+                variable_part,
+                "".join(answer_parts),
+                t0,
+                datetime.now(timezone.utc),
+                prompt_tokens=getattr(usage, "prompt_token_count", 0) if usage else 0,
+                completion_tokens=getattr(usage, "candidates_token_count", 0) if usage else 0,
+            )
+            return
 
     logger.error("Gemini streaming failed on every (key, model) pair")
     yield _build_extractive_answer(query, chunks)

@@ -3,6 +3,8 @@ Tests for RAG pipeline: embedder, retriever, generator.
 Uses mocks to avoid real API calls and heavy model downloads.
 """
 
+import asyncio
+import time
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -106,6 +108,112 @@ class TestGenerator:
             async for token in stream_answer("q", []):
                 tokens.append(token)
             assert any("không" in t.lower() or "chưa" in t.lower() for t in tokens)
+
+
+class _FakeChunk:
+    def __init__(self, text: str):
+        self.text = text
+
+
+class _FakeUsage:
+    def __init__(self, prompt_tokens: int = 5, completion_tokens: int = 7):
+        self.prompt_token_count = prompt_tokens
+        self.candidates_token_count = completion_tokens
+
+
+class _FakeStream:
+    """Giả lập response.stream=True của genai — iterable đồng bộ, tuỳ chọn
+    time.sleep() giữa các chunk để mô phỏng độ trễ mạng thật (chạy trong
+    thread nền của _stream_chunks_in_thread, không phải trong test coroutine)."""
+
+    def __init__(self, texts: list[str], delay: float = 0.0):
+        self._texts = texts
+        self._delay = delay
+        self.usage_metadata = _FakeUsage()
+
+    def __iter__(self):
+        for t in self._texts:
+            if self._delay:
+                time.sleep(self._delay)
+            yield _FakeChunk(t)
+
+
+class _FakeModel:
+    def __init__(self, texts: list[str], delay: float = 0.0):
+        self._texts = texts
+        self._delay = delay
+
+    def generate_content(self, prompt, stream=True):
+        return _FakeStream(self._texts, delay=self._delay)
+
+
+def _make_chunk() -> RetrievedChunk:
+    return RetrievedChunk(
+        text="noi dung", score=0.9,
+        metadata={"title": "Law", "dieu_header": "", "source_url": ""},
+    )
+
+
+class TestStreamAnswerConcurrency:
+    """_stream_chunks_in_thread + queue bridge trong stream_answer() — thay
+    cho việc lặp trực tiếp generator đồng bộ của genai trong 1 coroutine async
+    (bug thật: đứng hình CẢ event loop, không chỉ 1 kết nối, khi chờ chunk kế
+    tiếp từ mạng — đo được ở local: 1 WS treo kéo REST không liên quan chờ
+    hơn 1 phút)."""
+
+    @pytest.mark.asyncio
+    async def test_yields_tokens_in_order_and_records_generation(self):
+        from src.rag.generator import stream_answer
+
+        chunks = [_make_chunk()]
+        fake_model = _FakeModel(["Xin ", "chao"])
+
+        with patch("src.rag.generator._gemini_pairs", return_value=[("key1", "model1")]), \
+             patch("src.rag.generator._effective_min_score", return_value=0.0), \
+             patch("google.generativeai.configure"), \
+             patch("google.generativeai.GenerativeModel", return_value=fake_model), \
+             patch("src.rag.generator.record_generation") as mock_record:
+            tokens = [t async for t in stream_answer("cau hoi", chunks)]
+
+        assert "".join(tokens) == "Xin chao"
+        mock_record.assert_called_once()
+        args = mock_record.call_args.args
+        assert args[0] == "gemini-generate-stream"
+        assert args[3] == "Xin chao"  # output_text
+        assert mock_record.call_args.kwargs["prompt_tokens"] == 5
+        assert mock_record.call_args.kwargs["completion_tokens"] == 7
+
+    @pytest.mark.asyncio
+    async def test_does_not_block_event_loop_while_waiting_for_network(self):
+        from src.rag.generator import stream_answer
+
+        chunks = [_make_chunk()]
+        ticks = 0
+
+        async def ticker():
+            nonlocal ticks
+            for _ in range(20):
+                await asyncio.sleep(0.01)
+                ticks += 1
+
+        # 2 chunk x 0.1s "độ trễ mạng" (thread nền) = ~0.2s tổng. Nếu event loop
+        # KHÔNG bị chặn, ticker (tick mỗi 0.01s) chạy song song suốt lúc đó.
+        with patch("src.rag.generator._gemini_pairs", return_value=[("key1", "model1")]), \
+             patch("src.rag.generator._effective_min_score", return_value=0.0), \
+             patch("google.generativeai.configure"), \
+             patch("google.generativeai.GenerativeModel",
+                   return_value=_FakeModel(["A", "B"], delay=0.1)), \
+             patch("src.rag.generator.record_generation"):
+
+            async def consume():
+                async for _ in stream_answer("cau hoi", chunks):
+                    pass
+
+            ticker_task = asyncio.create_task(ticker())
+            await consume()
+            ticker_task.cancel()
+
+        assert ticks >= 10
 
 
 class TestQueryComplexityRouting:

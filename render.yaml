@@ -60,3 +60,14 @@ services:
         sync: false
       - key: QDRANT_API_KEY
         sync: false
+      # Langfuse — log input/output/từng bước (router, retrieve, grade, generation
+      # kèm model+token+cost) của MỌI query thật vào Render, gửi ra ngoài qua
+      # OTLP/HTTP (xem src/langfuse_otel.py) nên KHÔNG phụ thuộc disk ephemeral —
+      # trace sống trên Langfuse Cloud dù container restart/ngủ/redeploy.
+      # Rỗng => tắt câm lặng, không lỗi gì (đúng thiết kế). Điền tay 2 key ở dashboard.
+      - key: LANGFUSE_PUBLIC_KEY
+        sync: false
+      - key: LANGFUSE_SECRET_KEY
+        sync: false
+      - key: LANGFUSE_BASE_URL
+        value: https://jp.cloud.langfuse.com

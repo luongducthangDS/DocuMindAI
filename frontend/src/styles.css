@@ -300,6 +300,10 @@ nav { display: flex; flex-direction: column; gap: 3px; }
 }
 .typing span:nth-child(2) { animation-delay: .2s; }
 .typing span:nth-child(3) { animation-delay: .4s; }
+.elapsed-timer {
+  margin-left: 6px; font-size: 12px; color: var(--text3);
+  font-variant-numeric: tabular-nums;
+}
 @keyframes blink {
   0%, 80%, 100% { opacity: .25; }
   40% { opacity: 1; }

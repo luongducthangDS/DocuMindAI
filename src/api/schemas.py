@@ -15,7 +15,11 @@ from pydantic import BaseModel, Field, field_validator
 # ── Query ──────────────────────────────────────────────────────────────────────
 
 class QueryRequest(BaseModel):
-    query: str = Field(..., min_length=3, max_length=1000)
+    # min_length=2, không phải 3 — khớp đúng min-length của WS handler
+    # (query.py::websocket_stream) và với lời chào ngắn nhất trong
+    # graph.py::_SMALLTALK_RE ("hi", "ok"): 3 từng chặn "hi" trước khi kịp
+    # tới nhánh smalltalk, trả về lỗi validate khó hiểu ngay câu hỏi đầu tiên.
+    query: str = Field(..., min_length=2, max_length=1000)
     session_id: str = Field(default="default", max_length=64)
     stream: bool = False
     # Mốc thời điểm tra cứu (ISO YYYY-MM-DD). Thiếu = quy định hiện hành hôm nay.

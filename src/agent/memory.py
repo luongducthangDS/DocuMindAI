@@ -1,6 +1,10 @@
 """
 Two-tier memory:
-  - Short-term: in-session list (Python dict, per request_id)
+  - Short-term: in-session list (Python dict cache), persisted to SQLite when
+    given a session_id — survives worker restart/redeploy (trước đây thuần
+    RAM, mất sạch mỗi lần restart dù frontend vẫn hiển thị lại đoạn chat cũ
+    từ localStorage, khiến contextualize câu hỏi tiếp theo mất ngữ cảnh mà
+    người dùng không biết).
   - Long-term:  SQLite with parameterized queries (no SQL injection)
 """
 
@@ -23,23 +27,50 @@ class Message:
 
 
 class ShortTermMemory:
-    """In-process session memory. Not shared across workers."""
+    """In-session message history, cached in-process for speed.
 
-    def __init__(self, max_turns: int = 10):
+    Truyền `session_id` => tự hydrate từ SQLite lúc khởi tạo và ghi xuống mỗi
+    lần `add()` — sống qua được restart/redeploy, kể cả khi cache in-process
+    (dict `_sessions` ở query.py) bị mất vì worker mới hoặc process mới khởi
+    động. Không truyền `session_id` => hành vi in-memory thuần cũ (dùng cho
+    test/script không cần bền)."""
+
+    def __init__(
+        self,
+        max_turns: int = 10,
+        session_id: str | None = None,
+        store: "LongTermMemory | None" = None,
+    ):
         self._max = max_turns
+        self._session_id = session_id
+        # store=... cho phép test tiêm một LongTermMemory riêng (tmp db) thay vì
+        # đụng vào singleton get_long_term_memory() (data/documind.db thật).
+        self._store = store
         self._history: list[Message] = []
+        if session_id:
+            self._history = [
+                Message(role=row["role"], content=row["content"], timestamp=row["created_at"])
+                for row in self._get_store().load_session_messages(session_id, max_turns)
+            ]
+
+    def _get_store(self) -> "LongTermMemory":
+        return self._store or get_long_term_memory()
 
     def add(self, role: str, content: str) -> None:
         self._history.append(Message(role=role, content=content))
         if len(self._history) > self._max * 2:
             # Keep last max_turns pairs — trim oldest
             self._history = self._history[-(self._max * 2):]
+        if self._session_id:
+            self._get_store().save_session_message(self._session_id, role, content, self._max)
 
     def as_messages(self) -> list[dict]:
         return [{"role": m.role, "content": m.content} for m in self._history]
 
     def clear(self) -> None:
         self._history.clear()
+        if self._session_id:
+            self._get_store().clear_session_messages(self._session_id)
 
 
 class LongTermMemory:
@@ -106,6 +137,17 @@ class LongTermMemory:
 
                 CREATE INDEX IF NOT EXISTS idx_error_log_created
                     ON error_log(created_at);
+
+                CREATE TABLE IF NOT EXISTS session_messages (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    session_id TEXT NOT NULL,
+                    role TEXT NOT NULL,
+                    content TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+
+                CREATE INDEX IF NOT EXISTS idx_session_messages_session
+                    ON session_messages(session_id, id);
             """)
         logger.debug("LongTermMemory DB initialized: {}", self._db)
 
@@ -167,6 +209,42 @@ class LongTermMemory:
                    VALUES (?, ?, ?, ?)""",
                 (endpoint, error_type, session_id, now),
             )
+
+    def load_session_messages(self, session_id: str, max_turns: int) -> list[sqlite3.Row]:
+        """Trả về tối đa max_turns*2 message gần nhất của session, theo đúng
+        thứ tự thời gian (cũ -> mới) — ShortTermMemory hydrate trực tiếp từ đây."""
+        with self._connect() as conn:
+            rows = conn.execute(
+                """SELECT role, content, created_at FROM session_messages
+                   WHERE session_id = ? ORDER BY id DESC LIMIT ?""",
+                (session_id, max_turns * 2),
+            ).fetchall()
+        return list(reversed(rows))
+
+    def save_session_message(
+        self, session_id: str, role: str, content: str, max_turns: int
+    ) -> None:
+        """Ghi 1 message + tỉa bớt message cũ ngoài cửa sổ max_turns*2 của
+        CHÍNH session này — giữ bảng không phình vô hạn theo thời gian, đúng
+        như ShortTermMemory tỉa trong RAM."""
+        now = datetime.utcnow().isoformat()
+        with self._connect() as conn:
+            conn.execute(
+                """INSERT INTO session_messages (session_id, role, content, created_at)
+                   VALUES (?, ?, ?, ?)""",
+                (session_id, role, content, now),
+            )
+            conn.execute(
+                """DELETE FROM session_messages WHERE session_id = ? AND id NOT IN (
+                       SELECT id FROM session_messages WHERE session_id = ?
+                       ORDER BY id DESC LIMIT ?
+                   )""",
+                (session_id, session_id, max_turns * 2),
+            )
+
+    def clear_session_messages(self, session_id: str) -> None:
+        with self._connect() as conn:
+            conn.execute("DELETE FROM session_messages WHERE session_id = ?", (session_id,))
 
     def get_error_rate(self, window_minutes: int = 60) -> float:
         since = (datetime.utcnow() - timedelta(minutes=window_minutes)).isoformat()

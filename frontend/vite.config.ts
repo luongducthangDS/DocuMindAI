@@ -9,6 +9,10 @@ export default defineConfig({
   },
   server: {
     port: 5174,
-    proxy: { "/api": "http://localhost:8081" },
+    // ws: true bắt buộc để Vite proxy cả kết nối WebSocket (/api/v1/ws/...),
+    // không chỉ HTTP thường — thiếu nó thì streaming chỉ chạy được khi build
+    // production (frontend/backend cùng domain hoặc qua VITE_API_URL), không
+    // chạy được ở dev local qua proxy này.
+    proxy: { "/api": { target: "http://localhost:8081", ws: true } },
   },
 });

@@ -15,7 +15,7 @@ from loguru import logger
 from src.agent.graph import run_agent
 from src.agent.memory import ShortTermMemory, get_long_term_memory
 from src.api.schemas import ComplianceVerdict, QueryRequest, QueryResponse, SourceItem, ThinkingStep
-from src.config import DOMAIN_NAME
+from src.config import DOMAIN_NAME, get_settings
 from src.guardrails import check_prompt_injection, validate_citations
 from src.langfuse_otel import end_trace, start_trace
 from src.rag.generator import stream_answer
@@ -56,7 +56,10 @@ _sessions: dict[str, ShortTermMemory] = {}
 
 def _get_session(session_id: str) -> ShortTermMemory:
     if session_id not in _sessions:
-        _sessions[session_id] = ShortTermMemory(max_turns=10)
+        # session_id=... => hydrate từ SQLite nếu worker này chưa từng thấy
+        # session này trong RAM (vd. sau restart/redeploy, hoặc worker khác
+        # trong cluster nhiều process) — không còn mất ngữ cảnh câm lặng.
+        _sessions[session_id] = ShortTermMemory(max_turns=10, session_id=session_id)
     return _sessions[session_id]
 
 
@@ -225,8 +228,12 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
             raw_query = data.get("query", "").strip()
             query = raw_query
 
-            if not query or len(query) < 3:
-                await websocket.send_json({"error": "Query too short (min 3 chars)"})
+            # min 2 — không phải 3: khớp đúng /api/v1/query (QueryRequest.query)
+            # và với chính danh sách lời chào ngắn nhất của _SMALLTALK_RE ("hi",
+            # "ok") — trước đây 3 ký tự chặn cả "hi" trước khi kịp tới nhánh
+            # smalltalk, người dùng nhận lỗi validate khó hiểu ngay câu đầu tiên.
+            if not query or len(query) < 2:
+                await websocket.send_json({"error": "Query too short (min 2 chars)"})
                 continue
             if len(query) > 1000:
                 await websocket.send_json({"error": "Query too long (max 1000 chars)"})
@@ -262,9 +269,14 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
             # khối bên dưới để tránh re-indent lớn — an toàn vì mỗi kết nối WS
             # chạy trong 1 asyncio Task riêng, contextvar không rò sang request
             # khác kể cả khi có exception thoát khỏi vòng lặp này).
-            ctx, token = start_trace(
+            # lf_token (không phải "token") — vòng lặp stream bên dưới dùng
+            # đúng tên "token" cho từng chunk văn bản; trùng tên sẽ ghi đè mất
+            # contextvars.Token thật, làm end_trace() nhận nhầm 1 chuỗi text
+            # và raise TypeError ("expected an instance of Token") — đã xảy ra
+            # thật, WS trả "Server error" dù câu trả lời stream ra đúng hết.
+            ctx, lf_token = start_trace(
                 "documind-ws-query", session_id=session_id,
-                tags=["legal-qa", "feature:websocket-chat"],
+                tags=["legal-qa", "feature:websocket-chat", f"env:{get_settings().environment}"],
             )
 
             history = session.as_messages()
@@ -310,7 +322,7 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
                 answer_parts.append(token)
 
             full_answer = "".join(answer_parts)
-            end_trace(ctx, token, "documind-ws-query", raw_query, full_answer)
+            end_trace(ctx, lf_token, "documind-ws-query", raw_query, full_answer)
             _, invalid_citations = validate_citations(full_answer, len(chunks))
             if invalid_citations:
                 logger.warning(

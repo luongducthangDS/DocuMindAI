@@ -37,6 +37,54 @@ class TestShortTermMemory:
         mem.clear()
         assert mem.as_messages() == []
 
+    def test_without_session_id_does_not_touch_db(self, tmp_path):
+        """Hành vi cũ (test khác cũng gọi ShortTermMemory() không session_id)
+        không được đụng vào SQLite — không session_id nghĩa là thuần RAM."""
+        store = LongTermMemory(db_path=tmp_path / "unused.db")
+        mem = ShortTermMemory(store=store)
+        mem.add("user", "test")
+        with store._connect() as conn:
+            count = conn.execute("SELECT COUNT(*) FROM session_messages").fetchone()[0]
+        assert count == 0
+
+    def test_survives_restart_via_session_id(self, tmp_path):
+        """Đúng bug Ted báo: worker restart mất _sessions dict trong RAM, nhưng
+        session_id thì frontend vẫn gửi lại (localStorage) — instance MỚI với
+        cùng session_id phải thấy lại lịch sử cũ từ SQLite."""
+        store = LongTermMemory(db_path=tmp_path / "sess.db")
+
+        mem1 = ShortTermMemory(max_turns=10, session_id="s-restart", store=store)
+        mem1.add("user", "câu hỏi 1")
+        mem1.add("assistant", "trả lời 1")
+
+        # Giả lập restart: KHÔNG tái sử dụng mem1, tạo instance mới cùng session_id.
+        mem2 = ShortTermMemory(max_turns=10, session_id="s-restart", store=store)
+        messages = mem2.as_messages()
+        assert len(messages) == 2
+        assert messages[0] == {"role": "user", "content": "câu hỏi 1"}
+        assert messages[1] == {"role": "assistant", "content": "trả lời 1"}
+
+    def test_persisted_history_trimmed_to_max_turns(self, tmp_path):
+        store = LongTermMemory(db_path=tmp_path / "sess.db")
+        mem1 = ShortTermMemory(max_turns=2, session_id="s-trim", store=store)
+        for i in range(5):
+            mem1.add("user", f"q{i}")
+            mem1.add("assistant", f"a{i}")
+
+        mem2 = ShortTermMemory(max_turns=2, session_id="s-trim", store=store)
+        messages = mem2.as_messages()
+        assert len(messages) == 4  # max_turns=2 => tối đa 4 message
+        assert messages[-1] == {"role": "assistant", "content": "a4"}  # giữ mới nhất
+
+    def test_clear_wipes_persisted_history_too(self, tmp_path):
+        store = LongTermMemory(db_path=tmp_path / "sess.db")
+        mem1 = ShortTermMemory(session_id="s-clear", store=store)
+        mem1.add("user", "test")
+        mem1.clear()
+
+        mem2 = ShortTermMemory(session_id="s-clear", store=store)
+        assert mem2.as_messages() == []
+
 
 class TestLongTermMemory:
     def _fetch_query_log(self, mem, session_id):
@@ -418,7 +466,15 @@ class TestSchemas:
         from src.api.schemas import QueryRequest
 
         with pytest.raises(ValidationError):
-            QueryRequest(query="ab")
+            QueryRequest(query="a")
+
+    def test_query_request_accepts_short_greeting(self):
+        """min_length=2 (không phải 3) — "hi"/"ok" là lời chào ngắn nhất trong
+        graph.py::_SMALLTALK_RE; 3 ký tự từng chặn "hi" trước khi kịp tới
+        nhánh smalltalk, trả lỗi validate khó hiểu ngay câu hỏi đầu tiên."""
+        from src.api.schemas import QueryRequest
+
+        assert QueryRequest(query="hi").query == "hi"
 
     def test_query_request_rejects_script_injection(self):
         from pydantic import ValidationError
