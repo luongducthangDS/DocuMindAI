@@ -27,6 +27,7 @@ Chưa đo lại cho gemini-embedding-001.
 
 from __future__ import annotations
 
+import asyncio
 import time
 from collections import deque
 from functools import lru_cache
@@ -188,13 +189,20 @@ class _GeminiAPIEmbedding(BaseEmbedding):
         return self._embed(texts, "retrieval_document")
 
     async def _aget_query_embedding(self, query: str) -> List[float]:
-        return self._get_query_embedding(query)
+        # asyncio.to_thread bắt buộc — _get_query_embedding có thể time.sleep()
+        # hàng chục giây trong _reserve_key() khi cả 3 key Gemini đều chạm trần
+        # quota phút. Gọi trực tiếp (không to_thread) chặn ĐÚNG event loop asyncio
+        # dùng chung cho mọi kết nối — 1 câu hỏi gặp lúc hết quota là đứng hình
+        # TOÀN BỘ server (mọi WS/REST khác), không chỉ câu hỏi đó. Đo được thật
+        # trên production: 1 request treo >3 phút, health check vẫn <1s nên biết
+        # server không chết hẳn — chỉ mỗi event loop bị khối đồng bộ này chiếm.
+        return await asyncio.to_thread(self._get_query_embedding, query)
 
     async def _aget_text_embedding(self, text: str) -> List[float]:
-        return self._get_text_embedding(text)
+        return await asyncio.to_thread(self._get_text_embedding, text)
 
     async def _aget_text_embeddings(self, texts: List[str]) -> List[List[float]]:
-        return self._get_text_embeddings(texts)
+        return await asyncio.to_thread(self._get_text_embeddings, texts)
 
 
 @lru_cache(maxsize=1)

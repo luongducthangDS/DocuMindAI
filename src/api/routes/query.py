@@ -18,7 +18,7 @@ from src.api.schemas import ComplianceVerdict, QueryRequest, QueryResponse, Sour
 from src.config import DOMAIN_NAME, get_settings
 from src.guardrails import check_prompt_injection, validate_citations
 from src.langfuse_otel import end_trace, start_trace
-from src.rag.generator import stream_answer
+from src.rag.generator import _cited_sources, stream_answer
 
 _CHAT_LOG: Path | None = None
 
@@ -335,16 +335,16 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
             # drift compounds turn over turn.
             session.add("user", raw_query)
             session.add("assistant", full_answer)
+            # _cited_sources (hàm dùng chung với REST, generator.py) — không tự
+            # ghép chunks[:5]: (a) tên field khớp đúng Source phía frontend
+            # (index/title/dieu_header/source_url), chunks[:5] cũ thiếu "index"
+            # nên frontend render literal "[]"; (b) chỉ trả chunk THẬT SỰ được
+            # trích dẫn [N] trong câu trả lời — chunks[:5] cũ hiện đủ 5 nguồn dù
+            # câu trả lời là "không tìm thấy quy định này" (0 trích dẫn), gây
+            # hiển thị mâu thuẫn: trả lời "không tìm thấy" nhưng vẫn liệt kê nguồn.
             await websocket.send_json({
                 "done": True,
-                "sources": [
-                    {
-                        "title": c.metadata.get("title", ""),
-                        "dieu": c.metadata.get("dieu_header", ""),
-                        "url": c.metadata.get("source_url", ""),
-                    }
-                    for c in chunks[:5]
-                ],
+                "sources": _cited_sources(full_answer, chunks),
             })
 
     except WebSocketDisconnect:

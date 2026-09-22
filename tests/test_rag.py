@@ -505,3 +505,31 @@ class TestGeminiEmbedderKeyRotation:
             slept.side_effect = lambda _: embedder._cooldown.update(k1=0.0)
             assert embedder._reserve_key(["xin chào"]) == "k1"
         slept.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_aget_query_embedding_does_not_block_event_loop(self):
+        """asyncio.to_thread bắt buộc: _get_query_embedding có thể time.sleep()
+        hàng chục giây chờ quota (_reserve_key) — gọi trực tiếp (không qua
+        thread) từng chặn CẢ event loop, đứng hình mọi WS/REST khác trên cùng
+        server khi retrieval gặp lúc hết quota Gemini embedding."""
+        embedder = self._make(keys=("k1",))
+
+        def slow_call(key, texts, task_type):
+            time.sleep(0.2)  # mô phỏng gọi mạng chậm / chờ quota
+            return [[0.1, 0.2]]
+
+        ticks = 0
+
+        async def ticker():
+            nonlocal ticks
+            for _ in range(20):
+                await asyncio.sleep(0.01)
+                ticks += 1
+
+        with patch.object(type(embedder), "_call_api", staticmethod(slow_call)):
+            ticker_task = asyncio.create_task(ticker())
+            result = await embedder._aget_query_embedding("cau hoi")
+            ticker_task.cancel()
+
+        assert result == [0.1, 0.2]
+        assert ticks >= 10
