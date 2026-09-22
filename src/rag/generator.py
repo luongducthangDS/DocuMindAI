@@ -7,11 +7,13 @@ from __future__ import annotations
 
 import asyncio
 import re
+from datetime import datetime, timezone
 from typing import AsyncIterator
 
 from loguru import logger
 
 from src.config import DOMAIN_NAME, DOMAIN_SCOPE, get_settings
+from src.langfuse_otel import record_generation
 from src.rag.retriever import RetrievedChunk
 
 # LangSmith tracing — optional
@@ -66,6 +68,42 @@ _EXTRACTIVE_CHARS_PER_SOURCE = 700
 # scores are on yet another scale. Callers using a non-reranked retriever MUST
 # pass an appropriate `min_score` (e.g. 0.0 to disable the gate).
 _MIN_RELEVANCE_SCORE = 0.05
+
+# --- Routing theo độ khó câu hỏi -------------------------------------------
+# ponytail: heuristic rẻ tiền, không phải classifier ML — nâng cấp lên model/
+# nhãn thật khi có đủ traffic để đo lệch. Dùng CHUNG cho cả việc chọn model
+# tier (RPD thấp hơn nhưng mạnh hơn flash-lite) và số chunk đưa vào context:
+# câu "khó" giữ nguyên top_n=8 của retriever để không mất nguồn cần đối chiếu,
+# câu thường cắt bớt để giảm token input.
+_COMPLEX_MIN_QUERY_CHARS = 150
+_COMPLEX_KEYWORDS = ("so sánh", "khác nhau")
+_COMPLEX_MIN_HISTORY_TURNS = 4
+_DOC_REF_RE = re.compile(r"\d{1,3}[-/]\d{4}")
+_SIMPLE_QUERY_MAX_CHUNKS = 5
+
+
+def _is_complex_query(query: str, history: list[dict] | None = None) -> bool:
+    """Câu hỏi dài, nhắc >=2 văn bản, có từ so sánh, hoặc hội thoại đã đi vài
+    lượt => coi là "khó"."""
+    if history and len(history) >= _COMPLEX_MIN_HISTORY_TURNS:
+        return True
+    if len(query) >= _COMPLEX_MIN_QUERY_CHARS:
+        return True
+    if len(set(_DOC_REF_RE.findall(query))) >= 2:
+        return True
+    ql = query.lower()
+    return any(kw in ql for kw in _COMPLEX_KEYWORDS)
+
+
+def _select_models(complex_query: bool) -> list[str] | None:
+    """None = dùng danh sách mặc định (gemini_generation_models) của
+    _gemini_pairs. Chỉ chuyển sang tier "khó" khi câu hỏi bị coi là phức tạp
+    VÀ tier đó thực sự có cấu hình (không rỗng)."""
+    if not complex_query:
+        return None
+    s = get_settings()
+    models = [m.strip() for m in s.gemini_generation_models_complex.split(",") if m.strip()]
+    return models or None
 
 
 def _effective_min_score() -> float:
@@ -220,8 +258,21 @@ def gemini_generate(prompt: str, models: list[str] | None = None) -> str:
         api_key, model_name = pairs[(start + offset) % n]
         try:
             genai.configure(api_key=api_key)
+            t0 = datetime.now(timezone.utc)
             response = genai.GenerativeModel(model_name).generate_content(prompt)
+            t1 = datetime.now(timezone.utc)
             if response.text:
+                usage = getattr(response, "usage_metadata", None)
+                record_generation(
+                    "gemini-generate",
+                    model_name,
+                    prompt,
+                    response.text,
+                    t0,
+                    t1,
+                    prompt_tokens=getattr(usage, "prompt_token_count", 0) if usage else 0,
+                    completion_tokens=getattr(usage, "candidates_token_count", 0) if usage else 0,
+                )
                 # Advance cursor so the NEXT call starts at the following pair —
                 # round-robin keeps any single (key, model) under its RPM limit.
                 _GEMINI_PAIR_CURSOR = (start + offset + 1) % n
@@ -241,7 +292,12 @@ def gemini_generate(prompt: str, models: list[str] | None = None) -> str:
     )
 
 
-def _call_gemini(prompt: str, context: str, history: list[dict] | None = None) -> str | None:
+def _call_gemini(
+    prompt: str,
+    context: str,
+    history: list[dict] | None = None,
+    models: list[str] | None = None,
+) -> str | None:
     """Câu trả lời có trích dẫn cho một câu hỏi, qua vòng xoay của gemini_generate."""
     history_block = ""
     if history:
@@ -249,7 +305,8 @@ def _call_gemini(prompt: str, context: str, history: list[dict] | None = None) -
                  for m in history]
         history_block = "\n**Lịch sử hội thoại:**\n" + "\n".join(lines) + "\n\n"
     return gemini_generate(
-        f"{_SYSTEM_PROMPT}\n\n{history_block}**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {prompt}"
+        f"{_SYSTEM_PROMPT}\n\n{history_block}**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {prompt}",
+        models=models,
     )
 
 
@@ -324,6 +381,10 @@ def generate_answer(
         }
     chunks = relevant_chunks
 
+    complex_query = _is_complex_query(query, history)
+    if not complex_query and len(chunks) > _SIMPLE_QUERY_MAX_CHUNKS:
+        chunks = chunks[:_SIMPLE_QUERY_MAX_CHUNKS]
+
     context, citation_list = _build_context(chunks)
     context = _as_of_block(as_of_date) + context
 
@@ -331,7 +392,7 @@ def generate_answer(
     # (key × model) bên trong _call_gemini; hết mọi cặp thì rơi về trích dẫn
     # nguyên văn, không gọi nhà cung cấp nào khác.
     try:
-        answer = _call_gemini(query, context, history=history)
+        answer = _call_gemini(query, context, history=history, models=_select_models(complex_query))
         used_llm = "gemini"
         logger.info("Gemini answered query ({} chars)", len(answer or ""))
     except Exception as exc:
@@ -375,9 +436,13 @@ async def stream_answer(
         return
     chunks = relevant_chunks
 
+    complex_query = _is_complex_query(query)
+    if not complex_query and len(chunks) > _SIMPLE_QUERY_MAX_CHUNKS:
+        chunks = chunks[:_SIMPLE_QUERY_MAX_CHUNKS]
+
     context, citation_list = _build_context(chunks)
 
-    pairs = _gemini_pairs()
+    pairs = _gemini_pairs(_select_models(complex_query))
     if not pairs:
         yield _build_extractive_answer(query, chunks)
         return
@@ -392,6 +457,8 @@ async def stream_answer(
     # lời của cặp trước, nối tiếp bằng cặp khác sẽ ra văn bản chắp vá.
     for api_key, model_name in pairs:
         streamed = False
+        answer_parts: list[str] = []
+        t0 = datetime.now(timezone.utc)
         try:
             genai.configure(api_key=api_key)
             stream = genai.GenerativeModel(model_name).generate_content(
@@ -400,9 +467,21 @@ async def stream_answer(
             for chunk in stream:
                 if chunk.text:
                     streamed = True
+                    answer_parts.append(chunk.text)
                     yield chunk.text
                     await asyncio.sleep(0)  # yield control to event loop
             if streamed:
+                usage = getattr(stream, "usage_metadata", None)
+                record_generation(
+                    "gemini-generate-stream",
+                    model_name,
+                    full_prompt,
+                    "".join(answer_parts),
+                    t0,
+                    datetime.now(timezone.utc),
+                    prompt_tokens=getattr(usage, "prompt_token_count", 0) if usage else 0,
+                    completion_tokens=getattr(usage, "candidates_token_count", 0) if usage else 0,
+                )
                 return
         except Exception as exc:
             logger.warning("Gemini stream {} (key…{}) failed: {}",

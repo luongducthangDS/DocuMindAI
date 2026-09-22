@@ -1,6 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
 
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # ── Phạm vi sản phẩm ──────────────────────────────────────────────────────────
@@ -39,6 +40,41 @@ class Settings(BaseSettings):
     # 2.5-flash-lite=20/10. Cac "flash" thuong (2.5/3/3.5/3.6/3.7/3.8) chi RPD 20.
     # gemini-2.0-* / 1.5-* / 2.5-pro / 3.1-pro = KHONG co quota tren key nay.
     gemini_generation_models: str = "gemini-3.1-flash-lite,gemini-3.5-flash-lite,gemini-2.5-flash-lite"
+    # Tier "khó": dùng khi generator._is_complex_query() đánh giá câu hỏi phức tạp
+    # (dài, so sánh nhiều văn bản, hội thoại nhiều lượt). "flash" thường RPD=20 —
+    # thấp hơn flash-lite (RPD=500) nhưng vẫn free tier, chấp nhận được vì số câu
+    # "khó" là thiểu số so với tổng truy vấn.
+    # Đã probe trực tiếp API (2026-09-22) để xác nhận tồn tại + có quota trên key
+    # hiện tại — KHÔNG suy đoán từ tên: gemini-2.5-flash bị retired ("no longer
+    # available to new users"), gemini-3-flash / gemini-3.1-flash 404 not found.
+    # 3.6/3.7/3.8-flash và 3-flash-preview đều OK. Nếu .env override
+    # GEMINI_GENERATION_MODELS (tier mặc định) bằng model nào trong danh sách
+    # dưới, đổi tier này để hai tier không trùng model.
+    gemini_generation_models_complex: str = "gemini-3.7-flash,gemini-3.8-flash,gemini-3.6-flash"
+
+    # Langfuse — LLM observability tùy chọn (trace/span cho toàn bộ agent run:
+    # router, retrieve, grade, reformulate, answer — xem src/langfuse_otel.py).
+    # Rỗng => tắt, không lỗi gì. Gửi bằng OTLP/HTTP thuần qua `requests` (đã có
+    # sẵn), KHÔNG dùng SDK chính thức: langfuse-python (OTel-based, >=4.x) đòi
+    # opentelemetry-api/sdk>=1.33.1; nâng 2 gói đó trong venv này để lại
+    # opentelemetry-exporter-otlp-proto-grpc==1.27.0 (dependency của chromadb)
+    # lệch version — đã thử cài thật, ImportError phá 17 test không liên quan
+    # gì tới LLM. 2026-09-22: dry-run pip không báo lỗi trên giấy nhưng bản grpc
+    # exporter vẫn cũ hơn nhiều so với bản SDK kéo lên — quyết định giữ nguyên
+    # REST thuần, đã đổi sang endpoint OTel (/api/public/otel/v1/traces) vì
+    # Legacy Ingestion API (/api/public/ingestion) sunset trên Langfuse Cloud
+    # 16/11/2026. Lấy keys tại cloud.langfuse.com (free tier) hoặc set
+    # langfuse_host nếu tự host / dùng vùng US, JP, HIPAA.
+    langfuse_public_key: str = ""
+    langfuse_secret_key: str = ""
+    # .env dùng tên LANGFUSE_BASE_URL (theo langfuse-cli) — field vẫn tên
+    # langfuse_host trong code, nên khai báo alias tường minh; nếu chỉ dựa vào
+    # case_sensitive=False mặc định, pydantic-settings chỉ khớp LANGFUSE_HOST,
+    # LANGFUSE_BASE_URL trong .env bị bỏ qua lặng lẽ.
+    langfuse_host: str = Field(
+        default="https://cloud.langfuse.com",
+        validation_alias=AliasChoices("LANGFUSE_HOST", "LANGFUSE_BASE_URL"),
+    )
     # Embedding chạy qua Gemini Embedding API — không nạp model nào vào RAM.
     # Collection mang nhãn model đã index; lệch nhãn ⇒ EmbeddingModelMismatch lúc mở
     # store, nên đổi giá trị này BẮT BUỘC chạy: python scripts/reembed_corpus.py --yes

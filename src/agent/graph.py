@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import re
 import time
+from datetime import datetime, timezone
 from typing import Annotated, Any, Literal, TypedDict
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
@@ -22,6 +23,7 @@ from loguru import logger
 from src.agent.memory import LongTermMemory, ShortTermMemory
 from src.agent.tools import ALL_TOOLS
 from src.config import DOMAIN_NAME, DOMAIN_SCOPE, DOMAIN_TOPICS, get_settings
+from src.langfuse_otel import end_trace, record_generation, record_span, start_trace
 from src.rag.generator import _cited_sources, generate_answer, stream_answer
 from src.rag.grader import grade_chunks
 from src.ingestion.manifest import corpus_earliest_point_in_time
@@ -187,11 +189,19 @@ def _contextualize_query(query: str, history: list[dict]) -> str:
         # and returning the original query.
         _MAX_GEMINI_ATTEMPTS = 3
         for api_key, model_name in _gemini_pairs()[:_MAX_GEMINI_ATTEMPTS]:
+            t0 = datetime.now(timezone.utc)
             try:
                 genai.configure(api_key=api_key)
                 response = genai.GenerativeModel(model_name).generate_content(prompt)
                 rewritten = (response.text or "").strip().strip('"')
                 if rewritten:
+                    usage = getattr(response, "usage_metadata", None)
+                    record_generation(
+                        "contextualize-query", model_name, prompt, rewritten,
+                        t0, datetime.now(timezone.utc),
+                        prompt_tokens=getattr(usage, "prompt_token_count", 0) if usage else 0,
+                        completion_tokens=getattr(usage, "candidates_token_count", 0) if usage else 0,
+                    )
                     return rewritten
             except Exception as exc:
                 logger.debug("contextualize_node Gemini {} failed: {}", model_name, str(exc)[:100])
@@ -237,14 +247,21 @@ def _restore_diacritics(query: str) -> str:
 
         # Cùng lý do với contextualize_node: node này nằm trên critical path
         # trước retrieval, nên chặn ở 2 lần thử thay vì quét hết mọi cặp.
+        prompt = _RESTORE_DIACRITICS_PROMPT.format(query=query)
         for api_key, model_name in _gemini_pairs()[:2]:
+            t0 = datetime.now(timezone.utc)
             try:
                 genai.configure(api_key=api_key)
-                response = genai.GenerativeModel(model_name).generate_content(
-                    _RESTORE_DIACRITICS_PROMPT.format(query=query)
-                )
+                response = genai.GenerativeModel(model_name).generate_content(prompt)
                 restored = (response.text or "").strip().strip('"')
                 if restored and abs(len(restored.split()) - len(query.split())) <= 1:
+                    usage = getattr(response, "usage_metadata", None)
+                    record_generation(
+                        "restore-diacritics", model_name, prompt, restored,
+                        t0, datetime.now(timezone.utc),
+                        prompt_tokens=getattr(usage, "prompt_token_count", 0) if usage else 0,
+                        completion_tokens=getattr(usage, "candidates_token_count", 0) if usage else 0,
+                    )
                     return restored
             except Exception as exc:
                 logger.debug("restore_diacritics Gemini {} failed: {}", model_name, str(exc)[:100])
@@ -379,6 +396,7 @@ def retrieve_node(state: AgentState) -> dict:
     import src.rag.retriever as r_module
 
     t0 = time.time()  # fix: must be defined before try/except
+    t0_dt = datetime.now(timezone.utc)
     query = state["query"]
 
     try:
@@ -421,6 +439,7 @@ def retrieve_node(state: AgentState) -> dict:
             seen[key] = seen.get(key, 0) + 1
         doc_summary = ", ".join(f"{k} ({v} đoạn)" for k, v in list(seen.items())[:3])
         detail = f"Tìm thấy {len(chunks)} đoạn" + (f" — {doc_summary}" if doc_summary else "")
+        record_span("retrieve-documents", "retriever", query, detail, t0_dt, datetime.now(timezone.utc))
 
         steps = state.get("steps") or []
         return {
@@ -432,6 +451,8 @@ def retrieve_node(state: AgentState) -> dict:
         logger.error("retrieve_node failed: {}", exc)
         chunks = retrieve_direct_chroma(query)
         ms = int((time.time() - t0) * 1000)
+        detail = f"Fallback ({type(exc).__name__}): {len(chunks)} đoạn"
+        record_span("retrieve-documents", "retriever", query, detail, t0_dt, datetime.now(timezone.utc))
         steps = state.get("steps") or []
         return {
             "retrieved_chunks": chunks,
@@ -440,7 +461,7 @@ def retrieve_node(state: AgentState) -> dict:
             # nên đây là dấu vết DUY NHẤT cho biết retriever chính đã hỏng.
             "steps": steps + [{
                 "label": "Tìm kiếm tài liệu",
-                "detail": f"Fallback ({type(exc).__name__}): {len(chunks)} đoạn",
+                "detail": detail,
                 "ms": ms,
             }],
         }
@@ -721,6 +742,7 @@ async def compliance_check_node(state: AgentState) -> dict:
     criterion matches or the situation lacks a usable number — same
     graceful-degrade pattern as compare_node/summarize_node/report_node."""
     t0 = time.time()
+    t0_dt = datetime.now(timezone.utc)
     from src.rag.compliance import check_compliance
 
     try:
@@ -744,6 +766,10 @@ async def compliance_check_node(state: AgentState) -> dict:
 
     answer = _render_compliance_answer(result)
     ms = int((time.time() - t0) * 1000)
+    record_span(
+        "compliance-check", "tool", state["query"],
+        f"{result['verdict']}: {answer}", t0_dt, datetime.now(timezone.utc),
+    )
     steps = state.get("steps") or []
     citation = result.get("citation") or {}
     sources = (
@@ -938,5 +964,16 @@ async def run_agent(
         "time_out_of_range": is_out_of_range(as_of, corpus_earliest_point_in_time()),
     }
 
-    result = await graph.ainvoke(initial_state)
+    ctx, token = start_trace(
+        "documind-agent-query", session_id=session_id, tags=["legal-qa"]
+    )
+    result: AgentState | dict = {}
+    try:
+        result = await graph.ainvoke(initial_state)
+    finally:
+        end_trace(
+            ctx, token, "documind-agent-query", query,
+            result.get("answer", ""),
+            extra_tags=[f"feature:{result.get('intent', 'unknown')}"],
+        )
     return result

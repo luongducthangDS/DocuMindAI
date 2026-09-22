@@ -17,6 +17,7 @@ from src.agent.memory import ShortTermMemory, get_long_term_memory
 from src.api.schemas import ComplianceVerdict, QueryRequest, QueryResponse, SourceItem, ThinkingStep
 from src.config import DOMAIN_NAME
 from src.guardrails import check_prompt_injection, validate_citations
+from src.langfuse_otel import end_trace, start_trace
 from src.rag.generator import stream_answer
 
 _CHAT_LOG: Path | None = None
@@ -257,6 +258,15 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
                 await websocket.send_json({"error": exc.detail, "done": True})
                 continue
 
+            # Trace này scope theo 1 lượt hỏi-đáp WS (không try/finally quanh cả
+            # khối bên dưới để tránh re-indent lớn — an toàn vì mỗi kết nối WS
+            # chạy trong 1 asyncio Task riêng, contextvar không rò sang request
+            # khác kể cả khi có exception thoát khỏi vòng lặp này).
+            ctx, token = start_trace(
+                "documind-ws-query", session_id=session_id,
+                tags=["legal-qa", "feature:websocket-chat"],
+            )
+
             history = session.as_messages()
             from src.agent.graph import (
                 _contextualize_query,
@@ -300,6 +310,7 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
                 answer_parts.append(token)
 
             full_answer = "".join(answer_parts)
+            end_trace(ctx, token, "documind-ws-query", raw_query, full_answer)
             _, invalid_citations = validate_citations(full_answer, len(chunks))
             if invalid_citations:
                 logger.warning(

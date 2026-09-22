@@ -153,6 +153,12 @@ logs/
   collection mang nhãn model đã index, lệch nhãn là `EmbeddingModelMismatch` lúc mở store.
 - `API_PORT=8081`
 - **Không được** thêm `HF_HOME` vào `.env` — pydantic `extra_forbidden` sẽ reject
+- `LANGFUSE_PUBLIC_KEY` / `LANGFUSE_SECRET_KEY` / `LANGFUSE_BASE_URL` (hoặc `LANGFUSE_HOST`,
+  cả hai tên đều được đọc) — tracing tuỳ chọn, rỗng thì tắt hẳn. Xem `src/langfuse_otel.py`:
+  gửi OTLP/HTTP thuần qua `requests`, KHÔNG cài SDK `langfuse` chính thức (xung đột version
+  `opentelemetry-api/sdk` với `chromadb` trong venv này — đã thử thật, phá 17 test). Một trace
+  = một lượt `run_agent()`/1 câu hỏi WS, span con cho retrieve (`retriever`), mọi lời gọi Gemini
+  (`generation`, kèm model/token/cost), compliance-check (`tool`).
 
 ## Các lưu ý kỹ thuật
 

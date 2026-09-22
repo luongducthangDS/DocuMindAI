@@ -108,6 +108,209 @@ class TestGenerator:
             assert any("không" in t.lower() or "chưa" in t.lower() for t in tokens)
 
 
+class TestQueryComplexityRouting:
+    """Heuristic routing model + kích thước context theo độ khó câu hỏi
+    (generator._is_complex_query / _select_models)."""
+
+    def test_short_query_is_simple(self):
+        from src.rag.generator import _is_complex_query
+
+        assert _is_complex_query("Luong toi thieu vung I la bao nhieu?") is False
+
+    def test_long_query_is_complex(self):
+        from src.rag.generator import _is_complex_query
+
+        assert _is_complex_query("a" * 200) is True
+
+    def test_comparison_keyword_is_complex(self):
+        from src.rag.generator import _is_complex_query
+
+        assert _is_complex_query("So sánh mức lương tối thiểu vùng I và vùng II") is True
+
+    def test_two_doc_refs_is_complex(self):
+        from src.rag.generator import _is_complex_query
+
+        assert _is_complex_query("So với 74-2024-ND-CP thì 293-2025-ND-CP đổi gì?") is True
+
+    def test_long_history_is_complex(self):
+        from src.rag.generator import _is_complex_query
+
+        history = [{"role": "user", "content": "x"}] * 4
+        assert _is_complex_query("cau hoi ngan", history=history) is True
+
+    def test_select_models_simple_returns_default(self):
+        from src.rag.generator import _select_models
+
+        assert _select_models(False) is None
+
+    def test_select_models_complex_returns_complex_tier(self):
+        from src.rag.generator import _select_models
+
+        models = _select_models(True)
+        assert models is not None
+        assert "gemini-3.7-flash" in models
+
+    @patch("src.rag.generator._call_gemini")
+    def test_generate_answer_trims_chunks_for_simple_query(self, mock_gemini):
+        from src.rag.generator import _SIMPLE_QUERY_MAX_CHUNKS, generate_answer
+
+        mock_gemini.return_value = "Tra loi [1]"
+        chunks = [
+            RetrievedChunk(text=f"Noi dung {i}", score=0.9, metadata={"title": f"Law {i}"})
+            for i in range(8)
+        ]
+        generate_answer("cau hoi ngan don gian", chunks)
+        called_context = mock_gemini.call_args.args[1]
+        assert f"[{_SIMPLE_QUERY_MAX_CHUNKS}]" in called_context
+        assert f"[{_SIMPLE_QUERY_MAX_CHUNKS + 1}]" not in called_context
+
+    @patch("src.rag.generator._call_gemini")
+    def test_generate_answer_keeps_all_chunks_for_complex_query(self, mock_gemini):
+        from src.rag.generator import generate_answer
+
+        mock_gemini.return_value = "So sanh: A [1] con B [8]"
+        chunks = [
+            RetrievedChunk(text=f"Noi dung {i}", score=0.9, metadata={"title": f"Law {i}"})
+            for i in range(8)
+        ]
+        generate_answer("So sánh điều kiện giữa hai văn bản này khác nhau ra sao", chunks)
+        called_context = mock_gemini.call_args.args[1]
+        assert "[8]" in called_context
+
+
+class _ImmediateThread:
+    """Stand-in cho threading.Thread chạy target NGAY (đồng bộ) thay vì
+    thread thật — để test có thể assert kết quả mà không cần join()."""
+
+    def __init__(self, target=None, daemon=None):
+        self._target = target
+
+    def start(self):
+        self._target()
+
+
+class TestLangfuseTracing:
+    """REST thuần (không SDK) gửi trace lên Langfuse qua OTLP/HTTP — xem lý do
+    trong config.langfuse_* / src/langfuse_otel.py: langfuse-python (OTel-based)
+    xung đột opentelemetry version với chromadb trong venv này."""
+
+    @patch("src.langfuse_otel.get_settings")
+    def test_no_keys_configured_sends_nothing(self, mock_settings):
+        from datetime import datetime, timezone
+
+        from src.langfuse_otel import record_generation
+
+        mock_settings.return_value.langfuse_public_key = ""
+        mock_settings.return_value.langfuse_secret_key = ""
+        with patch("threading.Thread") as mock_thread:
+            record_generation(
+                "gemini-generate", "model", "prompt", "output",
+                datetime.now(timezone.utc), datetime.now(timezone.utc),
+                prompt_tokens=1, completion_tokens=2,
+            )
+            mock_thread.assert_not_called()
+
+    @patch("src.langfuse_otel.get_settings")
+    def test_standalone_generation_sends_one_span_to_otel_endpoint(self, mock_settings):
+        """Gọi record_generation() ngoài start_trace() (vd. gemini_generate() từ
+        eval script) => tự tạo 1 trace đứng riêng, gửi ngay tới endpoint OTel mới
+        (không phải Legacy Ingestion API sunset 16/11/2026)."""
+        from datetime import datetime, timezone
+
+        from src.langfuse_otel import record_generation
+
+        mock_settings.return_value.langfuse_public_key = "pk-test"
+        mock_settings.return_value.langfuse_secret_key = "sk-test"
+        mock_settings.return_value.langfuse_host = "https://cloud.langfuse.com"
+
+        captured = {}
+
+        def fake_post(url, json=None, auth=None, headers=None, timeout=None):
+            captured["url"] = url
+            captured["json"] = json
+            captured["auth"] = auth
+            captured["headers"] = headers
+            return MagicMock()
+
+        with patch("threading.Thread", _ImmediateThread), \
+             patch("requests.post", side_effect=fake_post):
+            record_generation(
+                "gemini-generate", "gemini-3.1-flash-lite", "cau hoi", "cau tra loi",
+                datetime(2026, 1, 1, tzinfo=timezone.utc),
+                datetime(2026, 1, 1, 0, 0, 1, tzinfo=timezone.utc),
+                prompt_tokens=10, completion_tokens=5,
+            )
+
+        assert captured["url"] == "https://cloud.langfuse.com/api/public/otel/v1/traces"
+        assert captured["auth"] == ("pk-test", "sk-test")
+        assert captured["headers"]["x-langfuse-ingestion-version"] == "4"
+        spans = captured["json"]["resourceSpans"][0]["scopeSpans"][0]["spans"]
+        assert len(spans) == 1
+        span = spans[0]
+        assert "parentSpanId" not in span  # standalone => tự làm root, không cha
+        attrs = {a["key"]: a["value"] for a in span["attributes"]}
+        assert attrs["langfuse.observation.type"]["stringValue"] == "generation"
+        assert attrs["langfuse.observation.model.name"]["stringValue"] == "gemini-3.1-flash-lite"
+        assert '"input":10' in attrs["langfuse.observation.usage_details"]["stringValue"]
+
+    @patch("src.langfuse_otel.get_settings")
+    def test_network_error_does_not_raise(self, mock_settings):
+        from datetime import datetime, timezone
+
+        from src.langfuse_otel import record_generation
+
+        mock_settings.return_value.langfuse_public_key = "pk-test"
+        mock_settings.return_value.langfuse_secret_key = "sk-test"
+        mock_settings.return_value.langfuse_host = "https://cloud.langfuse.com"
+
+        with patch("threading.Thread", _ImmediateThread), \
+             patch("requests.post", side_effect=ConnectionError("boom")):
+            record_generation(  # không raise ra ngoài — quan sát là best-effort
+                "gemini-generate", "m", "p", "o",
+                datetime.now(timezone.utc), datetime.now(timezone.utc),
+            )
+
+    @patch("src.langfuse_otel.get_settings")
+    def test_trace_nests_child_spans_under_root(self, mock_settings):
+        """start_trace() + record_generation()/record_span() bên trong => children
+        KHÔNG gửi ngay, chỉ gửi 1 batch (root + con) khi end_trace()."""
+        from datetime import datetime, timezone
+
+        from src.langfuse_otel import end_trace, record_generation, record_span, start_trace
+
+        mock_settings.return_value.langfuse_public_key = "pk-test"
+        mock_settings.return_value.langfuse_secret_key = "sk-test"
+        mock_settings.return_value.langfuse_host = "https://cloud.langfuse.com"
+
+        captured = {}
+
+        def fake_post(url, json=None, auth=None, headers=None, timeout=None):
+            captured["json"] = json
+            return MagicMock()
+
+        with patch("threading.Thread", _ImmediateThread), \
+             patch("requests.post", side_effect=fake_post):
+            ctx, token = start_trace("documind-agent-query", session_id="s1", tags=["legal-qa"])
+            now = datetime.now(timezone.utc)
+            record_span("retrieve-documents", "retriever", "q", "5 đoạn", now, now)
+            record_generation(
+                "gemini-generate", "gemini-3.1-flash-lite", "prompt", "answer", now, now,
+            )
+            # Chưa end_trace() => chưa gửi gì cả.
+            assert "json" not in captured
+            end_trace(ctx, token, "documind-agent-query", "q", "answer")
+
+        spans = captured["json"]["resourceSpans"][0]["scopeSpans"][0]["spans"]
+        assert len(spans) == 3  # root + retriever span + generation span
+        root = next(s for s in spans if "parentSpanId" not in s)
+        children = [s for s in spans if "parentSpanId" in s]
+        assert len(children) == 2
+        assert all(c["parentSpanId"] == root["spanId"] for c in children)
+        assert all(c["traceId"] == root["traceId"] for c in children)
+        root_attrs = {a["key"]: a["value"] for a in root["attributes"]}
+        assert root_attrs["langfuse.session.id"]["stringValue"] == "s1"
+
+
 # ── Retriever Tests ────────────────────────────────────────────────────────────
 
 class TestNodesConversion:
