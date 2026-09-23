@@ -27,6 +27,7 @@ interface Message {
   streaming?: boolean; // true trong lúc chờ/nhận token qua WebSocket
   error?: boolean; // true nếu đây là thông báo lỗi hệ thống, không phải câu trả lời
   stopped?: boolean; // người dùng bấm Dừng giữa chừng — phần chữ đã stream được giữ lại
+  as_of?: string; // ngày áp dụng (YYYY-MM-DD) đã gửi kèm câu hỏi; không có = hôm nay
 }
 
 interface Bookmark {
@@ -74,12 +75,12 @@ function extractErrorMessage(detail: unknown, fallback: string): string {
 }
 
 const api = {
-  async query(query: string, session_id: string, signal?: AbortSignal) {
+  async query(query: string, session_id: string, as_of_date: string, signal?: AbortSignal) {
     const r = await fetch(`${BASE}/query`, {
       method: "POST",
       signal,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query, session_id }),
+      body: JSON.stringify({ query, session_id, as_of_date: as_of_date || null }),
     });
     if (!r.ok) throw new Error(extractErrorMessage((await r.json()).detail, "Query failed"));
     return r.json();
@@ -121,7 +122,12 @@ function loadStoredSessionId(): string {
 function loadStoredMessages(): Message[] {
   try {
     const raw = localStorage.getItem(LS_MESSAGES_KEY);
-    return raw ? (JSON.parse(raw) as Message[]) : [];
+    const msgs = raw ? (JSON.parse(raw) as Message[]) : [];
+    // Reload giữa lúc stream: placeholder rỗng bỏ đi (không thì "..." treo mãi),
+    // phần chữ đã nhận được giữ lại như bấm Dừng.
+    return msgs
+      .filter((m) => !(m.streaming && !m.content))
+      .map((m) => (m.streaming ? { ...m, streaming: false, stopped: true } : m));
   } catch {
     return [];
   }
@@ -230,6 +236,7 @@ const ICON_PATHS = {
   quote: "M4 7h6v6H4zM4 13c0 3 1 5 4 6M14 7h6v6h-6zM14 13c0 3 1 5 4 6",
   clock: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2",
   shield: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
+  calendar: "M3 5h18v16H3zM16 3v4M8 3v4M3 10h18",
 };
 type IconName = keyof typeof ICON_PATHS;
 
@@ -269,12 +276,29 @@ function sourceDomId(msgIndex: number, citationN: number) {
   return `source-${msgIndex}-${citationN}`;
 }
 
+// Màn rộng: nguồn nằm ở cột phải (id có tiền tố "panel-"), chỉ hiện nguồn của
+// MỘT câu trả lời — báo App đổi sang câu trả lời chứa trích dẫn vừa bấm rồi mới
+// tìm thẻ. Màn hẹp: cột phải ẩn, rơi về thẻ nguồn nằm ngay dưới câu trả lời.
+// ponytail: setTimeout 0 chờ React vẽ lại cột phải (setState trong onClick được
+// commit ngay khi handler kết thúc) thay vì nối callback qua MdText →
+// renderInline → renderWithCitations. Không dùng rAF: tab ẩn thì rAF không chạy.
+const CITE_EVENT = "documind:cite";
+
 function scrollToSource(msgIndex: number, citationN: number) {
-  const el = document.getElementById(sourceDomId(msgIndex, citationN));
-  if (!el) return;
-  el.scrollIntoView({ behavior: "smooth", block: "center" });
-  el.classList.add("source-card-flash");
-  setTimeout(() => el.classList.remove("source-card-flash"), 1200);
+  window.dispatchEvent(new CustomEvent(CITE_EVENT, { detail: msgIndex }));
+  setTimeout(() => {
+    const id = sourceDomId(msgIndex, citationN);
+    const el = [document.getElementById(`panel-${id}`), document.getElementById(id)]
+      .find((e) => e && e.offsetParent !== null);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    el.classList.add("source-card-flash");
+    setTimeout(() => el.classList.remove("source-card-flash"), 1200);
+  }, 0);
+}
+
+function fmtDate(iso: string) {
+  return iso.split("-").reverse().join("/");
 }
 
 // Splits text on "[N]" citation markers, turning each into a clickable button
@@ -452,9 +476,9 @@ function AnswerActions({
 }
 
 // ── Source card ────────────────────────────────────────────────────────────────
-function SourceCard({ src, msgIndex }: { src: Source; msgIndex: number }) {
+function SourceCard({ src, msgIndex, idPrefix = "" }: { src: Source; msgIndex: number; idPrefix?: string }) {
   return (
-    <div className="source-card" id={sourceDomId(msgIndex, src.index)}>
+    <div className="source-card" id={idPrefix + sourceDomId(msgIndex, src.index)}>
       <div className="source-header">
         <span className="source-index">[{src.index}]</span>
         {src.dieu_header && <span className="source-dieu">{src.dieu_header}</span>}
@@ -466,6 +490,49 @@ function SourceCard({ src, msgIndex }: { src: Source; msgIndex: number }) {
         </a>
       )}
     </div>
+  );
+}
+
+// ── Ngày áp dụng (as_of_date) ─────────────────────────────────────────────────
+// Rỗng = quy định hiện hành hôm nay. Dùng lịch có sẵn của trình duyệt
+// (<input type="date">, ẩn, mở bằng showPicker) thay vì tự dựng date picker.
+function AsOfChip({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const ref = useRef<HTMLInputElement>(null);
+  function open() {
+    const el = ref.current;
+    if (!el) return;
+    try {
+      el.showPicker();
+    } catch {
+      el.focus(); // trình duyệt cũ không có showPicker
+    }
+  }
+  return (
+    <span className="asof-chip">
+      <button
+        type="button"
+        className="asof-open"
+        onClick={open}
+        title="Tra cứu theo quy định có hiệu lực tại một ngày cụ thể"
+      >
+        <Icon name="calendar" size={14} />
+        <span>Áp dụng tại: <strong>{value ? fmtDate(value) : "hôm nay"}</strong></span>
+      </button>
+      {value && (
+        <button type="button" className="asof-clear" onClick={() => onChange("")} aria-label="Về quy định hiện hành hôm nay">
+          <Icon name="x" size={12} />
+        </button>
+      )}
+      <input
+        ref={ref}
+        type="date"
+        className="asof-input"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        aria-label="Ngày áp dụng"
+        tabIndex={-1}
+      />
+    </span>
   );
 }
 
@@ -484,6 +551,8 @@ function App() {
   const [health, setHealth] = useState<"ok" | "degraded" | "error" | "unknown">("unknown");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [theme, setTheme] = useState<Theme>(loadStoredTheme);
+  const [asOf, setAsOf] = useState(""); // YYYY-MM-DD, rỗng = hôm nay
+  const [panelMsg, setPanelMsg] = useState<number | null>(null); // null = câu trả lời mới nhất có nguồn
   const fileRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -495,6 +564,15 @@ function App() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    const onCite = (e: Event) => {
+      const i = (e as CustomEvent<number>).detail;
+      if (i < 1000) setPanelMsg(i); // 1000+ = thẻ đã lưu, không thuộc hội thoại
+    };
+    window.addEventListener(CITE_EVENT, onCite);
+    return () => window.removeEventListener(CITE_EVENT, onCite);
+  }, []);
 
   // Ô nhập tự giãn theo nội dung, kể cả khi đổi từ code (huỷ, gợi ý, sửa).
   useLayoutEffect(() => {
@@ -580,6 +658,7 @@ function App() {
     const id = genSessionId();
     setSessionId(id);
     setMessages([]);
+    setPanelMsg(null);
     setSidebarOpen(false);
   }
 
@@ -601,11 +680,11 @@ function App() {
   // Đường cũ: chờ toàn bộ pipeline xong mới hiện 1 cục câu trả lời. Vẫn dùng
   // cho so sánh/tóm tắt/báo cáo/tuân thủ (chỉ REST làm được), và làm fallback
   // khi WS lỗi/không mở được.
-  async function sendViaRest(q: string, reqId: number) {
+  async function sendViaRest(q: string, reqId: number, asOfDate: string) {
     const ctrl = new AbortController();
     abortRef.current = () => ctrl.abort();
     try {
-      const d = await api.query(q, sessionId, ctrl.signal);
+      const d = await api.query(q, sessionId, asOfDate, ctrl.signal);
       if (reqId !== reqRef.current) return;
       setMessages((m) => [
         ...m,
@@ -616,6 +695,7 @@ function App() {
           latency_ms: d.latency_ms,
           used_llm: d.used_llm,
           steps: d.steps ?? [],
+          as_of: asOfDate || undefined,
         },
       ]);
     } catch (e: unknown) {
@@ -635,8 +715,8 @@ function App() {
   // tier ngủ/rớt kết nối). Server gửi token thô (text frame) xen giữa 2 JSON
   // control message ({"error":...} hoặc {"done":true,"sources":[...]}) — xem
   // src/api/routes/query.py::websocket_stream.
-  function sendViaStream(q: string, reqId: number) {
-    setMessages((m) => [...m, { role: "assistant", content: "", streaming: true }]);
+  function sendViaStream(q: string, reqId: number, asOfDate: string) {
+    setMessages((m) => [...m, { role: "assistant", content: "", streaming: true, as_of: asOfDate || undefined }]);
 
     const startedAt = Date.now();
     let settled = false; // true khi đã có done/error, hoặc đã fallback sang REST
@@ -654,7 +734,7 @@ function App() {
       if (settled) return;
       settled = true;
       setMessages((m) => m.slice(0, -1)); // bỏ placeholder rỗng
-      sendViaRest(q, reqId);
+      sendViaRest(q, reqId, asOfDate);
     };
 
     let ws: WebSocket;
@@ -682,7 +762,7 @@ function App() {
 
     ws.onopen = () => {
       clearTimeout(openTimeout);
-      ws.send(JSON.stringify({ query: q }));
+      ws.send(JSON.stringify({ query: q, as_of_date: asOfDate || null }));
     };
 
     ws.onmessage = (ev) => {
@@ -743,12 +823,13 @@ function App() {
     if (!q.trim() || busy) return;
     setMessages((m) => [...m, { role: "user", content: q }]);
     setQuestion("");
+    setPanelMsg(null); // cột nguồn theo câu trả lời mới
     setBusy(true);
     const reqId = ++reqRef.current;
     if (needsRest(q)) {
-      await sendViaRest(q, reqId);
+      await sendViaRest(q, reqId, asOf);
     } else {
-      sendViaStream(q, reqId);
+      sendViaStream(q, reqId, asOf);
     }
   }
 
@@ -814,6 +895,11 @@ function App() {
   const [headerTitle, headerSub] = HEADERS[tab];
   const isLanding = tab === "chat" && messages.length === 0;
 
+  // Cột nguồn bên phải (màn rộng): câu trả lời đang chọn, mặc định cái mới nhất có nguồn.
+  const latestSourced = messages.reduce((acc, m, i) => (m.role === "assistant" && m.sources?.length ? i : acc), -1);
+  const panelIdx = panelMsg !== null && messages[panelMsg]?.sources?.length ? panelMsg : latestSourced;
+  const panelSources = panelIdx >= 0 ? messages[panelIdx].sources ?? [] : [];
+
   // Điền vào ô nhập thay vì gửi ngay — sửa được trước khi Enter.
   function fillComposer(q: string) {
     setQuestion(q);
@@ -827,7 +913,10 @@ function App() {
         <button className="icon-only" onClick={() => setSidebarOpen(true)} aria-label="Mở menu">
           <Icon name="menu" size={20} />
         </button>
-        <span className="mobile-topbar-title">DocuMind</span>
+        <span className="mobile-topbar-title">
+          {tab === "chat" && <BrandMark size={24} />}
+          {tab === "chat" ? "DocuMind" : headerTitle}
+        </span>
         <button
           className="icon-only"
           onClick={() => { newConversation(); setTab("chat"); }}
@@ -906,6 +995,7 @@ function App() {
             khi trang trống, dưới đáy khi đã có hội thoại) để textarea không bị
             mount lại, không mất focus/nội dung khi chuyển qua lại. */}
         {tab === "chat" && (
+          <div className="chat-row">
           <div className={`panel chat-panel${isLanding ? " is-landing" : ""}`}>
             {isLanding ? (
               <div className="hero">
@@ -965,26 +1055,39 @@ function App() {
                               </div>
                             </div>
                           )}
-                          {!noAnswer && !msg.streaming && (
-                            <AnswerActions
-                              bookmarked={isBookmarked(messages[i - 1]?.content ?? "", msg.content)}
-                              onCopy={() => copyAnswer(msg.content)}
-                              onToggleBookmark={() =>
-                                toggleBookmark(messages[i - 1]?.content ?? "", msg.content, msg.sources ?? [])
-                              }
-                            />
-                          )}
-                          <div className="msg-meta">
-                            {msg.stopped && <span className="latency">Đã dừng</span>}
-                            {msg.used_llm && msg.used_llm !== "none" && (
-                              <span className="llm-badge">
-                                {msg.used_llm === "gemini" ? "Gemini" : msg.used_llm === "extractive_fallback" ? "Trích xuất trực tiếp" : msg.used_llm}
-                              </span>
+                          {!msg.streaming && (
+                          <div className="msg-footer">
+                            {!noAnswer && (
+                              <AnswerActions
+                                bookmarked={isBookmarked(messages[i - 1]?.content ?? "", msg.content)}
+                                onCopy={() => copyAnswer(msg.content)}
+                                onToggleBookmark={() =>
+                                  toggleBookmark(messages[i - 1]?.content ?? "", msg.content, msg.sources ?? [])
+                                }
+                              />
                             )}
-                            {msg.latency_ms && (
-                              <span className="latency">{(msg.latency_ms / 1000).toFixed(1)}s</span>
-                            )}
+                            <div className="msg-meta">
+                              {msg.sources && msg.sources.length > 0 && (
+                                <button
+                                  className={`icon-btn show-sources${i === panelIdx ? " icon-btn-active" : ""}`}
+                                  onClick={() => setPanelMsg(i)}
+                                >
+                                  {msg.sources.length} nguồn
+                                </button>
+                              )}
+                              {msg.as_of && <span className="latency">Áp dụng tại {fmtDate(msg.as_of)}</span>}
+                              {msg.stopped && <span className="latency">Đã dừng</span>}
+                              {msg.used_llm && msg.used_llm !== "none" && (
+                                <span className="llm-badge">
+                                  {msg.used_llm === "gemini" ? "Gemini" : msg.used_llm === "extractive_fallback" ? "Trích xuất trực tiếp" : msg.used_llm}
+                                </span>
+                              )}
+                              {msg.latency_ms && (
+                                <span className="latency">{(msg.latency_ms / 1000).toFixed(1)}s</span>
+                              )}
+                            </div>
                           </div>
+                          )}
                         </>
                       ) : (
                         msg.content
@@ -1025,6 +1128,8 @@ function App() {
                     }
                   }}
                 />
+                <div className="composer-bar">
+                <AsOfChip value={asOf} onChange={setAsOf} />
                 {busy ? (
                   <button className="send-btn stop" onClick={cancel} title="Dừng (Esc)">
                     <Icon name="stop" size={12} />
@@ -1041,6 +1146,7 @@ function App() {
                     <Icon name="arrowUp" size={18} />
                   </button>
                 )}
+                </div>
               </div>
               <div className="input-hint">
                 <span className="kbd-hint">
@@ -1072,6 +1178,24 @@ function App() {
               </div>
             )}
           </div>
+
+          {panelSources.length > 0 && (
+            <aside className="sources-aside" aria-label="Nguồn trích dẫn">
+              <div className="aside-head">
+                <h2 className="aside-title">Nguồn trích dẫn</h2>
+                <span className="aside-count">{panelSources.length} nguồn</span>
+              </div>
+              {messages[panelIdx - 1]?.role === "user" && (
+                <div className="aside-q">{messages[panelIdx - 1].content}</div>
+              )}
+              <div className="sources-list">
+                {panelSources.map((src) => (
+                  <SourceCard key={src.index} src={src} msgIndex={panelIdx} idPrefix="panel-" />
+                ))}
+              </div>
+            </aside>
+          )}
+          </div>
         )}
 
         {/* Docs */}
@@ -1084,18 +1208,21 @@ function App() {
                 <div className="empty-sub">Tải lên PDF để bắt đầu</div>
               </div>
             ) : (
-              <div className="doc-grid">
+              <div className="doc-table" role="table" aria-label="Văn bản đã lập chỉ mục">
+                <div className="doc-row doc-head" role="row">
+                  <span role="columnheader">Số hiệu</span>
+                  <span role="columnheader">Tên văn bản</span>
+                  <span role="columnheader">Loại</span>
+                  <span role="columnheader">Số đoạn</span>
+                  <span role="columnheader">Ban hành</span>
+                </div>
                 {docs.map((doc) => (
-                  <div key={doc.id} className="doc-card">
-                    <div className="doc-title">{doc.title}</div>
-                    <div className="doc-meta">
-                      {doc.doc_type && <span className="doc-tag">{doc.doc_type}</span>}
-                    </div>
-                    {doc.so_hieu && <div className="muted">{doc.so_hieu}</div>}
-                    <div className="doc-footer">
-                      <span>{doc.chunk_count} đoạn</span>
-                      {doc.ngay_ban_hanh && <span>Ban hành: {doc.ngay_ban_hanh}</span>}
-                    </div>
+                  <div key={doc.id} className="doc-row" role="row">
+                    <span role="cell" className="doc-so">{doc.so_hieu || "—"}</span>
+                    <span role="cell" className="doc-title">{doc.title}</span>
+                    <span role="cell">{doc.doc_type && <span className="doc-tag">{doc.doc_type}</span>}</span>
+                    <span role="cell" className="doc-num">{doc.chunk_count}</span>
+                    <span role="cell" className="doc-num">{doc.ngay_ban_hanh || "—"}</span>
                   </div>
                 ))}
               </div>
