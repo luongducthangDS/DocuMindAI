@@ -72,39 +72,26 @@ function extractErrorMessage(detail: unknown, fallback: string): string {
   return fallback;
 }
 
-// Tenant credential. Only the key travels — which tenant and which ACL labels it
-// grants is decided by the server (src/api/principal.py), never by this client.
-function authHeaders(apiKey: string): Record<string, string> {
-  return apiKey ? { "X-API-Key": apiKey } : {};
-}
-
-type Principal = { tenant_id: string; acl_labels: string[]; authenticated: boolean };
-
 const api = {
-  async query(query: string, session_id: string, apiKey = "") {
+  async query(query: string, session_id: string) {
     const r = await fetch(`${BASE}/query`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...authHeaders(apiKey) },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query, session_id }),
     });
     if (!r.ok) throw new Error(extractErrorMessage((await r.json()).detail, "Query failed"));
     return r.json();
   },
-  async upload(file: File, apiKey = "") {
+  async upload(file: File) {
     const form = new FormData();
     form.append("file", file);
-    const r = await fetch(`${BASE}/upload`, { method: "POST", body: form, headers: authHeaders(apiKey) });
+    const r = await fetch(`${BASE}/upload`, { method: "POST", body: form });
     if (!r.ok) throw new Error(extractErrorMessage((await r.json()).detail, "Upload failed"));
     return r.json();
   },
-  async documents(apiKey = ""): Promise<{ total: number; documents: Document[] }> {
-    const r = await fetch(`${BASE}/documents`, { headers: authHeaders(apiKey) });
+  async documents(): Promise<{ total: number; documents: Document[] }> {
+    const r = await fetch(`${BASE}/documents`);
     if (!r.ok) throw new Error("Failed to load documents");
-    return r.json();
-  },
-  async whoami(apiKey: string): Promise<Principal> {
-    const r = await fetch(`${BASE}/whoami`, { headers: authHeaders(apiKey) });
-    if (!r.ok) throw new Error(extractErrorMessage((await r.json()).detail, "API key không hợp lệ"));
     return r.json();
   },
   async health() {
@@ -174,16 +161,6 @@ function loadStoredTheme(): Theme {
     return localStorage.getItem(LS_THEME_KEY) === "dark" ? "dark" : "light";
   } catch {
     return "light";
-  }
-}
-
-const LS_API_KEY = "documind_api_key";
-
-function loadStoredApiKey(): string {
-  try {
-    return localStorage.getItem(LS_API_KEY) ?? "";
-  } catch {
-    return "";
   }
 }
 
@@ -437,13 +414,6 @@ function App() {
   const [health, setHealth] = useState<"ok" | "degraded" | "error" | "unknown">("unknown");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [theme, setTheme] = useState<Theme>(loadStoredTheme);
-  // apiKey is what requests use; keyDraft is what the input holds. Applying on
-  // submit rather than per keystroke avoids a /whoami call (and a server-side
-  // "rejected key" warning) for every character typed.
-  const [apiKey, setApiKey] = useState<string>(loadStoredApiKey);
-  const [keyDraft, setKeyDraft] = useState<string>(loadStoredApiKey);
-  const [principal, setPrincipal] = useState<Principal | null>(null);
-  const [principalError, setPrincipalError] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -526,36 +496,10 @@ function App() {
     api.health().then((d) => setHealth(d.status ?? "unknown")).catch(() => setHealth("error"));
   }, []);
 
-  useEffect(() => {
-    try {
-      if (apiKey) localStorage.setItem(LS_API_KEY, apiKey);
-      else localStorage.removeItem(LS_API_KEY);
-    } catch {
-      // localStorage unavailable — key just won't persist across reloads
-    }
-    let cancelled = false;
-    setPrincipalError("");
-    api
-      .whoami(apiKey)
-      .then((p) => {
-        if (!cancelled) setPrincipal(p);
-      })
-      .catch((e: Error) => {
-        if (cancelled) return;
-        setPrincipal(null);
-        setPrincipalError(e.message);
-      });
-    // Another tenant sees a different set of uploads — drop the cached list.
-    setDocsLoaded(false);
-    return () => {
-      cancelled = true;
-    };
-  }, [apiKey]);
-
   async function loadDocs() {
     if (docsLoaded) return;
     try {
-      const d = await api.documents(apiKey);
+      const d = await api.documents();
       setDocs(d.documents ?? []);
       setDocsLoaded(true);
     } catch {
@@ -568,7 +512,7 @@ function App() {
   // khi WS lỗi/không mở được.
   async function sendViaRest(q: string) {
     try {
-      const d = await api.query(q, sessionId, apiKey);
+      const d = await api.query(q, sessionId);
       setMessages((m) => [
         ...m,
         {
@@ -637,9 +581,7 @@ function App() {
 
     ws.onopen = () => {
       clearTimeout(openTimeout);
-      // Browsers cannot put headers on a WebSocket handshake, so the key rides
-      // in the message; the server resolves it per turn.
-      ws.send(JSON.stringify({ query: q, ...(apiKey ? { api_key: apiKey } : {}) }));
+      ws.send(JSON.stringify({ query: q }));
     };
 
     ws.onmessage = (ev) => {
@@ -715,7 +657,7 @@ function App() {
     setBusy(true);
     setUploadStatus("⏳ Đang xử lý...");
     try {
-      const d = await api.upload(file, apiKey);
+      const d = await api.upload(file);
       setUploadStatus(
         `✅ Đã lập chỉ mục "${d.document_title}" — ${d.indexed_chunks} đoạn văn bản.`
       );
@@ -828,38 +770,6 @@ function App() {
               {theme === "light" ? "◐ Tối" : "◑ Sáng"}
             </button>
           </div>
-
-          <form
-            className="tenant-box"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setApiKey(keyDraft.trim());
-            }}
-          >
-            <label className="tenant-label" htmlFor="api-key-input">
-              Tenant:{" "}
-              <strong className={principalError ? "tenant-bad" : ""}>
-                {principalError ? "key không hợp lệ" : principal ? principal.tenant_id : "…"}
-              </strong>
-              {principal && !principalError && (
-                <span className="tenant-labels"> · {principal.acl_labels.join(", ")}</span>
-              )}
-            </label>
-            <div className="tenant-row">
-              <input
-                id="api-key-input"
-                className="tenant-input"
-                type="password"
-                autoComplete="off"
-                placeholder="API key (bỏ trống = công khai)"
-                value={keyDraft}
-                onChange={(e) => setKeyDraft(e.target.value)}
-              />
-              <button className="tenant-apply" type="submit" disabled={keyDraft.trim() === apiKey}>
-                Áp dụng
-              </button>
-            </div>
-          </form>
 
           <div className="session-info">
             <span className="session-label">Phiên:</span>

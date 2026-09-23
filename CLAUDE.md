@@ -103,8 +103,9 @@ python scripts/backfill_access_meta.py --yes    # ghi
 
 Tenant demo khai ở `data/tenants/tenants.json`; client gửi `x-api-key`, **không bao giờ**
 tự khai `acl_labels` (server tra ra). Không header = ẩn danh, chỉ thấy `tenant_id=public`.
-WebSocket: trình duyệt **không** gắn được header lên handshake, nên UI gửi key trong
-message (`{"query": ..., "api_key": ...}`), server resolve theo từng lượt. Header vẫn
+UI web **không** có ô nhập key (đã gỡ 2026-09-23) — luôn chạy ẩn danh/`public`; tenant
+chỉ dùng qua API. WebSocket: trình duyệt không gắn được header lên handshake, nên client
+gửi key trong message (`{"query": ..., "api_key": ...}`), server resolve theo từng lượt. Header vẫn
 dùng được cho client không phải trình duyệt. `GET /api/v1/whoami` cho biết key ứng với
 tenant nào. CORS phải giữ `X-API-Key` trong `allow_headers` (`src/api/main.py`).
 `src/rag/temporal.py` vẫn chạy làm lớp lọc thứ hai — đừng gỡ.
