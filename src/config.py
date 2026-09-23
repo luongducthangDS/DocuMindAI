@@ -99,6 +99,12 @@ class Settings(BaseSettings):
     chroma_port: int = 8000
     chroma_collection: str = "documind_legal"
 
+    # Chroma Cloud — chỉ dùng cho scripts/copy_chroma_to_cloud.py (bản sao để xem
+    # dữ liệu trên dashboard), retrieval production không đọc từ đây.
+    chroma_cloud_api_key: str = ""
+    chroma_cloud_tenant: str = ""
+    chroma_cloud_database: str = ""
+
     # Qdrant Cloud
     qdrant_url: str = ""
     qdrant_api_key: str = ""

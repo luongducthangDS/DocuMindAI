@@ -37,6 +37,10 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
 - CI: `.github/workflows/ci.yml` — pytest + retrieval eval trên Qdrant (reranker tắt như Render),
   gate bằng `eval/ci_gate.py` so với `reports/eval_baseline.json`. Cần secrets `GOOGLE_API_KEY*`,
   `QDRANT_URL`, `QDRANT_API_KEY`.
+- **Chroma Cloud** (database `DocuMind`, biến `CHROMA_CLOUD_*`): chỉ là bản sao để xem dashboard
+  và so provider — app KHÔNG đọc từ đó. Đồng bộ: `python scripts/copy_chroma_to_cloud.py`; so
+  sánh: `python eval/provider_bench.py` (kết quả README mục Đánh giá). Gọi qua REST
+  (`src/rag/chroma_cloud.py`) vì `chromadb` 0.6.3 không tương thích server Cloud 1.x.
 - **Reranker local đang KHÔNG chạy** (2026-09-23): Windows Smart App Control chặn DLL `pyarrow`
   → `sentence_transformers` không import được → retriever log "Reranker unavailable" và bỏ qua.
   Report nào ghi rerank phải xem `meta.reranker_active`, không tin `ENABLE_RERANKER`.

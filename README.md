@@ -235,6 +235,43 @@ CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) chạy retrieval eva
 Cloud ở mỗi PR và **fail PR** nếu recall/MRR tụt quá ngưỡng so với
 [`reports/eval_baseline.json`](reports/eval_baseline.json) ([`eval/ci_gate.py`](eval/ci_gate.py)).
 
+### So sánh vector store: Qdrant Cloud vs Chroma Cloud (đo 2026-09-23)
+
+[`eval/provider_bench.py`](eval/provider_bench.py) đo **riêng tầng vector store**: cùng 1151
+vector (copy từ Chroma local, không re-embed — script kiểm tập id khớp trước khi đo), cùng
+query embedding (cache), cùng filter `RetrievalContext` (tenant/ACL/`as_of_date`). BM25,
+reranker, LLM giống nhau ở hai bên nên không đưa vào. "Exact" = cosine vét cạn numpy với cùng
+predicate filter — mốc để đo sai số của index ANN. 199 câu × 3 lần lặp, hai provider chạy xen
+kẽ từng query theo thứ tự ngẫu nhiên; latency đo từ máy dev ở Việt Nam, **gồm mạng**.
+
+| Chỉ số (top-10, có filter) | Exact | Qdrant Cloud | Chroma Cloud |
+|---|---:|---:|---:|
+| ANN recall@10 so với exact | 1.000 | **1.000** | 0.998 (3/199 câu lệch) |
+| Recall@1 / @5 · MRR (dense, gold clause) | 0.667 / 0.962 · 0.794 | 0.667 / 0.962 · 0.794 | 0.667 / 0.962 · 0.794 |
+| Kết quả vi phạm filter | — | 0% | 0% |
+| Latency query p50 / p95 / p99 | — | **209 / 324 / 402 ms** | 309 / 1336 / 2380 ms |
+| RTT mạng thuần p50 / p95 (healthcheck) | — | 193 / 197 ms | 260 / 734 ms |
+| Tải toàn corpus (dựng BM25) | — | 7.1 s | 4.2 s |
+
+Đọc bảng cho đúng:
+- **Chất lượng truy hồi như nhau**: recall/MRR trùng khít; Chroma Cloud lệch exact ở 3 câu
+  nhưng không đổi rank của gold clause. Filter đẩy xuống đúng 100% ở cả hai.
+- **Chênh latency phần lớn là mạng**, không phải engine: Qdrant ở GCP Sydney
+  (`australia-southeast1`), Chroma Cloud trả IP dải AWS (34.200.x, nhiều khả năng us-east).
+  Trừ RTT, phần xử lý phía server ≈ 15 ms (Qdrant) vs ≈ 50 ms (Chroma). Đuôi p95/p99 của Chroma
+  đến từ jitter mạng — chính healthcheck đã có p95 734 ms. Kết quả sẽ khác nếu đo từ Render.
+- Qdrant cần payload index cho mọi field filter (strict mode, xem `ensure_qdrant_payload_indexes`);
+  Chroma Cloud không cần, nhưng client `chromadb` 0.6.3 của dự án **không nói chuyện được** với
+  Chroma Cloud (server 1.x) — benchmark và [`scripts/copy_chroma_to_cloud.py`](scripts/copy_chroma_to_cloud.py)
+  gọi REST v2 qua [`src/rag/chroma_cloud.py`](src/rag/chroma_cloud.py). App production vẫn đọc Qdrant.
+
+Báo cáo đầy đủ (thiết kế phép đo, 3 câu lệch, giới hạn): [`reports/provider_bench.md`](reports/provider_bench.md).
+
+```powershell
+python scripts/copy_chroma_to_cloud.py            # đồng bộ Chroma Cloud mỗi khi corpus đổi
+python eval/provider_bench.py --repeat 3 --mlflow provider-bench   # experiment documind-provider-bench
+```
+
 **Benchmark lịch sử (kho tài liệu trước đây).** Phương pháp luận và các phát hiện kỹ thuật vẫn
 giữ nguyên giá trị — xem [`EVALUATION.md`](EVALUATION.md). Trên bộ 110 câu hỏi tự xây (lĩnh vực
 cũ: quy chế đào tạo đại học): hybrid+reranker đạt **hit_rate@K 0,95, MRR 0,87, tỉ lệ từ chối câu
