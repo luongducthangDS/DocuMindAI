@@ -18,7 +18,7 @@ data/hf_cache/
 !data/compliance/criteria.json
 
 # Virtualenvs
-.venv/
+.venv*/
 .venv_audit/
 venv/
 
