@@ -63,3 +63,9 @@ frontend/node_modules/
 
 # Cache xep hang dense cua eval/embedding_ab.py — tai tao duoc, khong commit
 reports/_ab_cache/
+reports/_eval_cache/
+
+# MLflow tracking store (eval runs)
+mlflow.db
+mlruns/
+mlartifacts/

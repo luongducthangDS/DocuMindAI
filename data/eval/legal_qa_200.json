@@ -1,0 +1,4704 @@
+[
+  {
+    "id": "ld_t01a",
+    "pair_id": "luong_toi_thieu_thang_vung_1",
+    "question": "Mức lương tối thiểu tháng áp dụng cho người lao động làm việc ở vùng I là bao nhiêu?",
+    "as_of_date": "2025-03-01",
+    "category": "luong_toi_thieu",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 3 Nghị định 74/2024/NĐ-CP (hiệu lực 01/7/2024), mức lương tối thiểu tháng của vùng I là 4.960.000 đồng/tháng.",
+    "source_doc": "74-2024-ND-CP",
+    "source_clause": "74-2024-ND-CP__d3",
+    "expect_contains": [
+      [
+        "4.960.000"
+      ]
+    ],
+    "expect_absent": [
+      "5.310.000",
+      "293/2025"
+    ],
+    "distractor_docs": [
+      "293-2025-ND-CP"
+    ]
+  },
+  {
+    "id": "ld_t01b",
+    "pair_id": "luong_toi_thieu_thang_vung_1",
+    "question": "Mức lương tối thiểu tháng áp dụng cho người lao động làm việc ở vùng I là bao nhiêu?",
+    "as_of_date": "2026-02-01",
+    "category": "luong_toi_thieu",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 3 Nghị định 293/2025/NĐ-CP (hiệu lực 01/01/2026), mức lương tối thiểu tháng của vùng I là 5.310.000 đồng/tháng.",
+    "source_doc": "293-2025-ND-CP",
+    "source_clause": "293-2025-ND-CP__d3",
+    "expect_contains": [
+      [
+        "5.310.000"
+      ]
+    ],
+    "expect_absent": [
+      "4.960.000",
+      "74/2024"
+    ],
+    "distractor_docs": [
+      "74-2024-ND-CP"
+    ]
+  },
+  {
+    "id": "ld_t02a",
+    "pair_id": "luong_toi_thieu_gio_vung_3",
+    "question": "Mức lương tối thiểu giờ của vùng III là bao nhiêu?",
+    "as_of_date": "2025-08-15",
+    "category": "luong_toi_thieu",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 3 Nghị định 74/2024/NĐ-CP, mức lương tối thiểu giờ của vùng III là 18.600 đồng/giờ.",
+    "source_doc": "74-2024-ND-CP",
+    "source_clause": "74-2024-ND-CP__d3",
+    "expect_contains": [
+      [
+        "18.600"
+      ]
+    ],
+    "expect_absent": [
+      "20.000",
+      "293/2025"
+    ],
+    "distractor_docs": [
+      "293-2025-ND-CP"
+    ]
+  },
+  {
+    "id": "ld_t02b",
+    "pair_id": "luong_toi_thieu_gio_vung_3",
+    "question": "Mức lương tối thiểu giờ của vùng III là bao nhiêu?",
+    "as_of_date": "2026-03-10",
+    "category": "luong_toi_thieu",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 3 Nghị định 293/2025/NĐ-CP, mức lương tối thiểu giờ của vùng III là 20.000 đồng/giờ.",
+    "source_doc": "293-2025-ND-CP",
+    "source_clause": "293-2025-ND-CP__d3",
+    "expect_contains": [
+      [
+        "20.000"
+      ]
+    ],
+    "expect_absent": [
+      "18.600",
+      "74/2024"
+    ],
+    "distractor_docs": [
+      "74-2024-ND-CP"
+    ]
+  },
+  {
+    "id": "ld_t03a",
+    "pair_id": "luong_toi_thieu_thang_vung_4",
+    "question": "Doanh nghiệp ở vùng IV phải trả mức lương tối thiểu tháng thấp nhất là bao nhiêu?",
+    "as_of_date": "2024-09-01",
+    "category": "luong_toi_thieu",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 3 Nghị định 74/2024/NĐ-CP, mức lương tối thiểu tháng của vùng IV là 3.450.000 đồng/tháng.",
+    "source_doc": "74-2024-ND-CP",
+    "source_clause": "74-2024-ND-CP__d3",
+    "expect_contains": [
+      [
+        "3.450.000"
+      ]
+    ],
+    "expect_absent": [
+      "3.700.000",
+      "293/2025"
+    ],
+    "distractor_docs": [
+      "293-2025-ND-CP"
+    ]
+  },
+  {
+    "id": "ld_t03b",
+    "pair_id": "luong_toi_thieu_thang_vung_4",
+    "question": "Doanh nghiệp ở vùng IV phải trả mức lương tối thiểu tháng thấp nhất là bao nhiêu?",
+    "as_of_date": "2026-01-05",
+    "category": "luong_toi_thieu",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 3 Nghị định 293/2025/NĐ-CP, mức lương tối thiểu tháng của vùng IV là 3.700.000 đồng/tháng.",
+    "source_doc": "293-2025-ND-CP",
+    "source_clause": "293-2025-ND-CP__d3",
+    "expect_contains": [
+      [
+        "3.700.000"
+      ]
+    ],
+    "expect_absent": [
+      "3.450.000",
+      "74/2024"
+    ],
+    "distractor_docs": [
+      "74-2024-ND-CP"
+    ]
+  },
+  {
+    "id": "ld_t04a",
+    "pair_id": "dieu_kien_huong_luong_huu",
+    "question": "Người lao động phải đóng bảo hiểm xã hội tối thiểu bao nhiêu năm thì được hưởng lương hưu?",
+    "as_of_date": "2024-05-01",
+    "category": "huu_tri",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 54 Luật Bảo hiểm xã hội 2014 (58/2014/QH13), người lao động nghỉ việc có đủ 20 năm đóng bảo hiểm xã hội trở lên thì được hưởng lương hưu khi đủ tuổi.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d54",
+    "expect_contains": [
+      [
+        "20 năm"
+      ]
+    ],
+    "expect_absent": [
+      "41/2024",
+      "Điều 64"
+    ],
+    "distractor_docs": [
+      "41-2024-QH15"
+    ]
+  },
+  {
+    "id": "ld_t04b",
+    "pair_id": "dieu_kien_huong_luong_huu",
+    "question": "Người lao động phải đóng bảo hiểm xã hội tối thiểu bao nhiêu năm thì được hưởng lương hưu?",
+    "as_of_date": "2025-09-01",
+    "category": "huu_tri",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 64 Luật Bảo hiểm xã hội 2024 (41/2024/QH15), người lao động nghỉ việc có thời gian đóng bảo hiểm xã hội bắt buộc từ đủ 15 năm trở lên thì được hưởng lương hưu khi đủ tuổi nghỉ hưu.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d64",
+    "expect_contains": [
+      [
+        "15 năm"
+      ]
+    ],
+    "expect_absent": [
+      "58/2014",
+      "Điều 54"
+    ],
+    "distractor_docs": [
+      "58-2014-QH13"
+    ]
+  },
+  {
+    "id": "ld_t05a",
+    "pair_id": "tro_cap_mot_lan_khi_sinh_con",
+    "question": "Lao động nữ sinh con được trợ cấp một lần bằng bao nhiêu?",
+    "as_of_date": "2024-10-01",
+    "category": "thai_san",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 38 Luật Bảo hiểm xã hội 2014 (58/2014/QH13), lao động nữ sinh con được trợ cấp một lần cho mỗi con bằng 02 lần mức lương cơ sở tại tháng sinh con.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d38",
+    "expect_contains": [
+      [
+        "02 lần",
+        "2 lần"
+      ],
+      [
+        "mức lương cơ sở"
+      ]
+    ],
+    "expect_absent": [
+      "mức tham chiếu",
+      "41/2024"
+    ],
+    "distractor_docs": [
+      "41-2024-QH15"
+    ]
+  },
+  {
+    "id": "ld_t05b",
+    "pair_id": "tro_cap_mot_lan_khi_sinh_con",
+    "question": "Lao động nữ sinh con được trợ cấp một lần bằng bao nhiêu?",
+    "as_of_date": "2026-02-01",
+    "category": "thai_san",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 4 Điều 58 Luật Bảo hiểm xã hội 2024 (41/2024/QH15), mức trợ cấp một lần cho mỗi con bằng 02 lần mức tham chiếu tại tháng lao động nữ sinh con.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d58",
+    "expect_contains": [
+      [
+        "02 lần",
+        "2 lần"
+      ],
+      [
+        "mức tham chiếu"
+      ]
+    ],
+    "expect_absent": [
+      "mức lương cơ sở",
+      "58/2014"
+    ],
+    "distractor_docs": [
+      "58-2014-QH13"
+    ]
+  },
+  {
+    "id": "ld_t06a",
+    "pair_id": "tran_tien_luong_dong_bhxh",
+    "question": "Tiền lương tháng làm căn cứ đóng bảo hiểm xã hội bắt buộc cao nhất bằng bao nhiêu?",
+    "as_of_date": "2024-03-01",
+    "category": "bhxh_dong_gop",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 3 Điều 89 Luật Bảo hiểm xã hội 2014 (58/2014/QH13), tiền lương tháng đóng bảo hiểm xã hội bắt buộc cao nhất bằng 20 lần mức lương cơ sở.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d89",
+    "expect_contains": [
+      [
+        "20 lần"
+      ],
+      [
+        "mức lương cơ sở"
+      ]
+    ],
+    "expect_absent": [
+      "mức tham chiếu",
+      "41/2024"
+    ],
+    "distractor_docs": [
+      "41-2024-QH15"
+    ]
+  },
+  {
+    "id": "ld_t06b",
+    "pair_id": "tran_tien_luong_dong_bhxh",
+    "question": "Tiền lương tháng làm căn cứ đóng bảo hiểm xã hội bắt buộc cao nhất bằng bao nhiêu?",
+    "as_of_date": "2025-10-01",
+    "category": "bhxh_dong_gop",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 31 Luật Bảo hiểm xã hội 2024 (41/2024/QH15), tiền lương làm căn cứ đóng bảo hiểm xã hội bắt buộc cao nhất bằng 20 lần mức tham chiếu tại thời điểm đóng.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d31",
+    "expect_contains": [
+      [
+        "20 lần"
+      ],
+      [
+        "mức tham chiếu"
+      ]
+    ],
+    "expect_absent": [
+      "mức lương cơ sở",
+      "58/2014"
+    ],
+    "distractor_docs": [
+      "58-2014-QH13"
+    ]
+  },
+  {
+    "id": "ld_t07a",
+    "pair_id": "che_do_bhxh_tu_nguyen",
+    "question": "Bảo hiểm xã hội tự nguyện gồm những chế độ nào?",
+    "as_of_date": "2024-06-01",
+    "category": "bhxh_tu_nguyen",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 4 Luật Bảo hiểm xã hội 2014 (58/2014/QH13), bảo hiểm xã hội tự nguyện có hai chế độ: hưu trí và tử tuất.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d4",
+    "expect_contains": [
+      [
+        "hưu trí"
+      ],
+      [
+        "tử tuất"
+      ]
+    ],
+    "expect_absent": [
+      "thai sản",
+      "41/2024"
+    ],
+    "distractor_docs": [
+      "41-2024-QH15"
+    ]
+  },
+  {
+    "id": "ld_t07b",
+    "pair_id": "che_do_bhxh_tu_nguyen",
+    "question": "Bảo hiểm xã hội tự nguyện gồm những chế độ nào?",
+    "as_of_date": "2025-12-01",
+    "category": "bhxh_tu_nguyen",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 3 Điều 4 Luật Bảo hiểm xã hội 2024 (41/2024/QH15), bảo hiểm xã hội tự nguyện có các chế độ: trợ cấp thai sản, hưu trí, tử tuất và bảo hiểm tai nạn lao động theo Luật An toàn, vệ sinh lao động.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d4",
+    "expect_contains": [
+      [
+        "thai sản"
+      ],
+      [
+        "hưu trí"
+      ],
+      [
+        "tử tuất"
+      ]
+    ],
+    "expect_absent": [
+      "58/2014"
+    ],
+    "distractor_docs": [
+      "58-2014-QH13"
+    ]
+  },
+  {
+    "id": "ld_t08a",
+    "pair_id": "muc_huong_tro_cap_that_nghiep",
+    "question": "Mức hưởng trợ cấp thất nghiệp hằng tháng được tính thế nào và tối đa là bao nhiêu?",
+    "as_of_date": "2025-05-01",
+    "category": "bhtn",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 50 Luật Việc làm 2013 (38/2013/QH13), mức hưởng hằng tháng bằng 60% mức bình quân tiền lương tháng đóng bảo hiểm thất nghiệp của 06 tháng liền kề trước khi thất nghiệp, tối đa không quá 05 lần mức lương cơ sở (người hưởng lương do Nhà nước quy định) hoặc 05 lần mức lương tối thiểu vùng (người hưởng lương do người sử dụng lao động quyết định).",
+    "source_doc": "38-2013-QH13",
+    "source_clause": "38-2013-QH13__d50",
+    "expect_contains": [
+      [
+        "60%"
+      ],
+      [
+        "05 lần",
+        "5 lần"
+      ],
+      [
+        "mức lương cơ sở"
+      ]
+    ],
+    "expect_absent": [
+      "74/2025"
+    ],
+    "distractor_docs": [
+      "74-2025-QH15"
+    ]
+  },
+  {
+    "id": "ld_t08b",
+    "pair_id": "muc_huong_tro_cap_that_nghiep",
+    "question": "Mức hưởng trợ cấp thất nghiệp hằng tháng được tính thế nào và tối đa là bao nhiêu?",
+    "as_of_date": "2026-03-01",
+    "category": "bhtn",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 39 Luật Việc làm 2025 (74/2025/QH15), mức hưởng hằng tháng bằng 60% mức bình quân tiền lương tháng đóng bảo hiểm thất nghiệp của 06 tháng đã đóng gần nhất, tối đa không quá 05 lần mức lương tối thiểu tháng theo vùng do Chính phủ công bố áp dụng tại tháng cuối cùng đóng bảo hiểm thất nghiệp.",
+    "source_doc": "74-2025-QH15",
+    "source_clause": "74-2025-QH15__d39",
+    "expect_contains": [
+      [
+        "60%"
+      ],
+      [
+        "05 lần",
+        "5 lần"
+      ],
+      [
+        "lương tối thiểu"
+      ]
+    ],
+    "expect_absent": [
+      "mức lương cơ sở",
+      "38/2013"
+    ],
+    "distractor_docs": [
+      "38-2013-QH13"
+    ]
+  },
+  {
+    "id": "ld_t09a",
+    "pair_id": "thoi_diem_huong_tro_cap_that_nghiep",
+    "question": "Thời điểm hưởng trợ cấp thất nghiệp được tính từ ngày nào kể từ ngày nộp đủ hồ sơ?",
+    "as_of_date": "2025-06-15",
+    "category": "bhtn",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 3 Điều 50 Luật Việc làm 2013 (38/2013/QH13), thời điểm hưởng trợ cấp thất nghiệp được tính từ ngày thứ 16 kể từ ngày nộp đủ hồ sơ.",
+    "source_doc": "38-2013-QH13",
+    "source_clause": "38-2013-QH13__d50",
+    "expect_contains": [
+      [
+        "thứ 16"
+      ]
+    ],
+    "expect_absent": [
+      "thứ 11",
+      "74/2025"
+    ],
+    "distractor_docs": [
+      "74-2025-QH15"
+    ]
+  },
+  {
+    "id": "ld_t09b",
+    "pair_id": "thoi_diem_huong_tro_cap_that_nghiep",
+    "question": "Thời điểm hưởng trợ cấp thất nghiệp được tính từ ngày nào kể từ ngày nộp đủ hồ sơ?",
+    "as_of_date": "2026-04-01",
+    "category": "bhtn",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 3 Điều 39 Luật Việc làm 2025 (74/2025/QH15), thời điểm hưởng trợ cấp thất nghiệp là ngày làm việc thứ 11 kể từ ngày nộp đủ hồ sơ.",
+    "source_doc": "74-2025-QH15",
+    "source_clause": "74-2025-QH15__d39",
+    "expect_contains": [
+      [
+        "thứ 11"
+      ]
+    ],
+    "expect_absent": [
+      "thứ 16",
+      "38/2013"
+    ],
+    "distractor_docs": [
+      "38-2013-QH13"
+    ]
+  },
+  {
+    "id": "ld_t10a",
+    "pair_id": "dieu_kien_chua_tim_duoc_viec_lam",
+    "question": "Sau khi nộp hồ sơ hưởng trợ cấp thất nghiệp, người lao động phải chưa tìm được việc làm trong bao lâu thì mới đủ điều kiện hưởng?",
+    "as_of_date": "2025-02-01",
+    "category": "bhtn",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 4 Điều 49 Luật Việc làm 2013 (38/2013/QH13), người lao động phải chưa tìm được việc làm sau 15 ngày kể từ ngày nộp hồ sơ hưởng bảo hiểm thất nghiệp (trừ các trường hợp loại trừ).",
+    "source_doc": "38-2013-QH13",
+    "source_clause": "38-2013-QH13__d49",
+    "expect_contains": [
+      [
+        "15 ngày"
+      ]
+    ],
+    "expect_absent": [
+      "10 ngày",
+      "74/2025"
+    ],
+    "distractor_docs": [
+      "74-2025-QH15"
+    ]
+  },
+  {
+    "id": "ld_t10b",
+    "pair_id": "dieu_kien_chua_tim_duoc_viec_lam",
+    "question": "Sau khi nộp hồ sơ hưởng trợ cấp thất nghiệp, người lao động phải chưa tìm được việc làm trong bao lâu thì mới đủ điều kiện hưởng?",
+    "as_of_date": "2026-05-01",
+    "category": "bhtn",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm d khoản 1 Điều 38 Luật Việc làm 2025 (74/2025/QH15), trong thời hạn 10 ngày làm việc kể từ ngày nộp đủ hồ sơ mà người lao động không thuộc các trường hợp loại trừ thì đủ điều kiện hưởng trợ cấp thất nghiệp.",
+    "source_doc": "74-2025-QH15",
+    "source_clause": "74-2025-QH15__d38",
+    "expect_contains": [
+      [
+        "10 ngày"
+      ]
+    ],
+    "expect_absent": [
+      "15 ngày",
+      "38/2013"
+    ],
+    "distractor_docs": [
+      "38-2013-QH13"
+    ]
+  },
+  {
+    "id": "ld_t11a",
+    "pair_id": "nghi_thai_san_thoi_gian",
+    "question": "Lao động nữ được nghỉ thai sản trước và sau khi sinh con bao lâu?",
+    "as_of_date": "2026-05-01",
+    "category": "thai_san",
+    "temporal_kind": "clause_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 139 Bộ luật Lao động 2019 (bản có hiệu lực tại 01/5/2026), lao động nữ được nghỉ thai sản trước và sau khi sinh con là 06 tháng; thời gian nghỉ trước khi sinh không quá 02 tháng.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d139_k1",
+    "expect_contains": [
+      [
+        "06 tháng",
+        "6 tháng"
+      ]
+    ],
+    "expect_absent": [
+      "07 tháng",
+      "7 tháng"
+    ],
+    "distractor_docs": [],
+    "distractor_versions": [
+      "45-2019-QH14__d139_k1__v2026-07-01"
+    ]
+  },
+  {
+    "id": "ld_t11b",
+    "pair_id": "nghi_thai_san_thoi_gian",
+    "question": "Lao động nữ được nghỉ thai sản trước và sau khi sinh con bao lâu?",
+    "as_of_date": "2026-09-10",
+    "category": "thai_san",
+    "temporal_kind": "clause_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 139 Bộ luật Lao động 2019 được sửa đổi bởi khoản 1 Điều 29 Luật Dân số 113/2025/QH15 (hiệu lực 01/7/2026), lao động nữ được nghỉ thai sản 06 tháng; trường hợp sinh con thứ hai được nghỉ 07 tháng.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d139_k1",
+    "expect_contains": [
+      [
+        "07 tháng",
+        "7 tháng"
+      ],
+      [
+        "con thứ hai",
+        "con thứ 2"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "distractor_versions": [
+      "45-2019-QH14__d139_k1__v2021-01-01"
+    ]
+  },
+  {
+    "id": "ld_t12a",
+    "pair_id": "nghi_thai_san_con_thu_hai",
+    "question": "Lao động nữ sinh con thứ hai được nghỉ thai sản mấy tháng?",
+    "as_of_date": "2026-03-01",
+    "category": "thai_san",
+    "temporal_kind": "clause_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Tại 01/3/2026, khoản 1 Điều 139 Bộ luật Lao động 2019 chưa có quy định riêng cho con thứ hai — lao động nữ sinh con được nghỉ thai sản 06 tháng như mọi trường hợp sinh con.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d139_k1",
+    "expect_contains": [
+      [
+        "06 tháng",
+        "6 tháng"
+      ]
+    ],
+    "expect_absent": [
+      "07 tháng",
+      "7 tháng"
+    ],
+    "distractor_docs": [],
+    "distractor_versions": [
+      "45-2019-QH14__d139_k1__v2026-07-01"
+    ]
+  },
+  {
+    "id": "ld_t12b",
+    "pair_id": "nghi_thai_san_con_thu_hai",
+    "question": "Lao động nữ sinh con thứ hai được nghỉ thai sản mấy tháng?",
+    "as_of_date": "2026-08-01",
+    "category": "thai_san",
+    "temporal_kind": "clause_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 139 Bộ luật Lao động 2019 (bản sửa đổi có hiệu lực 01/7/2026), lao động nữ sinh con thứ hai được nghỉ thai sản trước và sau khi sinh con là 07 tháng.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d139_k1",
+    "expect_contains": [
+      [
+        "07 tháng",
+        "7 tháng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "distractor_versions": [
+      "45-2019-QH14__d139_k1__v2021-01-01"
+    ]
+  },
+  {
+    "id": "ld_t13a",
+    "pair_id": "luong_lam_them_ngay_thuong",
+    "question": "Làm thêm giờ vào ngày thường được trả lương ít nhất bằng bao nhiêu phần trăm?",
+    "as_of_date": "2024-02-01",
+    "category": "tien_luong",
+    "temporal_kind": "control",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 98 Bộ luật Lao động 2019, làm thêm giờ vào ngày thường được trả ít nhất bằng 150% đơn giá tiền lương hoặc tiền lương thực trả theo công việc đang làm.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d98",
+    "expect_contains": [
+      [
+        "150%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": []
+  },
+  {
+    "id": "ld_t13b",
+    "pair_id": "luong_lam_them_ngay_thuong",
+    "question": "Làm thêm giờ vào ngày thường được trả lương ít nhất bằng bao nhiêu phần trăm?",
+    "as_of_date": "2026-06-01",
+    "category": "tien_luong",
+    "temporal_kind": "control",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 98 Bộ luật Lao động 2019, làm thêm giờ vào ngày thường được trả ít nhất bằng 150% — quy định không thay đổi giữa hai mốc thời điểm.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d98",
+    "expect_contains": [
+      [
+        "150%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": []
+  },
+  {
+    "id": "ld_t14a",
+    "pair_id": "nghi_hang_nam",
+    "question": "Người lao động làm đủ 12 tháng trong điều kiện bình thường được nghỉ hằng năm bao nhiêu ngày?",
+    "as_of_date": "2024-06-01",
+    "category": "thoi_gio_nghi_ngoi",
+    "temporal_kind": "control",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 113 Bộ luật Lao động 2019, người lao động làm việc đủ 12 tháng trong điều kiện bình thường được nghỉ hằng năm 12 ngày làm việc, hưởng nguyên lương.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d113",
+    "expect_contains": [
+      [
+        "12 ngày"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": []
+  },
+  {
+    "id": "ld_t14b",
+    "pair_id": "nghi_hang_nam",
+    "question": "Người lao động làm đủ 12 tháng trong điều kiện bình thường được nghỉ hằng năm bao nhiêu ngày?",
+    "as_of_date": "2026-06-01",
+    "category": "thoi_gio_nghi_ngoi",
+    "temporal_kind": "control",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 113 Bộ luật Lao động 2019, vẫn là 12 ngày làm việc — quy định không thay đổi giữa hai mốc thời điểm.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d113",
+    "expect_contains": [
+      [
+        "12 ngày"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": []
+  },
+  {
+    "id": "ld_t15",
+    "pair_id": "ngoai_pham_vi_thoi_gian_luong",
+    "question": "Mức lương tối thiểu vùng I là bao nhiêu?",
+    "as_of_date": "2010-01-01",
+    "category": "luong_toi_thieu",
+    "temporal_kind": "out_of_range",
+    "expected_behavior": "time_out_of_range",
+    "ground_truth": "Mốc 01/01/2010 nằm trước phạm vi thời gian corpus phủ (từ 01/01/2015). Hệ thống phải nói rõ giới hạn phủ thay vì trả lời bằng mức lương tối thiểu của văn bản hiện hành.",
+    "source_doc": "",
+    "source_clause": "",
+    "expect_contains": [
+      [
+        "2015",
+        "ngoài khoảng",
+        "không có căn cứ"
+      ]
+    ],
+    "expect_absent": [
+      "4.960.000",
+      "5.310.000"
+    ],
+    "distractor_docs": [
+      "74-2024-ND-CP",
+      "293-2025-ND-CP"
+    ]
+  },
+  {
+    "id": "ld_t16",
+    "pair_id": "ngoai_pham_vi_thoi_gian_huu_tri",
+    "question": "Điều kiện hưởng lương hưu gồm những gì?",
+    "as_of_date": "2012-06-01",
+    "category": "huu_tri",
+    "temporal_kind": "out_of_range",
+    "expected_behavior": "time_out_of_range",
+    "ground_truth": "Mốc 01/6/2012 nằm trước phạm vi thời gian corpus phủ (từ 01/01/2015). Hệ thống phải nói rõ giới hạn phủ thay vì trả lời theo Luật Bảo hiểm xã hội 2014 hoặc 2024.",
+    "source_doc": "",
+    "source_clause": "",
+    "expect_contains": [
+      [
+        "2015",
+        "ngoài khoảng",
+        "không có căn cứ"
+      ]
+    ],
+    "expect_absent": [
+      "20 năm",
+      "15 năm"
+    ],
+    "distractor_docs": [
+      "58-2014-QH13",
+      "41-2024-QH15"
+    ]
+  },
+  {
+    "id": "lh_m01",
+    "pair_id": "thu_viec_ky_su",
+    "question": "Công ty tuyển một kỹ sư cho vị trí yêu cầu trình độ đại học, mức lương chính thức 12.000.000 đồng/tháng. Thời gian thử việc được kéo dài tối đa bao lâu và lương thử việc thấp nhất là bao nhiêu?",
+    "as_of_date": "2026-03-01",
+    "category": "thu_viec",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Điều 25 khoản 2 Bộ luật Lao động: không quá 60 ngày với công việc cần trình độ từ cao đẳng trở lên. Điều 26: lương thử việc ít nhất bằng 85% mức lương của công việc, tức ít nhất 10.200.000 đồng/tháng.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "",
+    "source_clauses": [
+      "45-2019-QH14__d25",
+      "45-2019-QH14__d26"
+    ],
+    "expect_contains": [
+      [
+        "60 ngày"
+      ],
+      [
+        "10.200.000",
+        "10,2 triệu",
+        "10.2 triệu"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_m02",
+    "pair_id": "tro_cap_thoi_viec_mat_viec",
+    "question": "Trợ cấp thôi việc và trợ cấp mất việc làm khác nhau thế nào về mức chi trả cho mỗi năm làm việc? Khoảng thời gian nào bị trừ ra khi tính các khoản trợ cấp này?",
+    "as_of_date": "2026-03-01",
+    "category": "cham_dut_hdld",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Điều 46: trợ cấp thôi việc mỗi năm làm việc được một nửa tháng tiền lương. Điều 47: trợ cấp mất việc làm mỗi năm làm việc 01 tháng tiền lương nhưng ít nhất bằng 02 tháng tiền lương. Cả hai đều trừ thời gian đã tham gia bảo hiểm thất nghiệp và thời gian đã được chi trả trợ cấp thôi việc, mất việc làm.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "",
+    "source_clauses": [
+      "45-2019-QH14__d46",
+      "45-2019-QH14__d47"
+    ],
+    "expect_contains": [
+      [
+        "nửa tháng",
+        "1/2 tháng",
+        "0,5 tháng",
+        "một nửa"
+      ],
+      [
+        "01 tháng tiền lương",
+        "1 tháng tiền lương",
+        "một tháng tiền lương",
+        "01 tháng lương",
+        "1 tháng lương"
+      ],
+      [
+        "02 tháng",
+        "hai tháng",
+        "2 tháng tiền lương",
+        "2 tháng lương"
+      ],
+      [
+        "bảo hiểm thất nghiệp"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false,
+    "scoring_note": "Sửa công cụ chấm ngày 2026-09-23 SAU khi xem output lần chạy đầu: chỉ thêm cách viết tương đương / thu hẹp chuỗi cấm cho đúng lỗi cần bắt. Đáp án không đổi."
+  },
+  {
+    "id": "lh_m03",
+    "pair_id": "nghi_hang_nam_tham_nien",
+    "question": "Nhân viên văn phòng làm việc trong điều kiện bình thường, đã làm liên tục 17 năm cho cùng một công ty. Mỗi năm người này được nghỉ hằng năm hưởng nguyên lương bao nhiêu ngày?",
+    "as_of_date": "2026-03-01",
+    "category": "nghi_hang_nam",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Điều 113 khoản 1 điểm a: 12 ngày làm việc. Điều 114: cứ đủ 05 năm làm việc cho một người sử dụng lao động được tăng thêm 01 ngày — 17 năm đủ 3 lần 5 năm, thêm 3 ngày. Tổng 15 ngày làm việc.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "",
+    "source_clauses": [
+      "45-2019-QH14__d113",
+      "45-2019-QH14__d114"
+    ],
+    "expect_contains": [
+      [
+        "15 ngày"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_m04",
+    "pair_id": "lam_them_det_may",
+    "question": "Công nhân một nhà máy may hàng xuất khẩu được làm thêm tối đa bao nhiêu giờ trong một năm và trong một tháng? Nếu làm thêm vào Chủ nhật (ngày nghỉ hằng tuần) thì được trả lương ít nhất bao nhiêu phần trăm?",
+    "as_of_date": "2026-03-01",
+    "category": "lam_them_gio",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Điều 107 khoản 3 điểm a: sản xuất, gia công xuất khẩu hàng dệt, may được làm thêm không quá 300 giờ/năm; khoản 2 điểm b: không quá 40 giờ/tháng. Điều 98 khoản 1 điểm b: làm thêm vào ngày nghỉ hằng tuần ít nhất bằng 200%.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "",
+    "source_clauses": [
+      "45-2019-QH14__d107",
+      "45-2019-QH14__d98"
+    ],
+    "expect_contains": [
+      [
+        "300 giờ"
+      ],
+      [
+        "40 giờ"
+      ],
+      [
+        "200%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_m05a",
+    "pair_id": "huu_tri_nam_16_nam_dong",
+    "question": "Lao động nam làm việc trong điều kiện bình thường, đã đóng bảo hiểm xã hội bắt buộc 16 năm. Nếu nghỉ việc trong năm nay thì phải đủ bao nhiêu tuổi mới được nghỉ hưu, và người này có đủ điều kiện hưởng lương hưu không?",
+    "as_of_date": "2025-03-01",
+    "category": "huu_tri",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Năm 2025, tuổi nghỉ hưu của lao động nam trong điều kiện bình thường là 61 tuổi 3 tháng (Điều 4 Nghị định 135/2020/NĐ-CP). Theo Điều 54 Luật BHXH 58/2014/QH13 (còn hiệu lực tới 30/6/2025) phải có đủ 20 năm đóng BHXH — 16 năm chưa đủ điều kiện hưởng lương hưu.",
+    "source_doc": "135-2020-ND-CP",
+    "source_clause": "",
+    "source_clauses": [
+      "135-2020-ND-CP__d4",
+      "58-2014-QH13__d54"
+    ],
+    "expect_contains": [
+      [
+        "61 tuổi 3 tháng",
+        "61 tuổi 03 tháng"
+      ],
+      [
+        "20 năm"
+      ]
+    ],
+    "expect_absent": [
+      "41/2024"
+    ],
+    "distractor_docs": [
+      "41-2024-QH15"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false,
+    "scoring_note": "Sửa công cụ chấm ngày 2026-09-23 SAU khi xem output lần chạy đầu: chỉ thêm cách viết tương đương / thu hẹp chuỗi cấm cho đúng lỗi cần bắt. Đáp án không đổi."
+  },
+  {
+    "id": "lh_m05b",
+    "pair_id": "huu_tri_nam_16_nam_dong",
+    "question": "Lao động nam làm việc trong điều kiện bình thường, đã đóng bảo hiểm xã hội bắt buộc 16 năm. Nếu nghỉ việc trong năm nay thì phải đủ bao nhiêu tuổi mới được nghỉ hưu, và người này có đủ điều kiện hưởng lương hưu không?",
+    "as_of_date": "2026-03-01",
+    "category": "huu_tri",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Năm 2026, tuổi nghỉ hưu của lao động nam trong điều kiện bình thường là 61 tuổi 6 tháng (Điều 4 Nghị định 135/2020/NĐ-CP). Theo Điều 64 Luật BHXH 41/2024/QH15 (hiệu lực từ 01/7/2025) chỉ cần đủ 15 năm đóng BHXH bắt buộc — 16 năm đủ điều kiện hưởng lương hưu.",
+    "source_doc": "135-2020-ND-CP",
+    "source_clause": "",
+    "source_clauses": [
+      "135-2020-ND-CP__d4",
+      "41-2024-QH15__d64"
+    ],
+    "expect_contains": [
+      [
+        "61 tuổi 6 tháng",
+        "61 tuổi 06 tháng"
+      ],
+      [
+        "15 năm"
+      ]
+    ],
+    "expect_absent": [
+      "đủ 20 năm"
+    ],
+    "distractor_docs": [
+      "58-2014-QH13"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false,
+    "scoring_note": "Sửa công cụ chấm ngày 2026-09-23 SAU khi xem output lần chạy đầu: chỉ thêm cách viết tương đương / thu hẹp chuỗi cấm cho đúng lỗi cần bắt. Đáp án không đổi."
+  },
+  {
+    "id": "lh_t01",
+    "pair_id": "huu_tri_som_nu_2026",
+    "question": "Năm 2026, lao động nữ có đủ 15 năm làm nghề nặng nhọc, độc hại, nguy hiểm được nghỉ hưu sớm nhất ở độ tuổi nào?",
+    "as_of_date": "2026-06-01",
+    "category": "huu_tri",
+    "temporal_kind": "table_lookup",
+    "expected_behavior": "answer",
+    "ground_truth": "Bảng lộ trình tại Điều 5 Nghị định 135/2020/NĐ-CP: năm 2026, tuổi nghỉ hưu thấp nhất của lao động nữ thuộc trường hợp được nghỉ hưu ở tuổi thấp hơn là 52 tuổi.",
+    "source_doc": "135-2020-ND-CP",
+    "source_clause": "135-2020-ND-CP__d5",
+    "expect_contains": [
+      [
+        "52 tuổi"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_b01a",
+    "pair_id": "luong_toi_thieu_vung_2_giao_thoi",
+    "question": "Doanh nghiệp đặt tại địa bàn vùng II phải trả mức lương tối thiểu tháng là bao nhiêu?",
+    "as_of_date": "2025-12-31",
+    "category": "luong_toi_thieu",
+    "temporal_kind": "boundary",
+    "expected_behavior": "answer",
+    "ground_truth": "Ngày 31/12/2025 là ngày cuối cùng Nghị định 74/2024/NĐ-CP còn hiệu lực: vùng II là 4.410.000 đồng/tháng.",
+    "source_doc": "74-2024-ND-CP",
+    "source_clause": "74-2024-ND-CP__d3",
+    "expect_contains": [
+      [
+        "4.410.000"
+      ]
+    ],
+    "expect_absent": [
+      "4.730.000"
+    ],
+    "distractor_docs": [
+      "293-2025-ND-CP"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_b01b",
+    "pair_id": "luong_toi_thieu_vung_2_giao_thoi",
+    "question": "Doanh nghiệp đặt tại địa bàn vùng II phải trả mức lương tối thiểu tháng là bao nhiêu?",
+    "as_of_date": "2026-01-01",
+    "category": "luong_toi_thieu",
+    "temporal_kind": "boundary",
+    "expected_behavior": "answer",
+    "ground_truth": "Từ 01/01/2026 Nghị định 293/2025/NĐ-CP có hiệu lực: vùng II là 4.730.000 đồng/tháng.",
+    "source_doc": "293-2025-ND-CP",
+    "source_clause": "293-2025-ND-CP__d3",
+    "expect_contains": [
+      [
+        "4.730.000"
+      ]
+    ],
+    "expect_absent": [
+      "4.410.000"
+    ],
+    "distractor_docs": [
+      "74-2024-ND-CP"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_b02a",
+    "pair_id": "huu_tri_17_nam_giao_thoi",
+    "question": "Tôi đã đủ tuổi nghỉ hưu và nghỉ việc hôm nay, đã đóng bảo hiểm xã hội bắt buộc được 17 năm. Tôi có được hưởng lương hưu hằng tháng không?",
+    "as_of_date": "2025-06-30",
+    "category": "huu_tri",
+    "temporal_kind": "boundary",
+    "expected_behavior": "answer",
+    "ground_truth": "Ngày 30/6/2025 Luật BHXH 58/2014/QH13 còn hiệu lực: Điều 54 yêu cầu đủ 20 năm đóng BHXH. 17 năm chưa đủ để hưởng lương hưu hằng tháng.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d54",
+    "expect_contains": [
+      [
+        "20 năm"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [
+      "41-2024-QH15"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_b02b",
+    "pair_id": "huu_tri_17_nam_giao_thoi",
+    "question": "Tôi đã đủ tuổi nghỉ hưu và nghỉ việc hôm nay, đã đóng bảo hiểm xã hội bắt buộc được 17 năm. Tôi có được hưởng lương hưu hằng tháng không?",
+    "as_of_date": "2025-07-01",
+    "category": "huu_tri",
+    "temporal_kind": "boundary",
+    "expected_behavior": "answer",
+    "ground_truth": "Từ 01/7/2025 Luật BHXH 41/2024/QH15 có hiệu lực: Điều 64 chỉ yêu cầu đủ 15 năm đóng BHXH bắt buộc. 17 năm đủ điều kiện hưởng lương hưu.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d64",
+    "expect_contains": [
+      [
+        "15 năm"
+      ]
+    ],
+    "expect_absent": [
+      "đủ 20 năm"
+    ],
+    "distractor_docs": [
+      "58-2014-QH13"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false,
+    "scoring_note": "Sửa công cụ chấm ngày 2026-09-23 SAU khi xem output lần chạy đầu: chỉ thêm cách viết tương đương / thu hẹp chuỗi cấm cho đúng lỗi cần bắt. Đáp án không đổi."
+  },
+  {
+    "id": "lh_o01",
+    "pair_id": "ngoai_pham_vi_thue_tncn",
+    "question": "Mức giảm trừ gia cảnh cho bản thân người nộp thuế thu nhập cá nhân hiện nay là bao nhiêu?",
+    "as_of_date": "2026-03-01",
+    "category": "ngoai_pham_vi",
+    "temporal_kind": "out_of_scope",
+    "expected_behavior": "refuse",
+    "ground_truth": "Thuế TNCN nằm ngoài phạm vi corpus (manifest scope_out). Hệ thống phải từ chối, không trả lời bằng hiểu biết riêng của mô hình.",
+    "source_doc": "",
+    "source_clause": "",
+    "expect_contains": [
+      [
+        "không tìm thấy"
+      ]
+    ],
+    "expect_absent": [
+      "11.000.000",
+      "11 triệu",
+      "15.500.000",
+      "15,5 triệu"
+    ],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_o02",
+    "pair_id": "ngoai_pham_vi_bhyt",
+    "question": "Người lao động phải đóng bảo hiểm y tế bằng bao nhiêu phần trăm tiền lương tháng?",
+    "as_of_date": "2026-03-01",
+    "category": "ngoai_pham_vi",
+    "temporal_kind": "out_of_scope",
+    "expected_behavior": "refuse",
+    "ground_truth": "Bảo hiểm y tế nằm ngoài phạm vi corpus (manifest scope_out). Hệ thống phải từ chối.",
+    "source_doc": "",
+    "source_clause": "",
+    "expect_contains": [
+      [
+        "không tìm thấy"
+      ]
+    ],
+    "expect_absent": [
+      "1,5%",
+      "4,5%"
+    ],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_o03",
+    "pair_id": "ngoai_pham_vi_thue_tndn",
+    "question": "Thuế suất thuế thu nhập doanh nghiệp phổ thông hiện nay là bao nhiêu phần trăm?",
+    "as_of_date": "2026-03-01",
+    "category": "ngoai_pham_vi",
+    "temporal_kind": "out_of_scope",
+    "expected_behavior": "refuse",
+    "ground_truth": "Thuế thu nhập doanh nghiệp không thuộc phạm vi corpus. Hệ thống phải từ chối.",
+    "source_doc": "",
+    "source_clause": "",
+    "expect_contains": [
+      [
+        "không tìm thấy"
+      ]
+    ],
+    "expect_absent": [
+      "20%"
+    ],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_f01",
+    "pair_id": "phat_tien_di_muon",
+    "question": "Công ty được phạt tiền người lao động đi làm muộn tối đa bao nhiêu mỗi lần?",
+    "as_of_date": "2026-03-01",
+    "category": "ky_luat_lao_dong",
+    "temporal_kind": "false_premise",
+    "expected_behavior": "answer",
+    "ground_truth": "Tiền đề sai: Điều 127 khoản 2 Bộ luật Lao động nghiêm cấm phạt tiền, cắt lương thay việc xử lý kỷ luật lao động. Không có mức phạt tiền hợp pháp nào.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d127",
+    "expect_contains": [
+      [
+        "phạt tiền"
+      ],
+      [
+        "nghiêm cấm",
+        "bị cấm",
+        "không được"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_f02",
+    "pair_id": "nghi_phep_24_thang",
+    "question": "Theo Bộ luật Lao động, người lao động phải làm đủ 24 tháng mới được nghỉ hằng năm hưởng lương, đúng không?",
+    "as_of_date": "2026-03-01",
+    "category": "nghi_hang_nam",
+    "temporal_kind": "false_premise",
+    "expected_behavior": "answer",
+    "ground_truth": "Không đúng. Điều 113 khoản 1: làm việc đủ 12 tháng được nghỉ hằng năm; khoản 2: chưa đủ 12 tháng thì số ngày nghỉ theo tỷ lệ tương ứng với số tháng làm việc.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d113",
+    "expect_contains": [
+      [
+        "12 tháng"
+      ],
+      [
+        "tỷ lệ"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_c01",
+    "pair_id": "lam_them_45_gio_thang",
+    "question": "Một xưởng cơ khí (điều kiện lao động bình thường, không thuộc ngành được làm thêm 300 giờ/năm) yêu cầu công nhân làm thêm 45 giờ trong tháng này. Như vậy có vi phạm quy định về làm thêm giờ không?",
+    "as_of_date": "2026-03-01",
+    "category": "lam_them_gio",
+    "temporal_kind": "compliance",
+    "expected_behavior": "answer",
+    "ground_truth": "Có vi phạm. Điều 107 khoản 2 điểm b: số giờ làm thêm không quá 40 giờ trong 01 tháng; 45 giờ vượt 5 giờ.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d107",
+    "expect_contains": [
+      [
+        "40 giờ"
+      ],
+      [
+        "vi phạm",
+        "vượt"
+      ]
+    ],
+    "expect_absent": [
+      "không vi phạm"
+    ],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_c02a",
+    "pair_id": "luong_5_2_trieu_vung_1",
+    "question": "Doanh nghiệp ở vùng I trả 5.200.000 đồng/tháng cho người lao động làm công việc giản đơn trong điều kiện bình thường, làm đủ thời giờ làm việc. Mức lương này có vi phạm quy định về lương tối thiểu không?",
+    "as_of_date": "2025-10-01",
+    "category": "luong_toi_thieu",
+    "temporal_kind": "compliance",
+    "expected_behavior": "answer",
+    "ground_truth": "Không vi phạm. Ngày 01/10/2025 áp dụng Nghị định 74/2024/NĐ-CP, lương tối thiểu tháng vùng I là 4.960.000 đồng; 5.200.000 đồng cao hơn mức này.",
+    "source_doc": "74-2024-ND-CP",
+    "source_clause": "74-2024-ND-CP__d3",
+    "expect_contains": [
+      [
+        "4.960.000"
+      ],
+      [
+        "không vi phạm",
+        "đáp ứng",
+        "cao hơn",
+        "hợp pháp",
+        "đúng quy định",
+        "không thấp hơn"
+      ]
+    ],
+    "expect_absent": [
+      "5.310.000"
+    ],
+    "distractor_docs": [
+      "293-2025-ND-CP"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_c02b",
+    "pair_id": "luong_5_2_trieu_vung_1",
+    "question": "Doanh nghiệp ở vùng I trả 5.200.000 đồng/tháng cho người lao động làm công việc giản đơn trong điều kiện bình thường, làm đủ thời giờ làm việc. Mức lương này có vi phạm quy định về lương tối thiểu không?",
+    "as_of_date": "2026-02-01",
+    "category": "luong_toi_thieu",
+    "temporal_kind": "compliance",
+    "expected_behavior": "answer",
+    "ground_truth": "Có vi phạm. Từ 01/01/2026 áp dụng Nghị định 293/2025/NĐ-CP, lương tối thiểu tháng vùng I là 5.310.000 đồng; 5.200.000 đồng thấp hơn mức này.",
+    "source_doc": "293-2025-ND-CP",
+    "source_clause": "293-2025-ND-CP__d3",
+    "expect_contains": [
+      [
+        "5.310.000"
+      ],
+      [
+        "vi phạm",
+        "thấp hơn",
+        "dưới mức"
+      ]
+    ],
+    "expect_absent": [
+      "4.960.000",
+      "không vi phạm"
+    ],
+    "distractor_docs": [
+      "74-2024-ND-CP"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a001",
+    "pair_id": "loai_hop_dong",
+    "question": "Công ty muốn ký hợp đồng lao động xác định thời hạn với nhân viên mới, thời hạn tối đa được phép ký là bao nhiêu tháng?",
+    "as_of_date": "2026-02-10",
+    "category": "hop_dong_lao_dong",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm b khoản 1 Điều 20 Bộ luật Lao động 2019 (45/2019/QH14), hợp đồng lao động xác định thời hạn có thời hạn không quá 36 tháng kể từ thời điểm có hiệu lực của hợp đồng.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d20",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "36 tháng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a002",
+    "pair_id": "noi_dung_hdld",
+    "question": "Khi soạn hợp đồng lao động, ngoài mức lương thì có bắt buộc phải ghi thời hạn trả lương và phụ cấp lương không?",
+    "as_of_date": "2026-01-15",
+    "category": "noi_dung_hdld",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Có. Theo điểm đ khoản 1 Điều 21 Bộ luật Lao động 2019, hợp đồng lao động phải có nội dung về mức lương, hình thức trả lương, thời hạn trả lương, phụ cấp lương và các khoản bổ sung khác.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d21",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "thời hạn trả lương"
+      ],
+      [
+        "phụ cấp lương"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a003",
+    "pair_id": "thu_viec_duoi_1_thang",
+    "question": "Công ty ký hợp đồng lao động thời vụ 3 tuần với một lao động, công ty có được yêu cầu người này thử việc trước không?",
+    "as_of_date": "2026-03-05",
+    "category": "thu_viec",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Không. Theo khoản 3 Điều 24 Bộ luật Lao động 2019, không áp dụng thử việc đối với người lao động giao kết hợp đồng lao động có thời hạn dưới 01 tháng.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d24",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "dưới 01 tháng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a004",
+    "pair_id": "ket_thuc_thu_viec",
+    "question": "Trong thời gian thử việc, người lao động muốn nghỉ ngang thì có cần báo trước và có phải bồi thường cho công ty không?",
+    "as_of_date": "2025-11-20",
+    "category": "thu_viec",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Không. Theo khoản 2 Điều 27 Bộ luật Lao động 2019, trong thời gian thử việc mỗi bên có quyền hủy bỏ hợp đồng thử việc hoặc hợp đồng lao động đã giao kết mà không cần báo trước và không phải bồi thường.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d27",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "không cần báo trước"
+      ],
+      [
+        "không phải bồi thường"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a005",
+    "pair_id": "chuyen_cong_viec_khac",
+    "question": "Do sự cố mất điện đột xuất, công ty tạm thời điều chuyển một kỹ thuật viên sang bộ phận khác. Nếu không có sự đồng ý bằng văn bản của người lao động thì tối đa được điều chuyển bao nhiêu ngày làm việc cộng dồn trong 1 năm, và lương công việc mới tối thiểu phải bằng bao nhiêu phần trăm lương công việc cũ?",
+    "as_of_date": "2026-04-01",
+    "category": "dieu_chuyen_lao_dong",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 và khoản 3 Điều 29 Bộ luật Lao động 2019, không có sự đồng ý bằng văn bản thì tối đa 60 ngày làm việc cộng dồn trong 01 năm, và tiền lương công việc mới ít nhất phải bằng 85% tiền lương công việc cũ.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d29",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "60 ngày"
+      ],
+      [
+        "85%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a006",
+    "pair_id": "tam_hoan_hdld_nghia_vu_quan_su",
+    "question": "Một nhân viên phải thực hiện nghĩa vụ quân sự, hợp đồng lao động của người này sẽ được xử lý thế nào?",
+    "as_of_date": "2026-05-12",
+    "category": "tam_hoan_hdld",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 30 Bộ luật Lao động 2019, người lao động thực hiện nghĩa vụ quân sự thuộc trường hợp tạm hoãn thực hiện hợp đồng lao động.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d30",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "nghĩa vụ quân sự"
+      ],
+      [
+        "tạm hoãn thực hiện hợp đồng lao động"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a007",
+    "pair_id": "dinh_cong_dinh_nghia",
+    "question": "Theo Bộ luật Lao động, đình công có bắt buộc phải mang tính tự nguyện và có tổ chức hay có thể là hành động tự phát của một nhóm nhỏ người lao động?",
+    "as_of_date": "2025-10-08",
+    "category": "dinh_cong",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 198 Bộ luật Lao động 2019, đình công là sự ngừng việc tạm thời, tự nguyện và có tổ chức của người lao động do tổ chức đại diện người lao động tổ chức và lãnh đạo.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d198",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "tự nguyện và có tổ chức"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a008",
+    "pair_id": "lam_viec_khong_tron_thoi_gian",
+    "question": "Người lao động làm việc bán thời gian (không trọn thời gian) có được hưởng lương và đối xử bình đẳng như người làm việc trọn thời gian không?",
+    "as_of_date": "2026-06-18",
+    "category": "lam_viec_khong_tron_thoi_gian",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Có. Theo khoản 3 Điều 32 Bộ luật Lao động 2019, người lao động làm việc không trọn thời gian được hưởng lương, bình đẳng trong thực hiện quyền và nghĩa vụ với người lao động làm việc trọn thời gian.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d32",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "bình đẳng trong thực hiện quyền và nghĩa vụ"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a009",
+    "pair_id": "lao_dong_cao_tuoi_rut_ngan_gio",
+    "question": "Người lao động cao tuổi có được thỏa thuận với công ty để rút ngắn thời giờ làm việc hằng ngày không?",
+    "as_of_date": "2026-07-22",
+    "category": "lao_dong_cao_tuoi",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Có. Theo khoản 2 Điều 148 Bộ luật Lao động 2019, người lao động cao tuổi có quyền thỏa thuận với người sử dụng lao động về việc rút ngắn thời giờ làm việc hằng ngày hoặc áp dụng chế độ làm việc không trọn thời gian.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d148",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "rút ngắn thời giờ làm việc hằng ngày"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a010",
+    "pair_id": "don_phuong_cham_dut_nld_bao_truoc",
+    "question": "Nhân viên đang làm việc theo hợp đồng lao động không xác định thời hạn muốn nghỉ việc thì phải báo trước cho công ty ít nhất bao nhiêu ngày?",
+    "as_of_date": "2026-02-25",
+    "category": "cham_dut_hdld",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 35 Bộ luật Lao động 2019, người lao động làm việc theo hợp đồng lao động không xác định thời hạn phải báo trước ít nhất 45 ngày khi đơn phương chấm dứt hợp đồng lao động.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d35",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "45 ngày"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a011",
+    "pair_id": "don_phuong_cham_dut_nsdld_om_dau",
+    "question": "Người lao động làm việc theo hợp đồng lao động không xác định thời hạn bị ốm đau đã điều trị liên tục bao lâu thì công ty được quyền đơn phương chấm dứt hợp đồng lao động?",
+    "as_of_date": "2025-09-14",
+    "category": "cham_dut_hdld",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm b khoản 1 Điều 36 Bộ luật Lao động 2019, công ty được đơn phương chấm dứt hợp đồng lao động không xác định thời hạn nếu người lao động đã điều trị 12 tháng liên tục mà khả năng lao động chưa hồi phục.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d36",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "12 tháng liên tục"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a012",
+    "pair_id": "tro_cap_thoi_viec_muc",
+    "question": "Người lao động đã làm việc thường xuyên từ 12 tháng trở lên, khi chấm dứt hợp đồng lao động đúng luật thì mỗi năm làm việc được trợ cấp thôi việc bằng bao nhiêu tháng tiền lương?",
+    "as_of_date": "2026-03-19",
+    "category": "tro_cap_thoi_viec",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 46 Bộ luật Lao động 2019, mỗi năm làm việc người lao động được trợ cấp thôi việc một nửa tháng tiền lương.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d46",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "một nửa tháng tiền lương"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a013",
+    "pair_id": "tro_cap_mat_viec_muc",
+    "question": "Công ty cắt giảm nhân sự do thay đổi cơ cấu, mỗi năm làm việc người lao động bị mất việc làm được trả trợ cấp mất việc làm bao nhiêu, và mức tối thiểu là bao nhiêu tháng lương?",
+    "as_of_date": "2026-03-20",
+    "category": "tro_cap_mat_viec",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 47 Bộ luật Lao động 2019, cứ mỗi năm làm việc người sử dụng lao động trả 01 tháng tiền lương nhưng ít nhất bằng 02 tháng tiền lương.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d47",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "01 tháng tiền lương"
+      ],
+      [
+        "02 tháng tiền lương"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a014",
+    "pair_id": "thanh_toan_khi_cham_dut",
+    "question": "Sau khi hợp đồng lao động chấm dứt, trong thời hạn bao nhiêu ngày làm việc hai bên phải thanh toán đầy đủ các khoản tiền liên quan đến quyền lợi của mỗi bên?",
+    "as_of_date": "2026-01-30",
+    "category": "cham_dut_hdld",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 48 Bộ luật Lao động 2019, trong thời hạn 14 ngày làm việc kể từ ngày chấm dứt hợp đồng lao động, hai bên có trách nhiệm thanh toán đầy đủ các khoản tiền có liên quan đến quyền lợi của mỗi bên.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d48",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "14 ngày làm việc"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a015",
+    "pair_id": "tranh_chap_lao_dong_ca_nhan",
+    "question": "Tranh chấp lao động cá nhân điển hình là tranh chấp giữa những chủ thể nào?",
+    "as_of_date": "2025-12-05",
+    "category": "tranh_chap_lao_dong",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 179 Bộ luật Lao động 2019, tranh chấp lao động cá nhân là tranh chấp giữa người lao động với người sử dụng lao động.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d179",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "người lao động với người sử dụng lao động"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a016",
+    "pair_id": "giup_viec_gia_dinh_hop_dong",
+    "question": "Hợp đồng lao động với người giúp việc gia đình có bắt buộc phải giao kết bằng văn bản không? Nếu một bên muốn đơn phương chấm dứt thì phải báo trước bao lâu?",
+    "as_of_date": "2026-04-14",
+    "category": "giup_viec_gia_dinh",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 và khoản 2 Điều 162 Bộ luật Lao động 2019, hợp đồng lao động với lao động là người giúp việc gia đình phải giao kết bằng văn bản; một bên có quyền đơn phương chấm dứt hợp đồng bất kỳ khi nào nhưng phải báo trước ít nhất 15 ngày.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d162",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "bằng văn bản"
+      ],
+      [
+        "15 ngày"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a017",
+    "pair_id": "muc_luong_toi_thieu_dinh_nghia",
+    "question": "Mức lương tối thiểu được Nhà nước xác lập theo đơn vị nào - theo vùng, theo ngành hay áp dụng chung cả nước?",
+    "as_of_date": "2026-05-05",
+    "category": "tien_luong",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 91 Bộ luật Lao động 2019, mức lương tối thiểu được xác lập theo vùng, ấn định theo tháng, giờ.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d91",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "xác lập theo vùng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a018",
+    "pair_id": "nguyen_tac_tra_luong_ep_buoc",
+    "question": "Công ty có được ép buộc người lao động dùng tiền lương của mình để mua hàng hóa, dịch vụ của công ty không?",
+    "as_of_date": "2026-06-02",
+    "category": "tien_luong",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Không. Theo khoản 2 Điều 94 Bộ luật Lao động 2019, người sử dụng lao động không được ép buộc người lao động chi tiêu lương vào việc mua hàng hóa, sử dụng dịch vụ của người sử dụng lao động.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d94",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "ép buộc người lao động chi tiêu lương"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a019",
+    "pair_id": "ky_han_tra_luong_thang",
+    "question": "Người lao động hưởng lương theo tháng thì tối thiểu phải được trả lương bao nhiêu lần trong một tháng?",
+    "as_of_date": "2026-01-08",
+    "category": "tien_luong",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 97 Bộ luật Lao động 2019, người lao động hưởng lương theo tháng được trả một tháng một lần hoặc nửa tháng một lần.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d97",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "nửa tháng một lần"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a020",
+    "pair_id": "tien_luong_lam_dem_khong_lam_them",
+    "question": "Người lao động làm việc vào ban đêm (không phải làm thêm giờ) được trả thêm ít nhất bao nhiêu phần trăm tiền lương so với ngày làm việc bình thường?",
+    "as_of_date": "2025-11-11",
+    "category": "tien_luong_lam_them",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 98 Bộ luật Lao động 2019, người lao động làm việc vào ban đêm được trả thêm ít nhất bằng 30% tiền lương của ngày làm việc bình thường.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d98",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "30%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a021",
+    "pair_id": "tien_luong_ngung_viec_loi_cong_ty",
+    "question": "Nhà máy phải ngừng sản xuất do lỗi của công ty (không phải lỗi của người lao động), người lao động được trả lương ngừng việc như thế nào?",
+    "as_of_date": "2026-02-14",
+    "category": "tien_luong",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 99 Bộ luật Lao động 2019, nếu ngừng việc do lỗi của người sử dụng lao động thì người lao động được trả đủ tiền lương theo hợp đồng lao động.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d99",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "trả đủ tiền lương theo hợp đồng lao động"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a022",
+    "pair_id": "tam_ung_tien_luong_lai",
+    "question": "Khi người lao động được tạm ứng tiền lương, công ty có được tính lãi trên khoản tạm ứng đó không?",
+    "as_of_date": "2026-03-27",
+    "category": "tien_luong",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Không. Theo khoản 1 Điều 101 Bộ luật Lao động 2019, người lao động được tạm ứng tiền lương theo điều kiện do hai bên thỏa thuận và không bị tính lãi.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d101",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "không bị tính lãi"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a023",
+    "pair_id": "khau_tru_tien_luong_toi_da",
+    "question": "Công ty muốn khấu trừ dần lương hằng tháng của nhân viên làm hỏng thiết bị để bồi thường thiệt hại, mức khấu trừ tối đa mỗi tháng là bao nhiêu phần trăm tiền lương thực trả?",
+    "as_of_date": "2026-04-09",
+    "category": "tien_luong",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 3 Điều 102 Bộ luật Lao động 2019, mức khấu trừ tiền lương hằng tháng không được quá 30% tiền lương thực trả hằng tháng của người lao động.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d102",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "30%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a024",
+    "pair_id": "thuong_hinh_thuc",
+    "question": "Tiền thưởng cho người lao động có bắt buộc phải trả bằng tiền mặt hay công ty có thể thưởng bằng tài sản hoặc hình thức khác?",
+    "as_of_date": "2026-01-22",
+    "category": "tien_luong",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 104 Bộ luật Lao động 2019, thưởng là số tiền hoặc tài sản hoặc bằng các hình thức khác mà người sử dụng lao động thưởng cho người lao động.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d104",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "tài sản hoặc bằng các hình thức khác"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a025",
+    "pair_id": "thoi_gio_lam_viec_binh_thuong",
+    "question": "Thời giờ làm việc bình thường của người lao động tối đa là bao nhiêu giờ trong 1 ngày và bao nhiêu giờ trong 1 tuần?",
+    "as_of_date": "2026-05-30",
+    "category": "thoi_gio_lam_viec",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 105 Bộ luật Lao động 2019, thời giờ làm việc bình thường không quá 08 giờ trong 01 ngày và không quá 48 giờ trong 01 tuần.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d105",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "08 giờ"
+      ],
+      [
+        "48 giờ"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a026",
+    "pair_id": "gio_lam_viec_ban_dem",
+    "question": "Giờ làm việc ban đêm theo Bộ luật Lao động được tính từ mấy giờ đến mấy giờ sáng hôm sau?",
+    "as_of_date": "2025-10-25",
+    "category": "lam_viec_ban_dem",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 106 Bộ luật Lao động 2019, giờ làm việc ban đêm được tính từ 22 giờ đến 06 giờ sáng ngày hôm sau.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d106",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "22 giờ"
+      ],
+      [
+        "06 giờ"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a027",
+    "pair_id": "lam_them_gio_gioi_han_ngay_thang",
+    "question": "Trong một ngày làm việc bình thường, số giờ làm thêm không được vượt quá bao nhiêu phần trăm số giờ làm việc bình thường trong ngày, và số giờ làm thêm trong một tháng tối đa là bao nhiêu?",
+    "as_of_date": "2026-06-11",
+    "category": "lam_them_gio",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm b khoản 2 Điều 107 Bộ luật Lao động 2019, số giờ làm thêm không quá 50% số giờ làm việc bình thường trong 01 ngày và không quá 40 giờ trong 01 tháng.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d107",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "50%"
+      ],
+      [
+        "40 giờ"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a028",
+    "pair_id": "nghi_chuyen_ca",
+    "question": "Người lao động làm việc theo ca được nghỉ tối thiểu bao nhiêu giờ trước khi chuyển sang ca làm việc khác?",
+    "as_of_date": "2026-02-02",
+    "category": "nghi_ngoi",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 110 Bộ luật Lao động 2019, người lao động làm việc theo ca được nghỉ ít nhất 12 giờ trước khi chuyển sang ca làm việc khác.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d110",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "12 giờ"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a029",
+    "pair_id": "nghi_hang_tuan_toi_thieu",
+    "question": "Mỗi tuần, người lao động được nghỉ liên tục tối thiểu bao nhiêu giờ?",
+    "as_of_date": "2026-01-19",
+    "category": "nghi_ngoi",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 111 Bộ luật Lao động 2019, mỗi tuần người lao động được nghỉ ít nhất 24 giờ liên tục.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d111",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "24 giờ"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a030",
+    "pair_id": "nghi_le_tet_so_ngay",
+    "question": "Người lao động được nghỉ Tết Âm lịch mấy ngày và nghỉ lễ Quốc khánh mấy ngày, có được hưởng nguyên lương không?",
+    "as_of_date": "2026-01-02",
+    "category": "nghi_le_tet",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 112 Bộ luật Lao động 2019, người lao động được nghỉ làm việc hưởng nguyên lương: Tết Âm lịch 05 ngày, Quốc khánh 02 ngày.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d112",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "05 ngày"
+      ],
+      [
+        "02 ngày"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a031",
+    "pair_id": "nghi_hang_nam_tham_nien",
+    "question": "Cứ mỗi 5 năm làm việc liên tục cho một người sử dụng lao động thì số ngày nghỉ hằng năm của người lao động được cộng thêm bao nhiêu ngày?",
+    "as_of_date": "2026-03-16",
+    "category": "nghi_hang_nam",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 114 Bộ luật Lao động 2019, cứ đủ 05 năm làm việc cho một người sử dụng lao động thì số ngày nghỉ hằng năm được tăng thêm tương ứng 01 ngày.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d114",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "01 ngày"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a032",
+    "pair_id": "nghi_viec_rieng_ket_hon",
+    "question": "Nhân viên kết hôn thì được nghỉ việc riêng hưởng nguyên lương mấy ngày? Nếu con đẻ của nhân viên đó kết hôn thì được nghỉ mấy ngày?",
+    "as_of_date": "2026-04-27",
+    "category": "nghi_viec_rieng",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a và điểm b khoản 1 Điều 115 Bộ luật Lao động 2019, người lao động kết hôn được nghỉ 03 ngày; con đẻ, con nuôi kết hôn được nghỉ 01 ngày, đều hưởng nguyên lương.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d115",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "03 ngày"
+      ],
+      [
+        "01 ngày"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a033",
+    "pair_id": "thoi_hieu_ky_luat_lao_dong",
+    "question": "Thời hiệu xử lý kỷ luật lao động thông thường là bao lâu, và đối với hành vi vi phạm liên quan trực tiếp đến tài chính, tài sản của công ty thì thời hiệu là bao lâu?",
+    "as_of_date": "2026-05-19",
+    "category": "ky_luat_lao_dong",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 123 Bộ luật Lao động 2019, thời hiệu xử lý kỷ luật lao động thông thường là 06 tháng; đối với hành vi vi phạm liên quan trực tiếp đến tài chính, tài sản, bí mật công nghệ, bí mật kinh doanh thì thời hiệu là 12 tháng.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d123",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "06 tháng"
+      ],
+      [
+        "12 tháng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a034",
+    "pair_id": "hinh_thuc_ky_luat_lao_dong",
+    "question": "Bộ luật Lao động quy định những hình thức xử lý kỷ luật lao động nào, từ nhẹ nhất đến nặng nhất?",
+    "as_of_date": "2025-12-30",
+    "category": "ky_luat_lao_dong",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 124 Bộ luật Lao động 2019, các hình thức xử lý kỷ luật lao động gồm: khiển trách; kéo dài thời hạn nâng lương không quá 06 tháng; cách chức; sa thải.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d124",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "Khiển trách"
+      ],
+      [
+        "Sa thải"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a035",
+    "pair_id": "tam_dinh_chi_cong_viec",
+    "question": "Công ty tạm đình chỉ công việc của nhân viên để xác minh vi phạm, thời hạn tạm đình chỉ tối đa trong trường hợp thông thường là bao lâu, và nhân viên được tạm ứng bao nhiêu phần trăm lương trong thời gian đó?",
+    "as_of_date": "2026-06-25",
+    "category": "ky_luat_lao_dong",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 128 Bộ luật Lao động 2019, thời hạn tạm đình chỉ công việc không được quá 15 ngày (trường hợp đặc biệt không quá 90 ngày), người lao động được tạm ứng 50% tiền lương trước khi bị đình chỉ công việc.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d128",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "15 ngày"
+      ],
+      [
+        "50%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a036",
+    "pair_id": "boi_thuong_thiet_hai_so_suat",
+    "question": "Nhân viên làm hỏng thiết bị do sơ suất, gây thiệt hại không nghiêm trọng (giá trị không quá 10 tháng lương tối thiểu vùng), thì phải bồi thường tối đa bao nhiêu tháng tiền lương?",
+    "as_of_date": "2026-02-17",
+    "category": "boi_thuong_thiet_hai",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 129 Bộ luật Lao động 2019, người lao động gây thiệt hại không nghiêm trọng do sơ suất với giá trị không quá 10 tháng lương tối thiểu vùng thì phải bồi thường nhiều nhất là 03 tháng tiền lương.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d129",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "03 tháng tiền lương"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a037",
+    "pair_id": "lao_dong_nu_nghi_hanh_kinh_nuoi_con",
+    "question": "Lao động nữ trong thời gian hành kinh được nghỉ mỗi ngày bao nhiêu phút, và trong thời gian nuôi con dưới 12 tháng tuổi được nghỉ mỗi ngày bao nhiêu phút?",
+    "as_of_date": "2026-03-08",
+    "category": "lao_dong_nu",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 4 Điều 137 Bộ luật Lao động 2019, lao động nữ trong thời gian hành kinh được nghỉ mỗi ngày 30 phút, trong thời gian nuôi con dưới 12 tháng tuổi được nghỉ mỗi ngày 60 phút, vẫn hưởng đủ tiền lương.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d137",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "30 phút"
+      ],
+      [
+        "60 phút"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a038",
+    "pair_id": "lao_dong_chua_thanh_nien_dinh_nghia",
+    "question": "Theo Bộ luật Lao động, lao động chưa thành niên là người lao động chưa đủ bao nhiêu tuổi?",
+    "as_of_date": "2025-11-03",
+    "category": "lao_dong_chua_thanh_nien",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 143 Bộ luật Lao động 2019, lao động chưa thành niên là người lao động chưa đủ 18 tuổi.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d143",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "chưa đủ 18 tuổi"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a039",
+    "pair_id": "lao_dong_chua_thanh_nien_gio_lam_viec",
+    "question": "Người lao động chưa đủ 15 tuổi được phép làm việc tối đa bao nhiêu giờ trong 1 ngày và bao nhiêu giờ trong 1 tuần?",
+    "as_of_date": "2026-04-21",
+    "category": "lao_dong_chua_thanh_nien",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 146 Bộ luật Lao động 2019, thời giờ làm việc của người chưa đủ 15 tuổi không được quá 04 giờ trong 01 ngày và 20 giờ trong 01 tuần.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d146",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "04 giờ"
+      ],
+      [
+        "20 giờ"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a040",
+    "pair_id": "tuoi_nghi_huu_2026",
+    "question": "Năm 2026, lao động nam làm việc trong điều kiện bình thường nghỉ hưu ở tuổi bao nhiêu? Còn lao động nữ thì nghỉ hưu ở tuổi bao nhiêu?",
+    "as_of_date": "2026-05-04",
+    "category": "tuoi_nghi_huu",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 4 Nghị định 135/2020/NĐ-CP, năm 2026 tuổi nghỉ hưu trong điều kiện lao động bình thường là 61 tuổi 6 tháng đối với lao động nam và 57 tuổi đối với lao động nữ.",
+    "source_doc": "135-2020-ND-CP",
+    "source_clause": "135-2020-ND-CP__d4",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "61 tuổi 6 tháng"
+      ],
+      [
+        "57 tuổi"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a041",
+    "pair_id": "nghi_hang_nam_lao_dong_chua_thanh_nien_tham_nien",
+    "question": "Một lao động chưa thành niên đã làm việc liên tục 6 năm cho cùng một công ty (công việc trong điều kiện lao động bình thường, không thuộc danh mục nặng nhọc độc hại). Mỗi năm người này được nghỉ hằng năm hưởng nguyên lương bao nhiêu ngày làm việc?",
+    "as_of_date": "2026-03-30",
+    "category": "nghi_hang_nam",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Lao động chưa thành niên được nghỉ hằng năm 14 ngày làm việc theo điểm b khoản 1 Điều 113 Bộ luật Lao động 2019; do đã đủ 5 năm làm việc nên được tăng thêm 01 ngày theo Điều 114, tổng cộng 15 ngày làm việc.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "",
+    "source_clauses": [
+      "45-2019-QH14__d113",
+      "45-2019-QH14__d114"
+    ],
+    "expect_contains": [
+      [
+        "14 ngày làm việc"
+      ],
+      [
+        "01 ngày"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a042",
+    "pair_id": "don_phuong_cham_dut_trai_phap_luat_bao_truoc",
+    "question": "Công ty đơn phương chấm dứt hợp đồng lao động không xác định thời hạn với một nhân viên vì lý do tái cơ cấu, nhưng chỉ báo trước 10 ngày. Việc chấm dứt hợp đồng như vậy có bị coi là đơn phương chấm dứt hợp đồng lao động trái pháp luật không?",
+    "as_of_date": "2026-02-08",
+    "category": "cham_dut_hdld",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Có. Theo điểm a khoản 2 Điều 36 Bộ luật Lao động 2019, công ty phải báo trước ít nhất 45 ngày đối với hợp đồng lao động không xác định thời hạn; chấm dứt không đúng quy định tại Điều 36 thì theo Điều 39 bị coi là đơn phương chấm dứt hợp đồng lao động trái pháp luật.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "",
+    "source_clauses": [
+      "45-2019-QH14__d36",
+      "45-2019-QH14__d39"
+    ],
+    "expect_contains": [
+      [
+        "45 ngày"
+      ],
+      [
+        "không đúng quy định tại các điều 35, 36 và 37"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a043",
+    "pair_id": "tuoi_nghi_huu_lo_trinh_2026",
+    "question": "Theo lộ trình điều chỉnh tuổi nghỉ hưu, tuổi nghỉ hưu của lao động nam trong điều kiện bình thường sẽ tăng dần cho đến khi đủ bao nhiêu tuổi và vào năm nào? Riêng năm 2026, lao động nam nghỉ hưu ở tuổi bao nhiêu?",
+    "as_of_date": "2026-01-25",
+    "category": "tuoi_nghi_huu",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 169 Bộ luật Lao động 2019, tuổi nghỉ hưu của lao động nam được điều chỉnh theo lộ trình cho đến khi đủ 62 tuổi vào năm 2028; theo khoản 1 Điều 4 Nghị định 135/2020/NĐ-CP, năm 2026 lao động nam nghỉ hưu ở tuổi 61 tuổi 6 tháng.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "",
+    "source_clauses": [
+      "45-2019-QH14__d169",
+      "135-2020-ND-CP__d4"
+    ],
+    "expect_contains": [
+      [
+        "62 tuổi"
+      ],
+      [
+        "61 tuổi 6 tháng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a044",
+    "pair_id": "sa_thai_thoi_hieu_ky_luat_tai_chinh",
+    "question": "Công ty phát hiện một nhân viên có hành vi trộm cắp tài sản công ty (liên quan trực tiếp đến tài chính) cách đây 10 tháng. Công ty còn có thể ra quyết định sa thải nhân viên này không, và thời hiệu xử lý kỷ luật trong trường hợp này là bao lâu?",
+    "as_of_date": "2026-04-16",
+    "category": "ky_luat_lao_dong",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Còn. Theo khoản 1 Điều 123 Bộ luật Lao động 2019, hành vi vi phạm liên quan trực tiếp đến tài chính, tài sản có thời hiệu xử lý kỷ luật là 12 tháng; sa thải là một trong các hình thức xử lý kỷ luật lao động theo Điều 124.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "",
+    "source_clauses": [
+      "45-2019-QH14__d123",
+      "45-2019-QH14__d124"
+    ],
+    "expect_contains": [
+      [
+        "12 tháng"
+      ],
+      [
+        "Sa thải"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a045",
+    "pair_id": "lam_them_gio_ngay_le_va_gioi_han_nam",
+    "question": "Nếu công ty tổ chức cho công nhân làm thêm giờ đúng vào ngày nghỉ Tết Dương lịch, số giờ làm thêm tối đa trong ngày đó là bao nhiêu? Còn số giờ làm thêm tối đa trong 1 năm, đối với trường hợp thông thường không thuộc danh mục ngành nghề được làm đến 300 giờ, là bao nhiêu?",
+    "as_of_date": "2026-01-01",
+    "category": "lam_them_gio",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 4 Điều 60 Nghị định 145/2020/NĐ-CP, tổng số giờ làm thêm không quá 12 giờ trong một ngày khi làm thêm vào ngày nghỉ lễ, tết; theo điểm c khoản 2 Điều 107 Bộ luật Lao động 2019, số giờ làm thêm trong trường hợp thông thường không quá 200 giờ trong 01 năm.",
+    "source_doc": "145-2020-ND-CP",
+    "source_clause": "",
+    "source_clauses": [
+      "145-2020-ND-CP__d60",
+      "45-2019-QH14__d107"
+    ],
+    "expect_contains": [
+      [
+        "12 giờ"
+      ],
+      [
+        "200 giờ"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a046",
+    "pair_id": "fp_hop_dong_24_thang",
+    "question": "Theo Bộ luật Lao động, hợp đồng lao động xác định thời hạn chỉ được ký tối đa 24 tháng, đúng không?",
+    "as_of_date": "2026-02-11",
+    "category": "hop_dong_lao_dong",
+    "temporal_kind": "false_premise",
+    "expected_behavior": "answer",
+    "ground_truth": "Không đúng. Theo điểm b khoản 1 Điều 20 Bộ luật Lao động 2019, hợp đồng lao động xác định thời hạn có thời hạn tối đa không quá 36 tháng, không phải 24 tháng.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d20",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "36 tháng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a047",
+    "pair_id": "fp_khau_tru_luong_50_phan_tram",
+    "question": "Người sử dụng lao động có quyền khấu trừ tối đa 50% tiền lương hằng tháng của người lao động để bồi thường thiệt hại do làm hỏng thiết bị, đúng không?",
+    "as_of_date": "2026-03-24",
+    "category": "tien_luong",
+    "temporal_kind": "false_premise",
+    "expected_behavior": "answer",
+    "ground_truth": "Không đúng. Theo khoản 3 Điều 102 Bộ luật Lao động 2019, mức khấu trừ tiền lương hằng tháng không được quá 30% tiền lương thực trả hằng tháng, không phải 50%.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d102",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "30%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a048",
+    "pair_id": "fp_chua_du_15_tuoi_lam_them_gio",
+    "question": "Người lao động chưa đủ 15 tuổi có thể làm thêm giờ nếu được công ty và cha mẹ đồng ý, đúng không?",
+    "as_of_date": "2026-05-27",
+    "category": "lao_dong_chua_thanh_nien",
+    "temporal_kind": "false_premise",
+    "expected_behavior": "answer",
+    "ground_truth": "Không đúng. Theo khoản 1 Điều 146 Bộ luật Lao động 2019, người chưa đủ 15 tuổi không được làm thêm giờ, làm việc vào ban đêm, dù có sự đồng ý của các bên.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d146",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "không được làm thêm giờ"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a049",
+    "pair_id": "oos_vuot_den_do",
+    "question": "Mức phạt tiền đối với hành vi vượt đèn đỏ khi điều khiển xe máy theo Luật Giao thông đường bộ là bao nhiêu?",
+    "as_of_date": "2026-03-01",
+    "category": "ngoai_pham_vi",
+    "temporal_kind": "out_of_scope",
+    "expected_behavior": "refuse",
+    "ground_truth": "Câu hỏi thuộc lĩnh vực giao thông đường bộ, nằm ngoài phạm vi tài liệu về pháp luật lao động và bảo hiểm xã hội mà hệ thống đã nạp.",
+    "source_doc": "",
+    "source_clause": "",
+    "source_clauses": [],
+    "expect_contains": [],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_a050",
+    "pair_id": "oos_thoi_han_giao_dat_nong_nghiep",
+    "question": "Thời hạn giao đất nông nghiệp cho hộ gia đình, cá nhân trực tiếp sản xuất nông nghiệp theo Luật Đất đai là bao nhiêu năm?",
+    "as_of_date": "2026-04-05",
+    "category": "ngoai_pham_vi",
+    "temporal_kind": "out_of_scope",
+    "expected_behavior": "refuse",
+    "ground_truth": "Câu hỏi thuộc lĩnh vực đất đai, nằm ngoài phạm vi tài liệu về pháp luật lao động và bảo hiểm xã hội mà hệ thống đã nạp.",
+    "source_doc": "",
+    "source_clause": "",
+    "source_clauses": [],
+    "expect_contains": [],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b001",
+    "pair_id": "doi_tuong_hdld_bat_buoc",
+    "question": "Người lao động ký hợp đồng lao động xác định thời hạn phải có thời hạn hợp đồng từ bao lâu trở lên mới thuộc diện tham gia bảo hiểm xã hội bắt buộc?",
+    "as_of_date": "2025-10-01",
+    "category": "bhxh_dong_gop",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 2 Luật Bảo hiểm xã hội 2024 (41-2024-QH15), hợp đồng lao động xác định thời hạn phải có thời hạn từ đủ 01 tháng trở lên thì người lao động thuộc đối tượng tham gia bảo hiểm xã hội bắt buộc.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d2",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "từ đủ 01 tháng trở lên"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b002",
+    "pair_id": "tuoi_tham_gia_tu_nguyen",
+    "question": "Công dân Việt Nam phải từ đủ bao nhiêu tuổi mới được tham gia bảo hiểm xã hội tự nguyện?",
+    "as_of_date": "2025-10-01",
+    "category": "bhxh_tu_nguyen",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 4 Điều 2 Luật Bảo hiểm xã hội 2024, công dân Việt Nam từ đủ 15 tuổi trở lên, không thuộc đối tượng tham gia bảo hiểm xã hội bắt buộc và không đang hưởng lương hưu, trợ cấp bảo hiểm xã hội thì được tham gia bảo hiểm xã hội tự nguyện.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d2_s1",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "15 tuổi trở lên"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b003",
+    "pair_id": "che_do_bhxh_bat_buoc",
+    "question": "Bảo hiểm xã hội bắt buộc theo Luật Bảo hiểm xã hội 2024 gồm những chế độ nào?",
+    "as_of_date": "2025-10-01",
+    "category": "bhxh_dong_gop",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 4 Luật Bảo hiểm xã hội 2024, bảo hiểm xã hội bắt buộc gồm 5 chế độ: ốm đau, thai sản, hưu trí, tử tuất và bảo hiểm tai nạn lao động, bệnh nghề nghiệp theo Luật An toàn, vệ sinh lao động.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d4",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "Ốm đau"
+      ],
+      [
+        "Tử tuất"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b004",
+    "pair_id": "muc_tham_chieu_dung_de_lam_gi",
+    "question": "Mức tham chiếu trong Luật Bảo hiểm xã hội 2024 được dùng để làm gì?",
+    "as_of_date": "2025-10-01",
+    "category": "bhxh_dong_gop",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 7 Luật Bảo hiểm xã hội 2024, mức tham chiếu là mức tiền do Chính phủ quyết định dùng để tính mức đóng, mức hưởng một số chế độ bảo hiểm xã hội.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d7",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "tính mức đóng, mức hưởng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b005",
+    "pair_id": "tuoi_huong_tro_cap_huu_tri_xa_hoi",
+    "question": "Người dân phải từ đủ bao nhiêu tuổi mới đủ điều kiện hưởng trợ cấp hưu trí xã hội hằng tháng theo diện thông thường?",
+    "as_of_date": "2025-10-01",
+    "category": "tro_cap_huu_tri_xa_hoi",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 21 Luật Bảo hiểm xã hội 2024, công dân Việt Nam từ đủ 75 tuổi trở lên (không hưởng lương hưu hoặc trợ cấp bảo hiểm xã hội hằng tháng, có văn bản đề nghị) thì được hưởng trợ cấp hưu trí xã hội.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d21",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "75 tuổi"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b006",
+    "pair_id": "muc_toi_thieu_can_cu_dong_tu_nguyen",
+    "question": "Thu nhập làm căn cứ đóng bảo hiểm xã hội tự nguyện thấp nhất được quy định bằng mức nào?",
+    "as_of_date": "2025-10-01",
+    "category": "bhxh_tu_nguyen",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 31 Luật Bảo hiểm xã hội 2024, thu nhập làm căn cứ đóng bảo hiểm xã hội tự nguyện thấp nhất bằng mức chuẩn hộ nghèo của khu vực nông thôn và cao nhất bằng 20 lần mức tham chiếu.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d31",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "chuẩn hộ nghèo"
+      ],
+      [
+        "khu vực nông thôn"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b007",
+    "pair_id": "ty_le_dong_om_dau_thai_san",
+    "question": "Tỷ lệ đóng bảo hiểm xã hội bắt buộc vào quỹ ốm đau và thai sản là bao nhiêu phần trăm tiền lương?",
+    "as_of_date": "2025-10-01",
+    "category": "bhxh_dong_gop",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 32 Luật Bảo hiểm xã hội 2024, tỷ lệ đóng bảo hiểm xã hội bắt buộc vào quỹ ốm đau và thai sản là 3% tiền lương làm căn cứ đóng bảo hiểm xã hội.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d32",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "3%"
+      ],
+      [
+        "quỹ ốm đau và thai sản"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b008",
+    "pair_id": "muc_dong_nld_huu_tri_tu_tuat",
+    "question": "Người lao động làm việc theo hợp đồng lao động phải đóng bảo hiểm xã hội bắt buộc hằng tháng vào quỹ hưu trí và tử tuất bằng bao nhiêu phần trăm tiền lương?",
+    "as_of_date": "2025-10-01",
+    "category": "bhxh_dong_gop",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 33 Luật Bảo hiểm xã hội 2024, mức đóng hằng tháng của người lao động vào quỹ hưu trí và tử tuất bằng 8% tiền lương làm căn cứ đóng bảo hiểm xã hội bắt buộc.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d33",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "8%"
+      ],
+      [
+        "quỹ hưu trí và tử tuất"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b009",
+    "pair_id": "ho_tro_dong_ho_ngheo",
+    "question": "Người tham gia bảo hiểm xã hội tự nguyện thuộc hộ nghèo được Nhà nước hỗ trợ tiền đóng bằng bao nhiêu phần trăm mức đóng?",
+    "as_of_date": "2025-10-01",
+    "category": "ho_tro_dong_bhxh_tu_nguyen",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 5 Nghị định 159/2025/NĐ-CP, người tham gia bảo hiểm xã hội tự nguyện thuộc hộ nghèo được Nhà nước hỗ trợ 50% mức đóng bảo hiểm xã hội tự nguyện hằng tháng tính theo chuẩn hộ nghèo khu vực nông thôn.",
+    "source_doc": "159-2025-ND-CP",
+    "source_clause": "159-2025-ND-CP__d5",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "50%"
+      ],
+      [
+        "hộ nghèo"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b010",
+    "pair_id": "thoi_gian_ho_tro_dong_toi_da",
+    "question": "Thời gian Nhà nước hỗ trợ tiền đóng bảo hiểm xã hội tự nguyện cho một người tối đa là bao lâu?",
+    "as_of_date": "2025-10-01",
+    "category": "ho_tro_dong_bhxh_tu_nguyen",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 5 Nghị định 159/2025/NĐ-CP, thời gian hỗ trợ tiền đóng bảo hiểm xã hội tự nguyện tối đa không quá 10 năm (120 tháng).",
+    "source_doc": "159-2025-ND-CP",
+    "source_clause": "159-2025-ND-CP__d5",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "10 năm"
+      ],
+      [
+        "120 tháng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b011",
+    "pair_id": "ty_le_dong_tu_nguyen",
+    "question": "Người tham gia bảo hiểm xã hội tự nguyện phải đóng hằng tháng bằng bao nhiêu phần trăm thu nhập vào quỹ hưu trí và tử tuất?",
+    "as_of_date": "2025-10-01",
+    "category": "bhxh_tu_nguyen",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 36 Luật Bảo hiểm xã hội 2024, người tham gia bảo hiểm xã hội tự nguyện đóng hằng tháng bằng 22% mức thu nhập làm căn cứ đóng vào quỹ hưu trí và tử tuất.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d36",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "22%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b012",
+    "pair_id": "om_dau_cham_con",
+    "question": "Người lao động được nghỉ hưởng chế độ ốm đau khi phải chăm sóc con dưới bao nhiêu tuổi bị ốm đau?",
+    "as_of_date": "2025-10-01",
+    "category": "om_dau",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm e khoản 1 Điều 42 Luật Bảo hiểm xã hội 2024, người lao động được hưởng chế độ ốm đau khi phải nghỉ việc để chăm sóc con dưới 07 tuổi bị ốm đau.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d42",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "dưới 07 tuổi"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b013",
+    "pair_id": "om_dau_thoi_gian_toi_da",
+    "question": "Người lao động làm việc trong điều kiện bình thường, đã đóng bảo hiểm xã hội dưới 15 năm thì được nghỉ hưởng chế độ ốm đau tối đa bao nhiêu ngày trong một năm?",
+    "as_of_date": "2025-10-01",
+    "category": "om_dau",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 43 Luật Bảo hiểm xã hội 2024, người làm việc trong điều kiện bình thường, đóng bảo hiểm xã hội bắt buộc dưới 15 năm thì được nghỉ hưởng chế độ ốm đau tối đa 30 ngày trong một năm.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d43",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "30 ngày"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b014",
+    "pair_id": "muc_huong_om_dau_thong_thuong",
+    "question": "Mức hưởng trợ cấp ốm đau thông thường bằng bao nhiêu phần trăm tiền lương làm căn cứ đóng bảo hiểm xã hội?",
+    "as_of_date": "2025-10-01",
+    "category": "om_dau",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 45 Luật Bảo hiểm xã hội 2024, mức hưởng trợ cấp ốm đau thông thường (đối với trường hợp quy định tại khoản 1 Điều 43 và Điều 44) bằng 75% tiền lương làm căn cứ đóng bảo hiểm xã hội.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d45",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "75%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b015",
+    "pair_id": "dieu_kien_dong_thai_san_truoc_sinh",
+    "question": "Lao động nữ phải đóng bảo hiểm xã hội bắt buộc tối thiểu bao lâu trong 12 tháng trước khi sinh con để đủ điều kiện hưởng chế độ thai sản?",
+    "as_of_date": "2025-10-01",
+    "category": "thai_san",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 50 Luật Bảo hiểm xã hội 2024, lao động nữ sinh con phải đóng bảo hiểm xã hội bắt buộc từ đủ 06 tháng trở lên trong thời gian 12 tháng liền kề trước khi sinh con.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d50",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "từ đủ 06 tháng trở lên"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b016",
+    "pair_id": "lao_dong_nam_nghi_vo_sinh_doi",
+    "question": "Lao động nam đang tham gia bảo hiểm xã hội bắt buộc có vợ sinh đôi (không phải phẫu thuật) thì được nghỉ việc hưởng chế độ thai sản bao nhiêu ngày làm việc?",
+    "as_of_date": "2025-11-15",
+    "category": "thai_san",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm c khoản 2 Điều 53 Luật Bảo hiểm xã hội 2024, lao động nam đang tham gia bảo hiểm xã hội bắt buộc có vợ sinh đôi được nghỉ việc hưởng chế độ thai sản 10 ngày làm việc.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d53_k2_pc",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "sinh đôi"
+      ],
+      [
+        "10 ngày làm việc"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b017",
+    "pair_id": "tro_cap_mot_lan_chong_thay",
+    "question": "Nếu lao động nữ sinh con nhưng không đủ điều kiện hưởng trợ cấp thai sản (chưa đóng đủ bảo hiểm xã hội bắt buộc), thì ai có thể được nhận trợ cấp một lần khi sinh con thay?",
+    "as_of_date": "2025-10-01",
+    "category": "thai_san",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 58 Luật Bảo hiểm xã hội 2024, nếu lao động nữ sinh con không đủ điều kiện quy định tại khoản 2, 3 hoặc 5 Điều 50 nhưng người chồng đủ điều kiện đóng bảo hiểm xã hội bắt buộc theo khoản 2 Điều 50 thì người chồng được hưởng trợ cấp một lần.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d58",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "người chồng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b018",
+    "pair_id": "muc_tro_cap_thai_san_mot_thang",
+    "question": "Trợ cấp thai sản một tháng của người lao động được tính bằng bao nhiêu phần trăm mức bình quân tiền lương làm căn cứ đóng bảo hiểm xã hội của 6 tháng gần nhất?",
+    "as_of_date": "2025-10-01",
+    "category": "thai_san",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 59 Luật Bảo hiểm xã hội 2024, trợ cấp thai sản một tháng bằng 100% mức bình quân tiền lương làm căn cứ đóng bảo hiểm xã hội bắt buộc của 06 tháng gần nhất trước khi nghỉ việc hưởng chế độ thai sản.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d59",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "100%"
+      ],
+      [
+        "06 tháng gần nhất"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b019",
+    "pair_id": "dieu_kien_huu_hiv_tai_nan_nghe_nghiep",
+    "question": "Người lao động bị nhiễm HIV/AIDS do tai nạn rủi ro nghề nghiệp trong khi thực hiện nhiệm vụ được giao có thuộc trường hợp được hưởng lương hưu mà không cần điều kiện về tuổi không?",
+    "as_of_date": "2025-10-01",
+    "category": "huu_tri",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Có. Theo điểm d khoản 1 Điều 64 Luật Bảo hiểm xã hội 2024, người bị nhiễm HIV/AIDS do tai nạn rủi ro nghề nghiệp trong khi thực hiện nhiệm vụ được giao thuộc trường hợp được hưởng lương hưu (khi có đủ 15 năm đóng bảo hiểm xã hội bắt buộc trở lên) mà không yêu cầu điều kiện về tuổi.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d64",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "HIV/AIDS"
+      ],
+      [
+        "tai nạn rủi ro nghề nghiệp"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b020",
+    "pair_id": "muc_luong_huu_nu_15_nam",
+    "question": "Lao động nữ có đủ 15 năm đóng bảo hiểm xã hội thì mức lương hưu hằng tháng được tính bằng bao nhiêu phần trăm mức bình quân tiền lương làm căn cứ đóng?",
+    "as_of_date": "2025-10-01",
+    "category": "huu_tri",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 66 Luật Bảo hiểm xã hội 2024, lao động nữ đủ 15 năm đóng bảo hiểm xã hội thì mức lương hưu hằng tháng bằng 45% mức bình quân tiền lương làm căn cứ đóng, sau đó mỗi năm đóng thêm được tính thêm 2%, mức tối đa bằng 75%.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d66",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "45%"
+      ],
+      [
+        "75%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b021",
+    "pair_id": "tro_cap_mot_lan_khi_nghi_huu_nam",
+    "question": "Lao động nam có thời gian đóng bảo hiểm xã hội cao hơn bao nhiêu năm thì khi nghỉ hưu được hưởng thêm trợ cấp một lần ngoài lương hưu?",
+    "as_of_date": "2025-10-01",
+    "category": "huu_tri",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 68 Luật Bảo hiểm xã hội 2024, lao động nam có thời gian đóng bảo hiểm xã hội cao hơn 35 năm (lao động nữ cao hơn 30 năm) thì khi nghỉ hưu, ngoài lương hưu còn được hưởng trợ cấp một lần.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d68",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "cao hơn 35 năm"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b022",
+    "pair_id": "dieu_kien_bhxh_mot_lan_du_tuoi",
+    "question": "Người lao động đủ tuổi hưởng lương hưu nhưng chưa đủ 15 năm đóng bảo hiểm xã hội có được hưởng bảo hiểm xã hội một lần không?",
+    "as_of_date": "2025-10-01",
+    "category": "bhxh_mot_lan",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Có. Theo điểm a khoản 1 Điều 70 Luật Bảo hiểm xã hội 2024, người lao động đủ tuổi hưởng lương hưu mà chưa đủ 15 năm đóng bảo hiểm xã hội thì được hưởng bảo hiểm xã hội một lần nếu có đề nghị (hoặc có thể lựa chọn hưởng trợ cấp hằng tháng theo Điều 23).",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d70",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "chưa đủ 15 năm"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b023",
+    "pair_id": "dieu_kien_tro_cap_mai_tang_thoi_gian",
+    "question": "Người lao động phải có thời gian đóng bảo hiểm xã hội bắt buộc tối thiểu bao lâu thì khi chết, người lo mai táng được nhận trợ cấp mai táng?",
+    "as_of_date": "2025-10-01",
+    "category": "tu_tuat",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 85 Luật Bảo hiểm xã hội 2024, người có thời gian đóng bảo hiểm xã hội bắt buộc từ đủ 12 tháng trở lên khi chết thì tổ chức, cá nhân lo mai táng được nhận trợ cấp mai táng.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d85",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "từ đủ 12 tháng trở lên"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b024",
+    "pair_id": "muc_tro_cap_mai_tang",
+    "question": "Mức trợ cấp mai táng bằng bao nhiêu lần mức tham chiếu?",
+    "as_of_date": "2025-10-01",
+    "category": "tu_tuat",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 85 Luật Bảo hiểm xã hội 2024, mức trợ cấp mai táng bằng 10 lần mức tham chiếu tại tháng người đó chết.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d85",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "10 lần mức tham chiếu"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b025",
+    "pair_id": "thoi_diem_huong_luong_huu_tu_nguyen",
+    "question": "Thời điểm hưởng lương hưu của người tham gia bảo hiểm xã hội tự nguyện đủ điều kiện hưởng lương hưu được tính từ khi nào?",
+    "as_of_date": "2025-10-01",
+    "category": "huu_tri",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 5 Thông tư 11/2025/TT-BNV, thời điểm hưởng lương hưu của người tham gia bảo hiểm xã hội tự nguyện đủ điều kiện được tính từ ngày đầu tiên của tháng liền kề sau tháng đủ điều kiện hưởng lương hưu.",
+    "source_doc": "11-2025-TT-BNV",
+    "source_clause": "11-2025-TT-BNV__d5",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "ngày đầu tiên của tháng liền kề sau tháng đủ điều kiện"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b026",
+    "pair_id": "muc_tro_cap_tuat_hang_thang",
+    "question": "Mức trợ cấp tuất hằng tháng đối với mỗi thân nhân bằng bao nhiêu phần trăm mức tham chiếu?",
+    "as_of_date": "2025-10-01",
+    "category": "tu_tuat",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 87 Luật Bảo hiểm xã hội 2024, mức trợ cấp tuất hằng tháng đối với mỗi thân nhân bằng 50% mức tham chiếu; trường hợp thân nhân không có người trực tiếp nuôi dưỡng thì bằng 70% mức tham chiếu.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d87",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "50% mức tham chiếu"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b027",
+    "pair_id": "so_than_nhan_toi_da_tuat_hang_thang",
+    "question": "Khi một người tham gia bảo hiểm xã hội chết, số thân nhân tối đa được hưởng trợ cấp tuất hằng tháng là bao nhiêu người?",
+    "as_of_date": "2025-10-01",
+    "category": "tu_tuat",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 87 Luật Bảo hiểm xã hội 2024, khi một người chết thì số thân nhân được hưởng trợ cấp tuất hằng tháng tối đa 04 người.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d87",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "tối đa 04 người"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b028",
+    "pair_id": "tro_cap_tuat_mot_lan_2_thang_dau",
+    "question": "Người đang hưởng lương hưu chết trong 2 tháng đầu hưởng lương hưu thì thân nhân được nhận trợ cấp tuất một lần bằng bao nhiêu tháng lương hưu?",
+    "as_of_date": "2025-10-01",
+    "category": "tu_tuat",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 2 Điều 89 Luật Bảo hiểm xã hội 2024, nếu người đang hưởng lương hưu chết trong 02 tháng đầu thì mức trợ cấp tuất một lần bằng 48 tháng lương hưu của tháng đang hưởng.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d89",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "48 tháng lương hưu"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b029",
+    "pair_id": "muc_tro_cap_thai_san_tu_nguyen",
+    "question": "Mức trợ cấp thai sản cho người tham gia bảo hiểm xã hội tự nguyện khi sinh con là bao nhiêu tiền cho mỗi con?",
+    "as_of_date": "2025-10-01",
+    "category": "thai_san",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 95 Luật Bảo hiểm xã hội 2024, mức trợ cấp thai sản cho người tham gia bảo hiểm xã hội tự nguyện là 2.000.000 đồng cho mỗi con được sinh ra.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d95",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "2.000.000 đồng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b030",
+    "pair_id": "dieu_kien_thai_san_tu_nguyen_chong",
+    "question": "Lao động nam có vợ sinh con có thể được hưởng trợ cấp thai sản trong bảo hiểm xã hội tự nguyện không, cần điều kiện gì về thời gian đóng?",
+    "as_of_date": "2025-10-01",
+    "category": "thai_san",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Có. Theo khoản 1 Điều 94 Luật Bảo hiểm xã hội 2024, lao động nam có vợ sinh con được hưởng trợ cấp thai sản trong bảo hiểm xã hội tự nguyện nếu có thời gian đóng bảo hiểm xã hội tự nguyện (hoặc vừa bắt buộc vừa tự nguyện) từ đủ 06 tháng trở lên trong thời gian 12 tháng trước khi sinh con.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d94",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "từ đủ 06 tháng trở lên"
+      ],
+      [
+        "lao động nam có vợ sinh con"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b031",
+    "pair_id": "dieu_kien_luong_huu_tu_nguyen",
+    "question": "Bác Năm tham gia bảo hiểm xã hội tự nguyện đã nhiều năm và sắp đến tuổi nghỉ hưu. Bác cần tích lũy đủ bao nhiêu năm đóng bảo hiểm xã hội tự nguyện thì mới bắt đầu được nhận lương hưu hằng tháng?",
+    "as_of_date": "2025-10-01",
+    "category": "huu_tri",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 98 Luật Bảo hiểm xã hội 2024, người tham gia bảo hiểm xã hội tự nguyện được hưởng lương hưu khi đủ tuổi nghỉ hưu và có thời gian đóng bảo hiểm xã hội từ đủ 15 năm trở lên.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d98",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "từ đủ 15 năm trở lên"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b032",
+    "pair_id": "muc_luong_huu_tu_nguyen_nam_15_20nam",
+    "question": "Lao động nam tham gia bảo hiểm xã hội tự nguyện có thời gian đóng từ đủ 15 năm đến dưới 20 năm thì mức lương hưu hằng tháng bằng bao nhiêu phần trăm mức bình quân thu nhập?",
+    "as_of_date": "2025-10-01",
+    "category": "huu_tri",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 99 Luật Bảo hiểm xã hội 2024, lao động nam đóng bảo hiểm xã hội tự nguyện từ đủ 15 năm đến dưới 20 năm thì mức lương hưu hằng tháng bằng 40% mức bình quân thu nhập làm căn cứ đóng, sau đó mỗi năm đóng thêm được tính thêm 1%.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d99",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "40%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b033",
+    "pair_id": "chon_tro_cap_hang_thang_thay_bhxh_mot_lan",
+    "question": "Người lao động đủ tuổi nghỉ hưu nhưng chưa đủ 15 năm đóng bảo hiểm xã hội, không muốn nhận bảo hiểm xã hội một lần thì có thể lựa chọn hưởng chế độ gì, và cần đáp ứng điều kiện gì?",
+    "as_of_date": "2025-10-01",
+    "category": "bhxh_mot_lan",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Người lao động có thể lựa chọn hưởng trợ cấp hằng tháng thay vì bảo hiểm xã hội một lần (điểm a khoản 1 Điều 70 Luật Bảo hiểm xã hội 2024). Theo Điều 22 Nghị định 158/2025/NĐ-CP, điều kiện là không hưởng bảo hiểm xã hội một lần, không bảo lưu thời gian đóng bảo hiểm xã hội và có đề nghị hưởng trợ cấp hằng tháng, áp dụng cho người đủ tuổi nghỉ hưu nhưng chưa đủ điều kiện hưởng lương hưu và chưa đủ tuổi hưởng trợ cấp hưu trí xã hội.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "",
+    "source_clauses": [
+      "41-2024-QH15__d70",
+      "158-2025-ND-CP__d22"
+    ],
+    "expect_contains": [
+      [
+        "trợ cấp hằng tháng"
+      ],
+      [
+        "không bảo lưu thời gian đóng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b034",
+    "pair_id": "dieu_kien_va_muc_luong_huu_nam_20_nam",
+    "question": "Lao động nam đủ tuổi nghỉ hưu theo quy định, đã đóng bảo hiểm xã hội bắt buộc đủ 20 năm. Người này có đủ điều kiện hưởng lương hưu không, và mức lương hưu hằng tháng bằng bao nhiêu phần trăm mức bình quân tiền lương?",
+    "as_of_date": "2025-10-01",
+    "category": "huu_tri",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Có, vì đã đóng bảo hiểm xã hội bắt buộc từ đủ 15 năm trở lên và đủ tuổi nghỉ hưu (khoản 1 Điều 64 Luật Bảo hiểm xã hội 2024). Theo điểm b khoản 1 Điều 66, lao động nam đóng đủ 20 năm thì mức lương hưu hằng tháng bằng 45% mức bình quân tiền lương làm căn cứ đóng bảo hiểm xã hội.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "",
+    "source_clauses": [
+      "41-2024-QH15__d64",
+      "41-2024-QH15__d66"
+    ],
+    "expect_contains": [
+      [
+        "từ đủ 15 năm trở lên"
+      ],
+      [
+        "45%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b035",
+    "pair_id": "vo_chong_cung_tham_gia_tu_nguyen_thai_san",
+    "question": "Vợ chồng đều tham gia bảo hiểm xã hội tự nguyện và đều đủ điều kiện hưởng trợ cấp thai sản khi sinh con. Hai vợ chồng có được cùng nhận trợ cấp thai sản không, và mức trợ cấp là bao nhiêu?",
+    "as_of_date": "2025-10-01",
+    "category": "thai_san",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Không. Theo khoản 3 Điều 94 Luật Bảo hiểm xã hội 2024, nếu cả cha và mẹ cùng tham gia bảo hiểm xã hội và đủ điều kiện thì chỉ cha hoặc mẹ được hưởng trợ cấp thai sản. Theo khoản 1 Điều 95, mức trợ cấp là 2.000.000 đồng cho mỗi con được sinh ra.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "",
+    "source_clauses": [
+      "41-2024-QH15__d94",
+      "41-2024-QH15__d95"
+    ],
+    "expect_contains": [
+      [
+        "chỉ cha hoặc mẹ được hưởng"
+      ],
+      [
+        "2.000.000 đồng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b036",
+    "pair_id": "dong_bu_thieu_14nam6thang",
+    "question": "Người lao động đã đóng bảo hiểm xã hội bắt buộc được 14 năm 8 tháng, đủ tuổi nghỉ hưu theo diện thông thường (Điều 64 Luật Bảo hiểm xã hội). Người này có được đóng một lần cho số tháng còn thiếu để đủ điều kiện hưởng lương hưu không?",
+    "as_of_date": "2025-10-01",
+    "category": "huu_tri",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Có. Theo khoản 7 Điều 33 Luật Bảo hiểm xã hội 2024, người lao động còn thiếu tối đa 06 tháng đóng bảo hiểm xã hội để đủ điều kiện hưởng lương hưu được đóng tiếp một lần cho số tháng còn thiếu. Theo điểm a khoản 2 Điều 12 Thông tư 12/2025/TT-BNV, đối với trường hợp đủ tuổi theo diện thông thường (Điều 64), điều kiện áp dụng là đã có thời gian đóng bảo hiểm xã hội bắt buộc từ đủ 14 năm 6 tháng đến dưới 15 năm — 14 năm 8 tháng thỏa mãn điều kiện này.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "",
+    "source_clauses": [
+      "41-2024-QH15__d33_s1",
+      "12-2025-TT-BNV__d12"
+    ],
+    "expect_contains": [
+      [
+        "tối đa 06 tháng"
+      ],
+      [
+        "14 năm 6 tháng đến dưới 15 năm"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b037",
+    "pair_id": "sai_dieu_kien_20_nam_luong_huu",
+    "question": "Theo Luật Bảo hiểm xã hội 2024, người lao động phải đóng bảo hiểm xã hội bắt buộc đủ 20 năm mới đủ điều kiện hưởng lương hưu, đúng không?",
+    "as_of_date": "2025-10-01",
+    "category": "huu_tri",
+    "temporal_kind": "false_premise",
+    "expected_behavior": "answer",
+    "ground_truth": "Sai. Theo khoản 1 Điều 64 Luật Bảo hiểm xã hội 2024, điều kiện về thời gian đóng bảo hiểm xã hội bắt buộc để hưởng lương hưu (diện thông thường) là từ đủ 15 năm trở lên, không phải 20 năm.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d64",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "từ đủ 15 năm trở lên"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b038",
+    "pair_id": "sai_ty_le_dong_tu_nguyen_25",
+    "question": "Mức đóng bảo hiểm xã hội tự nguyện hằng tháng của người tham gia là 25% thu nhập làm căn cứ đóng vào quỹ hưu trí và tử tuất, có đúng không?",
+    "as_of_date": "2025-10-01",
+    "category": "bhxh_tu_nguyen",
+    "temporal_kind": "false_premise",
+    "expected_behavior": "answer",
+    "ground_truth": "Sai. Theo khoản 1 Điều 36 Luật Bảo hiểm xã hội 2024, mức đóng bảo hiểm xã hội tự nguyện hằng tháng là 22% mức thu nhập làm căn cứ đóng vào quỹ hưu trí và tử tuất, không phải 25%.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d36",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "22%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b039",
+    "pair_id": "the_bhyt_khach_du_lich",
+    "question": "Thẻ bảo hiểm y tế cho khách du lịch nước ngoài đến Việt Nam ngắn hạn được mua ở đâu và thủ tục thế nào?",
+    "as_of_date": "2025-10-01",
+    "category": "ngoai_pham_vi",
+    "temporal_kind": "out_of_scope",
+    "expected_behavior": "refuse",
+    "ground_truth": "Câu hỏi nằm ngoài phạm vi tài liệu về pháp luật lao động và bảo hiểm xã hội Việt Nam mà hệ thống đã nạp; hệ thống từ chối trả lời vì không có tài liệu liên quan trong corpus.",
+    "source_doc": "",
+    "source_clause": "",
+    "source_clauses": [],
+    "expect_contains": [],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_b040",
+    "pair_id": "co_phieu_nao_nen_mua",
+    "question": "Trong quý này nên mua cổ phiếu ngành nào để có lợi nhuận tốt nhất trên thị trường chứng khoán Việt Nam?",
+    "as_of_date": "2025-10-01",
+    "category": "ngoai_pham_vi",
+    "temporal_kind": "out_of_scope",
+    "expected_behavior": "refuse",
+    "ground_truth": "Câu hỏi nằm ngoài phạm vi tài liệu về pháp luật lao động và bảo hiểm xã hội Việt Nam mà hệ thống đã nạp; hệ thống từ chối trả lời vì đây là tư vấn đầu tư chứng khoán, không thuộc corpus.",
+    "source_doc": "",
+    "source_clause": "",
+    "source_clauses": [],
+    "expect_contains": [],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c001",
+    "pair_id": "om_dau_dieu_kien_con_om",
+    "question": "Người lao động được nghỉ việc hưởng chế độ ốm đau khi phải chăm sóc con dưới bao nhiêu tuổi bị ốm đau?",
+    "as_of_date": "2018-04-01",
+    "category": "om_dau",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 25 Luật Bảo hiểm xã hội số 58/2014/QH13, người lao động được hưởng chế độ ốm đau khi phải nghỉ việc để chăm sóc con dưới 07 tuổi bị ốm đau và có xác nhận của cơ sở khám bệnh, chữa bệnh có thẩm quyền.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d25",
+    "expect_contains": [
+      [
+        "07 tuổi"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c002",
+    "pair_id": "om_dau_benh_dai_ngay",
+    "question": "Người lao động mắc bệnh cần chữa trị dài ngày được hưởng chế độ ốm đau tối đa bao nhiêu ngày, tính cả ngày nghỉ lễ, Tết?",
+    "as_of_date": "2020-09-01",
+    "category": "om_dau",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 2 Điều 26 Luật Bảo hiểm xã hội số 58/2014/QH13, người lao động nghỉ việc do mắc bệnh thuộc Danh mục bệnh cần chữa trị dài ngày được hưởng chế độ ốm đau tối đa 180 ngày, tính cả ngày nghỉ lễ, nghỉ Tết, ngày nghỉ hằng tuần.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d26",
+    "expect_contains": [
+      [
+        "180 ngày"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c003",
+    "pair_id": "om_dau_muc_huong_75",
+    "question": "Người lao động nghỉ ốm đau thông thường (không thuộc diện bệnh dài ngày) được hưởng trợ cấp bằng bao nhiêu phần trăm mức tiền lương đóng bảo hiểm xã hội?",
+    "as_of_date": "2019-02-01",
+    "category": "om_dau",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 28 Luật Bảo hiểm xã hội số 58/2014/QH13, mức hưởng chế độ ốm đau tính theo tháng bằng 75% mức tiền lương đóng bảo hiểm xã hội của tháng liền kề trước khi nghỉ việc.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d28",
+    "expect_contains": [
+      [
+        "75%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c004",
+    "pair_id": "thai_san_say_thai_13_25_tuan",
+    "question": "Lao động nữ bị sẩy thai khi thai được 20 tuần tuổi thì được nghỉ việc hưởng chế độ thai sản tối đa bao nhiêu ngày?",
+    "as_of_date": "2021-03-01",
+    "category": "thai_san",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm c khoản 1 Điều 33 Luật Bảo hiểm xã hội số 58/2014/QH13, lao động nữ sẩy thai khi thai từ 13 tuần tuổi đến dưới 25 tuần tuổi được nghỉ việc hưởng chế độ thai sản tối đa 40 ngày.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d33",
+    "expect_contains": [
+      [
+        "40 ngày"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c005",
+    "pair_id": "thai_san_lao_dong_nam_vo_sinh",
+    "question": "Lao động nam đang đóng bảo hiểm xã hội có vợ sinh con bình thường (không phẫu thuật, không sinh đôi) được nghỉ việc hưởng chế độ thai sản bao nhiêu ngày làm việc?",
+    "as_of_date": "2017-06-01",
+    "category": "thai_san",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 2 Điều 34 Luật Bảo hiểm xã hội số 58/2014/QH13, lao động nam đang đóng bảo hiểm xã hội khi vợ sinh con được nghỉ việc hưởng chế độ thai sản 05 ngày làm việc.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d34",
+    "expect_contains": [
+      [
+        "05 ngày làm việc"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c006",
+    "pair_id": "thai_san_muc_huong_100",
+    "question": "Mức hưởng chế độ thai sản theo tháng được tính bằng bao nhiêu phần trăm mức bình quân tiền lương tháng đóng bảo hiểm xã hội?",
+    "as_of_date": "2022-04-01",
+    "category": "thai_san",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 39 Luật Bảo hiểm xã hội số 58/2014/QH13, mức hưởng chế độ thai sản một tháng bằng 100% mức bình quân tiền lương tháng đóng bảo hiểm xã hội của 06 tháng trước khi nghỉ việc hưởng chế độ thai sản.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d39",
+    "expect_contains": [
+      [
+        "100%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c007",
+    "pair_id": "thai_san_duong_suc_30pct",
+    "question": "Mức hưởng chế độ dưỡng sức, phục hồi sức khỏe sau thai sản tính theo ngày bằng bao nhiêu?",
+    "as_of_date": "2023-01-01",
+    "category": "thai_san",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 3 Điều 41 Luật Bảo hiểm xã hội số 58/2014/QH13, mức hưởng chế độ dưỡng sức, phục hồi sức khỏe sau thai sản một ngày bằng 30% mức lương cơ sở.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d41",
+    "expect_contains": [
+      [
+        "30% mức lương cơ sở"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c008",
+    "pair_id": "huu_tri_nam_2020_18_nam",
+    "question": "Lao động nam nghỉ hưu vào năm 2020 cần có đủ bao nhiêu năm đóng bảo hiểm xã hội để mức lương hưu hằng tháng đạt tỷ lệ 45%?",
+    "as_of_date": "2020-06-01",
+    "category": "huu_tri",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 2 Điều 56 Luật Bảo hiểm xã hội số 58/2014/QH13, lao động nam nghỉ hưu vào năm 2020 cần đủ 18 năm đóng bảo hiểm xã hội để mức lương hưu hằng tháng đạt tỷ lệ 45% mức bình quân tiền lương tháng đóng bảo hiểm xã hội.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d56",
+    "expect_contains": [
+      [
+        "18 năm"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c009",
+    "pair_id": "huu_tri_tro_cap_mot_lan_nghi_huu",
+    "question": "Người lao động có thời gian đóng bảo hiểm xã hội cao hơn số năm tương ứng tỷ lệ hưởng lương hưu 75% thì mỗi năm đóng dư được hưởng trợ cấp một lần bằng bao nhiêu?",
+    "as_of_date": "2018-01-01",
+    "category": "huu_tri",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 58 Luật Bảo hiểm xã hội số 58/2014/QH13, mỗi năm đóng bảo hiểm xã hội cao hơn số năm tương ứng với tỷ lệ hưởng lương hưu 75% được tính trợ cấp một lần bằng 0,5 tháng mức bình quân tiền lương tháng đóng bảo hiểm xã hội.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d58",
+    "expect_contains": [
+      [
+        "0,5 tháng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c010",
+    "pair_id": "huu_tri_thoi_diem_huong",
+    "question": "Đối với người lao động đang đóng bảo hiểm xã hội bắt buộc, thời điểm hưởng lương hưu được xác định như thế nào?",
+    "as_of_date": "2019-05-01",
+    "category": "huu_tri",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 59 Luật Bảo hiểm xã hội số 58/2014/QH13, thời điểm hưởng lương hưu là thời điểm ghi trong quyết định nghỉ việc do người sử dụng lao động lập khi người lao động đã đủ điều kiện hưởng lương hưu theo quy định của pháp luật.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d59",
+    "expect_contains": [
+      [
+        "thời điểm ghi trong quyết định nghỉ việc"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c011",
+    "pair_id": "bhxh_mot_lan_muc_huong",
+    "question": "Mức hưởng bảo hiểm xã hội một lần được tính theo số năm đã đóng bảo hiểm xã hội như thế nào?",
+    "as_of_date": "2021-07-01",
+    "category": "bhxh_mot_lan",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 60 Luật Bảo hiểm xã hội số 58/2014/QH13, mức hưởng bảo hiểm xã hội một lần được tính bằng 1,5 tháng mức bình quân tiền lương tháng đóng bảo hiểm xã hội cho những năm đóng trước năm 2014, và 02 tháng mức bình quân tiền lương tháng đóng bảo hiểm xã hội cho những năm đóng từ năm 2014 trở đi.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d60",
+    "expect_contains": [
+      [
+        "1,5 tháng"
+      ],
+      [
+        "02 tháng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c012",
+    "pair_id": "tu_tuat_tro_cap_mai_tang",
+    "question": "Trợ cấp mai táng đối với người lao động đang đóng bảo hiểm xã hội bằng bao nhiêu?",
+    "as_of_date": "2017-09-01",
+    "category": "tu_tuat",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 66 Luật Bảo hiểm xã hội số 58/2014/QH13, trợ cấp mai táng bằng 10 lần mức lương cơ sở tại tháng mà người lao động chết.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d66",
+    "expect_contains": [
+      [
+        "10 lần mức lương cơ sở"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c013",
+    "pair_id": "tu_tuat_tro_cap_hang_thang",
+    "question": "Mức trợ cấp tuất hằng tháng đối với mỗi thân nhân của người lao động chết bằng bao nhiêu phần trăm mức lương cơ sở?",
+    "as_of_date": "2022-10-01",
+    "category": "tu_tuat",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 68 Luật Bảo hiểm xã hội số 58/2014/QH13, mức trợ cấp tuất hằng tháng đối với mỗi thân nhân bằng 50% mức lương cơ sở; nếu thân nhân không có người trực tiếp nuôi dưỡng thì bằng 70% mức lương cơ sở.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d68",
+    "expect_contains": [
+      [
+        "50% mức lương cơ sở"
+      ],
+      [
+        "70% mức lương cơ sở"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c014",
+    "pair_id": "tu_tuat_mot_lan_48_thang",
+    "question": "Nếu người đang hưởng lương hưu chết trong 02 tháng đầu hưởng lương hưu thì thân nhân được hưởng trợ cấp tuất một lần bằng bao nhiêu?",
+    "as_of_date": "2024-02-01",
+    "category": "tu_tuat",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 70 Luật Bảo hiểm xã hội số 58/2014/QH13, nếu người đang hưởng lương hưu chết trong 02 tháng đầu hưởng lương hưu thì mức trợ cấp tuất một lần tính bằng 48 tháng lương hưu đang hưởng.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d70",
+    "expect_contains": [
+      [
+        "48 tháng lương hưu"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c015",
+    "pair_id": "tu_nguyen_muc_dong_22pct",
+    "question": "Người tham gia bảo hiểm xã hội tự nguyện hằng tháng phải đóng bằng bao nhiêu phần trăm mức thu nhập tháng đã lựa chọn?",
+    "as_of_date": "2016-06-01",
+    "category": "tu_nguyen",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 87 Luật Bảo hiểm xã hội số 58/2014/QH13, người lao động tham gia bảo hiểm xã hội tự nguyện hằng tháng đóng bằng 22% mức thu nhập tháng do mình lựa chọn vào quỹ hưu trí và tử tuất.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d87",
+    "expect_contains": [
+      [
+        "22%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c016",
+    "pair_id": "tu_nguyen_ho_tro_ho_ngheo",
+    "question": "Người thuộc hộ nghèo tham gia bảo hiểm xã hội tự nguyện được Nhà nước hỗ trợ tiền đóng bằng bao nhiêu phần trăm, và thời gian hỗ trợ tối đa là bao lâu?",
+    "as_of_date": "2019-11-01",
+    "category": "tu_nguyen",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 và khoản 2 Điều 14 Nghị định 134/2015/NĐ-CP, người tham gia bảo hiểm xã hội tự nguyện thuộc hộ nghèo được Nhà nước hỗ trợ 30% mức đóng, thời gian hỗ trợ không quá 10 năm (120 tháng).",
+    "source_doc": "134-2015-ND-CP",
+    "source_clause": "134-2015-ND-CP__d14",
+    "expect_contains": [
+      [
+        "30%"
+      ],
+      [
+        "10 năm (120 tháng)"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c017",
+    "pair_id": "dong_gop_nld_8pct",
+    "question": "Người lao động tham gia bảo hiểm xã hội bắt buộc hằng tháng phải đóng bằng bao nhiêu phần trăm mức tiền lương tháng vào quỹ hưu trí và tử tuất?",
+    "as_of_date": "2020-03-01",
+    "category": "bhxh_dong_gop",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 85 Luật Bảo hiểm xã hội số 58/2014/QH13, người lao động hằng tháng đóng bằng 8% mức tiền lương tháng vào quỹ hưu trí và tử tuất.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d85",
+    "expect_contains": [
+      [
+        "8%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c018",
+    "pair_id": "dong_gop_nsdld_3_14pct",
+    "question": "Người sử dụng lao động hằng tháng phải đóng bao nhiêu phần trăm quỹ tiền lương vào quỹ ốm đau, thai sản và quỹ hưu trí, tử tuất cho người lao động?",
+    "as_of_date": "2023-05-01",
+    "category": "bhxh_dong_gop",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 86 Luật Bảo hiểm xã hội số 58/2014/QH13, người sử dụng lao động hằng tháng đóng 3% vào quỹ ốm đau và thai sản, và 14% vào quỹ hưu trí và tử tuất trên quỹ tiền lương đóng bảo hiểm xã hội của người lao động.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d86",
+    "expect_contains": [
+      [
+        "3%"
+      ],
+      [
+        "14%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c019",
+    "pair_id": "thu_tuc_giai_quyet_om_dau_10ngay",
+    "question": "Cơ quan bảo hiểm xã hội phải giải quyết và chi trả chế độ ốm đau, thai sản trong thời hạn bao nhiêu ngày kể từ khi nhận đủ hồ sơ từ người sử dụng lao động?",
+    "as_of_date": "2018-08-01",
+    "category": "om_dau",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 3 Điều 102 Luật Bảo hiểm xã hội số 58/2014/QH13, trong thời hạn 10 ngày kể từ ngày nhận đủ hồ sơ từ người sử dụng lao động, cơ quan bảo hiểm xã hội phải giải quyết và tổ chức chi trả cho người lao động.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d102",
+    "expect_contains": [
+      [
+        "10 ngày"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c020",
+    "pair_id": "thu_tuc_tu_tuat_90ngay",
+    "question": "Thân nhân của người lao động đang đóng bảo hiểm xã hội bắt buộc bị chết phải nộp hồ sơ hưởng chế độ tử tuất trong thời hạn bao nhiêu ngày?",
+    "as_of_date": "2021-12-01",
+    "category": "tu_tuat",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 112 Luật Bảo hiểm xã hội số 58/2014/QH13, trong thời hạn 90 ngày kể từ ngày người lao động đang đóng bảo hiểm xã hội bắt buộc bị chết, thân nhân phải nộp hồ sơ hưởng chế độ tử tuất cho người sử dụng lao động.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d112",
+    "expect_contains": [
+      [
+        "90 ngày"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c021",
+    "pair_id": "tnld_tro_cap_mot_lan_5pct",
+    "question": "Người lao động bị tai nạn lao động suy giảm 5% khả năng lao động được hưởng trợ cấp một lần bằng bao nhiêu?",
+    "as_of_date": "2019-09-01",
+    "category": "tai_nan_lao_dong",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 2 Điều 46 Luật Bảo hiểm xã hội số 58/2014/QH13, suy giảm 5% khả năng lao động thì được hưởng trợ cấp một lần bằng 05 lần mức lương cơ sở.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d46",
+    "expect_contains": [
+      [
+        "05 lần mức lương cơ sở"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c022",
+    "pair_id": "luong_toi_thieu_gio_vung_2",
+    "question": "Từ ngày 01/7/2024, mức lương tối thiểu giờ áp dụng cho người lao động làm việc ở vùng II là bao nhiêu?",
+    "as_of_date": "2024-09-01",
+    "category": "luong_toi_thieu",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 3 Nghị định 74/2024/NĐ-CP (hiệu lực 01/7/2024), mức lương tối thiểu giờ của vùng II là 21.200 đồng/giờ.",
+    "source_doc": "74-2024-ND-CP",
+    "source_clause": "74-2024-ND-CP__d3",
+    "expect_contains": [
+      [
+        "21.200"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c023",
+    "pair_id": "luong_toi_thieu_thang_vung_3",
+    "question": "Doanh nghiệp ở vùng III phải trả mức lương tối thiểu tháng thấp nhất là bao nhiêu theo Nghị định 74/2024/NĐ-CP?",
+    "as_of_date": "2025-02-01",
+    "category": "luong_toi_thieu",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 3 Nghị định 74/2024/NĐ-CP, mức lương tối thiểu tháng của vùng III là 3.860.000 đồng/tháng.",
+    "source_doc": "74-2024-ND-CP",
+    "source_clause": "74-2024-ND-CP__d3",
+    "expect_contains": [
+      [
+        "3.860.000"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c024",
+    "pair_id": "luong_toi_thieu_gio_vung_4",
+    "question": "Mức lương tối thiểu giờ áp dụng cho vùng IV theo Nghị định 74/2024/NĐ-CP là bao nhiêu?",
+    "as_of_date": "2025-10-01",
+    "category": "luong_toi_thieu",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 3 Nghị định 74/2024/NĐ-CP, mức lương tối thiểu giờ của vùng IV là 16.600 đồng/giờ.",
+    "source_doc": "74-2024-ND-CP",
+    "source_clause": "74-2024-ND-CP__d3",
+    "expect_contains": [
+      [
+        "16.600"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c025",
+    "pair_id": "huu_tri_bat_buoc_nam_dong_toi_thieu",
+    "question": "Người lao động đóng bảo hiểm xã hội bắt buộc cần có tối thiểu bao nhiêu năm đóng bảo hiểm xã hội (khi đã đủ tuổi nghỉ hưu) để được hưởng lương hưu?",
+    "as_of_date": "2023-03-01",
+    "category": "huu_tri",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 54 Luật Bảo hiểm xã hội số 58/2014/QH13 (hiệu lực đến 30/6/2025), người lao động khi nghỉ việc cần có đủ 20 năm đóng bảo hiểm xã hội trở lên (và đủ tuổi nghỉ hưu) mới được hưởng lương hưu; từ 01/7/2025, Luật Bảo hiểm xã hội số 41/2024/QH15 (Điều 64) giảm điều kiện này xuống còn 15 năm.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d54",
+    "expect_contains": [
+      [
+        "20 năm"
+      ]
+    ],
+    "expect_absent": [
+      "đủ 15 năm trở lên"
+    ],
+    "distractor_docs": [
+      "41-2024-QH15"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c026",
+    "pair_id": "luong_toi_thieu_gio_vung_1",
+    "question": "Mức lương tối thiểu giờ áp dụng cho người lao động làm việc ở vùng I là bao nhiêu?",
+    "as_of_date": "2025-05-01",
+    "category": "luong_toi_thieu",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 3 Nghị định 74/2024/NĐ-CP (hiệu lực 01/7/2024), mức lương tối thiểu giờ của vùng I là 23.800 đồng/giờ; từ 01/01/2026, Nghị định 293/2025/NĐ-CP nâng mức này lên 25.500 đồng/giờ.",
+    "source_doc": "74-2024-ND-CP",
+    "source_clause": "74-2024-ND-CP__d3",
+    "expect_contains": [
+      [
+        "23.800"
+      ]
+    ],
+    "expect_absent": [
+      "25.500"
+    ],
+    "distractor_docs": [
+      "293-2025-ND-CP"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c027",
+    "pair_id": "tu_tuat_mai_tang_can_cu_tinh",
+    "question": "Trợ cấp mai táng đối với người lao động đang đóng bảo hiểm xã hội bắt buộc được tính bằng 10 lần mức gì?",
+    "as_of_date": "2020-01-01",
+    "category": "tu_tuat",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 66 Luật Bảo hiểm xã hội số 58/2014/QH13, trợ cấp mai táng bằng 10 lần mức lương cơ sở tại tháng người lao động chết; từ 01/7/2025, Luật Bảo hiểm xã hội số 41/2024/QH15 (khoản 2 Điều 85) vẫn giữ 10 lần nhưng đổi căn cứ tính sang mức tham chiếu.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d66",
+    "expect_contains": [
+      [
+        "10 lần mức lương cơ sở"
+      ]
+    ],
+    "expect_absent": [
+      "mức tham chiếu"
+    ],
+    "distractor_docs": [
+      "41-2024-QH15"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c028",
+    "pair_id": "huu_tri_tu_nguyen_nam_dong_toi_thieu",
+    "question": "Người tham gia bảo hiểm xã hội tự nguyện cần có tối thiểu bao nhiêu năm đóng bảo hiểm xã hội để được hưởng lương hưu?",
+    "as_of_date": "2022-08-01",
+    "category": "huu_tri",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm b khoản 1 Điều 73 Luật Bảo hiểm xã hội số 58/2014/QH13, người tham gia bảo hiểm xã hội tự nguyện cần đủ 20 năm đóng bảo hiểm xã hội trở lên (và đủ tuổi nghỉ hưu) mới được hưởng lương hưu; từ 01/7/2025, Luật Bảo hiểm xã hội số 41/2024/QH15 (Điều 98) giảm xuống còn 15 năm.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d73",
+    "expect_contains": [
+      [
+        "20 năm"
+      ]
+    ],
+    "expect_absent": [
+      "đủ 15 năm trở lên"
+    ],
+    "distractor_docs": [
+      "41-2024-QH15"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c029",
+    "pair_id": "om_dau_ngoai_pham_vi",
+    "question": "Người lao động bị ốm đau (không phải tai nạn lao động) làm việc trong điều kiện bình thường được nghỉ việc hưởng chế độ ốm đau tối đa bao nhiêu ngày trong một năm?",
+    "as_of_date": "2011-04-01",
+    "category": "om_dau",
+    "temporal_kind": "out_of_range",
+    "expected_behavior": "time_out_of_range",
+    "ground_truth": "Mốc 01/4/2011 nằm trước phạm vi thời gian corpus phủ (từ 01/01/2015) và trước ngày Luật Bảo hiểm xã hội 2014 có hiệu lực (01/01/2016). Hệ thống phải nói rõ giới hạn phủ thay vì trả lời theo Luật Bảo hiểm xã hội 58/2014/QH13.",
+    "source_doc": "",
+    "source_clause": "",
+    "expect_contains": [],
+    "expect_absent": [
+      "30 ngày",
+      "40 ngày",
+      "60 ngày"
+    ],
+    "distractor_docs": [
+      "58-2014-QH13"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_c030",
+    "pair_id": "tu_nguyen_ho_tro_ngoai_pham_vi",
+    "question": "Người tham gia bảo hiểm xã hội tự nguyện được Nhà nước hỗ trợ tiền đóng theo tỷ lệ bao nhiêu phần trăm?",
+    "as_of_date": "2009-09-01",
+    "category": "tu_nguyen",
+    "temporal_kind": "out_of_range",
+    "expected_behavior": "time_out_of_range",
+    "ground_truth": "Mốc 01/9/2009 nằm trước phạm vi thời gian corpus phủ (từ 01/01/2015) và trước khi chính sách hỗ trợ tiền đóng bảo hiểm xã hội tự nguyện hiện hành có hiệu lực (Nghị định 134/2015/NĐ-CP, từ 15/02/2016). Hệ thống phải nói rõ giới hạn phủ thay vì trả lời theo Nghị định 134/2015/NĐ-CP.",
+    "source_doc": "",
+    "source_clause": "",
+    "expect_contains": [],
+    "expect_absent": [
+      "30%",
+      "25%",
+      "10%"
+    ],
+    "distractor_docs": [
+      "134-2015-ND-CP"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d001",
+    "pair_id": "doi_tuong_mien_tru_bhtn_new",
+    "question": "Theo Luật Việc làm 2025, người lao động đang hưởng lương hưu có thuộc đối tượng tham gia bảo hiểm thất nghiệp không?",
+    "as_of_date": "2026-03-10",
+    "category": "bhtn",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 31 Luật Việc làm số 74/2025/QH15, người lao động đang hưởng lương hưu, trợ cấp bảo hiểm xã hội, trợ cấp hằng tháng hoặc đủ điều kiện hưởng lương hưu thì không thuộc đối tượng tham gia bảo hiểm thất nghiệp.",
+    "source_doc": "74-2025-QH15",
+    "source_clause": "74-2025-QH15__d31",
+    "expect_contains": [
+      [
+        "không thuộc đối tượng tham gia bảo hiểm thất nghiệp"
+      ],
+      [
+        "đang hưởng lương hưu"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d002",
+    "pair_id": "muc_dong_bhtn_nsdld_new",
+    "question": "Theo Luật Việc làm 2025, người sử dụng lao động phải đóng bảo hiểm thất nghiệp tối đa bằng bao nhiêu phần trăm quỹ tiền lương tháng?",
+    "as_of_date": "2026-04-12",
+    "category": "bhtn",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm b khoản 1 Điều 33 Luật Việc làm số 74/2025/QH15, người sử dụng lao động đóng tối đa bằng 1% quỹ tiền lương tháng của những người lao động đang tham gia bảo hiểm thất nghiệp.",
+    "source_doc": "74-2025-QH15",
+    "source_clause": "74-2025-QH15__d33",
+    "expect_contains": [
+      [
+        "1% quỹ tiền lương tháng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d003",
+    "pair_id": "dieu_kien_huong_tctn_new",
+    "question": "Theo Luật Việc làm 2025, người lao động phải đóng bảo hiểm thất nghiệp trong khoảng thời gian bao lâu để đủ điều kiện hưởng trợ cấp thất nghiệp?",
+    "as_of_date": "2026-05-18",
+    "category": "bhtn",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm b khoản 1 Điều 38 Luật Việc làm số 74/2025/QH15, người lao động phải đã đóng bảo hiểm thất nghiệp từ đủ 12 tháng trở lên trong thời gian 24 tháng trước khi chấm dứt hợp đồng lao động, hợp đồng làm việc hoặc chấm dứt làm việc.",
+    "source_doc": "74-2025-QH15",
+    "source_clause": "74-2025-QH15__d38",
+    "expect_contains": [
+      [
+        "12 tháng trở lên trong thời gian 24 tháng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d004",
+    "pair_id": "thoi_gian_huong_tctn_new",
+    "question": "Theo Luật Việc làm 2025, sau khi đã được hưởng 3 tháng trợ cấp thất nghiệp ban đầu, người lao động cần đóng thêm bao nhiêu tháng bảo hiểm thất nghiệp để được hưởng thêm 1 tháng trợ cấp?",
+    "as_of_date": "2026-02-14",
+    "category": "bhtn",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 39 Luật Việc làm số 74/2025/QH15, sau khi đã hưởng 03 tháng trợ cấp thất nghiệp ứng với 12-36 tháng đóng, cứ đóng đủ thêm 12 tháng thì người lao động được hưởng thêm 01 tháng trợ cấp thất nghiệp.",
+    "source_doc": "74-2025-QH15",
+    "source_clause": "74-2025-QH15__d39",
+    "expect_contains": [
+      [
+        "đóng đủ thêm 12 tháng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d005",
+    "pair_id": "thoi_gian_ho_tro_dao_tao_new",
+    "question": "Theo Luật Việc làm 2025, người lao động đang hưởng trợ cấp thất nghiệp được hỗ trợ đào tạo, nâng cao trình độ kỹ năng nghề tối đa trong bao lâu?",
+    "as_of_date": "2026-06-20",
+    "category": "bhtn",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 3 Điều 37 Luật Việc làm số 74/2025/QH15, tổng thời gian hỗ trợ đào tạo, nâng cao trình độ kỹ năng nghề cho người lao động không quá 06 tháng.",
+    "source_doc": "74-2025-QH15",
+    "source_clause": "74-2025-QH15__d37",
+    "expect_contains": [
+      [
+        "không quá 06 tháng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d006",
+    "pair_id": "muc_ho_tro_hoc_phi_new",
+    "question": "Theo Nghị định 374/2025/NĐ-CP, mức hỗ trợ học phí tối đa cho người lao động tham gia khóa đào tạo nghề dưới 3 tháng là bao nhiêu?",
+    "as_of_date": "2026-07-08",
+    "category": "bhtn",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 11 Nghị định số 374/2025/NĐ-CP, đối với khóa đào tạo, nâng cao trình độ kỹ năng nghề dưới 03 tháng, mức hỗ trợ học phí tối đa không quá 4.500.000 đồng/người/khóa đào tạo.",
+    "source_doc": "374-2025-ND-CP",
+    "source_clause": "374-2025-ND-CP__d11",
+    "expect_contains": [
+      [
+        "4.500.000 đồng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d007",
+    "pair_id": "muc_ho_tro_tien_an_new",
+    "question": "Theo Nghị định 374/2025/NĐ-CP, người lao động tham gia khóa đào tạo nâng cao trình độ kỹ năng nghề được hỗ trợ tiền ăn bao nhiêu mỗi ngày?",
+    "as_of_date": "2026-08-15",
+    "category": "bhtn",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 11 Nghị định số 374/2025/NĐ-CP, người lao động tham gia khóa đào tạo, nâng cao trình độ kỹ năng nghề được hỗ trợ mức tiền ăn 50.000 đồng/người/ngày thực học.",
+    "source_doc": "374-2025-ND-CP",
+    "source_clause": "374-2025-ND-CP__d11",
+    "expect_contains": [
+      [
+        "50.000 đồng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d008",
+    "pair_id": "doi_tuong_vay_von_lai_suat_thap_new",
+    "question": "Theo Luật Việc làm 2025, cơ sở sản xuất, kinh doanh sử dụng nhiều lao động thuộc nhóm nào thì được vay vốn hỗ trợ tạo việc làm với mức lãi suất thấp hơn?",
+    "as_of_date": "2026-09-05",
+    "category": "vay_von",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 3 Điều 9 Luật Việc làm số 74/2025/QH15, cơ sở sản xuất, kinh doanh sử dụng nhiều lao động là người khuyết tật, người dân tộc thiểu số, người đã chấp hành xong án phạt tù hoặc quyết định đưa vào cơ sở giáo dục bắt buộc, cơ sở cai nghiện bắt buộc được vay vốn với mức lãi suất thấp hơn.",
+    "source_doc": "74-2025-QH15",
+    "source_clause": "74-2025-QH15__d9",
+    "expect_contains": [
+      [
+        "người khuyết tật"
+      ],
+      [
+        "người dân tộc thiểu số"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d009",
+    "pair_id": "dieu_kien_cap_giay_phep_dvvl_new",
+    "question": "Theo Luật Việc làm 2025, doanh nghiệp cần đáp ứng điều kiện gì về tài chính để được cấp giấy phép hoạt động dịch vụ việc làm?",
+    "as_of_date": "2026-04-28",
+    "category": "dich_vu_viec_lam",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 28 Luật Việc làm số 74/2025/QH15, doanh nghiệp được cấp giấy phép hoạt động dịch vụ việc làm khi có cơ sở vật chất, nhân sự đáp ứng yêu cầu và đã ký quỹ, đồng thời phải duy trì các điều kiện này trong suốt quá trình hoạt động.",
+    "source_doc": "74-2025-QH15",
+    "source_clause": "74-2025-QH15__d28",
+    "expect_contains": [
+      [
+        "đã ký quỹ"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d010",
+    "pair_id": "noi_dung_ttttld_new",
+    "question": "Theo Luật Việc làm 2025, thông tin thị trường lao động bao gồm những nội dung nào?",
+    "as_of_date": "2026-05-30",
+    "category": "thi_truong_lao_dong",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 20 Luật Việc làm số 74/2025/QH15, thông tin thị trường lao động bao gồm thông tin về cung lao động, cầu lao động, kết nối cung - cầu lao động; thông tin đào tạo, trình độ kỹ năng nghề; xu hướng tìm kiếm việc làm và tiền lương, thu nhập của người lao động.",
+    "source_doc": "74-2025-QH15",
+    "source_clause": "74-2025-QH15__d20",
+    "expect_contains": [
+      [
+        "cung lao động, cầu lao động"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d011",
+    "pair_id": "chung_chi_ky_nang_nghe_new",
+    "question": "Theo Luật Việc làm 2025, chứng chỉ kỹ năng nghề quốc gia dùng để công nhận điều gì đối với người lao động?",
+    "as_of_date": "2026-03-22",
+    "category": "ky_nang_nghe",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 24 Luật Việc làm số 74/2025/QH15, chứng chỉ kỹ năng nghề quốc gia là văn bản công nhận người lao động có đủ khả năng thực hiện công việc đạt yêu cầu ở một bậc trình độ kỹ năng của một nghề.",
+    "source_doc": "74-2025-QH15",
+    "source_clause": "74-2025-QH15__d24",
+    "expect_contains": [
+      [
+        "có đủ khả năng thực hiện công việc"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d012",
+    "pair_id": "thoi_han_dang_ky_bhtn_old",
+    "question": "Theo Luật Việc làm 2013, người sử dụng lao động phải đăng ký tham gia bảo hiểm thất nghiệp cho người lao động trong thời hạn bao nhiêu ngày kể từ khi hợp đồng lao động có hiệu lực?",
+    "as_of_date": "2018-06-10",
+    "category": "bhtn",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 44 Luật Việc làm số 38/2013/QH13, người sử dụng lao động phải tham gia bảo hiểm thất nghiệp cho người lao động trong thời hạn 30 ngày kể từ ngày hợp đồng lao động hoặc hợp đồng làm việc có hiệu lực.",
+    "source_doc": "38-2013-QH13",
+    "source_clause": "38-2013-QH13__d44",
+    "expect_contains": [
+      [
+        "30 ngày"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d013",
+    "pair_id": "muc_dong_bhtn_nsdld_old",
+    "question": "Theo Luật Việc làm 2013, người sử dụng lao động đóng bảo hiểm thất nghiệp bằng bao nhiêu phần trăm quỹ tiền lương tháng?",
+    "as_of_date": "2019-03-15",
+    "category": "bhtn",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm b khoản 1 Điều 57 Luật Việc làm số 38/2013/QH13, người sử dụng lao động đóng bằng 1% quỹ tiền lương tháng của những người lao động đang tham gia bảo hiểm thất nghiệp.",
+    "source_doc": "38-2013-QH13",
+    "source_clause": "38-2013-QH13__d57",
+    "expect_contains": [
+      [
+        "1% quỹ tiền lương tháng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d014",
+    "pair_id": "dieu_kien_huong_tctn_old",
+    "question": "Theo Luật Việc làm 2013, người lao động làm việc theo hợp đồng lao động không xác định thời hạn phải đóng bảo hiểm thất nghiệp trong khoảng thời gian nào để đủ điều kiện hưởng trợ cấp thất nghiệp?",
+    "as_of_date": "2020-07-01",
+    "category": "bhtn",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 49 Luật Việc làm số 38/2013/QH13, người lao động phải đã đóng bảo hiểm thất nghiệp từ đủ 12 tháng trở lên trong thời gian 24 tháng trước khi chấm dứt hợp đồng lao động.",
+    "source_doc": "38-2013-QH13",
+    "source_clause": "38-2013-QH13__d49",
+    "expect_contains": [
+      [
+        "12 tháng trở lên trong thời gian 24 tháng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d015",
+    "pair_id": "tam_dung_huong_tctn_old",
+    "question": "Theo Luật Việc làm 2013, người đang hưởng trợ cấp thất nghiệp bị tạm dừng hưởng trong trường hợp nào?",
+    "as_of_date": "2016-05-20",
+    "category": "bhtn",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 53 Luật Việc làm số 38/2013/QH13, người đang hưởng trợ cấp thất nghiệp bị tạm dừng hưởng khi không thông báo về việc tìm kiếm việc làm hằng tháng theo quy định.",
+    "source_doc": "38-2013-QH13",
+    "source_clause": "38-2013-QH13__d53",
+    "expect_contains": [
+      [
+        "không thông báo về việc tìm kiếm việc làm hằng tháng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d016",
+    "pair_id": "muc_ho_tro_dao_tao_nsdld_old",
+    "question": "Theo Nghị định 28/2015/NĐ-CP, mức hỗ trợ kinh phí đào tạo, bồi dưỡng nâng cao trình độ kỹ năng nghề cho người sử dụng lao động tối đa là bao nhiêu mỗi tháng?",
+    "as_of_date": "2017-04-12",
+    "category": "bhtn",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 4 Nghị định số 28/2015/NĐ-CP, mức hỗ trợ kinh phí đào tạo, bồi dưỡng, nâng cao trình độ kỹ năng nghề tối đa 01 triệu đồng/người/tháng.",
+    "source_doc": "28-2015-ND-CP",
+    "source_clause": "28-2015-ND-CP__d4",
+    "expect_contains": [
+      [
+        "01 triệu đồng/người/tháng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d017",
+    "pair_id": "dieu_kien_vay_von_du_an_old",
+    "question": "Theo Luật Việc làm 2013, doanh nghiệp nhỏ và vừa muốn vay vốn từ Quỹ quốc gia về việc làm cần đáp ứng điều kiện gì về dự án vay vốn?",
+    "as_of_date": "2022-02-14",
+    "category": "vay_von",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 13 Luật Việc làm số 38/2013/QH13, doanh nghiệp phải có dự án vay vốn khả thi tại địa phương, phù hợp với ngành, nghề sản xuất kinh doanh, thu hút thêm lao động vào làm việc ổn định.",
+    "source_doc": "38-2013-QH13",
+    "source_clause": "38-2013-QH13__d13",
+    "expect_contains": [
+      [
+        "dự án vay vốn khả thi"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d018",
+    "pair_id": "trung_tam_dvvl_old",
+    "question": "Theo Luật Việc làm 2013, trung tâm dịch vụ việc làm là loại hình tổ chức gì?",
+    "as_of_date": "2016-11-20",
+    "category": "dich_vu_viec_lam",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 37 Luật Việc làm số 38/2013/QH13, trung tâm dịch vụ việc làm là đơn vị sự nghiệp công lập, do cơ quan quản lý nhà nước hoặc tổ chức chính trị - xã hội thành lập.",
+    "source_doc": "38-2013-QH13",
+    "source_clause": "38-2013-QH13__d37",
+    "expect_contains": [
+      [
+        "đơn vị sự nghiệp công lập"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d019",
+    "pair_id": "noi_dung_dich_vu_viec_lam_old",
+    "question": "Theo Luật Việc làm 2013, dịch vụ việc làm bao gồm những nội dung nào?",
+    "as_of_date": "2023-08-05",
+    "category": "dich_vu_viec_lam",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 36 Luật Việc làm số 38/2013/QH13, dịch vụ việc làm bao gồm tư vấn, giới thiệu việc làm; cung ứng và tuyển lao động theo yêu cầu của người sử dụng lao động; thu thập, cung cấp thông tin về thị trường lao động.",
+    "source_doc": "38-2013-QH13",
+    "source_clause": "38-2013-QH13__d36",
+    "expect_contains": [
+      [
+        "tư vấn, giới thiệu việc làm"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d020",
+    "pair_id": "noi_dung_ttttld_old",
+    "question": "Theo Luật Việc làm 2013, nội dung thông tin thị trường lao động bao gồm những gì?",
+    "as_of_date": "2019-10-10",
+    "category": "thi_truong_lao_dong",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 23 Luật Việc làm số 38/2013/QH13, thông tin thị trường lao động bao gồm tình trạng, xu hướng việc làm; thông tin về cung cầu lao động, biến động cung cầu lao động; thông tin về lao động nước ngoài và tiền lương, tiền công.",
+    "source_doc": "38-2013-QH13",
+    "source_clause": "38-2013-QH13__d23",
+    "expect_contains": [
+      [
+        "cung cầu lao động"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d021",
+    "pair_id": "muc_dich_chung_chi_kndn_old",
+    "question": "Theo Luật Việc làm 2013, việc đánh giá, cấp chứng chỉ kỹ năng nghề quốc gia nhằm mục đích gì?",
+    "as_of_date": "2024-01-15",
+    "category": "ky_nang_nghe",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 29 Luật Việc làm số 38/2013/QH13, đánh giá, cấp chứng chỉ kỹ năng nghề quốc gia nhằm công nhận cấp độ kỹ năng nghề nghiệp theo trình độ của người lao động.",
+    "source_doc": "38-2013-QH13",
+    "source_clause": "38-2013-QH13__d29",
+    "expect_contains": [
+      [
+        "công nhận cấp độ kỹ năng nghề nghiệp"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d022",
+    "pair_id": "ho_tro_hoc_nghe_nong_thon_old",
+    "question": "Theo Luật Việc làm 2013, người lao động ở khu vực nông thôn học nghề trong thời gian bao lâu thì được hỗ trợ chi phí học nghề?",
+    "as_of_date": "2021-06-01",
+    "category": "ho_tro_viec_lam",
+    "temporal_kind": "single_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo Điều 16 Luật Việc làm số 38/2013/QH13, người lao động ở khu vực nông thôn học nghề dưới 03 tháng hoặc học nghề trình độ sơ cấp được hỗ trợ chi phí học nghề theo quy định của Thủ tướng Chính phủ.",
+    "source_doc": "38-2013-QH13",
+    "source_clause": "38-2013-QH13__d16",
+    "expect_contains": [
+      [
+        "học nghề dưới 03 tháng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d023",
+    "pair_id": "thoi_han_qd_tctn_new",
+    "question": "Theo Nghị định 374/2025/NĐ-CP hướng dẫn Luật Việc làm 2025, tổ chức dịch vụ việc làm công phải trình quyết định hưởng trợ cấp thất nghiệp trong thời hạn bao nhiêu ngày làm việc kể từ khi nhận đủ hồ sơ?",
+    "as_of_date": "2026-05-05",
+    "category": "bhtn",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 16 Nghị định số 374/2025/NĐ-CP, tổ chức dịch vụ việc làm công trình Giám đốc Sở Nội vụ quyết định về việc hưởng trợ cấp thất nghiệp trong thời hạn 15 ngày làm việc kể từ ngày nhận đủ hồ sơ; quy định trước đây tại Nghị định 28/2015/NĐ-CP là 20 ngày làm việc.",
+    "source_doc": "374-2025-ND-CP",
+    "source_clause": "374-2025-ND-CP__d16",
+    "expect_contains": [
+      [
+        "15 ngày làm việc"
+      ]
+    ],
+    "expect_absent": [
+      "20 ngày làm việc"
+    ],
+    "distractor_docs": [
+      "28-2015-ND-CP"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d024",
+    "pair_id": "dk_thoi_gian_dong_ho_tro_hoc_nghe_old",
+    "question": "Theo Luật Việc làm 2013, để được hỗ trợ học nghề, người lao động phải đóng bảo hiểm thất nghiệp từ đủ 09 tháng trở lên trong khoảng thời gian bao nhiêu tháng trước khi chấm dứt hợp đồng lao động?",
+    "as_of_date": "2020-03-01",
+    "category": "bhtn",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 2 Điều 55 Luật Việc làm số 38/2013/QH13, người lao động phải đã đóng bảo hiểm thất nghiệp từ đủ 09 tháng trở lên trong thời gian 24 tháng trước khi chấm dứt hợp đồng lao động hoặc hợp đồng làm việc; Luật Việc làm 2025 sau này nâng khoảng thời gian này lên 36 tháng.",
+    "source_doc": "38-2013-QH13",
+    "source_clause": "38-2013-QH13__d55",
+    "expect_contains": [
+      [
+        "09 tháng trở lên trong thời gian 24 tháng"
+      ]
+    ],
+    "expect_absent": [
+      "36 tháng"
+    ],
+    "distractor_docs": [
+      "74-2025-QH15"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d025",
+    "pair_id": "nguong_hdld_bhtn_new",
+    "question": "Theo Luật Việc làm 2025, hợp đồng lao động xác định thời hạn phải có thời hạn tối thiểu bao lâu thì người lao động thuộc đối tượng tham gia bảo hiểm thất nghiệp?",
+    "as_of_date": "2026-06-12",
+    "category": "bhtn",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 31 Luật Việc làm số 74/2025/QH15, người làm việc theo hợp đồng lao động không xác định thời hạn hoặc hợp đồng lao động xác định thời hạn từ đủ 01 tháng trở lên thuộc đối tượng tham gia bảo hiểm thất nghiệp; Luật Việc làm 2013 trước đây chỉ bắt buộc với hợp đồng mùa vụ có thời hạn từ đủ 03 tháng đến dưới 12 tháng.",
+    "source_doc": "74-2025-QH15",
+    "source_clause": "74-2025-QH15__d31",
+    "expect_contains": [
+      [
+        "từ đủ 01 tháng trở lên"
+      ]
+    ],
+    "expect_absent": [
+      "từ đủ 03 tháng đến dưới 12 tháng"
+    ],
+    "distractor_docs": [
+      "38-2013-QH13"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d026",
+    "pair_id": "doi_tuong_vay_von_qgvl_old",
+    "question": "Theo Luật Việc làm 2013, đối tượng nào được vay vốn từ Quỹ quốc gia về việc làm?",
+    "as_of_date": "2018-09-01",
+    "category": "vay_von",
+    "temporal_kind": "doc_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 1 Điều 12 Luật Việc làm số 38/2013/QH13, đối tượng được vay vốn từ Quỹ quốc gia về việc làm gồm doanh nghiệp nhỏ và vừa, hợp tác xã, tổ hợp tác, hộ kinh doanh và người lao động; Luật Việc làm 2025 sau này bổ sung thêm liên hiệp hợp tác xã vào nhóm được vay vốn.",
+    "source_doc": "38-2013-QH13",
+    "source_clause": "38-2013-QH13__d12",
+    "expect_contains": [
+      [
+        "Doanh nghiệp nhỏ và vừa, hợp tác xã, tổ hợp tác, hộ kinh doanh"
+      ]
+    ],
+    "expect_absent": [
+      "liên hiệp hợp tác xã"
+    ],
+    "distractor_docs": [
+      "74-2025-QH15"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d027",
+    "pair_id": "multi_doituong_mucdong_bhtn",
+    "question": "Một người lao động ký hợp đồng lao động xác định thời hạn 2 tháng tại một hợp tác xã nông nghiệp, hưởng lương theo sản phẩm. Theo Luật Việc làm 2025, người này có thuộc đối tượng tham gia bảo hiểm thất nghiệp không, và nếu có thì mức đóng bảo hiểm thất nghiệp tối đa mà người lao động phải đóng là bao nhiêu?",
+    "as_of_date": "2026-06-01",
+    "category": "bhtn",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 31 Luật Việc làm số 74/2025/QH15, người lao động làm việc theo hợp đồng lao động xác định thời hạn từ đủ 01 tháng trở lên thuộc đối tượng tham gia bảo hiểm thất nghiệp; theo điểm a khoản 1 Điều 33, người lao động đóng tối đa bằng 1% tiền lương tháng.",
+    "source_doc": "74-2025-QH15",
+    "source_clause": "",
+    "source_clauses": [
+      "74-2025-QH15__d31",
+      "74-2025-QH15__d33"
+    ],
+    "expect_contains": [
+      [
+        "từ đủ 01 tháng trở lên"
+      ],
+      [
+        "1% tiền lương tháng"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d028",
+    "pair_id": "multi_dieukien_thoigian_tctn",
+    "question": "Một người lao động đã đóng bảo hiểm thất nghiệp liên tục 20 tháng rồi chấm dứt hợp đồng lao động đúng luật, nộp hồ sơ đề nghị hưởng trợ cấp thất nghiệp sau 1 tháng. Theo Luật Việc làm 2025, người này có đủ điều kiện hưởng trợ cấp thất nghiệp không, và nếu có thì được hưởng trợ cấp thất nghiệp trong bao nhiêu tháng?",
+    "as_of_date": "2026-07-15",
+    "category": "bhtn",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm b khoản 1 Điều 38 Luật Việc làm số 74/2025/QH15, người lao động đã đóng bảo hiểm thất nghiệp từ đủ 12 tháng trở lên trong 24 tháng trước khi chấm dứt hợp đồng và nộp hồ sơ trong thời hạn 03 tháng thì đủ điều kiện hưởng trợ cấp thất nghiệp; theo khoản 2 Điều 39, với 20 tháng đóng bảo hiểm thất nghiệp (từ 12 đến 36 tháng) thì được hưởng 03 tháng trợ cấp thất nghiệp.",
+    "source_doc": "74-2025-QH15",
+    "source_clause": "",
+    "source_clauses": [
+      "74-2025-QH15__d38",
+      "74-2025-QH15__d39"
+    ],
+    "expect_contains": [
+      [
+        "12 tháng trở lên trong thời gian 24 tháng"
+      ],
+      [
+        "03 tháng trợ cấp thất nghiệp"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d029",
+    "pair_id": "ngoai_pham_vi_dkkd",
+    "question": "Thủ tục đăng ký kinh doanh hộ cá thể tại Việt Nam cần chuẩn bị những giấy tờ gì?",
+    "as_of_date": "2026-05-01",
+    "category": "ngoai_pham_vi",
+    "temporal_kind": "out_of_scope",
+    "expected_behavior": "refuse",
+    "ground_truth": "Câu hỏi thuộc lĩnh vực đăng ký kinh doanh, nằm ngoài phạm vi corpus pháp luật lao động và bảo hiểm xã hội (Luật Việc làm, Luật Bảo hiểm xã hội...) mà hệ thống được nạp, nên cần từ chối trả lời.",
+    "source_doc": "",
+    "source_clause": "",
+    "expect_contains": [],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g2_d030",
+    "pair_id": "ngoai_pham_vi_hinh_su",
+    "question": "Khung hình phạt đối với tội trốn thuế theo Bộ luật Hình sự Việt Nam là gì?",
+    "as_of_date": "2020-01-01",
+    "category": "ngoai_pham_vi",
+    "temporal_kind": "out_of_scope",
+    "expected_behavior": "refuse",
+    "ground_truth": "Câu hỏi thuộc lĩnh vực pháp luật hình sự, nằm ngoài phạm vi corpus pháp luật lao động và bảo hiểm xã hội mà hệ thống được nạp, nên cần từ chối trả lời.",
+    "source_doc": "",
+    "source_clause": "",
+    "expect_contains": [],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  }
+]

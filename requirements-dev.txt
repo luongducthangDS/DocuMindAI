@@ -5,6 +5,7 @@
 
 ragas==0.1.21
 datasets>=2.14.0
+mlflow==3.16.1  # eval/temporal_eval.py --mlflow
 
 pytest==8.3.3
 pytest-asyncio==0.24.0

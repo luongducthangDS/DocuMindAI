@@ -9,7 +9,7 @@
 [![ChromaDB](https://img.shields.io/badge/ChromaDB-0.6-FF6F00.svg)](https://www.trychroma.com)
 [![React 19](https://img.shields.io/badge/React-19.0-61DAFB.svg?logo=react&logoColor=black)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-6.0-646CFF.svg?logo=vite&logoColor=white)](https://vitejs.dev)
-[![Test Suite](https://img.shields.io/badge/Tests-227%2F227%20Passing%20(100%25)-brightgreen.svg)](tests/)
+[![Test Suite](https://img.shields.io/badge/Tests-284%2F284%20Passing%20(100%25)-brightgreen.svg)](tests/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ---
@@ -188,13 +188,52 @@ Bộ khung đánh giá ([`eval/`](eval/)) chạy ablation truy hồi trên 4 chi
 (BM25 · dense · hybrid+RRF · hybrid+reranker) cùng các chỉ số sinh văn bản của RAGAS, đối chiếu
 với bộ câu hỏi tự xây có sẵn đáp án chuẩn và id chunk nguồn.
 
-**Chưa công bố baseline truy hồi cho kho tài liệu hiện tại.** Bộ gold set đang dùng là
-[`data/eval/temporal_questions.json`](data/eval/temporal_questions.json) — 30 câu viết tay kèm
-id `source_clause`, đã commit trước khi chạy hệ thống trên chúng, toàn bộ trích từ chính các văn
-bản trong [`data/raw/lao_dong/`](data/raw/lao_dong/) (kể cả các bản sửa đổi cấp khoản trong
-`_versions/`). Bộ hợp nhất ≥50 câu phủ cả trong phạm vi / ngoài phạm vi / tra theo thời điểm
-đang được xây. Chưa tuyên bố con số độ chính xác nào cho tới khi đo được trên chính kho tài
-liệu này.
+### Kết quả trên kho lao động/BHXH hiện tại (đo 2026-09-23)
+
+Gold set [`data/eval/legal_qa_200.json`](data/eval/legal_qa_200.json): **199 câu**, 11 loại
+(tra một điều khoản, đổi phiên bản văn bản, ghép nhiều điều khoản, tiền đề sai, ngoài phạm
+vi, trước mốc phủ corpus…). Mỗi câu trỏ tới `clause_uid` nguồn;
+[`eval/validate_gold.py`](eval/validate_gold.py) kiểm tra trên index thật rằng đáp án có
+**nguyên văn** trong chunk nguồn và `as_of_date` nằm trong hiệu lực của chunk đó (199/199 đạt).
+
+Cấu hình đo = cấu hình production (Render: hybrid BM25 + dense, RRF, **không reranker**).
+"Trước" = truy hồi thường; "sau" = điều kiện hiệu lực `as_of_date` đẩy xuống vector store
+([DEC-0003](docs/decisions/DEC-0003-retrieval-context-acl-tenant.md)).
+
+| Chỉ số | Trước (`no_temporal`) | Sau (`pre_filter`) |
+|---|---:|---:|
+| Recall@1 | 0.500 | **0.667** |
+| Recall@5 | 0.903 | **0.935** |
+| MRR | 0.671 | **0.779** |
+| Ngữ cảnh lẫn bản luật hết hiệu lực | 21.6% | **0.0%** |
+| Answer accuracy (169 câu cả hai arm đều gọi được LLM) | 0.763 | **0.935** |
+| — riêng câu đổi phiên bản văn bản (n=28) | 0.36 | **1.00** |
+| Faithfulness (LLM judge, n≈160) | 0.975 | 0.957 |
+| Latency truy hồi p95 | 555 ms | 672 ms |
+| Latency end-to-end p50 / p95 | 4.6 s / 22.8 s | 4.6 s / 19.0 s |
+
+Đọc bảng cho đúng:
+- **p95 end-to-end bị chi phối bởi quota free tier Gemini**, không phải thời gian sinh: lượt
+  đo gặp hàng trăm lần 429, xoay key/model rồi chờ; ~25 câu/arm rơi xuống chế độ trích
+  nguyên văn (không LLM). Vì thế accuracy được so trên tập 169 câu cả hai arm đều do Gemini trả lời.
+- Faithfulness giảm nhẹ ở arm "sau" — chưa đủ mẫu để kết luận khác biệt; ghi đúng như đo.
+- Câu do Claude soạn (`drafted_by: claude`, `reviewed: false`) **chưa được người duyệt**.
+
+Tái lập (mỗi lần chạy là một run trong MLflow, experiment `documind-eval`, kèm git sha + cấu hình):
+
+```powershell
+# Truy hồi — không gọi LLM
+python eval/temporal_eval.py --gold data/eval/legal_qa_200.json --retrieval-only `
+  --arms no_temporal temporal_filter pre_filter --mlflow retrieval
+# End-to-end + faithfulness judge
+python eval/temporal_eval.py --gold data/eval/legal_qa_200.json `
+  --arms no_temporal pre_filter --judge no_temporal pre_filter --mlflow e2e
+mlflow ui   # http://localhost:5000 — so sánh run
+```
+
+CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) chạy retrieval eval trên Qdrant
+Cloud ở mỗi PR và **fail PR** nếu recall/MRR tụt quá ngưỡng so với
+[`reports/eval_baseline.json`](reports/eval_baseline.json) ([`eval/ci_gate.py`](eval/ci_gate.py)).
 
 **Benchmark lịch sử (kho tài liệu trước đây).** Phương pháp luận và các phát hiện kỹ thuật vẫn
 giữ nguyên giá trị — xem [`EVALUATION.md`](EVALUATION.md). Trên bộ 110 câu hỏi tự xây (lĩnh vực
@@ -208,7 +247,7 @@ khiến hệ thống từ chối nhầm, và ~15% câu bị từ chối thừa �
 | Truy hồi thưa | Okapi BM25 — khớp chính xác thuật ngữ luật / số hiệu điều khoản |
 | Truy hồi dày | `gemini-embedding-001` (3072 chiều, qua API) — khớp theo ngữ nghĩa |
 | Hợp nhất | Reciprocal Rank Fusion trên cả hai danh sách ứng viên (top-20) |
-| Rerank | Cross-encoder `BAAI/bge-reranker-v2-m3` → top-8 |
+| Rerank | Cross-encoder `BAAI/bge-reranker-v2-m3` → top-8 (local; production tắt — Render free 512MB RAM) |
 | Rào chắn khi sinh | Từ chối câu ngoài kho · bắt buộc trích dẫn ở từng đoạn |
 
 ---

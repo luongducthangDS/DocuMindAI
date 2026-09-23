@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+      - run: pip install -r requirements-dev.txt
+      - run: pytest -q --no-cov
+
+  # Retrieval-only eval against the production vector store (Qdrant Cloud) with the
+  # production retrieval config (render.yaml: ENABLE_RERANKER=false). No LLM calls.
+  # Fails the PR if recall/MRR drops beyond eval/ci_gate.py tolerances vs the
+  # committed baseline.
+  eval:
+    runs-on: ubuntu-latest
+    needs: test
+    # Fork PRs get no secrets — skip instead of failing red for reasons unrelated to the diff.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    env:
+      GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+      GOOGLE_API_KEY_2: ${{ secrets.GOOGLE_API_KEY_2 }}
+      GOOGLE_API_KEY_3: ${{ secrets.GOOGLE_API_KEY_3 }}
+      VECTOR_STORE_PROVIDER: qdrant
+      QDRANT_URL: ${{ secrets.QDRANT_URL }}
+      QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+      ENABLE_RERANKER: "false"
+      MLFLOW_TRACKING_URI: sqlite:///mlflow.db
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+      - run: pip install -r requirements-dev.txt
+
+      # Gold questions rarely change → their embeddings neither. Keeps each run far
+      # below the ~1000 embeds/day/project Gemini quota.
+      - uses: actions/cache@v4
+        with:
+          path: reports/_eval_cache/query_embeddings.json
+          key: qemb-gemini-embedding-001-${{ hashFiles('data/eval/legal_qa_200.json') }}
+          restore-keys: qemb-gemini-embedding-001-
+
+      - name: Gold set still answerable from the index
+        run: python eval/validate_gold.py data/eval/legal_qa_200.json
+
+      - name: Retrieval eval
+        run: >
+          python eval/temporal_eval.py --gold data/eval/legal_qa_200.json
+          --retrieval-only --arms pre_filter
+          --embed-cache reports/_eval_cache/query_embeddings.json
+          --output reports/ci_eval.json --mlflow "ci-${{ github.sha }}"
+
+      - name: Gate vs baseline
+        run: python eval/ci_gate.py reports/ci_eval.json --baseline reports/eval_baseline.json
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-${{ github.sha }}
+          path: |
+            reports/ci_eval.json
+            mlflow.db
+            mlruns/

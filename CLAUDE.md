@@ -29,7 +29,18 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   nguyên văn corpus, `reviewed: false` — **cần người duyệt**. Bộ 30 câu temporal đã bão hoà
   (1.000), dùng bộ này để đo cải tiến:
   `python eval/temporal_eval.py --gold data/eval/hard_questions.json --output reports/hard_eval.json`
-- Test suite: 277/277 tests passed (đo 2026-09-23).
+- **Gold set chính: `data/eval/legal_qa_200.json` (199 câu)** = 30 temporal + 19 hard + 150 câu
+  Claude soạn (`g2_*`, `reviewed: false`). Kiểm tra với index thật:
+  `python eval/validate_gold.py data/eval/legal_qa_200.json`. Metric: recall@1/3/5/8, MRR,
+  faithfulness (`--judge <arms>`), p50/p95; `--mlflow <run>` log vào MLflow (`mlflow.db`, gitignored);
+  `--embed-cache` chỉ dùng cho CI (latency khi đó không phải số thật). Kết quả: README mục Đánh giá.
+- CI: `.github/workflows/ci.yml` — pytest + retrieval eval trên Qdrant (reranker tắt như Render),
+  gate bằng `eval/ci_gate.py` so với `reports/eval_baseline.json`. Cần secrets `GOOGLE_API_KEY*`,
+  `QDRANT_URL`, `QDRANT_API_KEY`.
+- **Reranker local đang KHÔNG chạy** (2026-09-23): Windows Smart App Control chặn DLL `pyarrow`
+  → `sentence_transformers` không import được → retriever log "Reranker unavailable" và bỏ qua.
+  Report nào ghi rerank phải xem `meta.reranker_active`, không tin `ENABLE_RERANKER`.
+- Test suite: 284/284 tests passed (đo 2026-09-23).
 
 **Stack:**
 - Backend: FastAPI + LangGraph agent + vector store qua `VECTOR_STORE_PROVIDER`
