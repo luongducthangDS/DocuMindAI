@@ -343,12 +343,13 @@ def get_async_qdrant_client():
     return AsyncQdrantClient(url=settings.qdrant_url, api_key=settings.qdrant_api_key or None)
 
 
-def get_qdrant_client_and_collection() -> tuple:
+def get_qdrant_client_and_collection(timeout: int | None = None) -> tuple:
     """
     Return (QdrantClient, collection_name). Creates the collection if it doesn't
     exist yet (cosine distance, chiều vector hỏi thẳng model đang cấu hình).
 
     Requires QDRANT_URL in .env (Qdrant Cloud cluster URL) + QDRANT_API_KEY.
+    `timeout` (giây): None = mặc định của qdrant_client (5s); migrate cần dài hơn.
     """
     from qdrant_client import QdrantClient
     from qdrant_client.models import Distance, VectorParams
@@ -359,7 +360,9 @@ def get_qdrant_client_and_collection() -> tuple:
             "VECTOR_STORE_PROVIDER=qdrant nhưng QDRANT_URL chưa được set trong .env"
         )
 
-    client = QdrantClient(url=settings.qdrant_url, api_key=settings.qdrant_api_key or None)
+    client = QdrantClient(
+        url=settings.qdrant_url, api_key=settings.qdrant_api_key or None, timeout=timeout
+    )
     collection_name = settings.qdrant_collection
 
     existing = {c.name for c in client.get_collections().collections}

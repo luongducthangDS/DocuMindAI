@@ -13,6 +13,11 @@ from loguru import logger
 # Module-level singletons — set by api/main.py at startup
 _active_retriever = None
 _active_index = None
+# The two expensive legs, kept so a per-request context-aware retriever can
+# reuse them instead of rebuilding: BM25 re-indexes the whole corpus and the
+# cross-encoder loads a model — neither may run per query.
+_bm25_retriever = None
+_reranker_instance = None
 
 # True only once a cross-encoder reranker actually loaded and is wrapping the
 # active retriever. settings.enable_reranker alone isn't enough to gate the
@@ -76,6 +81,8 @@ def build_hybrid_retriever(
             similarity_top_k=top_k,
         )
         retrievers = [vector_retriever, bm25_retriever]
+        global _bm25_retriever
+        _bm25_retriever = bm25_retriever
         logger.info("Hybrid retriever ready (dense + BM25, top_k={})", top_k)
     except Exception as exc:
         logger.warning("BM25 init failed, using vector-only: {}", exc)
@@ -136,6 +143,8 @@ def _wrap_with_reranker(base_retriever, top_n: int = 8):
         )
         logger.info("Cross-encoder reranker loaded: {} (top_n={})", model_name, top_n)
         _reranker_active = True
+        global _reranker_instance
+        _reranker_instance = reranker
         return _RerankedRetriever(base_retriever, reranker)
 
     except Exception as exc:
@@ -197,7 +206,7 @@ def nodes_to_chunks(nodes: list["NodeWithScore"]) -> list[RetrievedChunk]:
     ]
 
 
-def retrieve_direct_chroma(query: str, top_k: int = 5) -> list[RetrievedChunk]:
+def retrieve_direct_chroma(query: str, top_k: int = 5, ctx=None) -> list[RetrievedChunk]:
     """Fallback retrieval path that queries the vector store directly.
 
     Name kept as "_chroma" for backward compat with existing call sites
@@ -216,7 +225,8 @@ def retrieve_direct_chroma(query: str, top_k: int = 5) -> list[RetrievedChunk]:
 
         embedder = get_embedder()
         query_embedding = embedder.get_query_embedding(query)
-        results = direct_query(backend, query_embedding, top_k=top_k)
+        where = ctx.to_where() if ctx is not None else None
+        results = direct_query(backend, query_embedding, top_k=top_k, where=where)
 
         chunks = [
             RetrievedChunk(text=r["text"], score=r["score"], metadata=r["metadata"])
@@ -227,3 +237,87 @@ def retrieve_direct_chroma(query: str, top_k: int = 5) -> list[RetrievedChunk]:
     except Exception as exc:
         logger.error("Direct fallback failed: {}", exc)
         return []
+
+
+class _ScreenedRetriever:
+    """Drops chunks the caller may not see, before they reach fusion.
+
+    BM25 keeps one in-process index over the entire corpus and has no notion of
+    a filter, so this is where its hits get screened. Screening *before* RRF
+    rather than after matters twice over: a forbidden chunk never leaves the
+    retriever, and fusion ranks are computed over the visible set instead of
+    being skewed by neighbours the caller is not allowed to read.
+    """
+
+    def __init__(self, base_retriever, ctx):
+        self._base = base_retriever
+        self._ctx = ctx
+
+    def _screen(self, nodes: list) -> list:
+        return [n for n in nodes if self._ctx.allows(n.node.metadata or {})]
+
+    def retrieve(self, query) -> list["NodeWithScore"]:
+        return self._screen(self._base.retrieve(query))
+
+    async def aretrieve(self, query) -> list["NodeWithScore"]:
+        return self._screen(await self._base.aretrieve(query))
+
+
+def retrieve_with_context(query: str, ctx, top_k: int = 20, top_n: int = 8) -> list[RetrievedChunk]:
+    """Access-controlled, tenant-scoped, point-in-time retrieval.
+
+    The dense leg pre-filters inside the vector store; the sparse leg is
+    screened on the way out (see _ScreenedRetriever). Both legs therefore spend
+    their whole candidate budget on chunks the caller may actually read — which
+    is the difference from filtering afterwards, where the top-8 was shared with
+    clauses that were never in force (reports/temporal_eval.json: avg_chunks 2.87).
+
+    Falls back to the unfiltered singleton retriever only if no index is active,
+    and screens that result too — an empty index must not mean an open door.
+    """
+    from llama_index.core.llms.mock import MockLLM
+    from llama_index.core.retrievers import QueryFusionRetriever
+    from llama_index.core.schema import QueryBundle
+
+    index = _active_index
+    if index is None:
+        logger.warning("No active index — context retrieval falling back to direct query")
+        chunks = retrieve_direct_chroma(query, top_k=top_n, ctx=ctx)
+        return [c for c in chunks if ctx.allows(c.metadata)]
+
+    dense = index.as_retriever(similarity_top_k=top_k, filters=ctx.to_llama_filters())
+
+    retrievers = [dense]
+    if _bm25_retriever is not None:
+        retrievers.append(_ScreenedRetriever(_bm25_retriever, ctx))
+
+    if len(retrievers) == 1:
+        nodes = dense.retrieve(query)
+    else:
+        nodes = QueryFusionRetriever(
+            retrievers=retrievers,
+            similarity_top_k=top_k,
+            num_queries=1,
+            mode="reciprocal_rerank",
+            use_async=False,  # same reason as build_hybrid_retriever
+            # num_queries=1 never calls an LLM, but the constructor still resolves
+            # one from the global Settings and falls back to OpenAI when none is
+            # set. Passing MockLLM removes the hidden dependency on main.py having
+            # configured Settings first (it made this path fail in isolation).
+            llm=MockLLM(),
+        ).retrieve(query)
+
+    # Belt and braces: the dense leg was filtered by the store and the sparse leg
+    # by _ScreenedRetriever, so this should never drop anything. It stays because
+    # an ACL that only holds when every upstream layer behaves is not an ACL.
+    visible = [n for n in nodes if ctx.allows(n.node.metadata or {})]
+    if len(visible) != len(nodes):
+        logger.error("Context screening caught {} chunk(s) that upstream filters missed",
+                     len(nodes) - len(visible))
+
+    if _reranker_instance is not None and visible:
+        visible = _reranker_instance.postprocess_nodes(visible, QueryBundle(query_str=query))
+    else:
+        visible = visible[:top_n]
+
+    return nodes_to_chunks(visible)

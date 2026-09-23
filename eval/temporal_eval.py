@@ -14,6 +14,12 @@ varies is what happens above retrieval:
                      (isolates "just tell the model the date")
   ③ temporal_filter  versions_in_force(as_of) + out-of-range guard → generator
                      told as_of_date (what `do_temporal_filter` does in the graph)
+  ④ pre_filter       the effective-date predicate is pushed INTO the vector store,
+                     so the candidate pool and the reranker only ever see clauses
+                     in force. Unlike ①-③ this arm cannot share the single
+                     retrieval call — the filter is part of the query, which is
+                     the whole point: ③ spends its top-8 budget on clauses it is
+                     about to discard, ④ never retrieves them.
 
 Metrics per arm:
   • answer_accuracy   — answer contains every expect_contains group and none of
@@ -64,7 +70,7 @@ import src.logger  # noqa: E402,F401 — init loguru sinks
 from src.ingestion.manifest import corpus_earliest_point_in_time  # noqa: E402
 from src.rag.temporal import is_out_of_range, versions_in_force  # noqa: E402
 
-ARMS = ("no_temporal", "prompt_only", "temporal_filter")
+ARMS = ("no_temporal", "prompt_only", "temporal_filter", "pre_filter")
 DEFAULT_GOLD = _REPO_ROOT / "data" / "eval" / "temporal_questions.json"
 DEFAULT_OUTPUT = _REPO_ROOT / "reports" / "temporal_eval.json"
 
@@ -132,8 +138,22 @@ def score_context(chunks: list, question: dict) -> dict:
     elif gold_hit and gold_clause:
         gold_hit = gold_clause in clauses
 
+    # Multi-clause questions (data/eval/hard_questions.json) name every clause the
+    # answer has to combine. All of them must be in context: a context holding the
+    # probation *length* but not the probation *pay* cannot support a full answer,
+    # however relevant it looks. Coverage is reported too, so "found 1 of 2" is
+    # distinguishable from "found neither".
+    required = list(question.get("source_clauses") or [])
+    if required:
+        found = [c for c in required if c in clauses]
+        coverage = len(found) / len(required)
+        gold_hit = gold_hit and coverage == 1.0
+    else:
+        coverage = 1.0 if gold_hit else 0.0
+
     distractor_hit = bool(docs & bad_docs) or bool(versions & bad_versions)
     return {
+        "gold_coverage": coverage,
         "gold": gold_hit,
         "distractor": distractor_hit,
         "clean": gold_hit and not distractor_hit,
@@ -168,10 +188,17 @@ def _build_retriever():
     from src.config import get_settings
     from src.rag.retriever import build_hybrid_retriever
 
+    import src.rag.retriever as r_module
+
     index, _collection, all_nodes, _embedder = _init_rag_shared()
     rerank = get_settings().enable_reranker
     logger.info("Retriever cho eval: rerank={}", rerank)
-    return build_hybrid_retriever(index, nodes=all_nodes, rerank=rerank)
+    retriever = build_hybrid_retriever(index, nodes=all_nodes, rerank=rerank)
+    # retrieve_with_context (the pre_filter arm) reads these module singletons,
+    # exactly as the API does after startup — so the arm measures the production
+    # path rather than a lookalike assembled here.
+    r_module._active_index = index
+    return retriever
 
 
 def run(
@@ -179,8 +206,9 @@ def run(
     arms: tuple[str, ...],
     retrieval_only: bool,
 ) -> dict[str, Any]:
+    from src.rag.context import RetrievalContext
     from src.rag.generator import generate_answer
-    from src.rag.retriever import nodes_to_chunks
+    from src.rag.retriever import nodes_to_chunks, retrieve_with_context
 
     retriever = _build_retriever()
     earliest = corpus_earliest_point_in_time()
@@ -207,8 +235,22 @@ def run(
         }
 
         for arm in arms:
-            used, oor, prompt_as_of = apply_arm(arm, chunks, q["as_of_date"], earliest)
+            if arm == "pre_filter":
+                t_pf = time.time()
+                used = retrieve_with_context(
+                    q["question"], RetrievalContext(as_of_date=q["as_of_date"])
+                )
+                oor = is_out_of_range(q["as_of_date"], earliest)
+                if oor:
+                    used = []
+                prompt_as_of = q["as_of_date"]
+                pre_filter_ms = int((time.time() - t_pf) * 1000)
+            else:
+                used, oor, prompt_as_of = apply_arm(arm, chunks, q["as_of_date"], earliest)
+                pre_filter_ms = None
             entry: dict[str, Any] = {"context": score_context(used, q)}
+            if pre_filter_ms is not None:
+                entry["retrieve_ms"] = pre_filter_ms
 
             if not retrieval_only:
                 t1 = time.time()
@@ -255,6 +297,8 @@ def summarise(rows: list[dict], arms: tuple[str, ...], retrieval_only: bool) -> 
         agg = {
             "n": n,
             "context_gold": sum(c["gold"] for c in ctx) / n,
+            # .get: reports written before multi-clause scoring lack the field.
+            "context_gold_coverage": sum(c.get("gold_coverage", float(c["gold"])) for c in ctx) / n,
             "context_distractor": sum(c["distractor"] for c in ctx) / n,
             "context_clean": sum(c["clean"] for c in ctx) / n,
             "avg_chunks": sum(c["n_chunks"] for c in ctx) / n,
@@ -375,6 +419,11 @@ def main() -> None:
         report = rescore(json.loads(args.rescore.read_text(encoding="utf-8")), questions)
     else:
         report = run(questions, tuple(args.arms), args.retrieval_only)
+    # run() chỉ biết DEFAULT_GOLD — ghi đè bằng file thực sự chạy (--gold)
+    gold = args.gold.resolve()
+    report["meta"]["gold_set"] = (
+        str(gold.relative_to(_REPO_ROOT)) if gold.is_relative_to(_REPO_ROOT) else str(gold)
+    ).replace("\\", "/")
     print_report(report)
 
     args.output.parent.mkdir(parents=True, exist_ok=True)

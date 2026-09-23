@@ -38,14 +38,17 @@ async def search_legal_docs(
         return [{"error": "Retriever chưa được khởi tạo"}]
 
     try:
-        if hasattr(_retriever, "aretrieve"):
-            nodes = await _retriever.aretrieve(query)
-        else:
-            nodes = _retriever.retrieve(query)
+        # The LLM chooses when to call this tool, so there is no argument to
+        # pass a context through — it is read from the ambient one set by
+        # run_agent. Without this, a model that decided to call the search tool
+        # would retrieve across every tenant and every repealed clause, bypassing
+        # the filters the graph's own retrieve path applies.
+        from src.rag.context import current_context
+        from src.rag.retriever import nodes_to_chunks, retrieve_with_context
 
-        from src.rag.retriever import nodes_to_chunks
-
-        chunks = nodes_to_chunks(nodes[:top_k])
+        ctx = current_context()
+        chunks = await asyncio.to_thread(retrieve_with_context, query, ctx)
+        chunks = chunks[:top_k]
         return [
             {
                 "text": c.text[:500],

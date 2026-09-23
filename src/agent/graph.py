@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import re
 import time
+from dataclasses import replace
 from datetime import datetime, timezone
 from typing import Annotated, Any, Literal, TypedDict
 
@@ -27,6 +28,7 @@ from src.langfuse_otel import end_trace, record_generation, record_span, start_t
 from src.rag.generator import _cited_sources, generate_answer, stream_answer
 from src.rag.grader import grade_chunks
 from src.ingestion.manifest import corpus_earliest_point_in_time
+from src.rag.context import PUBLIC_CONTEXT, reset_current_context, set_current_context
 from src.rag.retriever import nodes_to_chunks, retrieve_direct_chroma
 from src.rag.temporal import is_out_of_range, today_iso, versions_in_force
 
@@ -77,6 +79,9 @@ class AgentState(TypedDict):
     # thời gian corpus phủ được. Cả hai luôn có mặt trong state.
     as_of_date: str
     time_out_of_range: bool
+    # Identity envelope (tenant + ACL labels + as_of) carried to the retriever.
+    # Named retrieval_ctx, not ctx: run_agent already binds `ctx` to the trace.
+    retrieval_ctx: object | None
 
 
 # ── LLM Setup ─────────────────────────────────────────────────────────────────
@@ -413,6 +418,27 @@ def retrieve_node(state: AgentState) -> dict:
         # so we use the synchronous retrieve() method to avoid nested event loops.
         # If only aretrieve() exists, use asyncio.run() which creates a fresh loop
         # in the worker thread (safe because threads don't have a running loop).
+        rctx = state.get("retrieval_ctx")
+        if rctx is not None:
+            # Access-controlled path: dense pre-filters in the store, sparse is
+            # screened before fusion. Never falls back to the unfiltered
+            # singleton — an ACL that degrades to "everything" under load is worse
+            # than an error, because nothing upstream would notice.
+            from src.rag.retriever import retrieve_with_context
+
+            chunks = retrieve_with_context(query, rctx)
+            if not chunks:
+                chunks = retrieve_direct_chroma(query, ctx=rctx)
+            ms = int((time.time() - t0) * 1000)
+            detail = f"Tìm thấy {len(chunks)} đoạn (tenant={rctx.tenant_id}, mốc {rctx.effective_as_of})"
+            record_span("retrieve-documents", "retriever", query, detail,
+                        t0_dt, datetime.now(timezone.utc))
+            steps = state.get("steps") or []
+            return {
+                "retrieved_chunks": chunks,
+                "steps": steps + [{"label": "Tìm kiếm tài liệu", "detail": detail, "ms": ms}],
+            }
+
         if hasattr(retriever, "retrieve"):
             nodes = retriever.retrieve(query)
         elif hasattr(retriever, "aretrieve"):
@@ -434,7 +460,7 @@ def retrieve_node(state: AgentState) -> dict:
         chunks = nodes_to_chunks(nodes)
         if not chunks:
             logger.warning("Retriever returned no chunks, trying direct Chroma fallback")
-            chunks = retrieve_direct_chroma(query)
+            chunks = retrieve_direct_chroma(query, ctx=state.get("retrieval_ctx"))
 
         ms = int((time.time() - t0) * 1000)
         seen: dict[str, int] = {}
@@ -453,7 +479,7 @@ def retrieve_node(state: AgentState) -> dict:
 
     except Exception as exc:
         logger.error("retrieve_node failed: {}", exc)
-        chunks = retrieve_direct_chroma(query)
+        chunks = retrieve_direct_chroma(query, ctx=state.get("retrieval_ctx"))
         ms = int((time.time() - t0) * 1000)
         detail = f"Fallback ({type(exc).__name__}): {len(chunks)} đoạn"
         record_span("retrieve-documents", "retriever", query, detail, t0_dt, datetime.now(timezone.utc))
@@ -927,6 +953,7 @@ async def run_agent(
     session_id: str = "default",
     history: list[dict] | None = None,
     as_of_date: str | None = None,
+    retrieval_ctx=None,
 ) -> AgentState:
     """Main entry point for agent invocation.
 
@@ -967,6 +994,10 @@ async def run_agent(
         "compliance_result": None,
         "as_of_date": as_of,
         "time_out_of_range": is_out_of_range(as_of, corpus_earliest_point_in_time()),
+        # as_of always comes from the parameter, never from the caller's context:
+        # one source of truth, so the date the filter uses and the date the
+        # generator cites can never drift apart.
+        "retrieval_ctx": replace(retrieval_ctx or PUBLIC_CONTEXT, as_of_date=as_of),
     }
 
     ctx, token = start_trace(
@@ -974,9 +1005,13 @@ async def run_agent(
         tags=["legal-qa", f"env:{get_settings().environment}"],
     )
     result: AgentState | dict = {}
+    # Also published as ambient context so LLM-invoked tools (search_legal_docs)
+    # filter identically to the graph's own retrieve node.
+    ctx_token = set_current_context(initial_state["retrieval_ctx"])
     try:
         result = await graph.ainvoke(initial_state)
     finally:
+        reset_current_context(ctx_token)
         end_trace(
             ctx, token, "documind-agent-query", query,
             result.get("answer", ""),

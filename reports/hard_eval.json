@@ -1,0 +1,1840 @@
+{
+  "meta": {
+    "gold_set": "data/eval/hard_questions.json",
+    "n_questions": 19,
+    "arms": [
+      "no_temporal",
+      "prompt_only",
+      "temporal_filter",
+      "pre_filter"
+    ],
+    "retrieval_only": false,
+    "corpus_earliest_point_in_time": "2015-01-01",
+    "retriever": "hybrid BM25 + dense, RRF fusion, cross-encoder rerank → top-8"
+  },
+  "rows": [
+    {
+      "id": "lh_m01",
+      "pair_id": "thu_viec_ky_su",
+      "question": "Công ty tuyển một kỹ sư cho vị trí yêu cầu trình độ đại học, mức lương chính thức 12.000.000 đồng/tháng. Thời gian thử việc được kéo dài tối đa bao lâu và lương thử việc thấp nhất là bao nhiêu?",
+      "as_of_date": "2026-03-01",
+      "temporal_kind": "multi_clause",
+      "expected_behavior": "answer",
+      "retrieve_ms": 1509,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Thời gian thử việc kéo dài tối đa **không quá 60 ngày** và mức lương thử việc thấp nhất là **10.200.000 đồng/tháng**.\n\nCụ thể theo quy định:\n- **Thời gian thử việc:** Đối với công việc có chức danh nghề nghiệp cần trình độ chuyên môn, kỹ thuật từ cao đẳng trở lên (bao gồm trình độ đại học), thời gian thử việc do hai bên thỏa thuận nhưng **không quá 60 ngày** và chỉ được thử việc **01 lần** đối với một công việc [3].\n- **Mức lương thử việc:** Tiền lương trong thời gian thử việc do hai bên thỏa thuận nhưng ít nhất phải bằng **85%** mức lương của công việc đó [1]. Với mức lương chính thức là **12.000.000 đồng/tháng**, lương thử việc tối thiểu người lao động nhận được là:\n  $$\\text{12.000.000 đồng} \\times 85\\% = \\textbf{10.200.000 đồng/tháng}$$",
+          "used_llm": "gemini",
+          "generate_ms": 6194,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Thời gian thử việc tối đa là **không quá 60 ngày** và mức lương thử việc thấp nhất là **10.200.000 đồng/tháng** [1], [3].\n\nQuy định chi tiết áp dụng tại thời điểm **2026-03-01** như sau:\n\n- **Về thời gian thử việc:** Đối với công việc có chức danh nghề nghiệp cần trình độ chuyên môn, kỹ thuật từ cao đẳng trở lên (bao gồm trình độ đại học), thời gian thử việc do hai bên thỏa thuận căn cứ vào tính chất, mức độ phức tạp của công việc nhưng **không quá 60 ngày** và chỉ được thử việc một lần đối với một công việc [3].\n- **Về tiền lương thử việc:** Tiền lương của người lao động trong thời gian thử việc do hai bên thỏa thuận nhưng ít nhất phải bằng **85%** mức lương của công việc đó [1]. Do mức lương chính thức của công việc là **12.000.000 đồng/tháng**, mức lương thử việc tối thiểu được nhận là:\n  $$\\text{12.000.000 đồng} \\times 85\\% = \\textbf{10.200.000 đồng/tháng}$$ [1].",
+          "used_llm": "gemini",
+          "generate_ms": 33710,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 7
+          },
+          "answer": "Thời gian thử việc tối đa là **không quá 60 ngày** và mức lương thử việc thấp nhất là **10.200.000 đồng/tháng** (áp dụng theo quy định có hiệu lực tại thời điểm **2026-03-01**).\n\nCụ thể các quy định liên quan như sau:\n\n- **Về thời gian thử việc tối đa:** Đối với công việc có chức danh nghề nghiệp cần trình độ chuyên môn, kỹ thuật từ cao đẳng trở lên (bao gồm trình độ đại học), thời gian thử việc do hai bên thỏa thuận nhưng **không quá 60 ngày** và chỉ được thử việc **01 lần** đối với một công việc [3].\n- **Về mức lương thử việc thấp nhất:** Tiền lương trong thời gian thử việc do hai bên thỏa thuận nhưng ít nhất phải bằng **85%** mức lương của công việc đó [1]. Với mức lương chính thức là **12.000.000 đồng/tháng**, mức lương thử việc tối thiểu người lao động nhận được là:\n  $$\\text{12.000.000 đồng} \\times 85\\% = \\textbf{10.200.000 đồng/tháng}$$ [1].",
+          "used_llm": "gemini",
+          "generate_ms": 5481,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "pre_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 532,
+          "answer": "Thời gian thử việc tối đa là **không quá 60 ngày** và mức lương thử việc thấp nhất là **10.200.000 đồng/tháng** (tính tại thời điểm **01/03/2026**).\n\nChi tiết theo quy định:\n- **Thời gian thử việc:** Vị trí kỹ sư yêu cầu trình độ đại học thuộc nhóm công việc có chức danh nghề nghiệp cần trình độ chuyên môn, kỹ thuật từ cao đẳng trở lên, do đó thời gian thử việc do hai bên thỏa thuận nhưng **không quá 60 ngày** và chỉ được thử việc một lần đối với công việc đó [3].\n- **Mức lương thử việc:** Tiền lương trong thời gian thử việc do hai bên thỏa thuận nhưng ít nhất phải bằng **85%** mức lương của công việc đó [1]. Với mức lương chính thức là **12.000.000 đồng/tháng**, lương thử việc tối thiểu người lao động nhận được là: \n  $$12.000.0\n00 \\times 85\\% = \\mathbf{10.200.000\\text{ đồng/tháng}}$$ [1].",
+          "used_llm": "gemini",
+          "generate_ms": 5908,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "lh_m02",
+      "pair_id": "tro_cap_thoi_viec_mat_viec",
+      "question": "Trợ cấp thôi việc và trợ cấp mất việc làm khác nhau thế nào về mức chi trả cho mỗi năm làm việc? Khoảng thời gian nào bị trừ ra khi tính các khoản trợ cấp này?",
+      "as_of_date": "2026-03-01",
+      "temporal_kind": "multi_clause",
+      "expected_behavior": "answer",
+      "retrieve_ms": 470,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Mức chi trả cho mỗi năm làm việc của trợ cấp thôi việc là **một nửa tháng tiền lương**, trong khi trợ cấp mất việc làm là **01 tháng tiền lương** (nhưng bảo đảm ít nhất bằng **02 tháng tiền lương**) [1], [2], [3].\n\n### Bảng so sánh mức chi trả cho mỗi năm làm việc\n\n| Tiêu chí | Trợ cấp thôi việc | Trợ cấp mất việc làm |\n|---|---|---|\n| **Mức chi trả cho mỗi năm làm việc** | Cứ mỗi năm làm việc được trợ cấp **một nửa tháng tiền lương** [2]. | Cứ mỗi năm làm việc trả **01 tháng tiền lương** [3]. |\n| **Mức chi trả tối thiểu** | Không quy định mức tối thiểu [2]. | Ít nhất bằng **02 tháng tiền lương** (áp dụng khi người lao động đã làm việc thường xuyên từ **đủ 12 tháng trở lên**) [1], [3]. |\n\n---\n\n### Các khoảng thời gian bị trừ ra khi tính trợ cấp thôi việc, trợ cấp mất việc làm\n\nKhi xác định thời gian làm việc để tính trợ cấp thôi việc và trợ cấp mất việc làm (lấy tổng thời gian làm việc thực tế trừ đi), các khoảng thời gian sau đây bị trừ ra:\n\n- **Thời gian đã tham gia bảo hiểm thất nghiệp** theo quy định của pháp luật về bảo hiểm thất nghiệp [1], [2], [3].\n- **Thời gian làm việc đã được người sử dụng lao động chi trả** trợ cấp thôi việc hoặc trợ cấp mất việc làm trước đó [1], [2], [3].\n- Trường hợp người lao động làm việc theo **nhiều hợp đồng lao động kế tiếp nhau** mà chưa được chi trả trợ cấp khi chấm dứt từng hợp đồng, thời gian làm việc thực tế còn bị trừ thêm [5]:\n  - Thời gian làm việc thực tế theo hợp đồng lao động bị tuyên bố vô hiệu toàn bộ (do toàn bộ nội dung vi phạm pháp luật hoặc công việc giao kết là công việc pháp luật cấm) [5].\n  - Thời gian làm việc theo hợp đồng lao động mà người lao động bị xử lý kỷ luật sa thải [5].\n  - Thời gian làm việc theo hợp đồng lao động mà người lao động đơn phương chấm dứt trái pháp luật [5].",
+          "used_llm": "gemini",
+          "generate_ms": 7701,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Mức chi trả cho mỗi năm làm việc của trợ cấp thôi việc là **một nửa (1/2) tháng tiền lương** [2], trong khi trợ cấp mất việc làm là **01 tháng tiền lương** (tối thiểu bằng **02 tháng tiền lương**) [1], [3].\n\nCụ thể, theo quy định có hiệu lực tại thời điểm **01/03/2026**, sự khác nhau giữa hai khoản trợ cấp được so sánh như sau:\n\n| Tiêu chí | Trợ cấp thôi việc | Trợ cấp mất việc làm |\n|---|---|---|\n| **Mức chi trả cho mỗi năm làm việc** | Cứ mỗi năm làm việc được trợ cấp **một nửa (1/2) tháng tiền lương** [2] | Cứ mỗi năm làm việc trả **01 tháng tiền lương** [3] |\n| **Mức sàn chi trả tối thiểu** | Không quy định mức tối thiểu [2] | Ít nhất bằng **02 tháng tiền lương** (áp dụng cả khi thời gian tính trợ cấp ít hơn **24 tháng**) [1], [3] |\n\n---\n\n### Các khoảng thời gian bị trừ ra khi tính trợ cấp thôi việc, trợ cấp mất việc làm:\nThời gian làm việc để tính trợ cấp thôi việc và trợ cấp mất việc làm là tổng thời gian làm việc thực tế trừ đi:\n- **Thời gian người lao động đã tham gia bảo hiểm thất nghiệp** theo quy định của pháp luật về bảo hiểm thất nghiệp [1], [2], [3].\n- **Thời gian làm việc đã được người sử dụng lao động chi trả trợ cấp thôi việc, trợ cấp mất việc làm** trước đó [1], [2], [3].\n\n*(Trường hợp người lao động làm việc theo nhiều hợp đồng lao động kế tiếp nhau mà chưa được chi trả trợ cấp, khi tính tổng thời gian làm việc thực tế còn phải trừ thêm: thời gian làm việc theo hợp đồng lao động bị tuyên bố vô hiệu toàn bộ do vi phạm pháp luật/công việc pháp luật cấm; hợp đồng bị xử lý kỷ luật sa thải; hoặc hợp đồng do người lao động đơn phương chấm dứt trái pháp luật [5]).*",
+          "used_llm": "gemini",
+          "generate_ms": 17223,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 7
+          },
+          "answer": "Mức chi trả cho mỗi năm làm việc tính đến thời điểm **01/03/2026** đối với trợ cấp thôi việc là **1/2 tháng tiền lương** [2], còn đối với trợ cấp mất việc làm là **01 tháng tiền lương** (mức chi trả ít nhất bằng **02 tháng tiền lương**) [1], [3].\n\nBảng so sánh chi tiết mức chi trả:\n\n| Tiêu chí | Trợ cấp thôi việc | Trợ cấp mất việc làm |\n|---|---|---|\n| **Mức chi trả cho mỗi năm làm việc** | **1/2 tháng tiền lương** [2] | **01 tháng tiền lương** [3] |\n| **Mức chi trả tối thiểu** | Không quy định mức tối thiểu [2] | Ít nhất bằng **02 tháng tiền lương** [1], [3] |\n\n các khoảng thời gian bị trừ ra khi tính thời gian làm việc để hưởng trợ cấp thôi việc, trợ cấp mất việc làm bao gồm:\n- **Thời gian người lao động đã tham gia bảo hiểm thất nghiệp** theo quy định của pháp luật [1], [2], [3].\n- **Thời gian làm việc đã được người sử dụng lao động chi trả trợ cấp thôi việc, trợ cấp mất việc làm** [1], [2], [3].\n- **Thời gian làm việc thực tế theo hợp đồng lao động bị tuyên bố vô hiệu toàn bộ** do toàn bộ nội dung vi phạm pháp luật hoặc công việc giao kết là công việc pháp luật cấm (áp dụng khi làm việc theo nhiều hợp đồng lao động kế tiếp) [5].\n- **Thời gian làm việc theo hợp đồng lao động mà người lao động bị xử lý kỷ luật lao động sa thải** (áp dụng khi làm việc theo nhiều hợp đồng lao động kế tiếp) [5].\n- **Thời gian làm việc theo hợp đồng lao động mà người lao động đơn phương chấm dứt trái pháp luật** (áp dụng khi làm việc theo nhiều hợp đồng lao động kế tiếp) [5].",
+          "used_llm": "gemini",
+          "generate_ms": 21932,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "pre_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 548,
+          "answer": "Mức chi trả cho mỗi năm làm việc tính đến mốc thời điểm **01/03/2026** của trợ cấp thôi việc là **một nửa (1/2) tháng tiền lương**, trong khi trợ cấp mất việc làm là **01 tháng tiền lương** (mức chi trả ít nhất bằng **02 tháng tiền lương**) [2], [3].\n\nBảng so sánh chi tiết mức chi trả cho mỗi năm làm việc của hai khoản trợ cấp:\n\n| Tiêu chí so sánh | Trợ cấp thôi việc | Trợ cấp mất việc làm |\n|---|---|---|\n| **Mức chi trả cho mỗi năm làm việc** | **Một nửa (1/2) tháng tiền lương** [2] | **01 tháng tiền lương** [3] |\n| **Mức chi trả tối thiểu** | Không quy định mức tối thiểu [2] | Mức chi trả ít nhất bằng **02 tháng tiền lương** [1], [3] |\n| **Căn cứ tiền lương tính trợ cấp** | Bình quân của **06 tháng liền kề** theo hợp đồng lao động trước khi thôi việc [2] | Bình quân của **06 tháng liền kề** theo hợp đồng lao động trước khi mất việc làm [3] |\n\n**Các khoảng thời gian bị trừ ra khi tính thời gian hưởng trợ cấp:**\n\nThời gian làm việc để tính trợ cấp thôi việc và trợ cấp mất việc làm là tổng thời gian người lao động đã làm việc thực tế cho người sử dụng lao động trừ đi các khoảng thời gian sau [1], [2], [3]:\n- **Thời gian người lao động đã tham gia bảo hiểm thất nghiệp** theo quy định của pháp luật [1], [2], [3].\n- **Thời gian làm việc đã được người sử dụng lao động chi trả trợ cấp thôi việc, trợ cấp mất việc làm** trước đó [1], [2], [3].\n- **Thời gian làm việc thực tế theo các hợp đồng bị loại trừ** (áp dụng khi làm việc theo nhiều hợp đồng kế tiếp nhau), bao gồm: thời gian theo hợp đồng bị tuyên bố vô hiệu toàn bộ, hợp đồng bị xử lý kỷ luật sa thải, hoặc hợp đồng do người lao động đơn phương chấm dứt trái pháp luật [5].",
+          "used_llm": "gemini",
+          "generate_ms": 23841,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "lh_m03",
+      "pair_id": "nghi_hang_nam_tham_nien",
+      "question": "Nhân viên văn phòng làm việc trong điều kiện bình thường, đã làm liên tục 17 năm cho cùng một công ty. Mỗi năm người này được nghỉ hằng năm hưởng nguyên lương bao nhiêu ngày?",
+      "as_of_date": "2026-03-01",
+      "temporal_kind": "multi_clause",
+      "expected_behavior": "answer",
+      "retrieve_ms": 492,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Người lao động được nghỉ hằng năm hưởng nguyên lương **15 ngày làm việc** mỗi năm [1], [3].\n\nSố ngày nghỉ hằng năm này được xác định cụ thể như sau:\n- **12 ngày làm việc**: Mức nghỉ hằng năm cơ bản đối với người làm công việc trong điều kiện bình thường làm việc đủ **12 tháng** cho một người sử dụng lao động [1].\n- **03 ngày làm việc** tăng thêm theo thâm niên: Cứ **đủ 05 năm** làm việc cho một người sử dụng lao động thì số ngày nghỉ hằng năm được **tăng thêm 01 ngày** [3]. Với thâm niên **17 năm** liên tục, người lao động đã **đủ 05 năm** lần thứ 3 (đủ **15 năm**) nên được cộng thêm **03 ngày** [3].",
+          "used_llm": "gemini",
+          "generate_ms": 15067,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Người lao động này được nghỉ hằng năm hưởng nguyên lương **15 ngày làm việc** mỗi năm (áp dụng tại thời điểm **01/03/2026**) [1], [3].\n\nCách tính cụ thể như sau:\n- **Số ngày nghỉ hằng năm cơ bản:** **12 ngày làm việc** đối với người làm việc đủ **12 tháng** trong điều kiện bình thường [1].\n- **Số ngày nghỉ tăng thêm theo thâm niên:** Cứ đủ **05 năm** làm việc cho một người sử dụng lao động thì được tăng thêm tương ứng **01 ngày** [3]. Với **17 năm** làm việc liên tục, người lao động có 3 mốc đủ 5 năm (**15 năm**), do đó được cộng thêm **03 ngày làm việc** [3].\n- **Tổng số ngày nghỉ hằng năm:** 12 + 3 = **15 ngày làm việc** [1], [3].",
+          "used_llm": "gemini",
+          "generate_ms": 15926,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 6
+          },
+          "answer": "Người lao động này được nghỉ hằng năm hưởng nguyên lương **15 ngày làm việc** mỗi năm (theo quy định có hiệu lực tại thời điểm **2026-03-01**) [1, 2].\n\nChi tiết cách tính như sau:\n- **Số ngày nghỉ cơ bản:** **12 ngày làm việc** đối với người làm công việc trong điều kiện bình thường đã làm việc đủ 12 tháng cho một người sử dụng lao động [1].\n- **Số ngày nghỉ tăng thêm theo thâm niên:** Cứ đủ **05 năm** làm việc cho một người sử dụng lao động thì được tăng thêm tương ứng **01 ngày** [2]. Với thời gian làm việc **17 năm**, người lao động đã tích lũy đủ 3 lần mốc 5 năm (đủ 15 năm) nên được tăng thêm **03 ngày** [2].\n- **Tổng số ngày nghỉ hằng năm:** **12 ngày** + **03 ngày** = **15 ngày làm việc** [1, 2].",
+          "used_llm": "gemini",
+          "generate_ms": 12016,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "pre_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 544,
+          "answer": "Người lao động được nghỉ hằng năm hưởng nguyên lương là **15 ngày làm việc** mỗi năm (tính tại thời điểm **2026-03-01**) [1], [2].\n\nCụ thể cách tính như sau:\n- **Số ngày nghỉ cơ bản:** **12 ngày làm việc** áp dụng cho người lao động làm việc đủ **12 tháng** trong điều kiện bình thường [1].\n- **Số ngày nghỉ tăng thêm theo thâm niên:** Cứ đủ **05 năm** làm việc cho một người sử dụng lao động thì được tăng thêm **01 ngày** nghỉ [2]. Với **17 năm** làm việc liên tục cho cùng một công ty, người lao động có **3 lần đủ 05 năm** (15 năm), tương ứng được cộng thêm **03 ngày** làm việc [2].\n- **Tổng số ngày nghỉ hằng năm:** **12 ngày** + **03 ngày** = **15 ngày làm việc** [1], [2].",
+          "used_llm": "gemini",
+          "generate_ms": 23905,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "lh_m04",
+      "pair_id": "lam_them_det_may",
+      "question": "Công nhân một nhà máy may hàng xuất khẩu được làm thêm tối đa bao nhiêu giờ trong một năm và trong một tháng? Nếu làm thêm vào Chủ nhật (ngày nghỉ hằng tuần) thì được trả lương ít nhất bao nhiêu phần trăm?",
+      "as_of_date": "2026-03-01",
+      "temporal_kind": "multi_clause",
+      "expected_behavior": "answer",
+      "retrieve_ms": 481,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Công nhân nhà máy may hàng xuất khẩu được làm thêm tối đa **40 giờ trong 01 tháng**, **300 giờ trong 01 năm** và được trả lương làm thêm giờ ít nhất bằng **200%** khi làm việc vào ngày nghỉ hằng tuần (Chủ nhật) [1], [2], [5].\n\nQuy định chi tiết như sau:\n\n- **Giới hạn số giờ làm thêm trong tháng:** Không quá **40 giờ** trong **01 tháng** [1].\n- **Giới hạn số giờ làm thêm trong năm:** Tối đa không quá **300 giờ** trong **01 năm** do thuộc ngành nghề \"sản xuất, gia công xuất khẩu sản phẩm hàng dệt, may\" [1]. Khi tổ chức làm thêm tới 300 giờ/năm, người sử dụng lao động phải thông báo bằng văn bản cho cơ quan chuyên môn về lao động thuộc Ủy ban nhân dân cấp tỉnh và phải được sự đồng ý của người lao động [1].\n- **Tiền lương làm thêm vào ngày nghỉ hằng tuần (Chủ nhật):** Được trả ít nhất bằng **200%** tính theo đơn giá tiền lương sản phẩm hoặc tiền lương thực trả của công việc đang làm vào ngày làm việc bình thường [2], [5].",
+          "used_llm": "gemini",
+          "generate_ms": 9981,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Tại thời điểm **2026-03-01**, công nhân nhà máy may hàng xuất khẩu được làm thêm tối đa không quá **40 giờ trong 01 tháng**, không quá **300 giờ trong 01 năm**, và được trả lương ít nhất bằng **200%** khi làm thêm vào ngày nghỉ hằng tuần [1], [2], [5].\n\nCụ thể các quy định như sau:\n\n- **Giới hạn số giờ làm thêm trong 01 tháng:** Không quá **40 giờ** trong 01 tháng [1].\n- **Giới hạn số giờ làm thêm trong 01 năm:** Do thuộc ngành sản xuất, gia công xuất khẩu sản phẩm hàng may, người sử dụng lao động được phép bố trí làm thêm không quá **300 giờ** trong 01 năm (phải được sự đồng ý của người lao động và phải thông báo bằng văn bản cho cơ quan chuyên môn về lao động thuộc Ủy ban nhân dân cấp tỉnh) [1].\n- **Mức trả lương làm thêm vào Chủ nhật (ngày nghỉ hằng tuần):** Được trả ít nhất bằng **200%** so với đơn giá tiền lương hoặc tiền lương thực trả của công việc đang làm vào ngày làm việc bình thường [2], [5].",
+          "used_llm": "gemini",
+          "generate_ms": 4681,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Tại thời điểm **01/03/2026**, công nhân nhà máy may hàng xuất khẩu được làm thêm tối đa không quá **300 giờ/năm**, không quá **40 giờ/tháng**, và được trả lương ít nhất bằng **200%** khi làm thêm vào ngày nghỉ hằng tuần (Chủ nhật) [1], [2], [5].\n\nCụ thể các điều kiện và quy định chi tiết:\n\n- **Giới hạn giờ làm thêm trong năm:** Tối đa không quá **300 giờ trong 01 năm** do ngành sản xuất, gia công xuất khẩu sản phẩm hàng dệt, may thuộc trường hợp được phép làm thêm trên 200 giờ đến 300 giờ/năm (khi tổ chức làm thêm, người sử dụng lao động phải thông báo bằng văn bản cho cơ quan chuyên môn về lao động thuộc Ủy ban nhân dân cấp tỉnh) [1].\n- **Giới hạn giờ làm thêm trong tháng:** Không quá **40 giờ trong 01 tháng** và phải bảo đảm số giờ làm thêm không quá **50%** số giờ làm việc bình thường trong 01 ngày (trường hợp áp dụng quy định làm việc theo tuần thì tổng số giờ làm việc bình thường và số giờ làm thêm không quá **12 giờ trong 01 ngày**) [1].\n- **Tiền lương làm thêm vào ngày nghỉ hằng tuần (Chủ nhật):** Được trả ít nhất bằng **200%** tính theo đơn giá tiền lương hoặc tiền lương thực trả (hoặc đơn giá tiền lương sản phẩm) của công việc đang làm vào ngày làm việc bình thường [2], [5]. Ngoài ra, tổng số giờ làm thêm vào ngày nghỉ hằng tuần không được quá **12 giờ trong một ngày** [4].",
+          "used_llm": "gemini",
+          "generate_ms": 6228,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "pre_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 511,
+          "answer": "Tính đến thời điểm ngày **01/03/2026**, công nhân nhà máy may hàng xuất khẩu được làm thêm tối đa **300 giờ** trong **01 năm**, không quá **40 giờ** trong **01 tháng** và được trả ít nhất **200%** lương khi làm thêm vào Chủ nhật (ngày nghỉ hằng tuần) [1], [2], [5].\n\nChi tiết quy định cụ thể như sau:\n\n- **Mức làm thêm giờ tối đa theo tháng:** Không quá **40 giờ** trong **01 tháng** [1].\n- **Mức làm thêm giờ tối đa theo năm:** Tối đa **300 giờ** trong **01 năm** (do thuộc trường hợp sản xuất, gia công xuất khẩu sản phẩm hàng dệt, may) [1].\n- **Mức trả lương làm thêm vào Chủ nhật (ngày nghỉ hằng tuần):** Được tính ít nhất bằng **200%** so với tiền lương giờ thực trả hoặc đơn giá tiền lương sản phẩm của ngày làm việc bình thường [2], [5].",
+          "used_llm": "gemini",
+          "generate_ms": 16112,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "lh_m05a",
+      "pair_id": "huu_tri_nam_16_nam_dong",
+      "question": "Lao động nam làm việc trong điều kiện bình thường, đã đóng bảo hiểm xã hội bắt buộc 16 năm. Nếu nghỉ việc trong năm nay thì phải đủ bao nhiêu tuổi mới được nghỉ hưu, và người này có đủ điều kiện hưởng lương hưu không?",
+      "as_of_date": "2025-03-01",
+      "temporal_kind": "multi_clause",
+      "expected_behavior": "answer",
+      "retrieve_ms": 497,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold_coverage": 0.5,
+            "gold": false,
+            "distractor": false,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "**Không đủ điều kiện hưởng lương hưu** và phải **đủ 60 tuổi** mới đạt điều kiện về tuổi nghỉ hưu đối với lao động nam làm việc trong điều kiện bình thường [2], [6], [7].\n\nChi tiết các quy định áp dụng:\n- **Về tuổi nghỉ hưu:** Lao động nam làm việc trong điều kiện bình thường phải **đủ 60 tuổi** [2], [6], [7].\n- **Về điều kiện hưởng lương hưu:** Người lao động phải có **đủ 20 năm** đóng bảo hiểm xã hội trở lên [6], [7]. Do mới đóng bảo hiểm xã hội bắt buộc được **16 năm**, người này **chưa đủ điều kiện** hưởng lương hưu [6], [7].\n- **Quy định đóng bù/tiếp tục đóng:** Trường hợp người lao động đã **đủ 60 tuổi** nhưng thời gian đóng bảo hiểm xã hội chưa **đủ 20 năm** thì được đóng cho đến khi **đủ 20 năm** để hưởng lương hưu [7].",
+          "used_llm": "gemini",
+          "generate_ms": 13047,
+          "score": {
+            "correct": false,
+            "missing": [
+              "61 tuổi 3 tháng"
+            ],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold_coverage": 0.5,
+            "gold": false,
+            "distractor": false,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Lao động nam làm việc trong điều kiện bình thường phải **đủ 60 tuổi** mới đạt điều kiện về tuổi nghỉ hưu, và người này **chưa đủ điều kiện** hưởng lương hưu ngay nếu nghỉ việc do mới đóng bảo hiểm xã hội **16 năm** (thiếu **04 năm** so với điều kiện **đủ 20 năm**).\n\nChi tiết quy định theo tài liệu hiện có như sau:\n\n- **Về tuổi nghỉ hưu:** Lao động nam làm việc trong điều kiện bình thường phải **đủ 60 tuổi** [6], [7].\n- **Về điều kiện thời gian đóng BHXH:** Phải có **đủ 20 năm** đóng bảo hiểm xã hội trở lên [6], [7].\n- **Hướng giải quyết khi chưa đủ số năm đóng:** Do mới đóng được **16 năm**, người này chưa đủ điều kiện hưởng lương hưu ngay khi nghỉ việc [6], [7]. Nếu đã đủ **60 tuổi** nhưng thời gian đóng chưa đủ **20 năm**, người lao động được đóng tiếp cho đến khi **đủ 20 năm** để hưởng lương hưu [7].",
+          "used_llm": "gemini",
+          "generate_ms": 10404,
+          "score": {
+            "correct": false,
+            "missing": [
+              "61 tuổi 3 tháng"
+            ],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold_coverage": 0.0,
+            "gold": false,
+            "distractor": false,
+            "clean": false,
+            "n_chunks": 7
+          },
+          "answer": "Lao động nam làm việc trong điều kiện bình thường phải **đủ 60 tuổi** mới đủ điều kiện về tuổi nghỉ hưu, và hiện tại **chưa đủ điều kiện để hưởng lương hưu ngay** do mới đóng bảo hiểm xã hội được **16 năm** (chưa đạt mức tối thiểu **20 năm**) [2], [6].\n\nCăn cứ theo quy định (tính đến thời điểm tra cứu ngày **01/03/2025**):\n\n- **Điều kiện về tuổi đời:** Lao động nam làm việc trong điều kiện bình thường phải **đủ 60 tuổi** [2], [6].\n- **Điều kiện về thời gian đóng BHXH:** Phải có **đủ 20 năm đóng bảo hiểm xã hội trở lên** [6]. Do người này mới đóng được **16 năm** nên chưa đủ điều kiện hưởng lương hưu hàng tháng tại thời điểm nghỉ việc [6].\n- **Hướng giải quyết:** Trường hợp người lao động đã đủ **60 tuổi** nhưng thời gian đóng bảo hiểm xã hội chưa đủ **20 năm** (đang có **16 năm**) thì được tiếp tục đóng cho đến khi đủ **20 năm** để hưởng lương hưu [6].",
+          "used_llm": "gemini",
+          "generate_ms": 17889,
+          "score": {
+            "correct": false,
+            "missing": [
+              "61 tuổi 3 tháng"
+            ],
+            "forbidden_present": []
+          }
+        },
+        "pre_filter": {
+          "context": {
+            "gold_coverage": 0.0,
+            "gold": false,
+            "distractor": false,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 540,
+          "answer": "Tại thời điểm năm **2025** (tính đến ngày **01/03/2025**), lao động nam làm việc trong điều kiện bình thường phải đủ **61 tuổi 03 tháng** mới đủ tuổi nghỉ hưu, và người này **chưa đủ điều kiện hưởng lương hưu** do mới có **16 năm** đóng bảo hiểm xã hội [6], [7].\n\nChi tiết quy định cụ thể như sau:\n\n**1. Về độ tuổi nghỉ hưu trong năm 2025:**\n- Kể từ năm 2021, tuổi nghỉ hưu của lao động nam trong điều kiện bình thường là đủ **60 tuổi 03 tháng**, sau đó cứ mỗi năm tăng thêm **03 tháng** cho đến khi đủ **62 tuổi** vào năm 2028 [7].\n- Theo lộ trình này, tuổi nghỉ hưu của lao động nam vào năm **2025** là **61 tuổi 03 tháng** [7].\n\n**2. Về điều kiện thời gian đóng bảo hiểm xã hội để hưởng lương hưu:**\n- Người lao động hưởng lương hưu khi đáp ứng đủ điều kiện về tuổi đời và phải có đủ từ **20 năm đóng bảo hiểm xã hội trở lên** [6].\n- Trường hợp người lao động mới đóng bảo hiểm xã hội bắt buộc được **16 năm** thì **chưa đủ điều kiện** về thời gian đóng BHXH để hưởng lương hưu [6].\n- Khi đã đủ điều kiện về tuổi nghỉ hưu nhưng thời gian đóng bảo hiểm xã hội chưa đủ **20 năm**, người lao động được tiếp tục đóng cho đến khi đủ **20 năm** để được hưởng lương hưu [6].",
+          "used_llm": "gemini",
+          "generate_ms": 20374,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "lh_m05b",
+      "pair_id": "huu_tri_nam_16_nam_dong",
+      "question": "Lao động nam làm việc trong điều kiện bình thường, đã đóng bảo hiểm xã hội bắt buộc 16 năm. Nếu nghỉ việc trong năm nay thì phải đủ bao nhiêu tuổi mới được nghỉ hưu, và người này có đủ điều kiện hưởng lương hưu không?",
+      "as_of_date": "2026-03-01",
+      "temporal_kind": "multi_clause",
+      "expected_behavior": "answer",
+      "retrieve_ms": 493,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold_coverage": 0.0,
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Lao động nam làm việc trong điều kiện bình thường phải **đủ 60 tuổi** và **chưa đủ điều kiện hưởng lương hưu** do mới đóng bảo hiểm xã hội được **16 năm** [6], [7].\n\nCụ thể theo quy định:\n- **Về độ tuổi:** Lao động nam làm việc trong điều kiện bình thường phải **đủ 60 tuổi** [6], [7].\n- **Về thời gian đóng bảo hiểm xã hội:** Yêu cầu phải có **đủ 20 năm đóng bảo hiểm xã hội trở lên** [6], [7].\n- Do người lao động mới có **16 năm đóng bảo hiểm xã hội bắt buộc** (chưa đủ 20 năm), nên chưa đủ điều kiện hưởng lương hưu hàng tháng khi nghỉ việc [6], [7]. Trường hợp đã đủ điều kiện về tuổi đời nhưng chưa đủ 20 năm đóng bảo hiểm xã hội thì được đóng cho đến khi **đủ 20 năm** để hưởng lương hưu [7].",
+          "used_llm": "gemini",
+          "generate_ms": 25412,
+          "score": {
+            "correct": false,
+            "missing": [
+              "61 tuổi 6 tháng",
+              "15 năm"
+            ],
+            "forbidden_present": [
+              "đủ 20 năm"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold_coverage": 0.0,
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Lao động nam làm việc trong điều kiện bình thường phải **đủ 60 tuổi** [6], [7] và **chưa đủ điều kiện** để được hưởng lương hưu do mới chỉ có **16 năm đóng BHXH** (tính đến thời điểm tra cứu ngày **01/03/2026**) [6], [7].\n\nCụ thể theo quy định:\n- **Điều kiện về độ tuổi**: Lao động nam làm việc trong điều kiện bình thường phải **đủ 60 tuổi** [6], [7].\n- **Điều kiện về thời gian đóng BHXH**: Phải có **đủ 20 năm đóng bảo hiểm xã hội trở lên** [6], [7].\n- **Đánh giá trường hợp**: Người lao động nam này mới có **16 năm** đóng BHXH bắt buộc nên chưa đáp ứng điều kiện về thời gian đóng để hưởng lương hưu [6], [7]. Trường hợp đã đủ điều kiện về tuổi đời nhưng chưa đủ 20 năm đóng BHXH thì được tiếp tục đóng cho đến khi **đủ 20 năm** để hưởng lương hưu [7].",
+          "used_llm": "gemini",
+          "generate_ms": 5404,
+          "score": {
+            "correct": false,
+            "missing": [
+              "61 tuổi 6 tháng",
+              "15 năm"
+            ],
+            "forbidden_present": [
+              "đủ 20 năm"
+            ]
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold_coverage": 0.0,
+            "gold": false,
+            "distractor": false,
+            "clean": false,
+            "n_chunks": 0
+          },
+          "answer": "Tôi không tìm thấy văn bản pháp luật liên quan đến câu hỏi này.",
+          "used_llm": "none",
+          "generate_ms": 0,
+          "score": {
+            "correct": false,
+            "missing": [
+              "61 tuổi 6 tháng",
+              "15 năm"
+            ],
+            "forbidden_present": []
+          }
+        },
+        "pre_filter": {
+          "context": {
+            "gold_coverage": 0.5,
+            "gold": false,
+            "distractor": false,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 558,
+          "answer": "Lao động nam phải đủ **61 tuổi 6 tháng** mới được nghỉ hưu trong năm **2026**, và người này **đủ điều kiện** hưởng lương hưu khi đạt độ tuổi này với **16 năm** đóng bảo hiểm xã hội bắt buộc [1], [2].\n\nCụ thể theo quy định tại thời điểm năm **2026**:\n\n- **Về độ tuổi nghỉ hưu:** Kể từ năm **2021**, tuổi nghỉ hưu của lao động nam trong điều kiện lao động bình thường là đủ **60 tuổi 3 tháng**, sau đó mỗi năm tăng thêm **3 tháng** [1]. Do đó, vào năm **2026**, tuổi nghỉ hưu đối với lao động nam là đủ **61 tuổi 6 tháng** [1].\n- **Về điều kiện hưởng lương hưu:** Người lao động nghỉ việc có thời gian đóng bảo hiểm xã hội bắt buộc từ **đủ 15 năm trở lên** và đủ tuổi nghỉ hưu theo quy định trong điều kiện lao động bình thường thì được hưởng lương hưu [2]. Vì người này đã đóng được **16 năm** bảo hiểm xã hội bắt buộc (vượt mức tối thiểu 15 năm), nên hoàn toàn đủ điều kiện về thời gian đóng để hưởng lương hưu khi đủ tuổi [2].\n- **Mức hưởng tham chiếu:** Đối với lao động nam có **16 năm** đóng bảo hiểm xã hội, mức lương hưu hằng tháng bằng **41%** mức bình quân tiền lương làm căn cứ đóng bảo hiểm xã hội (tương ứng **40%** cho **15 năm** đầu và cộng thêm **1%** cho **01 năm** tiếp theo) [7].",
+          "used_llm": "gemini",
+          "generate_ms": 35827,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "lh_t01",
+      "pair_id": "huu_tri_som_nu_2026",
+      "question": "Năm 2026, lao động nữ có đủ 15 năm làm nghề nặng nhọc, độc hại, nguy hiểm được nghỉ hưu sớm nhất ở độ tuổi nào?",
+      "as_of_date": "2026-06-01",
+      "temporal_kind": "table_lookup",
+      "expected_behavior": "answer",
+      "retrieve_ms": 480,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Năm 2026, lao động nữ có đủ 15 năm làm nghề nặng nhọc, độc hại, nguy hiểm có thể nghỉ hưu ở độ tuổi thấp nhất là **52 tuổi** [1].\n\nTheo quy định, người lao động có từ đủ 15 năm trở lên làm nghề hoặc công việc nặng nhọc, độc hại, nguy hiểm có thể nghỉ hưu ở tuổi thấp hơn nhưng không quá **05 năm** so với tuổi nghỉ hưu trong điều kiện lao động bình thường [1]. Cụ thể lộ trình tuổi nghỉ hưu thấp nhất cho lao động nữ trong trường hợp này vào năm 2026 được xác định là 52 tuổi [1].",
+          "used_llm": "gemini",
+          "generate_ms": 3761,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "**52 tuổi** là độ tuổi nghỉ hưu sớm nhất đối với lao động nữ có đủ **15 năm** làm nghề, công việc nặng nhọc, độc hại, nguy hiểm nghỉ hưu vào năm **2026** [1].\n\nChi tiết quy định áp dụng tại thời điểm tra cứu ngày **01/06/2026** như sau:\n\n- Người lao động nữ có từ **đủ 15 năm trở lên** làm nghề, công việc nặng nhọc, độc hại, nguy hiểm hoặc đặc biệt nặng nhọc, độc hại, nguy hiểm thuộc danh mục do Bộ Lao động - Thương binh và Xã hội ban hành có thể nghỉ hưu ở tuổi thấp hơn nhưng không quá **05 tuổi** so với tuổi nghỉ hưu trong điều kiện lao động bình thường [1].\n- Tuổi nghỉ hưu trong điều kiện lao động bình thường của lao động nữ nghỉ hưu vào năm **2026** là **57 tuổi** [4].\n- Theo lộ trình thực hiện, tuổi nghỉ hưu thấp nhất của lao động nữ thuộc trường hợp nghỉ hưu sớm nêu trên trong năm **2026** được xác định chính xác là **52 tuổi** [1].",
+          "used_llm": "gemini",
+          "generate_ms": 21437,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 4
+          },
+          "answer": "Năm **2026**, lao động nữ có đủ **15 năm** làm nghề, công việc nặng nhọc, độc hại, nguy hiểm được nghỉ hưu sớm nhất ở độ tuổi **52 tuổi** [1].\n\nTheo quy định, người lao động thuộc trường hợp này có thể nghỉ hưu ở tuổi thấp hơn nhưng không quá **05 tuổi** so với tuổi nghỉ hưu trong điều kiện lao động bình thường [1]. Lộ trình tuổi nghỉ hưu thấp nhất đối với lao động nữ trong năm **2026** được xác định là **52 tuổi** [1].",
+          "used_llm": "gemini",
+          "generate_ms": 4803,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "pre_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 521,
+          "answer": "Lao động nữ có từ đủ **15 năm** làm nghề nặng nhọc, độc hại, nguy hiểm được nghỉ hưu ở tuổi thấp nhất là **52 tuổi** vào năm **2026** [1].\n\nTheo quy định tại thời điểm **2026-06-01**:\n- Người lao động thuộc các trường hợp làm nghề, công việc nặng nhọc, độc hại, nguy hiểm từ đủ **15 năm** trở lên có thể nghỉ hưu ở tuổi thấp hơn nhưng không quá **05 năm** so với tuổi nghỉ hưu trong điều kiện lao động bình thường [1].\n- Đối với năm **2026**, tuổi nghỉ hưu thấp nhất quy định cho lao động nữ trong trường hợp này là **52 tuổi** [1].",
+          "used_llm": "gemini",
+          "generate_ms": 3813,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "lh_b01a",
+      "pair_id": "luong_toi_thieu_vung_2_giao_thoi",
+      "question": "Doanh nghiệp đặt tại địa bàn vùng II phải trả mức lương tối thiểu tháng là bao nhiêu?",
+      "as_of_date": "2025-12-31",
+      "temporal_kind": "boundary",
+      "expected_behavior": "answer",
+      "retrieve_ms": 461,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Mức lương tối thiểu tháng đối với người lao động làm việc cho doanh nghiệp tại địa bàn **vùng II** là **4.730.000 đồng/tháng** [1].",
+          "used_llm": "gemini",
+          "generate_ms": 2814,
+          "score": {
+            "correct": false,
+            "missing": [
+              "4.410.000"
+            ],
+            "forbidden_present": [
+              "4.730.000"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Mức lương tối thiểu tháng đối với doanh nghiệp hoạt động tại địa bàn **vùng II** tại thời điểm ngày **31/12/2025** là **5.310.000 đồng/tháng** [1].\n\nDưới đây là thông tin chi tiết và các quy định áp dụng liên quan:\n\n### 1. So sánh các mức lương tối thiểu đối với Vùng II trong tài liệu\nTài liệu cung cấp hai văn bản quy định về mức lương tối thiểu đối với **vùng II**, trong đó văn bản mới nhất được ký ngày **19/11/2025** [1]:\n\n| Loại mức lương tối thiểu tại **Vùng II** | Quy định áp dụng tại ngày **31/12/2025** (Văn bản ký ngày **19/11/2025**) [1] | Quy định khác trong tài liệu [2] |\n| :--- | :--- | :--- |\n| **Mức lương tối thiểu tháng** | **5.310.000 đồng/tháng** [1] | **4.410.000 đồng/tháng** [2] |\n| **Mức lương tối thiểu giờ** | **22.700 đồng/giờ** [1] | **21.200 đồng/giờ** [2] |\n\n### 2. Nguyên tắc áp dụng địa bàn vùng đối với doanh nghiệp\nViệc áp dụng mức lương tối thiểu vùng của doanh nghiệp được xác định theo các nguyên tắc sau:\n- Doanh nghiệp hoạt động trên địa bàn thuộc vùng nào thì áp dụng mức lương tối thiểu quy định đối với địa bàn đó [1], [2].\n- Doanh nghiệp có đơn vị, chi nhánh hoạt động trên các địa bàn có mức lương tối thiểu khác nhau thì đơn vị, chi nhánh hoạt động ở địa bàn nào, áp dụng mức lương tối thiểu quy định đối với địa bàn đó [1], [2].\n- Doanh nghiệp hoạt động trong khu công nghiệp, khu chế xuất, khu công nghệ cao, khu công nghệ số tập trung nằm trên các địa bàn có mức lương tối thiểu khác nhau thì áp dụng theo địa bàn có mức lương tối thiểu cao nhất [1].\n- Doanh nghiệp hoạt động trên địa bàn có sự thay đổi tên hoặc chia tách thì tạm thời áp dụng mức lương tối thiểu đối với địa bàn trước khi thay đổi cho đến khi có quy định mới [1], [2].\n- Doanh nghiệp hoạt động trên địa bàn được thành lập mới từ một hoặc nhiều địa bàn có mức lương tối thiểu khác nhau thì áp dụng mức lương tối thiểu theo địa bàn có mức lương tối thiểu cao nhất [1], [2].",
+          "used_llm": "gemini",
+          "generate_ms": 16163,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 6
+          },
+          "answer": "Doanh nghiệp đặt tại địa bàn **vùng II** phải trả mức lương tối thiểu tháng là **4.410.000 đồng/tháng** (số liệu áp dụng tại thời điểm **2025-12-31**) [1].",
+          "used_llm": "gemini",
+          "generate_ms": 3360,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "pre_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 514,
+          "answer": "Doanh nghiệp đặt tại địa bàn **vùng II** phải trả mức lương tối thiểu tháng là **4.410.000 đồng/tháng** (theo dữ liệu cập nhật tại thời điểm **2025-12-31**) [1].",
+          "used_llm": "gemini",
+          "generate_ms": 3556,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "lh_b01b",
+      "pair_id": "luong_toi_thieu_vung_2_giao_thoi",
+      "question": "Doanh nghiệp đặt tại địa bàn vùng II phải trả mức lương tối thiểu tháng là bao nhiêu?",
+      "as_of_date": "2026-01-01",
+      "temporal_kind": "boundary",
+      "expected_behavior": "answer",
+      "retrieve_ms": 477,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Doanh nghiệp đặt tại địa bàn **vùng II** phải trả mức lương tối thiểu tháng là **4.730.000 đồng/tháng** [1].",
+          "used_llm": "gemini",
+          "generate_ms": 2303,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Doanh nghiệp đặt tại địa bàn **vùng II** phải trả mức lương tối thiểu tháng là **4.730.000 đồng/tháng** (áp dụng tại thời điểm ngày **01/01/2026**) [1].",
+          "used_llm": "gemini",
+          "generate_ms": 3428,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 4
+          },
+          "answer": "Doanh nghiệp đặt tại địa bàn **vùng II** phải trả mức lương tối thiểu tháng là **4.730.000 đồng/tháng** (áp dụng tại thời điểm ngày 01/01/2026) [1].",
+          "used_llm": "gemini",
+          "generate_ms": 1914,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "pre_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 493,
+          "answer": "Doanh nghiệp đặt tại địa bàn **vùng II** phải trả mức lương tối thiểu tháng là **4.730.000 đồng/tháng** [1].\n\nMức lương này áp dụng theo quy định có hiệu lực từ ngày **01 tháng 01 năm 2026** [1, 2].",
+          "used_llm": "gemini",
+          "generate_ms": 2421,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "lh_b02a",
+      "pair_id": "huu_tri_17_nam_giao_thoi",
+      "question": "Tôi đã đủ tuổi nghỉ hưu và nghỉ việc hôm nay, đã đóng bảo hiểm xã hội bắt buộc được 17 năm. Tôi có được hưởng lương hưu hằng tháng không?",
+      "as_of_date": "2025-06-30",
+      "temporal_kind": "boundary",
+      "expected_behavior": "answer",
+      "retrieve_ms": 508,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold_coverage": 0.0,
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Bạn có đủ điều kiện hưởng lương hưu hằng tháng [1].\n\nThời điểm hưởng lương hưu của bạn được tính từ **tháng liền kề sau tháng chấm dứt hợp đồng lao động hoặc chấm dứt làm việc** [1].\n\nTheo quy định, người lao động có thời gian đóng bảo hiểm xã hội từ **đủ 15 năm đến dưới 20 năm** thuộc đối tượng quy định tại Điều 64 của Luật Bảo hiểm xã hội thì có thể được hưởng lương hưu [1], [3]. Các trường hợp cụ thể được hưởng lương hưu với thời gian đóng dưới 20 năm thường áp dụng cho các đối tượng đặc thù (như người hoạt động chuyên trách hoặc không chuyên trách ở xã, phường, thị trấn đáp ứng điều kiện nhất định) [5]. \n\nLưu ý: Nếu bạn không thuộc các nhóm đối tượng đặc thù được quy định tại Luật Bảo hiểm xã hội để hưởng lương hưu với thời gian đóng từ 15 năm, bạn sẽ chưa đủ điều kiện hưởng lương hưu hằng tháng với mức đóng 17 năm. Tài liệu hiện có không nêu cụ thể toàn bộ các đối tượng được hưởng lương hưu với 17 năm đóng, nhưng khẳng định thời gian từ đủ 15 năm đến dưới 20 năm là cơ sở để hưởng lương hưu theo quy định tại Điều 64 Luật Bảo hiểm xã hội [1].",
+          "used_llm": "gemini",
+          "generate_ms": 4415,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold_coverage": 0.0,
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Bạn **có thể** được hưởng lương hưu hàng tháng nếu thuộc một trong các đối tượng có quy định cho phép hưởng lương hưu với thời gian đóng bảo hiểm xã hội (BHXH) dưới 20 năm tại thời điểm tra cứu 2025-06-30.\n\nCụ thể, điều kiện hưởng lương hưu với **17 năm** đóng BHXH bắt buộc được xác định như sau:\n\n- **Đối tượng là người hoạt động chuyên trách hoặc không chuyên trách ở xã, phường, thị trấn:** Bạn được hưởng lương hưu nếu thuộc đối tượng quy định tại khoản 3 Điều 54 của Luật Bảo hiểm xã hội và đáp ứng điều kiện có thời gian đóng BHXH bắt buộc từ đủ **15 năm** trở lên [5].\n- **Đối tượng hưởng lương hưu theo Điều 64 Luật Bảo hiểm xã hội:** Bạn có thể hưởng lương hưu nếu có thời gian đóng BHXH từ đủ **15 năm** đến dưới **20 năm** [1].\n- **Thời điểm hưởng:** Đối với người lao động nghỉ việc khi đã đủ tuổi nghỉ hưu và có đủ điều kiện về thời gian đóng BHXH, thời điểm hưởng lương hưu được tính từ **tháng liền kề sau tháng chấm dứt hợp đồng lao động** hoặc chấm dứt làm việc [1].\n\n**Lưu ý:** Nếu bạn không thuộc các nhóm đối tượng đặc thù được quy định hưởng lương hưu với thời gian đóng BHXH từ 15 năm (như nêu trên), theo quy định chung, điều kiện để hưởng lương hưu hàng tháng thường yêu cầu phải có đủ **20 năm** đóng BHXH trở lên [5]. Bạn nên kiểm tra kỹ đối tượng công việc và các văn bản quy định cụ thể về điều kiện của mình để xác định chính xác quyền lợi.",
+          "used_llm": "gemini",
+          "generate_ms": 5230,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold_coverage": 0.0,
+            "gold": false,
+            "distractor": false,
+            "clean": false,
+            "n_chunks": 3
+          },
+          "answer": "Bạn **không được hưởng lương hưu hằng tháng** với thời gian đóng bảo hiểm xã hội bắt buộc là **17 năm** theo các quy định được cung cấp [2].\n\nCụ thể các điều kiện hưởng lương hưu trong tài liệu hiện có như sau:\n\n- **Đối với người làm công việc khai thác than trong hầm lò:** Cần có đủ **20 năm** đóng bảo hiểm xã hội trở lên, trong đó có đủ **15 năm** làm công việc này [2].\n- **Đối với người làm công việc nặng nhọc, độc hại, nguy hiểm hoặc làm việc ở nơi có phụ cấp khu vực hệ số 0,7 trở lên:** Cần có đủ **20 năm** đóng bảo hiểm xã hội trở lên, trong đó có đủ **15 năm** làm các công việc/địa bàn nêu trên [2].\n- **Đối với lao động nữ là người hoạt động chuyên trách hoặc không chuyên trách ở xã, phường, thị trấn:** Cần có thời gian đóng bảo hiểm xã hội bắt buộc từ đủ **15 năm** đến dưới **20 năm** [2]. \n\nVới trường hợp của bạn, trừ khi bạn là đối tượng lao động nữ hoạt động chuyên trách hoặc không chuyên trách ở xã, phường, thị trấn (vẫn cần đáp ứng các điều kiện cụ thể về chức danh và thời điểm nghỉ việc theo quy định [2]), mức đóng **17 năm** hiện chưa đáp ứng điều kiện về thời gian đóng bảo hiểm xã hội tối thiểu (20 năm) đối với các nhóm đối tượng thông thường khác.",
+          "used_llm": "gemini",
+          "generate_ms": 4304,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "pre_filter": {
+          "context": {
+            "gold_coverage": 0.0,
+            "gold": false,
+            "distractor": false,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 575,
+          "answer": "Bạn không đủ điều kiện hưởng lương hưu hàng tháng nếu bạn là lao động nam, nhưng có thể đủ điều kiện nếu bạn là lao động nữ thuộc đối tượng quy định tại khoản 3 Điều 54 của Luật Bảo hiểm xã hội [1].\n\nDưới đây là các căn cứ chi tiết dựa trên tài liệu tại thời điểm **2025-06-30**:\n\n*   **Đối với lao động nam:** Điều kiện hưởng lương hưu bắt buộc phải có đủ **20 năm** đóng bảo hiểm xã hội trở lên [1]. Với **17 năm** đóng bảo hiểm, bạn chưa đủ điều kiện về thời gian đóng.\n*   **Đối với lao động nữ là người hoạt động chuyên trách hoặc không chuyên trách ở xã, phường, thị trấn:** Bạn có thể được hưởng lương hưu vì điều kiện thời gian đóng bảo hiểm xã hội bắt buộc chỉ cần từ đủ **15 năm** đến dưới **20 năm** [1].\n*   **Trường hợp thiếu thời gian đóng:** Nếu bạn thuộc diện đủ điều kiện về tuổi nghỉ hưu nhưng thời gian đóng bảo hiểm xã hội bắt buộc còn thiếu tối đa **06 tháng**, bạn có quyền lựa chọn đóng một lần cho số tháng còn thiếu để được hưởng lương hưu [5]. Tuy nhiên, vì bạn mới đóng được **17 năm** (còn thiếu 3 năm để đạt mốc 20 năm thông thường), bạn không thuộc trường hợp được đóng một lần cho số tháng thiếu tối đa **06 tháng** này [5].\n\n*Lưu ý:* Nội dung trên chưa bao gồm các trường hợp đặc biệt về làm nghề/công việc nặng nhọc, độc hại, nguy hiểm hoặc khai thác than trong hầm lò, vì bạn không cung cấp thông tin về loại công việc mình đã thực hiện [1].",
+          "used_llm": "gemini",
+          "generate_ms": 4412,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "lh_b02b",
+      "pair_id": "huu_tri_17_nam_giao_thoi",
+      "question": "Tôi đã đủ tuổi nghỉ hưu và nghỉ việc hôm nay, đã đóng bảo hiểm xã hội bắt buộc được 17 năm. Tôi có được hưởng lương hưu hằng tháng không?",
+      "as_of_date": "2025-07-01",
+      "temporal_kind": "boundary",
+      "expected_behavior": "answer",
+      "retrieve_ms": 497,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold_coverage": 0.0,
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Bạn chưa đủ điều kiện để hưởng lương hưu hằng tháng theo quy định chung hiện nay vì chưa đáp ứng đủ thời gian đóng bảo hiểm xã hội tối thiểu là **20 năm** [3].\n\nTuy nhiên, bạn có thể thuộc các trường hợp đặc biệt sau đây (cần đối chiếu với điều kiện thực tế của bản thân):\n\n- **Nếu bạn là người hoạt động chuyên trách hoặc không chuyên trách ở xã, phường, thị trấn:** Theo quy định, nếu bạn đủ điều kiện về tuổi và có thời gian đóng bảo hiểm xã hội bắt buộc từ đủ **15 năm** đến dưới **20 năm** thì vẫn được hưởng lương hưu hằng tháng [5].\n- **Nếu bạn thuộc đối tượng quy định tại Điều 64 của Luật Bảo hiểm xã hội:** Bạn có thể được hưởng lương hưu nếu có thời gian đóng bảo hiểm xã hội từ đủ **15 năm** trở lên [1], [3].\n\n**Lưu ý:** Nếu không thuộc các trường hợp đặc biệt nêu trên, bạn chưa đủ thời gian đóng bảo hiểm xã hội (17 năm) để hưởng lương hưu hằng tháng theo điều kiện thông thường (20 năm) [3]. Trong trường hợp này, bạn có thể tham khảo các quy định về bảo hiểm xã hội một lần hoặc tiếp tục đóng bảo hiểm xã hội (tự nguyện hoặc bắt buộc) để tích lũy đủ thời gian hưởng lương hưu [3], [5].",
+          "used_llm": "gemini",
+          "generate_ms": 3354,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold_coverage": 0.0,
+            "gold": false,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Bạn có thể được hưởng lương hưu hằng tháng nếu thuộc một trong các trường hợp sau đây [3, 5]:\n\n- **Lao động nữ là người hoạt động chuyên trách hoặc không chuyên trách ở xã, phường, thị trấn**: Với 17 năm đóng bảo hiểm xã hội bắt buộc, bạn đủ điều kiện hưởng lương hưu nếu đáp ứng các tiêu chuẩn về đối tượng và thời gian đóng quy định tại khoản 3 Điều 54 Luật Bảo hiểm xã hội [5].\n- **Trường hợp có thời gian đóng BHXH từ đủ 15 năm đến dưới 20 năm**: Bạn có thể được hưởng lương hưu sớm nhất từ ngày Luật Bảo hiểm xã hội có hiệu lực thi hành nếu thuộc đối tượng quy định tại Điều 64 của Luật Bảo hiểm xã hội [1].\n- **Trường hợp đã tham gia bảo hiểm xã hội bắt buộc từ trước ngày 01/7/2025**: Nếu bạn thuộc các đối tượng quy định tại điểm a, b, c, d, đ, g và i khoản 1 Điều 2 Luật Bảo hiểm xã hội, bạn cần đảm bảo có từ đủ 20 năm đóng BHXH bắt buộc trở lên để hưởng lương hưu theo chính sách BHXH bắt buộc [3].\n\n**Lưu ý:**\n- Thời điểm hưởng lương hưu của bạn được tính từ tháng liền kề sau tháng chấm dứt hợp đồng lao động hoặc chấm dứt làm việc [1].\n- Nếu bạn không thuộc các trường hợp đặc thù nêu trên (ví dụ làm nghề khai thác than trong hầm lò hoặc các công việc nặng nhọc, độc hại, nguy hiểm theo quy định), điều kiện chung để hưởng lương hưu thông thường là phải có đủ 20 năm đóng bảo hiểm xã hội trở lên [3, 5]. Trong trường hợp này, nếu thời gian đóng chưa đủ, bạn có thể cân nhắc đóng tiếp để đạt đủ số năm quy định [3].\n\nTài liệu hiện có không đủ thông tin để xác định chính xác bạn có thuộc đối tượng đặc biệt hay không, do đó bạn cần đối chiếu quá trình công tác của mình với các điều kiện nêu trên tại thời điểm ngày 01/7/2025 [3, 5].",
+          "used_llm": "gemini",
+          "generate_ms": 5238,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "đủ 20 năm"
+            ]
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold_coverage": 0.0,
+            "gold": false,
+            "distractor": false,
+            "clean": false,
+            "n_chunks": 5
+          },
+          "answer": "Có, bạn đủ điều kiện hưởng lương hưu hằng tháng [1].\n\nTheo quy định tại thời điểm **01/07/2025**, điều kiện để bạn được hưởng lương hưu như sau:\n\n- **Thời điểm hưởng:** Được tính từ tháng liền kề sau tháng chấm dứt hợp đồng lao động hoặc chấm dứt làm việc [1].\n- **Điều kiện:** Bạn đã có **17 năm** đóng bảo hiểm xã hội bắt buộc, đáp ứng quy định về thời gian đóng bảo hiểm xã hội (từ đủ 15 năm trở lên đối với các trường hợp theo quy định tại Điều 64 Luật Bảo hiểm xã hội) [2], [5].\n- **Tuổi nghỉ hưu:** Bạn đã đạt đủ tuổi nghỉ hưu theo quy định của Bộ luật Lao động [1], [5].",
+          "used_llm": "gemini",
+          "generate_ms": 5772,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "pre_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 533,
+          "answer": "Bạn **được hưởng** lương hưu hằng tháng.\n\nTheo quy định tại thời điểm **01/07/2025**, điều kiện để hưởng lương hưu bao gồm việc đáp ứng đủ tuổi nghỉ hưu và thời gian đóng bảo hiểm xã hội [1]:\n\n- Đối với người lao động tham gia bảo hiểm xã hội bắt buộc, nếu đã **đủ tuổi nghỉ hưu** theo quy định và đã có thời gian đóng bảo hiểm xã hội từ đủ **15 năm trở lên** (theo các trường hợp quy định tại Điều 64 Luật Bảo hiểm xã hội), bạn đủ điều kiện hưởng lương hưu [3].\n- Thời điểm hưởng lương hưu của bạn được tính từ **tháng liền kề sau tháng chấm dứt hợp đồng lao động** hoặc chấm dứt làm việc vì bạn đã đủ tuổi nghỉ hưu và đủ điều kiện về thời gian đóng bảo hiểm xã hội [1].",
+          "used_llm": "gemini",
+          "generate_ms": 2984,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "lh_o01",
+      "pair_id": "ngoai_pham_vi_thue_tncn",
+      "question": "Mức giảm trừ gia cảnh cho bản thân người nộp thuế thu nhập cá nhân hiện nay là bao nhiêu?",
+      "as_of_date": "2026-03-01",
+      "temporal_kind": "out_of_scope",
+      "expected_behavior": "refuse",
+      "retrieve_ms": 479,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+          "used_llm": "gemini",
+          "generate_ms": 1903,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+          "used_llm": "gemini",
+          "generate_ms": 3675,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 5
+          },
+          "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+          "used_llm": "gemini",
+          "generate_ms": 2564,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "pre_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 556,
+          "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+          "used_llm": "gemini",
+          "generate_ms": 2168,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "lh_o02",
+      "pair_id": "ngoai_pham_vi_bhyt",
+      "question": "Người lao động phải đóng bảo hiểm y tế bằng bao nhiêu phần trăm tiền lương tháng?",
+      "as_of_date": "2026-03-01",
+      "temporal_kind": "out_of_scope",
+      "expected_behavior": "refuse",
+      "retrieve_ms": 488,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+          "used_llm": "gemini",
+          "generate_ms": 3183,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+          "used_llm": "gemini",
+          "generate_ms": 2711,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 4
+          },
+          "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+          "used_llm": "gemini",
+          "generate_ms": 3628,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "pre_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 545,
+          "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+          "used_llm": "gemini",
+          "generate_ms": 4170,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "lh_o03",
+      "pair_id": "ngoai_pham_vi_thue_tndn",
+      "question": "Thuế suất thuế thu nhập doanh nghiệp phổ thông hiện nay là bao nhiêu phần trăm?",
+      "as_of_date": "2026-03-01",
+      "temporal_kind": "out_of_scope",
+      "expected_behavior": "refuse",
+      "retrieve_ms": 473,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+          "used_llm": "gemini",
+          "generate_ms": 2507,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+          "used_llm": "gemini",
+          "generate_ms": 3565,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 5
+          },
+          "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+          "used_llm": "gemini",
+          "generate_ms": 4179,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "pre_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 525,
+          "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+          "used_llm": "gemini",
+          "generate_ms": 2265,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "lh_f01",
+      "pair_id": "phat_tien_di_muon",
+      "question": "Công ty được phạt tiền người lao động đi làm muộn tối đa bao nhiêu mỗi lần?",
+      "as_of_date": "2026-03-01",
+      "temporal_kind": "false_premise",
+      "expected_behavior": "answer",
+      "retrieve_ms": 438,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Công ty **không được phép phạt tiền** người lao động dưới mọi hình thức khi xử lý kỷ luật lao động [3].\n\nPháp luật nghiêm cấm hành vi phạt tiền hoặc cắt lương thay cho việc xử lý kỷ luật lao động [3].",
+          "used_llm": "gemini",
+          "generate_ms": 2669,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Công ty **không được phép phạt tiền** người lao động dưới bất kỳ hình thức nào (mức phạt tối đa là **0 đồng**) khi xử lý kỷ luật lao động đối với hành vi đi làm muộn [3].\n\nTại thời điểm **01/03/2026**, quy định về các hành vi bị nghiêm cấm khi xử lý kỷ luật lao động bao gồm:\n- **Phạt tiền, cắt lương** thay việc xử lý kỷ luật lao động [3].\n- **Xâm phạm sức khỏe, danh dự, tính mạng, uy tín, nhân phẩm** của người lao động [3].\n- Xử lý kỷ luật lao động đối với người lao động có hành vi vi phạm **không được quy định** trong nội quy lao động, **không thỏa thuận** trong hợp đồng lao động đã giao kết hoặc pháp luật về lao động **không có quy định** [3].",
+          "used_llm": "gemini",
+          "generate_ms": 9675,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 3
+          },
+          "answer": "Công ty không được phép phạt tiền người lao động khi đi làm muộn [2].\n\nTheo quy định có hiệu lực tại ngày **2026-03-01**, các hành vi bị nghiêm cấm khi xử lý kỷ luật lao động bao gồm:\n- **Phạt tiền** hoặc **cắt lương** thay cho việc xử lý kỷ luật lao động [2].\n- Xâm phạm sức khỏe, danh dự, tính mạng, uy tín, nhân phẩm của người lao động [2].\n- Xử lý kỷ luật đối với hành vi vi phạm không được quy định trong nội quy lao động, hợp đồng lao động hoặc pháp luật về lao động [2].",
+          "used_llm": "gemini",
+          "generate_ms": 3699,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "pre_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 537,
+          "answer": "Tôi không tìm thấy quy định này trong tài liệu hiện có.",
+          "used_llm": "gemini",
+          "generate_ms": 3118,
+          "score": {
+            "correct": false,
+            "missing": [
+              "phạt tiền",
+              "nghiêm cấm"
+            ],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "lh_f02",
+      "pair_id": "nghi_phep_24_thang",
+      "question": "Theo Bộ luật Lao động, người lao động phải làm đủ 24 tháng mới được nghỉ hằng năm hưởng lương, đúng không?",
+      "as_of_date": "2026-03-01",
+      "temporal_kind": "false_premise",
+      "expected_behavior": "answer",
+      "retrieve_ms": 468,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Không, quy định này không đúng.\n\nNgười lao động chỉ cần làm việc đủ **12 tháng** cho một người sử dụng lao động thì đã được nghỉ hằng năm hưởng nguyên lương [1]. Trường hợp người lao động làm việc chưa đủ **12 tháng** thì số ngày nghỉ hằng năm sẽ được tính theo tỷ lệ tương ứng với số tháng làm việc thực tế [1], [3].",
+          "used_llm": "gemini",
+          "generate_ms": 6146,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "Không đúng, người lao động chỉ cần làm việc đủ **12 tháng** cho một người sử dụng lao động thì được nghỉ hằng năm hưởng nguyên lương [1].\n\nĐối với người lao động làm việc chưa đủ **12 tháng**, số ngày nghỉ hằng năm được tính theo tỷ lệ tương ứng với số tháng làm việc [1].",
+          "used_llm": "gemini",
+          "generate_ms": 5718,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 6
+          },
+          "answer": "Không đúng, người lao động làm việc **đủ 12 tháng** cho một người sử dụng lao động đã được nghỉ hằng năm hưởng nguyên lương [1].\n\nĐối với trường hợp làm việc **chưa đủ 12 tháng**, số ngày nghỉ hằng năm của người lao động được tính theo tỷ lệ tương ứng với số tháng làm việc thực tế [1], [2].",
+          "used_llm": "gemini",
+          "generate_ms": 3409,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "pre_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 509,
+          "answer": "Không đúng [1].\n\nNgười lao động làm việc đủ **12 tháng** cho một người sử dụng lao động thì được nghỉ hằng năm hưởng nguyên lương [1].\n\nTrường hợp người lao động làm việc chưa đủ **12 tháng**, số ngày nghỉ hằng năm được tính theo tỷ lệ tương ứng với số tháng làm việc thực tế [1], [3].",
+          "used_llm": "gemini",
+          "generate_ms": 2681,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "lh_c01",
+      "pair_id": "lam_them_45_gio_thang",
+      "question": "Một xưởng cơ khí (điều kiện lao động bình thường, không thuộc ngành được làm thêm 300 giờ/năm) yêu cầu công nhân làm thêm 45 giờ trong tháng này. Như vậy có vi phạm quy định về làm thêm giờ không?",
+      "as_of_date": "2026-03-01",
+      "temporal_kind": "compliance",
+      "expected_behavior": "answer",
+      "retrieve_ms": 505,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "**Có, việc xưởng cơ khí yêu cầu công nhân làm thêm 45 giờ trong một tháng là vi phạm quy định của pháp luật lao động [1].**\n\nTheo quy định về điều kiện tổ chức làm thêm giờ:\n- Người sử dụng lao động phải bảo đảm số giờ làm thêm của người lao động **không quá 40 giờ trong 01 tháng** [1].\n- Mức làm thêm **45 giờ trong tháng** đã vượt quá giới hạn tối đa cho phép (vượt quá **5 giờ** so với trần quy định là **40 giờ/tháng**) [1].",
+          "used_llm": "gemini",
+          "generate_ms": 31407,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "**Có, việc yêu cầu công nhân làm thêm 45 giờ trong một tháng là vi phạm quy định của pháp luật lao động (tính tại thời điểm 01/03/2026).**\n\nCăn cứ quy định về điều kiện tổ chức làm thêm giờ:\n\n- **Giới hạn theo tháng:** Người sử dụng lao động phải bảo đảm số giờ làm thêm của người lao động **không quá 40 giờ trong 01 tháng** [1]. Do đó, việc xưởng cơ khí yêu cầu công nhân làm thêm **45 giờ/tháng** đã vượt quá trần quy định cho phép [1].\n- **Các giới hạn và điều kiện bắt buộc khác:**\n  - Phải được sự **đồng ý của người lao động** [1].\n  - Số giờ làm thêm **không quá 50%** số giờ làm việc bình thường trong **01 ngày**; nếu tính thời giờ làm việc theo tuần thì tổng số giờ làm việc bình thường và làm thêm **không quá 12 giờ trong 01 ngày** [1].\n  - Tổng số giờ làm thêm **không quá 200 giờ trong 01 năm** đối với điều kiện lao động bình thường [1].",
+          "used_llm": "gemini",
+          "generate_ms": 19172,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "answer": "**Việc yêu cầu công nhân làm thêm 45 giờ trong một tháng là vi phạm quy định của pháp luật lao động (quy định có hiệu lực tại ngày 01/03/\n2026)** [1].\n\nCụ thể, theo quy định về giới hạn thời gian làm thêm giờ:\n- Người sử dụng lao động phải bảo đảm số giờ làm thêm của người lao động **không quá 40 giờ trong 01 tháng** [1].\n- Mức **45 giờ/tháng** mà xưởng cơ khí yêu cầu đã vượt quá mức trần tối đa cho phép theo quy định [1].\n\nNgoài ra, việc tổ chức làm thêm giờ bắt buộc phải đáp ứng đồng thời các điều kiện khác:\n- Phải được **sự đồng ý của người lao động** [1].\n- Số giờ làm thêm **không quá 50% số giờ làm việc bình thường trong 01 ngày**; trường hợp áp dụng thời giờ làm việc theo tuần thì tổng số giờ làm việc bình thường và số giờ làm thêm **không quá 12 giờ trong 01 ngày** [1], [2].\n- Tổng số giờ làm thêm **không quá 200 giờ trong 01 năm** đối với trường hợp thông thường [1].",
+          "used_llm": "gemini",
+          "generate_ms": 135263,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "pre_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 539,
+          "answer": "**Có**, việc xưởng cơ khí yêu cầu công nhân làm thêm **45 giờ trong một tháng** là vi phạm quy định của pháp luật lao động (tính tại thời điểm **2026-03-01**) [1].\n\nQuy định cụ thể về giới hạn số giờ làm thêm trong tháng:\n- Khi tổ chức làm thêm giờ, người sử dụng lao động phải bảo đảm số giờ làm thêm của người lao động **không quá 40 giờ trong 01 tháng** [1]. \n- Do đó, mức làm thêm **45 giờ trong tháng** đã vượt quá giới hạn tối đa cho phép theo quy định pháp luật [1].",
+          "used_llm": "gemini",
+          "generate_ms": 60330,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "lh_c02a",
+      "pair_id": "luong_5_2_trieu_vung_1",
+      "question": "Doanh nghiệp ở vùng I trả 5.200.000 đồng/tháng cho người lao động làm công việc giản đơn trong điều kiện bình thường, làm đủ thời giờ làm việc. Mức lương này có vi phạm quy định về lương tối thiểu không?",
+      "as_of_date": "2025-10-01",
+      "temporal_kind": "compliance",
+      "expected_behavior": "answer",
+      "retrieve_ms": 471,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Mức lương **5.200.000 đồng/tháng** **không vi phạm** theo quy định áp dụng từ ngày **01/07/2024**, nhưng **sẽ vi phạm** theo quy định áp dụng từ ngày **01/01/2026** [1], [2], [4], [5], [6].\n\nCụ thể theo từng thời điểm áp dụng quy định pháp luật:\n\n| Giai đoạn áp dụng | Mức lương tối thiểu tháng Vùng I | Đánh giá mức 5.200.000 đồng/tháng |\n|---|---|---|\n| Từ ngày **01/07/2024** (theo Nghị định số 74/2024/NĐ-CP) [2], [4] | **4.960.000 đồng/tháng** [2] | **Không vi phạm** vì cao hơn mức lương tối thiểu tháng quy định [2], [6]. |\n| Từ ngày **01/01/2026** (theo Nghị định số 293/2025/NĐ-CP) [1], [5] | **5.310.000 đồng/tháng** [1] | **Vi phạm** vì thấp hơn mức lương tối thiểu tháng quy định [1], [6]. |\n\n**Nguyên tắc áp dụng:**\nMức lương theo công việc hoặc chức danh của người lao động làm việc đủ thời giờ làm việc bình thường trong tháng và hoàn thành định mức lao động hoặc công việc đã thỏa thuận không được thấp hơn mức lương tối thiểu tháng [6], [7]. Do đó, kể từ ngày **01/01/2026**, doanh nghiệp bắt buộc phải rà soát, điều chỉnh mức lương tối thiểu trả cho người lao động làm việc tại Vùng I lên tối thiểu **5.310.000 đồng/tháng** [1], [5], [6].",
+          "used_llm": "gemini",
+          "generate_ms": 9236,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "5.310.000"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Mức lương **5.200.000 đồng/tháng** **không vi phạm** quy định về mức lương tối thiểu tại thời điểm tra cứu ngày **01/10/2025**.\n\nCụ thể:\n- Tại thời điểm ngày **01/10/2025**, quy định về mức lương tối thiểu có hiệu lực từ ngày **01/07/2024** đang được áp dụng [4] (mức lương tối thiểu mới tại nguồn [1] chỉ có hiệu lực thi hành từ ngày **01/01/2026** [5]).\n- Mức lương tối thiểu tháng đối với **Vùng I** có hiệu lực tại ngày **01/10/2025** là **4.960.000 đồng/tháng** [2].\n- Mức lương theo công việc hoặc chức danh của người lao động làm công việc giản đơn nhất trong điều kiện lao động bình thường [3], làm việc đủ thời giờ làm việc bình thường trong tháng và hoàn thành định mức lao động hoặc công việc đã thỏa thuận không được thấp hơn mức lương tối thiểu tháng [6], [7]. \n- Do mức lương doanh nghiệp chi trả là **5.200.000 đồng/tháng**, cao hơn mức lương tối thiểu **4.960.000 đồng/tháng** của Vùng I [2], nên hoàn toàn bảo đảm đúng quy định pháp luật [6], [7].",
+          "used_llm": "gemini",
+          "generate_ms": 75527,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 5
+          },
+          "answer": "Mức lương **5.200.000 đồng/tháng** **KHÔNG** vi phạm quy định về lương tối thiểu tại thời điểm **01/10/2025** [1][4].\n\nGiải thích chi tiết:\n- Theo quy định áp dụng từ ngày **01/07/2024** (có hiệu lực tại thời điểm **01/10/2025**),\n mức lương tối thiểu tháng đối với địa bàn **Vùng I** là **4.960.000 đồng/tháng** [1].\n- Người lao động làm công việc giản đơn nhất trong điều kiện lao động bình thường, hoàn thành định mức lao động và làm đủ thời giờ làm việc bình thường trong tháng được bảo đảm mức lương không được thấp hơn mức lương tối thiểu tháng [2][4].\n- Mức lương doanh nghiệp đang trả là **5.200.000 đồng/tháng**, cao hơn mức lương tối thiểu quy định cho **Vùng I** (**4.960.000 đồng/tháng**), nên hoàn toàn phù hợp với quy định pháp luật [1][4].",
+          "used_llm": "gemini",
+          "generate_ms": 14049,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "pre_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 570,
+          "answer": "Mức lương này **không vi phạm** quy định về mức lương tối thiểu.\n\nTại thời điểm tra cứu (**2025-10-01**), theo quy định áp dụng từ ngày **01/07/2024**, mức lương tối thiểu tháng đối với người lao động làm việc thuộc địa bàn **Vùng I** là **4.960.000 đồng/tháng** [1][2]. \n\nMức lương tối thiểu tháng là mức thấp nhất làm cơ sở để thỏa thuận và trả lương đối với người lao động làm công việc giản đơn nhất trong điều kiện lao động bình thường, làm đủ thời giờ làm việc bình thường trong tháng và hoàn thành định mức lao động [3][4]. Vì mức lương doanh nghiệp trả là **5.200.000 đồng/tháng**, cao hơn mức lương tối thiểu quy định cho Vùng I (**4.960.000 đồng/tháng**), nên doanh nghiệp hoàn toàn tuân thủ quy định [1][4].",
+          "used_llm": "gemini",
+          "generate_ms": 29435,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    },
+    {
+      "id": "lh_c02b",
+      "pair_id": "luong_5_2_trieu_vung_1",
+      "question": "Doanh nghiệp ở vùng I trả 5.200.000 đồng/tháng cho người lao động làm công việc giản đơn trong điều kiện bình thường, làm đủ thời giờ làm việc. Mức lương này có vi phạm quy định về lương tối thiểu không?",
+      "as_of_date": "2026-02-01",
+      "temporal_kind": "compliance",
+      "expected_behavior": "answer",
+      "retrieve_ms": 499,
+      "arms": {
+        "no_temporal": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "Mức lương **5.200.000 đồng/tháng** không vi phạm trong giai đoạn từ ngày **01/07/2024** đến hết ngày **31/12/2025**, nhưng sẽ vi phạm quy định từ ngày **01/01/2026**.\n\nTheo quy định, mức lương trả cho người lao động làm công việc giản đơn nhất trong điều kiện lao động bình thường, làm đủ thời giờ làm việc bình thường và hoàn thành định mức lao động không được thấp hơn mức lương tối thiểu tháng [6], [7]. \n\nCụ thể theo từng thời điểm áp dụng như sau:\n\n- **Giai đoạn từ ngày 01/07/2024 đến hết ngày 31/12/2025**: Mức lương tối thiểu tháng đối với địa bàn **Vùng I** là **4.960.000 đồng/tháng** [2], [4]. Do mức **5.200.000 đồng/tháng** cao hơn mức lương tối thiểu vùng quy định, doanh nghiệp **không vi phạm** [2], [6].\n- **Giai đoạn từ ngày 01/01/2026 trở đi**: Mức lương tối thiểu tháng đối với địa bàn **Vùng I** tăng lên là **5.310.000 đồng/tháng** [1], [5]. Do mức **5.200.000 đồng/tháng** thấp hơn mức lương tối thiểu vùng quy định, doanh nghiệp **có vi phạm** quy định [1], [6].",
+          "used_llm": "gemini",
+          "generate_ms": 14163,
+          "score": {
+            "correct": false,
+            "missing": [],
+            "forbidden_present": [
+              "4.960.000",
+              "không vi phạm"
+            ]
+          }
+        },
+        "prompt_only": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": true,
+            "clean": false,
+            "n_chunks": 8
+          },
+          "answer": "**Có, mức lương 5.200.000 đồng/tháng là vi phạm quy định về mức lương tối thiểu** [1, 6].\n\nChi tiết quy định tại thời điểm tra cứu ngày **01/02/2026**:\n\n- **Mức lương tối thiểu tháng Vùng I**: Theo quy định có hiệu lực từ ngày **01/01/2026**, mức lương tối thiểu tháng áp dụng cho người lao động làm việc tại **Vùng I** là **5.310.000 đồng/tháng** [1, 5].\n- **Nguyên tắc áp dụng**: Mức lương theo công việc hoặc chức danh của người lao động làm việc đủ thời giờ làm việc bình thường trong tháng và hoàn thành định mức lao động hoặc công việc đã thỏa thuận **không được thấp hơn mức lương tối thiểu tháng** [6].\n\nDo mức trả **5.200.000 đồng/tháng** thấp hơn mức lương tối thiểu luật định của Vùng I (**5.310.000 đồng/tháng**), doanh nghiệp đã vi phạm quy định pháp luật [1, 6].",
+          "used_llm": "gemini",
+          "generate_ms": 33871,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "temporal_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 4
+          },
+          "answer": "**Có, mức lương 5.200.000 đồng/tháng là vi phạm quy định về mức lương tối thiểu [1], [4].**\n\nTại thời điểm **ngày 01/02/2026** (áp dụng từ ngày **01/01/2026**), mức lương tối thiểu vùng được quy định như sau:\n\n- Mức lương tối thiểu tháng đối với **Vùng I** là **5.\n310.000 đồng/tháng** [1].\n- Mức lương theo công việc hoặc chức danh của người lao động làm việc đủ thời giờ làm việc bình thường trong tháng và hoàn thành định mức lao động/công việc đã thỏa thuận **không được thấp hơn mức lương tối thiểu tháng** [4].\n\nDoanh nghiệp tại Vùng I chỉ trả **5.200.000 đồng/tháng** cho người lao động làm công việc giản đơn trong điều kiện bình thường và làm đủ thời giờ làm việc là thấp hơn mức quy định (**5.310.000 đồng/tháng**), do đó đã vi phạm quy định pháp luật [1], [4].",
+          "used_llm": "gemini",
+          "generate_ms": 7122,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        },
+        "pre_filter": {
+          "context": {
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 577,
+          "answer": "**Có, mức lương 5.200.000 đồng/tháng là vi phạm quy định về mức lương tối thiểu.**\n\nCăn cứ quy định có hiệu lực tại thời điểm **01/02/2026** (áp dụng từ ngày **01/01/2026**):\n\n- Mức lương tối thiểu tháng đối với người lao động làm việc tại địa bàn **Vùng I** là **5.310.000 đồng/tháng** [1], [3].\n- Mức lương theo công việc hoặc chức danh của người lao động làm việc đủ thời giờ làm việc bình thường trong tháng và hoàn thành định mức lao động hoặc công việc đã thỏa thuận không được thấp hơn mức lương tối thiểu tháng [4], [8].\n\nDo mức trả **5.200.000 đồng/tháng** thấp hơn mức lương tối thiểu vùng quy định (**5.310.000 đồng/tháng**), doanh nghiệp đã vi phạm quy định pháp luật về mức lương tối thiểu [1], [4].",
+          "used_llm": "gemini",
+          "generate_ms": 30366,
+          "score": {
+            "correct": true,
+            "missing": [],
+            "forbidden_present": []
+          }
+        }
+      }
+    }
+  ],
+  "summary": {
+    "overall": {
+      "no_temporal": {
+        "n": 19,
+        "context_gold": 0.7894736842105263,
+        "context_gold_coverage": 0.8157894736842105,
+        "context_distractor": 0.3684210526315789,
+        "context_clean": 0.5789473684210527,
+        "avg_chunks": 8.0,
+        "answer_accuracy": 0.7368421052631579
+      },
+      "prompt_only": {
+        "n": 19,
+        "context_gold": 0.7894736842105263,
+        "context_gold_coverage": 0.8157894736842105,
+        "context_distractor": 0.3684210526315789,
+        "context_clean": 0.5789473684210527,
+        "avg_chunks": 8.0,
+        "answer_accuracy": 0.8421052631578947
+      },
+      "temporal_filter": {
+        "n": 19,
+        "context_gold": 0.7894736842105263,
+        "context_gold_coverage": 0.7894736842105263,
+        "context_distractor": 0.0,
+        "context_clean": 0.7894736842105263,
+        "avg_chunks": 5.105263157894737,
+        "answer_accuracy": 0.8947368421052632
+      },
+      "pre_filter": {
+        "n": 19,
+        "context_gold": 0.8421052631578947,
+        "context_gold_coverage": 0.868421052631579,
+        "context_distractor": 0.0,
+        "context_clean": 0.8421052631578947,
+        "avg_chunks": 8.0,
+        "answer_accuracy": 0.9473684210526315
+      }
+    },
+    "by_kind": {
+      "boundary": {
+        "no_temporal": {
+          "n": 4,
+          "context_gold": 0.5,
+          "context_gold_coverage": 0.5,
+          "context_distractor": 1.0,
+          "context_clean": 0.0,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 0.75
+        },
+        "prompt_only": {
+          "n": 4,
+          "context_gold": 0.5,
+          "context_gold_coverage": 0.5,
+          "context_distractor": 1.0,
+          "context_clean": 0.0,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 0.75
+        },
+        "temporal_filter": {
+          "n": 4,
+          "context_gold": 0.5,
+          "context_gold_coverage": 0.5,
+          "context_distractor": 0.0,
+          "context_clean": 0.5,
+          "avg_chunks": 4.5,
+          "answer_accuracy": 1.0
+        },
+        "pre_filter": {
+          "n": 4,
+          "context_gold": 0.75,
+          "context_gold_coverage": 0.75,
+          "context_distractor": 0.0,
+          "context_clean": 0.75,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 1.0
+        }
+      },
+      "compliance": {
+        "no_temporal": {
+          "n": 3,
+          "context_gold": 1.0,
+          "context_gold_coverage": 1.0,
+          "context_distractor": 0.6666666666666666,
+          "context_clean": 0.3333333333333333,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 0.3333333333333333
+        },
+        "prompt_only": {
+          "n": 3,
+          "context_gold": 1.0,
+          "context_gold_coverage": 1.0,
+          "context_distractor": 0.6666666666666666,
+          "context_clean": 0.3333333333333333,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 1.0
+        },
+        "temporal_filter": {
+          "n": 3,
+          "context_gold": 1.0,
+          "context_gold_coverage": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 5.666666666666667,
+          "answer_accuracy": 1.0
+        },
+        "pre_filter": {
+          "n": 3,
+          "context_gold": 1.0,
+          "context_gold_coverage": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 1.0
+        }
+      },
+      "false_premise": {
+        "no_temporal": {
+          "n": 2,
+          "context_gold": 1.0,
+          "context_gold_coverage": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 1.0
+        },
+        "prompt_only": {
+          "n": 2,
+          "context_gold": 1.0,
+          "context_gold_coverage": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 1.0
+        },
+        "temporal_filter": {
+          "n": 2,
+          "context_gold": 1.0,
+          "context_gold_coverage": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 4.5,
+          "answer_accuracy": 1.0
+        },
+        "pre_filter": {
+          "n": 2,
+          "context_gold": 1.0,
+          "context_gold_coverage": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 0.5
+        }
+      },
+      "multi_clause": {
+        "no_temporal": {
+          "n": 6,
+          "context_gold": 0.6666666666666666,
+          "context_gold_coverage": 0.75,
+          "context_distractor": 0.16666666666666666,
+          "context_clean": 0.6666666666666666,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 0.6666666666666666
+        },
+        "prompt_only": {
+          "n": 6,
+          "context_gold": 0.6666666666666666,
+          "context_gold_coverage": 0.75,
+          "context_distractor": 0.16666666666666666,
+          "context_clean": 0.6666666666666666,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 0.6666666666666666
+        },
+        "temporal_filter": {
+          "n": 6,
+          "context_gold": 0.6666666666666666,
+          "context_gold_coverage": 0.6666666666666666,
+          "context_distractor": 0.0,
+          "context_clean": 0.6666666666666666,
+          "avg_chunks": 5.833333333333333,
+          "answer_accuracy": 0.6666666666666666
+        },
+        "pre_filter": {
+          "n": 6,
+          "context_gold": 0.6666666666666666,
+          "context_gold_coverage": 0.75,
+          "context_distractor": 0.0,
+          "context_clean": 0.6666666666666666,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 1.0
+        }
+      },
+      "out_of_scope": {
+        "no_temporal": {
+          "n": 3,
+          "context_gold": 1.0,
+          "context_gold_coverage": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 1.0
+        },
+        "prompt_only": {
+          "n": 3,
+          "context_gold": 1.0,
+          "context_gold_coverage": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 1.0
+        },
+        "temporal_filter": {
+          "n": 3,
+          "context_gold": 1.0,
+          "context_gold_coverage": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 4.666666666666667,
+          "answer_accuracy": 1.0
+        },
+        "pre_filter": {
+          "n": 3,
+          "context_gold": 1.0,
+          "context_gold_coverage": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 1.0
+        }
+      },
+      "table_lookup": {
+        "no_temporal": {
+          "n": 1,
+          "context_gold": 1.0,
+          "context_gold_coverage": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 1.0
+        },
+        "prompt_only": {
+          "n": 1,
+          "context_gold": 1.0,
+          "context_gold_coverage": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 1.0
+        },
+        "temporal_filter": {
+          "n": 1,
+          "context_gold": 1.0,
+          "context_gold_coverage": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 4.0,
+          "answer_accuracy": 1.0
+        },
+        "pre_filter": {
+          "n": 1,
+          "context_gold": 1.0,
+          "context_gold_coverage": 1.0,
+          "context_distractor": 0.0,
+          "context_clean": 1.0,
+          "avg_chunks": 8.0,
+          "answer_accuracy": 1.0
+        }
+      }
+    }
+  }
+}

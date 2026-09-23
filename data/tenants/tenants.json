@@ -1,0 +1,17 @@
+{
+  "_comment": "Seed tenants for the multi-tenant demo. The api_key values here are DEMO credentials committed on purpose so the demo runs from a clean clone — they grant nothing beyond this local corpus. A real deployment resolves principals from an identity provider and never stores keys in the repo.",
+  "tenants": [
+    {
+      "tenant_id": "acme",
+      "name": "Acme Manufacturing JSC",
+      "api_key": "demo-acme-0000",
+      "acl_labels": ["public", "internal"]
+    },
+    {
+      "tenant_id": "globex",
+      "name": "Globex Legal Dept",
+      "api_key": "demo-globex-0000",
+      "acl_labels": ["public", "internal", "confidential"]
+    }
+  ]
+}

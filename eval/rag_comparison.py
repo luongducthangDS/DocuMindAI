@@ -96,9 +96,10 @@ def _init_rag_shared() -> tuple:
     result = collection.get(include=["documents", "metadatas"])
     docs = result.get("documents") or []
     metas = result.get("metadatas") or []
+    # id_ = Chroma id, same node_id the dense side returns — RRF fuses by it
     all_nodes = [
-        TextNode(text=d, metadata=m or {})
-        for d, m in zip(docs, metas) if d
+        TextNode(id_=i, text=d, metadata=m or {})
+        for i, d, m in zip(result["ids"], docs, metas) if d
     ]
     logger.info("Shared RAG init: {} nodes in corpus", len(all_nodes))
     return index, collection, all_nodes, embedder

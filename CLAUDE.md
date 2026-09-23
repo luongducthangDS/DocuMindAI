@@ -17,14 +17,19 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
 **Trạng thái hiện tại:**
 - Corpus lao động/BHXH: 20 văn bản tại `data/raw/lao_dong/` (+ `_versions/` cho bản sửa đổi
   cấp khoản). Corpus ngân hàng cũ đã bỏ — `data/raw/banking_docs/` không còn tồn tại.
-- ChromaDB `data/chroma_db/` (collection `documind_legal`): **1149 chunks**, 3072-dim.
+- ChromaDB `data/chroma_db/` (collection `documind_legal`): **1151 chunks**, 3072-dim.
 - `data/compliance/criteria.json`: 6 tiêu chí định lượng lao động (trần làm thêm giờ
   năm/tháng, thời gian thử việc, lương thử việc 85%, nghỉ hằng năm, lương tối thiểu vùng I).
   Mọi tiêu chí phải trích dẫn văn bản CÓ trong `data/raw/lao_dong/` — có test chặn
   (`tests/test_compliance.py::TestCriteriaDataIntegrity`).
 - Gold set: `data/eval/temporal_questions.json` (30 câu, viết tay trước khi chạy hệ thống).
   Bộ 25 câu ngân hàng tiền-pivot đã archive sang `data/eval/_archive/`.
-- Test suite: 201/201 tests passed (đo 2026-09-21).
+- Bộ câu khó: `data/eval/hard_questions.json` (19 câu, 6 loại: ghép nhiều điều khoản, ngày
+  giao thời, ngoài phạm vi, tiền đề sai, tình huống tuân thủ, tra bảng). Claude soạn từ
+  nguyên văn corpus, `reviewed: false` — **cần người duyệt**. Bộ 30 câu temporal đã bão hoà
+  (1.000), dùng bộ này để đo cải tiến:
+  `python eval/temporal_eval.py --gold data/eval/hard_questions.json --output reports/hard_eval.json`
+- Test suite: 277/277 tests passed (đo 2026-09-23).
 
 **Stack:**
 - Backend: FastAPI + LangGraph agent + vector store qua `VECTOR_STORE_PROVIDER`
@@ -64,7 +69,7 @@ Lệnh ingest tài liệu:
 ```powershell
 # Ingest corpus lao động vào ChromaDB.
 # BẮT BUỘC có --manifest: thiếu cờ này script rơi về chế độ quét thư mục, nuốt luôn
-# _versions/ thành tài liệu độc lập (1365 chunk rác thay vì 1149).
+# _versions/ thành tài liệu độc lập (chunk rác thay vì 1151).
 python scripts/ingest_documents.py --source-dir data/raw/lao_dong `
   --manifest docs/corpus/corpus_manifest.yaml --reset
 
@@ -72,6 +77,26 @@ python scripts/ingest_documents.py --source-dir data/raw/lao_dong `
 python scripts/ingest_documents.py --source-dir data/raw/lao_dong `
   --manifest docs/corpus/corpus_manifest.yaml --dry-run
 ```
+
+**Access control / multi-tenant / point-in-time (DEC-0003):** mọi truy hồi đi qua
+`RetrievalContext` (`src/rag/context.py`) — tenant + nhãn ACL + `as_of_date` compile thành
+filter đẩy **xuống** vector store trước khi search. Bốn field metadata bắt buộc:
+`tenant_id`, `acl_label`, `effective_from_i`, `effective_to_i` (ngày dạng int YYYYMMDD —
+Chroma 0.6.3 không so sánh `$lte` trên chuỗi). Chunk thiếu 4 field này **biến mất khỏi mọi
+kết quả**, nên sau khi ingest lại corpus cũ phải chạy:
+
+```powershell
+python scripts/backfill_access_meta.py          # xem trước
+python scripts/backfill_access_meta.py --yes    # ghi
+```
+
+Tenant demo khai ở `data/tenants/tenants.json`; client gửi `x-api-key`, **không bao giờ**
+tự khai `acl_labels` (server tra ra). Không header = ẩn danh, chỉ thấy `tenant_id=public`.
+WebSocket: trình duyệt **không** gắn được header lên handshake, nên UI gửi key trong
+message (`{"query": ..., "api_key": ...}`), server resolve theo từng lượt. Header vẫn
+dùng được cho client không phải trình duyệt. `GET /api/v1/whoami` cho biết key ứng với
+tenant nào. CORS phải giữ `X-API-Key` trong `allow_headers` (`src/api/main.py`).
+`src/rag/temporal.py` vẫn chạy làm lớp lọc thứ hai — đừng gỡ.
 
 `data/compliance/criteria.json` định nghĩa 6 tiêu chí kiểm định tuân thủ định lượng
 (pass/fail) cho agent node `compliance_check`. Engine này phát ✅/❌ kèm trích dẫn nên là
@@ -173,7 +198,7 @@ for k in ("HF_HOME", "HF_HUB_CACHE", "TRANSFORMERS_CACHE", "SENTENCE_TRANSFORMER
 
 **LLM temperature:** `0.0` (không phải 0.1) để citation ổn định giữa các lần chạy.
 
-**ChromaDB:** Dùng local `PersistentClient` (không cần server). HTTP server ở `localhost:8000` thường không chạy — code tự fallback sang local. Collection `documind_legal` đang có 1149 chunks (3072-dim, `gemini-embedding-001`), kèm metadata `embedding_model`/`embedding_dim` để phát hiện lệch model.
+**ChromaDB:** Dùng local `PersistentClient` (không cần server). HTTP server ở `localhost:8000` thường không chạy — code tự fallback sang local. Collection `documind_legal` đang có 1151 chunks (3072-dim, `gemini-embedding-001`), kèm metadata `embedding_model`/`embedding_dim` để phát hiện lệch model.
 
 **Đổi model embedding:** sửa `EMBEDDING_MODEL` trong `.env` → `python scripts/reembed_corpus.py --yes` (re-embed tại chỗ, giữ nguyên chunk + metadata temporal, tự sao lưu collection cũ sang `documind_legal__backup_<model cũ>`) → `pytest -q` + `python eval/temporal_eval.py`. So sánh ứng viên trước khi đổi: `python eval/embedding_ab.py --models current <model-moi>`.
 

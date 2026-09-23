@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import uuid
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -49,31 +50,54 @@ def load_chroma_corpus():
         )
     collection = client.get_collection(settings.chroma_collection)
     result = collection.get(include=["documents", "metadatas", "embeddings"])
+    ids = result["ids"]
     docs = result["documents"]
     metas = result["metadatas"]
     embs = result["embeddings"]
     if not docs:
         raise RuntimeError("ChromaDB collection rỗng — không có gì để migrate.")
     logger.info("Đọc {} chunks từ ChromaDB ({}), embedding dim={}", len(docs), chroma_path, len(embs[0]))
-    return docs, metas, embs, client, collection
+    return ids, docs, metas, embs, client, collection
 
 
-def migrate(docs, metas, embs) -> int:
+def migrate(ids, docs, metas, embs) -> int:
     from llama_index.core.schema import TextNode
     from llama_index.vector_stores.qdrant import QdrantVectorStore
 
     from src.rag.embedder import get_qdrant_client_and_collection
 
-    qclient, collection_name = get_qdrant_client_and_collection()
+    qclient, collection_name = get_qdrant_client_and_collection(timeout=120)
 
+    # Qdrant chỉ nhận id UUID/int, nên suy UUID cố định từ id Chroma: chạy lại
+    # là ghi đè chứ không nhân đôi (bản cũ dùng UUID ngẫu nhiên → mỗi lần chạy
+    # thêm một bản sao toàn bộ corpus).
     nodes = []
-    for doc, meta, emb in zip(docs, metas, embs):
-        node = TextNode(text=doc, metadata=meta or {})
+    for cid, doc, meta, emb in zip(ids, docs, metas, embs):
+        node = TextNode(id_=str(uuid.uuid5(uuid.NAMESPACE_URL, cid)), text=doc, metadata=meta or {})
         node.embedding = list(emb)
         nodes.append(node)
 
-    vs = QdrantVectorStore(client=qclient, collection_name=collection_name)
+    # batch nhỏ: 64 vector 3072-dim ≈ 4MB/request, quá timeout ghi 5s khi mạng chậm
+    vs = QdrantVectorStore(client=qclient, collection_name=collection_name, batch_size=8)
     vs.add(nodes)
+
+    # Upsert xong mới xoá point thừa (chunk đã bỏ, hoặc id ngẫu nhiên của lần
+    # migrate cũ) — production không lúc nào thấy collection rỗng.
+    keep = {n.node_id for n in nodes}
+    stale, offset = [], None
+    while True:
+        points, offset = qclient.scroll(
+            collection_name=collection_name, limit=1000, offset=offset,
+            with_payload=False, with_vectors=False,
+        )
+        stale += [p.id for p in points if str(p.id) not in keep]
+        if offset is None:
+            break
+    if stale:
+        from qdrant_client import models as qm
+
+        qclient.delete(collection_name=collection_name, points_selector=qm.PointIdsList(points=stale))
+        logger.info("Xoá {} point thừa khỏi Qdrant", len(stale))
 
     count = qclient.count(collection_name=collection_name, exact=True).count
     logger.info("Migration xong: {} points trong Qdrant collection '{}'", count, collection_name)
@@ -85,7 +109,7 @@ def verify(docs, metas, embs, chroma_client, chroma_collection) -> None:
     from src.rag.vector_backend import Backend, direct_query
     from src.rag.embedder import get_qdrant_client_and_collection
 
-    qclient, collection_name = get_qdrant_client_and_collection()
+    qclient, collection_name = get_qdrant_client_and_collection(timeout=120)
     qdrant_backend = Backend(provider="qdrant", client=qclient, collection=collection_name)
     chroma_backend = Backend(provider="chroma", client=chroma_client, collection=chroma_collection)
 
@@ -120,8 +144,8 @@ def main() -> None:
         logger.error("QDRANT_URL chưa set trong .env — xem hướng dẫn ở đầu file này.")
         sys.exit(1)
 
-    docs, metas, embs, chroma_client, chroma_collection = load_chroma_corpus()
-    migrate(docs, metas, embs)
+    ids, docs, metas, embs, chroma_client, chroma_collection = load_chroma_corpus()
+    migrate(ids, docs, metas, embs)
 
     if args.verify:
         verify(docs, metas, embs, chroma_client, chroma_collection)

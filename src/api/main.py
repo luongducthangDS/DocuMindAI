@@ -124,7 +124,7 @@ def _load_nodes_from_backend(backend) -> list:
             )
 
         chunks = fetch_all_chunks(backend, limit=_BM25_NODE_CAP)
-        nodes = [TextNode(text=text, metadata=metadata) for text, metadata in chunks]
+        nodes = [TextNode(id_=cid, text=text, metadata=metadata) for cid, text, metadata in chunks]
         logger.info("Loaded {} BM25 nodes from {} (collection size: {})",
                      len(nodes), backend.provider, count)
         return nodes
@@ -209,7 +209,10 @@ app.add_middleware(
     allow_origins=settings.cors_origins,
     allow_credentials=False,   # no cookies
     allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type", "Authorization"],
+    # X-API-Key: tenant credential (src/api/principal.py). Without it here the
+    # browser preflight rejects the header whenever frontend and backend sit on
+    # different origins (Vercel -> Render), and every call silently goes anonymous.
+    allow_headers=["Content-Type", "Authorization", "X-API-Key"],
 )
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 

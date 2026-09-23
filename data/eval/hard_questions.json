@@ -1,0 +1,535 @@
+[
+  {
+    "id": "lh_m01",
+    "pair_id": "thu_viec_ky_su",
+    "question": "Công ty tuyển một kỹ sư cho vị trí yêu cầu trình độ đại học, mức lương chính thức 12.000.000 đồng/tháng. Thời gian thử việc được kéo dài tối đa bao lâu và lương thử việc thấp nhất là bao nhiêu?",
+    "as_of_date": "2026-03-01",
+    "category": "thu_viec",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Điều 25 khoản 2 Bộ luật Lao động: không quá 60 ngày với công việc cần trình độ từ cao đẳng trở lên. Điều 26: lương thử việc ít nhất bằng 85% mức lương của công việc, tức ít nhất 10.200.000 đồng/tháng.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "",
+    "source_clauses": [
+      "45-2019-QH14__d25",
+      "45-2019-QH14__d26"
+    ],
+    "expect_contains": [
+      [
+        "60 ngày"
+      ],
+      [
+        "10.200.000",
+        "10,2 triệu",
+        "10.2 triệu"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_m02",
+    "pair_id": "tro_cap_thoi_viec_mat_viec",
+    "question": "Trợ cấp thôi việc và trợ cấp mất việc làm khác nhau thế nào về mức chi trả cho mỗi năm làm việc? Khoảng thời gian nào bị trừ ra khi tính các khoản trợ cấp này?",
+    "as_of_date": "2026-03-01",
+    "category": "cham_dut_hdld",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Điều 46: trợ cấp thôi việc mỗi năm làm việc được một nửa tháng tiền lương. Điều 47: trợ cấp mất việc làm mỗi năm làm việc 01 tháng tiền lương nhưng ít nhất bằng 02 tháng tiền lương. Cả hai đều trừ thời gian đã tham gia bảo hiểm thất nghiệp và thời gian đã được chi trả trợ cấp thôi việc, mất việc làm.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "",
+    "source_clauses": [
+      "45-2019-QH14__d46",
+      "45-2019-QH14__d47"
+    ],
+    "expect_contains": [
+      [
+        "nửa tháng",
+        "1/2 tháng",
+        "0,5 tháng",
+        "một nửa"
+      ],
+      [
+        "01 tháng tiền lương",
+        "1 tháng tiền lương",
+        "một tháng tiền lương",
+        "01 tháng lương",
+        "1 tháng lương"
+      ],
+      [
+        "02 tháng",
+        "hai tháng",
+        "2 tháng tiền lương",
+        "2 tháng lương"
+      ],
+      [
+        "bảo hiểm thất nghiệp"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false,
+    "scoring_note": "Sửa công cụ chấm ngày 2026-09-23 SAU khi xem output lần chạy đầu: chỉ thêm cách viết tương đương / thu hẹp chuỗi cấm cho đúng lỗi cần bắt. Đáp án không đổi."
+  },
+  {
+    "id": "lh_m03",
+    "pair_id": "nghi_hang_nam_tham_nien",
+    "question": "Nhân viên văn phòng làm việc trong điều kiện bình thường, đã làm liên tục 17 năm cho cùng một công ty. Mỗi năm người này được nghỉ hằng năm hưởng nguyên lương bao nhiêu ngày?",
+    "as_of_date": "2026-03-01",
+    "category": "nghi_hang_nam",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Điều 113 khoản 1 điểm a: 12 ngày làm việc. Điều 114: cứ đủ 05 năm làm việc cho một người sử dụng lao động được tăng thêm 01 ngày — 17 năm đủ 3 lần 5 năm, thêm 3 ngày. Tổng 15 ngày làm việc.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "",
+    "source_clauses": [
+      "45-2019-QH14__d113",
+      "45-2019-QH14__d114"
+    ],
+    "expect_contains": [
+      [
+        "15 ngày"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_m04",
+    "pair_id": "lam_them_det_may",
+    "question": "Công nhân một nhà máy may hàng xuất khẩu được làm thêm tối đa bao nhiêu giờ trong một năm và trong một tháng? Nếu làm thêm vào Chủ nhật (ngày nghỉ hằng tuần) thì được trả lương ít nhất bao nhiêu phần trăm?",
+    "as_of_date": "2026-03-01",
+    "category": "lam_them_gio",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Điều 107 khoản 3 điểm a: sản xuất, gia công xuất khẩu hàng dệt, may được làm thêm không quá 300 giờ/năm; khoản 2 điểm b: không quá 40 giờ/tháng. Điều 98 khoản 1 điểm b: làm thêm vào ngày nghỉ hằng tuần ít nhất bằng 200%.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "",
+    "source_clauses": [
+      "45-2019-QH14__d107",
+      "45-2019-QH14__d98"
+    ],
+    "expect_contains": [
+      [
+        "300 giờ"
+      ],
+      [
+        "40 giờ"
+      ],
+      [
+        "200%"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_m05a",
+    "pair_id": "huu_tri_nam_16_nam_dong",
+    "question": "Lao động nam làm việc trong điều kiện bình thường, đã đóng bảo hiểm xã hội bắt buộc 16 năm. Nếu nghỉ việc trong năm nay thì phải đủ bao nhiêu tuổi mới được nghỉ hưu, và người này có đủ điều kiện hưởng lương hưu không?",
+    "as_of_date": "2025-03-01",
+    "category": "huu_tri",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Năm 2025, tuổi nghỉ hưu của lao động nam trong điều kiện bình thường là 61 tuổi 3 tháng (Điều 4 Nghị định 135/2020/NĐ-CP). Theo Điều 54 Luật BHXH 58/2014/QH13 (còn hiệu lực tới 30/6/2025) phải có đủ 20 năm đóng BHXH — 16 năm chưa đủ điều kiện hưởng lương hưu.",
+    "source_doc": "135-2020-ND-CP",
+    "source_clause": "",
+    "source_clauses": [
+      "135-2020-ND-CP__d4",
+      "58-2014-QH13__d54"
+    ],
+    "expect_contains": [
+      [
+        "61 tuổi 3 tháng",
+        "61 tuổi 03 tháng"
+      ],
+      [
+        "20 năm"
+      ]
+    ],
+    "expect_absent": [
+      "41/2024"
+    ],
+    "distractor_docs": [
+      "41-2024-QH15"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false,
+    "scoring_note": "Sửa công cụ chấm ngày 2026-09-23 SAU khi xem output lần chạy đầu: chỉ thêm cách viết tương đương / thu hẹp chuỗi cấm cho đúng lỗi cần bắt. Đáp án không đổi."
+  },
+  {
+    "id": "lh_m05b",
+    "pair_id": "huu_tri_nam_16_nam_dong",
+    "question": "Lao động nam làm việc trong điều kiện bình thường, đã đóng bảo hiểm xã hội bắt buộc 16 năm. Nếu nghỉ việc trong năm nay thì phải đủ bao nhiêu tuổi mới được nghỉ hưu, và người này có đủ điều kiện hưởng lương hưu không?",
+    "as_of_date": "2026-03-01",
+    "category": "huu_tri",
+    "temporal_kind": "multi_clause",
+    "expected_behavior": "answer",
+    "ground_truth": "Năm 2026, tuổi nghỉ hưu của lao động nam trong điều kiện bình thường là 61 tuổi 6 tháng (Điều 4 Nghị định 135/2020/NĐ-CP). Theo Điều 64 Luật BHXH 41/2024/QH15 (hiệu lực từ 01/7/2025) chỉ cần đủ 15 năm đóng BHXH bắt buộc — 16 năm đủ điều kiện hưởng lương hưu.",
+    "source_doc": "135-2020-ND-CP",
+    "source_clause": "",
+    "source_clauses": [
+      "135-2020-ND-CP__d4",
+      "41-2024-QH15__d64"
+    ],
+    "expect_contains": [
+      [
+        "61 tuổi 6 tháng",
+        "61 tuổi 06 tháng"
+      ],
+      [
+        "15 năm"
+      ]
+    ],
+    "expect_absent": [
+      "đủ 20 năm"
+    ],
+    "distractor_docs": [
+      "58-2014-QH13"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false,
+    "scoring_note": "Sửa công cụ chấm ngày 2026-09-23 SAU khi xem output lần chạy đầu: chỉ thêm cách viết tương đương / thu hẹp chuỗi cấm cho đúng lỗi cần bắt. Đáp án không đổi."
+  },
+  {
+    "id": "lh_t01",
+    "pair_id": "huu_tri_som_nu_2026",
+    "question": "Năm 2026, lao động nữ có đủ 15 năm làm nghề nặng nhọc, độc hại, nguy hiểm được nghỉ hưu sớm nhất ở độ tuổi nào?",
+    "as_of_date": "2026-06-01",
+    "category": "huu_tri",
+    "temporal_kind": "table_lookup",
+    "expected_behavior": "answer",
+    "ground_truth": "Bảng lộ trình tại Điều 5 Nghị định 135/2020/NĐ-CP: năm 2026, tuổi nghỉ hưu thấp nhất của lao động nữ thuộc trường hợp được nghỉ hưu ở tuổi thấp hơn là 52 tuổi.",
+    "source_doc": "135-2020-ND-CP",
+    "source_clause": "135-2020-ND-CP__d5",
+    "expect_contains": [
+      [
+        "52 tuổi"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_b01a",
+    "pair_id": "luong_toi_thieu_vung_2_giao_thoi",
+    "question": "Doanh nghiệp đặt tại địa bàn vùng II phải trả mức lương tối thiểu tháng là bao nhiêu?",
+    "as_of_date": "2025-12-31",
+    "category": "luong_toi_thieu",
+    "temporal_kind": "boundary",
+    "expected_behavior": "answer",
+    "ground_truth": "Ngày 31/12/2025 là ngày cuối cùng Nghị định 74/2024/NĐ-CP còn hiệu lực: vùng II là 4.410.000 đồng/tháng.",
+    "source_doc": "74-2024-ND-CP",
+    "source_clause": "74-2024-ND-CP__d3",
+    "expect_contains": [
+      [
+        "4.410.000"
+      ]
+    ],
+    "expect_absent": [
+      "4.730.000"
+    ],
+    "distractor_docs": [
+      "293-2025-ND-CP"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_b01b",
+    "pair_id": "luong_toi_thieu_vung_2_giao_thoi",
+    "question": "Doanh nghiệp đặt tại địa bàn vùng II phải trả mức lương tối thiểu tháng là bao nhiêu?",
+    "as_of_date": "2026-01-01",
+    "category": "luong_toi_thieu",
+    "temporal_kind": "boundary",
+    "expected_behavior": "answer",
+    "ground_truth": "Từ 01/01/2026 Nghị định 293/2025/NĐ-CP có hiệu lực: vùng II là 4.730.000 đồng/tháng.",
+    "source_doc": "293-2025-ND-CP",
+    "source_clause": "293-2025-ND-CP__d3",
+    "expect_contains": [
+      [
+        "4.730.000"
+      ]
+    ],
+    "expect_absent": [
+      "4.410.000"
+    ],
+    "distractor_docs": [
+      "74-2024-ND-CP"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_b02a",
+    "pair_id": "huu_tri_17_nam_giao_thoi",
+    "question": "Tôi đã đủ tuổi nghỉ hưu và nghỉ việc hôm nay, đã đóng bảo hiểm xã hội bắt buộc được 17 năm. Tôi có được hưởng lương hưu hằng tháng không?",
+    "as_of_date": "2025-06-30",
+    "category": "huu_tri",
+    "temporal_kind": "boundary",
+    "expected_behavior": "answer",
+    "ground_truth": "Ngày 30/6/2025 Luật BHXH 58/2014/QH13 còn hiệu lực: Điều 54 yêu cầu đủ 20 năm đóng BHXH. 17 năm chưa đủ để hưởng lương hưu hằng tháng.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d54",
+    "expect_contains": [
+      [
+        "20 năm"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [
+      "41-2024-QH15"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_b02b",
+    "pair_id": "huu_tri_17_nam_giao_thoi",
+    "question": "Tôi đã đủ tuổi nghỉ hưu và nghỉ việc hôm nay, đã đóng bảo hiểm xã hội bắt buộc được 17 năm. Tôi có được hưởng lương hưu hằng tháng không?",
+    "as_of_date": "2025-07-01",
+    "category": "huu_tri",
+    "temporal_kind": "boundary",
+    "expected_behavior": "answer",
+    "ground_truth": "Từ 01/7/2025 Luật BHXH 41/2024/QH15 có hiệu lực: Điều 64 chỉ yêu cầu đủ 15 năm đóng BHXH bắt buộc. 17 năm đủ điều kiện hưởng lương hưu.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d64",
+    "expect_contains": [
+      [
+        "15 năm"
+      ]
+    ],
+    "expect_absent": [
+      "đủ 20 năm"
+    ],
+    "distractor_docs": [
+      "58-2014-QH13"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false,
+    "scoring_note": "Sửa công cụ chấm ngày 2026-09-23 SAU khi xem output lần chạy đầu: chỉ thêm cách viết tương đương / thu hẹp chuỗi cấm cho đúng lỗi cần bắt. Đáp án không đổi."
+  },
+  {
+    "id": "lh_o01",
+    "pair_id": "ngoai_pham_vi_thue_tncn",
+    "question": "Mức giảm trừ gia cảnh cho bản thân người nộp thuế thu nhập cá nhân hiện nay là bao nhiêu?",
+    "as_of_date": "2026-03-01",
+    "category": "ngoai_pham_vi",
+    "temporal_kind": "out_of_scope",
+    "expected_behavior": "refuse",
+    "ground_truth": "Thuế TNCN nằm ngoài phạm vi corpus (manifest scope_out). Hệ thống phải từ chối, không trả lời bằng hiểu biết riêng của mô hình.",
+    "source_doc": "",
+    "source_clause": "",
+    "expect_contains": [
+      [
+        "không tìm thấy"
+      ]
+    ],
+    "expect_absent": [
+      "11.000.000",
+      "11 triệu",
+      "15.500.000",
+      "15,5 triệu"
+    ],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_o02",
+    "pair_id": "ngoai_pham_vi_bhyt",
+    "question": "Người lao động phải đóng bảo hiểm y tế bằng bao nhiêu phần trăm tiền lương tháng?",
+    "as_of_date": "2026-03-01",
+    "category": "ngoai_pham_vi",
+    "temporal_kind": "out_of_scope",
+    "expected_behavior": "refuse",
+    "ground_truth": "Bảo hiểm y tế nằm ngoài phạm vi corpus (manifest scope_out). Hệ thống phải từ chối.",
+    "source_doc": "",
+    "source_clause": "",
+    "expect_contains": [
+      [
+        "không tìm thấy"
+      ]
+    ],
+    "expect_absent": [
+      "1,5%",
+      "4,5%"
+    ],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_o03",
+    "pair_id": "ngoai_pham_vi_thue_tndn",
+    "question": "Thuế suất thuế thu nhập doanh nghiệp phổ thông hiện nay là bao nhiêu phần trăm?",
+    "as_of_date": "2026-03-01",
+    "category": "ngoai_pham_vi",
+    "temporal_kind": "out_of_scope",
+    "expected_behavior": "refuse",
+    "ground_truth": "Thuế thu nhập doanh nghiệp không thuộc phạm vi corpus. Hệ thống phải từ chối.",
+    "source_doc": "",
+    "source_clause": "",
+    "expect_contains": [
+      [
+        "không tìm thấy"
+      ]
+    ],
+    "expect_absent": [
+      "20%"
+    ],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_f01",
+    "pair_id": "phat_tien_di_muon",
+    "question": "Công ty được phạt tiền người lao động đi làm muộn tối đa bao nhiêu mỗi lần?",
+    "as_of_date": "2026-03-01",
+    "category": "ky_luat_lao_dong",
+    "temporal_kind": "false_premise",
+    "expected_behavior": "answer",
+    "ground_truth": "Tiền đề sai: Điều 127 khoản 2 Bộ luật Lao động nghiêm cấm phạt tiền, cắt lương thay việc xử lý kỷ luật lao động. Không có mức phạt tiền hợp pháp nào.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d127",
+    "expect_contains": [
+      [
+        "phạt tiền"
+      ],
+      [
+        "nghiêm cấm",
+        "bị cấm",
+        "không được"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_f02",
+    "pair_id": "nghi_phep_24_thang",
+    "question": "Theo Bộ luật Lao động, người lao động phải làm đủ 24 tháng mới được nghỉ hằng năm hưởng lương, đúng không?",
+    "as_of_date": "2026-03-01",
+    "category": "nghi_hang_nam",
+    "temporal_kind": "false_premise",
+    "expected_behavior": "answer",
+    "ground_truth": "Không đúng. Điều 113 khoản 1: làm việc đủ 12 tháng được nghỉ hằng năm; khoản 2: chưa đủ 12 tháng thì số ngày nghỉ theo tỷ lệ tương ứng với số tháng làm việc.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d113",
+    "expect_contains": [
+      [
+        "12 tháng"
+      ],
+      [
+        "tỷ lệ"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_c01",
+    "pair_id": "lam_them_45_gio_thang",
+    "question": "Một xưởng cơ khí (điều kiện lao động bình thường, không thuộc ngành được làm thêm 300 giờ/năm) yêu cầu công nhân làm thêm 45 giờ trong tháng này. Như vậy có vi phạm quy định về làm thêm giờ không?",
+    "as_of_date": "2026-03-01",
+    "category": "lam_them_gio",
+    "temporal_kind": "compliance",
+    "expected_behavior": "answer",
+    "ground_truth": "Có vi phạm. Điều 107 khoản 2 điểm b: số giờ làm thêm không quá 40 giờ trong 01 tháng; 45 giờ vượt 5 giờ.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d107",
+    "expect_contains": [
+      [
+        "40 giờ"
+      ],
+      [
+        "vi phạm",
+        "vượt"
+      ]
+    ],
+    "expect_absent": [
+      "không vi phạm"
+    ],
+    "distractor_docs": [],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_c02a",
+    "pair_id": "luong_5_2_trieu_vung_1",
+    "question": "Doanh nghiệp ở vùng I trả 5.200.000 đồng/tháng cho người lao động làm công việc giản đơn trong điều kiện bình thường, làm đủ thời giờ làm việc. Mức lương này có vi phạm quy định về lương tối thiểu không?",
+    "as_of_date": "2025-10-01",
+    "category": "luong_toi_thieu",
+    "temporal_kind": "compliance",
+    "expected_behavior": "answer",
+    "ground_truth": "Không vi phạm. Ngày 01/10/2025 áp dụng Nghị định 74/2024/NĐ-CP, lương tối thiểu tháng vùng I là 4.960.000 đồng; 5.200.000 đồng cao hơn mức này.",
+    "source_doc": "74-2024-ND-CP",
+    "source_clause": "74-2024-ND-CP__d3",
+    "expect_contains": [
+      [
+        "4.960.000"
+      ],
+      [
+        "không vi phạm",
+        "đáp ứng",
+        "cao hơn",
+        "hợp pháp",
+        "đúng quy định",
+        "không thấp hơn"
+      ]
+    ],
+    "expect_absent": [
+      "5.310.000"
+    ],
+    "distractor_docs": [
+      "293-2025-ND-CP"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "lh_c02b",
+    "pair_id": "luong_5_2_trieu_vung_1",
+    "question": "Doanh nghiệp ở vùng I trả 5.200.000 đồng/tháng cho người lao động làm công việc giản đơn trong điều kiện bình thường, làm đủ thời giờ làm việc. Mức lương này có vi phạm quy định về lương tối thiểu không?",
+    "as_of_date": "2026-02-01",
+    "category": "luong_toi_thieu",
+    "temporal_kind": "compliance",
+    "expected_behavior": "answer",
+    "ground_truth": "Có vi phạm. Từ 01/01/2026 áp dụng Nghị định 293/2025/NĐ-CP, lương tối thiểu tháng vùng I là 5.310.000 đồng; 5.200.000 đồng thấp hơn mức này.",
+    "source_doc": "293-2025-ND-CP",
+    "source_clause": "293-2025-ND-CP__d3",
+    "expect_contains": [
+      [
+        "5.310.000"
+      ],
+      [
+        "vi phạm",
+        "thấp hơn",
+        "dưới mức"
+      ]
+    ],
+    "expect_absent": [
+      "4.960.000",
+      "không vi phạm"
+    ],
+    "distractor_docs": [
+      "74-2024-ND-CP"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  }
+]

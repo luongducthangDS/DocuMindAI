@@ -40,6 +40,7 @@ from pathlib import Path
 _repo_root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_repo_root))
 
+from src.rag.context import stamp_access_meta
 from src.hf_env import use_local_hf_cache
 
 # Trước mọi import HuggingFace. offline=False: ingest là lúc hợp lệ để tải model
@@ -265,7 +266,12 @@ def main() -> None:
         if not docs:
             return
         embeddings = embedder.get_text_embedding_batch(docs)
-        collection.upsert(ids=ids, documents=docs, metadatas=metas, embeddings=embeddings)
+        # Stamped here, not in the chunker: `metas` has already been through the
+        # clause-version rewrites that close `effective_to` on superseded text,
+        # so this is the first point where the integer mirrors are guaranteed to
+        # match the strings they mirror (see src/rag/context.stamp_access_meta).
+        stamped = [stamp_access_meta(m) for m in metas]
+        collection.upsert(ids=ids, documents=docs, metadatas=stamped, embeddings=embeddings)
         total += len(docs)
         logger.info("Indexed {} chunks so far", total)
         ids.clear(); docs.clear(); metas.clear()

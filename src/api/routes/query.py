@@ -4,8 +4,10 @@ Query routes: POST /api/v1/query (JSON) + WebSocket /api/v1/ws/{session_id}
 
 from __future__ import annotations
 
+import asyncio
 import json
 import time
+from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -14,10 +16,12 @@ from loguru import logger
 
 from src.agent.graph import run_agent
 from src.agent.memory import ShortTermMemory, get_long_term_memory
+from src.api.principal import InvalidApiKey, context_from_headers, resolve_context
 from src.api.schemas import ComplianceVerdict, QueryRequest, QueryResponse, SourceItem, ThinkingStep
 from src.config import DOMAIN_NAME, get_settings
 from src.guardrails import check_prompt_injection, validate_citations
 from src.langfuse_otel import end_trace, start_trace
+from src.rag.context import PUBLIC_TENANT, reset_current_context, set_current_context
 from src.rag.generator import _cited_sources, stream_answer
 
 _CHAT_LOG: Path | None = None
@@ -27,6 +31,7 @@ def _get_chat_log() -> Path:
     global _CHAT_LOG
     if _CHAT_LOG is None:
         from src.config import get_settings
+
         log_dir = get_settings().logs_dir
         log_dir.mkdir(parents=True, exist_ok=True)
         _CHAT_LOG = log_dir / "chat_history.jsonl"
@@ -107,6 +112,7 @@ async def query_endpoint(request: Request, body: QueryRequest) -> QueryResponse:
             session_id=body.session_id,
             history=session.as_messages(),
             as_of_date=body.as_of_date,
+            retrieval_ctx=resolve_context(request, body.as_of_date),
         )
     except HTTPException:
         # ensure_rag_initialized() đã trả sẵn 503 kèm loại lỗi — giữ nguyên,
@@ -204,6 +210,22 @@ async def query_endpoint(request: Request, body: QueryRequest) -> QueryResponse:
     )
 
 
+@router.get("/whoami")
+async def whoami(request: Request) -> dict:
+    """Which tenant and ACL labels this request resolves to.
+
+    Exists so a client can confirm a key before asking anything — otherwise a
+    wrong key shows up only as a 401 on the first question, and a *valid* key
+    for the wrong tenant shows up as nothing at all: just different answers.
+    """
+    rctx = resolve_context(request)
+    return {
+        "tenant_id": rctx.tenant_id,
+        "acl_labels": sorted(rctx.acl_labels),
+        "authenticated": rctx.tenant_id != PUBLIC_TENANT,
+    }
+
+
 @router.websocket("/ws/{session_id}")
 async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
     """
@@ -219,8 +241,15 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
         return
 
     await websocket.accept()
+    try:
+        ws_ctx = context_from_headers(websocket.headers)
+    except InvalidApiKey:
+        # 4401: application-level "unauthorized" in the private close-code range.
+        logger.warning("WS rejected: bad API key, session={}", session_id)
+        await websocket.close(code=4401, reason="API key không hợp lệ.")
+        return
     session = _get_session(session_id)
-    logger.info("WebSocket connected: session={}", session_id)
+    logger.info("WebSocket connected: session={} tenant={}", session_id, ws_ctx.tenant_id)
 
     try:
         while True:
@@ -292,34 +321,49 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
                 query = _contextualize_query(query, history[-6:])
 
             # Import retriever to get chunks
+            # Per-message as_of so a client can ask the same question at two
+            # points in time on one socket; falls back to the connection default.
+            # Browsers cannot set headers on a WebSocket handshake (the WebSocket
+            # constructor takes a URL and subprotocols, nothing else), so the UI
+            # sends its key inside the message. A header, when present, still
+            # works for non-browser clients. Resolved per turn: the key in the
+            # message is what this question is asked under.
+            msg_key = str(data.get("api_key") or "").strip()
             try:
-                import src.rag.retriever as r_module
+                base_ctx = context_from_headers({"x-api-key": msg_key}) if msg_key else ws_ctx
+            except InvalidApiKey as exc:
+                await websocket.send_json({"error": str(exc)})
+                end_trace(ctx, lf_token, "documind-ws-query", raw_query, "")
+                continue
+            turn_ctx = replace(base_ctx, as_of_date=(data.get("as_of_date") or "").strip() or None)
+            # The WS path streams without going through run_agent, so it sets the
+            # ambient context itself — otherwise anything this turn reaches would
+            # fall back to the public default.
+            ws_ctx_token = set_current_context(turn_ctx)
+            try:
+                try:
+                    from src.rag.retriever import retrieve_with_context
 
-                retriever = getattr(r_module, "_active_retriever", None)
-                if retriever:
-                    if hasattr(retriever, "aretrieve"):
-                        nodes = await retriever.aretrieve(query)
-                    else:
-                        nodes = retriever.retrieve(query)
-                    from src.rag.retriever import nodes_to_chunks
+                    chunks = await asyncio.to_thread(retrieve_with_context, query, turn_ctx)
+                    if not chunks:
+                        from src.rag.retriever import retrieve_direct_chroma
 
-                    chunks = nodes_to_chunks(nodes)
-                else:
-                    chunks = []
-                if not chunks:
+                        chunks = retrieve_direct_chroma(query, ctx=turn_ctx)
+                except Exception as exc:
+                    logger.warning("Retrieval failed in WS handler: {}", exc)
                     from src.rag.retriever import retrieve_direct_chroma
 
-                    chunks = retrieve_direct_chroma(query)
-            except Exception as exc:
-                logger.warning("Retrieval failed in WS handler: {}", exc)
-                from src.rag.retriever import retrieve_direct_chroma
+                    chunks = retrieve_direct_chroma(query, ctx=turn_ctx)
 
-                chunks = retrieve_direct_chroma(query)
-
-            answer_parts = []
-            async for token in stream_answer(query, chunks):
-                await websocket.send_text(token)
-                answer_parts.append(token)
+                answer_parts = []
+                async for token in stream_answer(query, chunks):
+                    await websocket.send_text(token)
+                    answer_parts.append(token)
+            finally:
+                # In a finally: one socket serves many turns, and a turn that
+                # raised mid-stream would otherwise leave its context set for
+                # whatever runs next on this connection.
+                reset_current_context(ws_ctx_token)
 
             full_answer = "".join(answer_parts)
             end_trace(ctx, lf_token, "documind-ws-query", raw_query, full_answer)

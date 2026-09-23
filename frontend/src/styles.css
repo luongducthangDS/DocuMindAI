@@ -208,6 +208,44 @@ nav { display: flex; flex-direction: column; gap: 3px; }
 }
 .theme-toggle:hover { color: var(--text1); border-color: var(--text3); }
 
+.tenant-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--surface2);
+  border-radius: 8px;
+}
+.tenant-label { font-size: 11.5px; color: var(--text2); overflow-wrap: anywhere; }
+.tenant-label strong { color: var(--text1); font-weight: 600; }
+.tenant-label .tenant-bad { color: var(--red); }
+.tenant-labels { color: var(--text3); }
+.tenant-row { display: flex; gap: 6px; }
+.tenant-input {
+  flex: 1;
+  min-width: 0;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text1);
+  font-size: 12px;
+  font-family: inherit;
+}
+.tenant-input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.tenant-apply {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text2);
+  border-radius: 6px;
+  padding: 4px 9px;
+  font-size: 11.5px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.tenant-apply:hover:not(:disabled) { color: var(--text1); border-color: var(--accent); }
+.tenant-apply:disabled { opacity: .45; cursor: not-allowed; }
+
 .session-info {
   padding: 7px 10px;
   background: var(--surface2);

@@ -294,6 +294,29 @@ documents:
     bi_thay_the_boi: ["41/2024/QH15"]
     nguon: "https://thuvienphapluat.vn/van-ban/Bao-hiem/Luat-Bao-hiem-xa-hoi-2014-259700.aspx"
     verify_status: "VERIFIED"
+    sua_doi_boi:
+      - so_hieu: "45/2019/QH14"
+        hieu_luc_tu: "2021-01-01"
+        pham_vi: "Điều 219 khoản 1 điểm a, b: thay toàn bộ Điều 54, Điều 55 — tuổi hưởng lương hưu dẫn chiếu Điều 169 BLLĐ (lộ trình NĐ 135/2020) thay cho 'nam đủ 60, nữ đủ 55'."
+        verify: "VERIFIED (nguyên văn Điều 219 trong data/raw/lao_dong/45-2019-QH14.md)"
+    # 2026-09-23: file 58-2014-QH13.md là bản gốc 2014 (không VBHN), nên chữ cũ
+    # "Nam đủ 60 tuổi" từng được coi là còn hiệu lực tới 2025 → trả lời sai tuổi hưu.
+    # Không có `khoan` = sửa cả Điều.
+    sua_doi_in_place:
+      - clause_uid: "58-2014-QH13__d54"
+        dieu: 54
+        dieu_tieu_de: "Điều kiện hưởng lương hưu"
+        effective_from: "2021-01-01"
+        amended_by_doc: "45/2019/QH14"
+        loai_sua: "sua_doi_khong_co_vbhn"
+        version_moi: "_versions/58-2014-QH13__d54__2021-01-01.md"
+      - clause_uid: "58-2014-QH13__d55"
+        dieu: 55
+        dieu_tieu_de: "Điều kiện hưởng lương hưu khi suy giảm khả năng lao động"
+        effective_from: "2021-01-01"
+        amended_by_doc: "45/2019/QH14"
+        loai_sua: "sua_doi_khong_co_vbhn"
+        version_moi: "_versions/58-2014-QH13__d55__2021-01-01.md"
 
   - doc_id: "115-2015-ND-CP"
     loai: "Nghị định"

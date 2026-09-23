@@ -12,6 +12,7 @@ from fastapi import APIRouter, HTTPException, Request, UploadFile, File, status
 from loguru import logger
 
 from src.agent.memory import get_long_term_memory
+from src.api.principal import resolve_context
 from src.api.routes.query import _get_client_ip
 from src.api.schemas import DocumentListResponse, DocumentMeta, IngestResponse
 from src.config import get_settings
@@ -22,6 +23,18 @@ router = APIRouter(prefix="/api/v1", tags=["documents"])
 
 # In-memory document registry (replaced by DB in production)
 _doc_registry: dict[str, DocumentMeta] = {}
+# Owning tenant per registry entry. Kept beside the registry rather than as a
+# DocumentMeta field so the public response schema does not change.
+_doc_tenant: dict[str, str] = {}
+
+
+def _upload_label(ctx) -> str:
+    """Most restrictive label the uploading tenant holds."""
+    ranked = ["confidential", "internal", "public"]
+    for label in ranked:
+        if label in ctx.acl_labels:
+            return label
+    return "public"
 
 
 def _audit_upload_error(filename: str, size: int, error: str, ip: str, ua: str) -> None:
@@ -46,6 +59,7 @@ async def upload_document(request: Request, file: UploadFile = File(...)) -> Ing
     Security checks: file size, MIME type, PDF magic bytes.
     """
     settings = get_settings()
+    ctx = resolve_context(request)
     ip = _get_client_ip(request)
     ua = request.headers.get("user-agent", "")[:200]
     filename = file.filename or "unknown.pdf"
@@ -106,8 +120,9 @@ async def upload_document(request: Request, file: UploadFile = File(...)) -> Ing
             message="No valid chunks extracted from document",
         )
 
-    indexed = await _index_chunks(chunks, doc)
+    indexed = await _index_chunks(chunks, doc, ctx=ctx)
     doc_id = str(uuid.uuid4())
+    _doc_tenant[doc_id] = ctx.tenant_id
     _doc_registry[doc_id] = DocumentMeta(
         id=doc_id,
         title=doc["title"],
@@ -135,9 +150,16 @@ async def upload_document(request: Request, file: UploadFile = File(...)) -> Ing
 
 
 @router.get("/documents", response_model=DocumentListResponse)
-async def list_documents() -> DocumentListResponse:
-    """List all indexed documents."""
-    docs = list(_doc_registry.values())
+async def list_documents(request: Request) -> DocumentListResponse:
+    """List the uploaded documents the caller's tenant may see.
+
+    Filtering the chunks is not enough on its own: a listing that returned every
+    tenant's uploads would still disclose what other tenants hold — titles are
+    often the sensitive part ("Phương án cắt giảm lao động 2026").
+    """
+    visible = set(resolve_context(request).visible_tenants)
+    docs = [d for doc_id, d in _doc_registry.items()
+            if _doc_tenant.get(doc_id, "public") in visible]
     return DocumentListResponse(total=len(docs), documents=docs)
 
 
@@ -163,8 +185,14 @@ async def reload_retriever() -> dict:
     return {"status": "ok", "message": "Retriever reloaded"}
 
 
-async def _index_chunks(chunks: list, doc: dict) -> int:
-    """Add chunks to the active vector index and refresh retriever. Returns count indexed."""
+async def _index_chunks(chunks: list, doc: dict, ctx=None) -> int:
+    """Add chunks to the active vector index and refresh retriever. Returns count indexed.
+
+    Every node is stamped with the uploader's tenant and ACL label before it is
+    written. An unstamped chunk would default to tenant `public` at query time
+    (RetrievalContext.allows), i.e. one tenant's upload would be readable by all
+    of them — so stamping happens here, at the only write path for uploads.
+    """
     import asyncio
 
     try:
@@ -176,8 +204,18 @@ async def _index_chunks(chunks: list, doc: dict) -> int:
             logger.warning("No active index found — chunks not persisted")
             return 0
 
+        from src.rag.context import PUBLIC_CONTEXT, stamp_access_meta
+
+        ctx = ctx or PUBLIC_CONTEXT
+        # An uploader writes at the *least* privileged label it holds: a doc
+        # nobody but its tenant should read must not be stamped `public` just
+        # because the uploader also happens to hold that label.
+        acl_label = min(ctx.acl_labels) if ctx.tenant_id == "public" else _upload_label(ctx)
         nodes = [
-            TextNode(text=c.text, metadata=c.metadata)
+            TextNode(
+                text=c.text,
+                metadata=stamp_access_meta(c.metadata, tenant_id=ctx.tenant_id, acl_label=acl_label),
+            )
             for c in chunks
             if c.is_valid
         ]

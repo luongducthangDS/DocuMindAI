@@ -363,6 +363,33 @@ class TestAmendedClauseWithoutVBHN:
         assert "vợ sinh con thứ hai" not in texts["2025-07-01"]
 
 
+class TestWholeArticleReplacedWithoutVBHN:
+    """Điều 54 Luật BHXH 2014, thay toàn bộ bởi Điều 219 khoản 1 BLLĐ 2019.
+
+    Regression: the 2014 wording "Nam đủ 60 tuổi" was treated as in force until
+    2025, so a 2025 retirement-age question got a confident wrong answer.
+    """
+
+    @pytest.fixture(scope="class")
+    def d54(self, manifest):
+        from scripts.ingest_documents import build_clause_chunks
+
+        chunks = build_clause_chunks(manifest["58-2014-QH13"], CORPUS_DIR, "2026-09-23")
+        return {c.metadata["effective_from"]: c for c in chunks
+                if c.metadata["clause_uid"] == "58-2014-QH13__d54"}
+
+    def test_old_wording_ends_when_bllđ_2019_takes_effect(self, d54):
+        assert set(d54) == {"2016-01-01", "2021-01-01"}
+        assert d54["2016-01-01"].metadata["effective_to"] == "2021-01-01"
+        assert "Nam đủ 60 tuổi" in d54["2016-01-01"].text
+
+    def test_new_wording_points_to_article_169_and_ends_with_the_law(self, d54):
+        new = d54["2021-01-01"]
+        assert new.metadata["effective_to"] == "2025-07-01"
+        assert "khoản 2 Điều 169 của Bộ luật Lao động" in new.text
+        assert "Nam đủ 60 tuổi" not in new.text
+
+
 class TestClauseStatus:
     def test_status_depends_on_as_of(self):
         from src.ingestion.chunker import clause_status

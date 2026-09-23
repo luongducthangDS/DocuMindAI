@@ -143,7 +143,13 @@ def _split_amended_dieu(
     wanted = {(a.khoan, a.khoan_hau_to): a for a in amendments if a.khoan is not None}
     buckets: list[tuple[InPlaceAmendment | None, list[str]]] = [(None, [])]
 
-    for line in dieu_text.split("\n"):
+    # No khoản given = the whole article was replaced (e.g. Điều 219 BLLĐ 2019
+    # rewriting Điều 54 Luật BHXH 2014): one chunk, versioned as a unit.
+    whole = next((a for a in amendments if a.khoan is None), None)
+    if whole is not None:
+        buckets = [(whole, dieu_text.split("\n"))]
+
+    for line in ([] if whole is not None else dieu_text.split("\n")):
         m = _KHOAN_HEAD_RE.match(line.strip())
         if m:
             key = (int(m.group(1)), m.group(2))
