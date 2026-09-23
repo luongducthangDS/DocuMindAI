@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
 
@@ -26,6 +26,7 @@ interface Message {
   steps?: ThinkingStep[];
   streaming?: boolean; // true trong lúc chờ/nhận token qua WebSocket
   error?: boolean; // true nếu đây là thông báo lỗi hệ thống, không phải câu trả lời
+  stopped?: boolean; // người dùng bấm Dừng giữa chừng — phần chữ đã stream được giữ lại
 }
 
 interface Bookmark {
@@ -73,9 +74,10 @@ function extractErrorMessage(detail: unknown, fallback: string): string {
 }
 
 const api = {
-  async query(query: string, session_id: string) {
+  async query(query: string, session_id: string, signal?: AbortSignal) {
     const r = await fetch(`${BASE}/query`, {
       method: "POST",
+      signal,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query, session_id }),
     });
@@ -179,6 +181,8 @@ function bookmarkId(question: string, answer: string): string {
 // sửa cả hai chỗ; mọi nhãn hiển thị phải lấy từ đây, không viết lại rải rác.
 const PRODUCT = {
   tagline: "Trợ lý tra cứu pháp luật lao động & BHXH",
+  laws: "Bộ luật Lao động · Luật BHXH · Luật Việc làm",
+  heroTitle: "Hỏi đáp luật lao động & BHXH, có dẫn chứng từng điều khoản",
   scope: "pháp luật lao động và bảo hiểm xã hội",
   chatTitle: "Hỏi đáp pháp luật lao động & BHXH",
   emptySub:
@@ -189,12 +193,76 @@ const PRODUCT = {
 };
 
 const SUGGESTED = [
-  "Thời gian thử việc tối đa là bao lâu?",
-  "Làm thêm giờ tối đa bao nhiêu giờ trong một năm?",
-  "Mức lương tối thiểu vùng I hiện nay là bao nhiêu?",
-  "Điều kiện hưởng trợ cấp thất nghiệp là gì?",
-  "Nghỉ việc đúng luật cần báo trước bao nhiêu ngày?",
+  { topic: "Hợp đồng", q: "Thời gian thử việc tối đa là bao lâu?" },
+  { topic: "Thời giờ làm việc", q: "Làm thêm giờ tối đa bao nhiêu giờ trong một năm?" },
+  { topic: "Tiền lương", q: "Mức lương tối thiểu vùng I hiện nay là bao nhiêu?" },
+  { topic: "Bảo hiểm thất nghiệp", q: "Điều kiện hưởng trợ cấp thất nghiệp là gì?" },
+  { topic: "Chấm dứt hợp đồng", q: "Nghỉ việc đúng luật cần báo trước bao nhiêu ngày?" },
+  { topic: "Hưu trí", q: "Tuổi nghỉ hưu của người lao động năm 2026 là bao nhiêu?" },
 ];
+
+const HIGHLIGHTS: { icon: IconName; text: string }[] = [
+  { icon: "quote", text: "Trích dẫn đúng điều, khoản" },
+  { icon: "clock", text: "Phân biệt văn bản còn / hết hiệu lực" },
+  { icon: "shield", text: "Từ chối câu hỏi ngoài phạm vi" },
+];
+
+// ── Icons ─────────────────────────────────────────────────────────────────────
+// ponytail: bộ path nét 24×24 tự viết thay vì thêm thư viện icon cho ~20 hình.
+const ICON_PATHS = {
+  chat: "M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z",
+  book: "M4 19.5A2.5 2.5 0 0 1 6.5 17H20V2H6.5A2.5 2.5 0 0 0 4 4.5v15zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5",
+  bookmark: "M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z",
+  upload: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12",
+  plus: "M12 5v14M5 12h14",
+  arrowUp: "M12 19V5M5 12l7-7 7 7",
+  stop: "M6 6h12v12H6z",
+  copy: "M9 9h11v11H9zM5 15H4V4h11v1",
+  check: "M20 6L9 17l-5-5",
+  moon: "M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z",
+  sun: "M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4",
+  menu: "M3 6h18M3 12h18M3 18h18",
+  x: "M18 6L6 18M6 6l12 12",
+  trash: "M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6",
+  file: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6",
+  search: "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3",
+  edit: "M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z",
+  quote: "M4 7h6v6H4zM4 13c0 3 1 5 4 6M14 7h6v6h-6zM14 13c0 3 1 5 4 6",
+  clock: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2",
+  shield: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
+};
+type IconName = keyof typeof ICON_PATHS;
+
+function Icon({ name, size = 16 }: { name: IconName; size?: number }) {
+  const filled = name === "stop";
+  return (
+    <svg
+      className="icon"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill={filled ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth={filled ? 0 : 1.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d={ICON_PATHS[name]} />
+    </svg>
+  );
+}
+
+function BrandMark({ size = 34 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 34 34" fill="none" aria-hidden="true" className="brand-mark">
+      <rect width="34" height="34" rx="9" style={{ fill: "var(--accent)" }} />
+      <path d="M10 10h14M10 15.5h14M10 21h9" stroke="#fdfaf2" strokeWidth="2.2" strokeLinecap="round" />
+      <circle cx="24" cy="23.5" r="4.6" style={{ fill: "var(--highlight)" }} />
+      <path d="M22.2 23.5l1.2 1.2 2-2.2" stroke="#fdfaf2" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 // ── Citation helpers ──────────────────────────────────────────────────────────
 function sourceDomId(msgIndex: number, citationN: number) {
@@ -368,14 +436,16 @@ function AnswerActions({
           }
         }}
       >
-        {copied ? "✅ Đã sao chép" : "📋 Sao chép"}
+        <Icon name={copied ? "check" : "copy"} size={14} />
+        {copied ? "Đã sao chép" : "Sao chép"}
       </button>
       <button
         className={`icon-btn${bookmarked ? " icon-btn-active" : ""}`}
         title={bookmarked ? "Bỏ lưu" : "Lưu lại"}
         onClick={onToggleBookmark}
       >
-        {bookmarked ? "🔖 Đã lưu" : "🔖 Lưu"}
+        <Icon name="bookmark" size={14} />
+        {bookmarked ? "Đã lưu" : "Lưu"}
       </button>
     </div>
   );
@@ -416,10 +486,23 @@ function App() {
   const [theme, setTheme] = useState<Theme>(loadStoredTheme);
   const fileRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  // Mỗi lượt gửi/huỷ tăng reqRef; callback của lượt cũ (WS/REST về muộn) so id
+  // và tự bỏ qua. abortRef đóng WS / abort fetch của lượt đang chạy.
+  const reqRef = useRef(0);
+  const abortRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Ô nhập tự giãn theo nội dung, kể cả khi đổi từ code (huỷ, gợi ý, sửa).
+  useLayoutEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 200)}px`;
+  }, [question, tab]);
 
   // Đếm giờ sống trong lúc chờ (REST) hoặc đang stream (WS) — vd. "12.3s"
   // cạnh chấm "..." thay vì im lặng không biết còn đang chạy hay đứng hình.
@@ -485,7 +568,15 @@ function App() {
     }
   }
 
+  function abortInFlight() {
+    reqRef.current++;
+    abortRef.current?.();
+    abortRef.current = null;
+    setBusy(false);
+  }
+
   function newConversation() {
+    if (busy) abortInFlight();
     const id = genSessionId();
     setSessionId(id);
     setMessages([]);
@@ -510,9 +601,12 @@ function App() {
   // Đường cũ: chờ toàn bộ pipeline xong mới hiện 1 cục câu trả lời. Vẫn dùng
   // cho so sánh/tóm tắt/báo cáo/tuân thủ (chỉ REST làm được), và làm fallback
   // khi WS lỗi/không mở được.
-  async function sendViaRest(q: string) {
+  async function sendViaRest(q: string, reqId: number) {
+    const ctrl = new AbortController();
+    abortRef.current = () => ctrl.abort();
     try {
-      const d = await api.query(q, sessionId);
+      const d = await api.query(q, sessionId, ctrl.signal);
+      if (reqId !== reqRef.current) return;
       setMessages((m) => [
         ...m,
         {
@@ -525,12 +619,13 @@ function App() {
         },
       ]);
     } catch (e: unknown) {
+      if (reqId !== reqRef.current) return;
       setMessages((m) => [
         ...m,
         { role: "assistant", content: `❌ ${(e as Error).message}`, error: true },
       ]);
     } finally {
-      setBusy(false);
+      if (reqId === reqRef.current) setBusy(false);
     }
   }
 
@@ -540,7 +635,7 @@ function App() {
   // tier ngủ/rớt kết nối). Server gửi token thô (text frame) xen giữa 2 JSON
   // control message ({"error":...} hoặc {"done":true,"sources":[...]}) — xem
   // src/api/routes/query.py::websocket_stream.
-  function sendViaStream(q: string) {
+  function sendViaStream(q: string, reqId: number) {
     setMessages((m) => [...m, { role: "assistant", content: "", streaming: true }]);
 
     const startedAt = Date.now();
@@ -559,7 +654,7 @@ function App() {
       if (settled) return;
       settled = true;
       setMessages((m) => m.slice(0, -1)); // bỏ placeholder rỗng
-      sendViaRest(q);
+      sendViaRest(q, reqId);
     };
 
     let ws: WebSocket;
@@ -579,12 +674,19 @@ function App() {
       }
     }, 60000);
 
+    abortRef.current = () => {
+      settled = true;
+      clearTimeout(openTimeout);
+      ws.close();
+    };
+
     ws.onopen = () => {
       clearTimeout(openTimeout);
       ws.send(JSON.stringify({ query: q }));
     };
 
     ws.onmessage = (ev) => {
+      if (reqId !== reqRef.current) return;
       const data = ev.data as string;
       let control: { done?: boolean; error?: string; sources?: Source[] } | null = null;
       try {
@@ -642,11 +744,35 @@ function App() {
     setMessages((m) => [...m, { role: "user", content: q }]);
     setQuestion("");
     setBusy(true);
+    const reqId = ++reqRef.current;
     if (needsRest(q)) {
-      await sendViaRest(q);
+      await sendViaRest(q, reqId);
     } else {
-      sendViaStream(q);
+      sendViaStream(q, reqId);
     }
+  }
+
+  // Dừng lượt đang chờ. Chưa có chữ nào thì gỡ luôn câu hỏi khỏi khung chat;
+  // đã stream được một phần thì giữ phần đó, đánh dấu "Đã dừng". Cả hai trường
+  // hợp đều trả câu hỏi về ô nhập để sửa rồi gửi lại.
+  // ponytail: REST chỉ abort phía client — server vẫn chạy nốt và ghi lượt đó
+  // vào memory phiên; WS thì không (server chỉ lưu khi stream xong).
+  function cancel() {
+    if (!busy) return;
+    abortInFlight();
+
+    const last = messages[messages.length - 1];
+    const hasPlaceholder = last?.role === "assistant" && !!last.streaming;
+    const keepPartial = hasPlaceholder && !!last.content;
+    const userIdx = messages.length - (hasPlaceholder ? 2 : 1);
+    const userMsg = messages[userIdx];
+    if (keepPartial) {
+      setMessages([...messages.slice(0, -1), { ...last, streaming: false, stopped: true }]);
+    } else if (userMsg?.role === "user") {
+      setMessages(messages.slice(0, userIdx));
+    }
+    if (userMsg?.role === "user" && !question.trim()) setQuestion(userMsg.content);
+    inputRef.current?.focus();
   }
 
   async function handleUpload(file: File) {
@@ -672,11 +798,11 @@ function App() {
   const healthDot = health === "ok" ? "dot-green" : health === "degraded" ? "dot-yellow" : "dot-red";
   const healthLabel = health === "ok" ? "Hệ thống bình thường" : health === "degraded" ? "Suy giảm" : health === "unknown" ? "Đang kiểm tra…" : "Lỗi kết nối";
 
-  const NAV_DEFS: { id: typeof tab; icon: string; label: string; badge?: string }[] = [
-    { id: "chat", icon: "💬", label: PRODUCT.chatTitle },
-    { id: "docs", icon: "📚", label: "Văn bản đã lập chỉ mục", badge: docsLoaded ? String(docs.length) : undefined },
-    { id: "bookmarks", icon: "🔖", label: "Đã lưu", badge: bookmarks.length > 0 ? String(bookmarks.length) : undefined },
-    { id: "upload", icon: "📤", label: "Tải lên văn bản" },
+  const NAV_DEFS: { id: typeof tab; icon: IconName; label: string; badge?: string }[] = [
+    { id: "chat", icon: "chat", label: "Hỏi đáp" },
+    { id: "docs", icon: "book", label: "Văn bản đã lập chỉ mục", badge: docsLoaded ? String(docs.length) : undefined },
+    { id: "bookmarks", icon: "bookmark", label: "Đã lưu", badge: bookmarks.length > 0 ? String(bookmarks.length) : undefined },
+    { id: "upload", icon: "upload", label: "Tải lên văn bản" },
   ];
 
   const HEADERS: Record<typeof tab, [string, string]> = {
@@ -686,35 +812,54 @@ function App() {
     upload: ["Tải lên văn bản", "PDF được tách theo Điều / Khoản"],
   };
   const [headerTitle, headerSub] = HEADERS[tab];
+  const isLanding = tab === "chat" && messages.length === 0;
+
+  // Điền vào ô nhập thay vì gửi ngay — sửa được trước khi Enter.
+  function fillComposer(q: string) {
+    setQuestion(q);
+    inputRef.current?.focus();
+  }
 
   return (
     <div className="layout">
       {/* ── Mobile topbar ── */}
       <div className="mobile-topbar">
-        <button className="hamburger" onClick={() => setSidebarOpen(true)} aria-label="Mở menu">
-          ☰
+        <button className="icon-only" onClick={() => setSidebarOpen(true)} aria-label="Mở menu">
+          <Icon name="menu" size={20} />
         </button>
-        <span className="mobile-topbar-title">DocuMind AI</span>
+        <span className="mobile-topbar-title">DocuMind</span>
+        <button
+          className="icon-only"
+          onClick={() => { newConversation(); setTab("chat"); }}
+          disabled={isLanding}
+          aria-label="Cuộc trò chuyện mới"
+        >
+          <Icon name="plus" size={20} />
+        </button>
       </div>
       {sidebarOpen && <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />}
 
       {/* ── Sidebar ── */}
       <aside className={`sidebar${sidebarOpen ? " sidebar-open" : ""}`}>
         <div className="brand">
-          <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
-            <rect width="34" height="34" rx="9" style={{ fill: "var(--accent)" }} />
-            <path d="M10 10h14M10 15.5h14M10 21h9" stroke="#fdfaf2" strokeWidth="2.2" strokeLinecap="round" />
-            <circle cx="24" cy="23.5" r="4.6" style={{ fill: "var(--highlight)" }} />
-            <path d="M22.2 23.5l1.2 1.2 2-2.2" stroke="#fdfaf2" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          <div>
+          <BrandMark size={34} />
+          <div className="brand-text">
             <div className="brand-name">DocuMind</div>
             <div className="brand-sub">{PRODUCT.tagline}</div>
           </div>
-          <button className="sidebar-close" onClick={() => setSidebarOpen(false)} aria-label="Đóng menu">
-            ✕
+          <button className="icon-only sidebar-close" onClick={() => setSidebarOpen(false)} aria-label="Đóng menu">
+            <Icon name="x" size={18} />
           </button>
         </div>
+
+        <button
+          className="new-chat-btn"
+          onClick={() => { newConversation(); setTab("chat"); }}
+          disabled={isLanding}
+        >
+          <Icon name="plus" size={16} />
+          Cuộc trò chuyện mới
+        </button>
 
         <nav>
           {NAV_DEFS.map((nv) => (
@@ -723,41 +868,15 @@ function App() {
               className={`nav-item${tab === nv.id ? " active" : ""}`}
               onClick={() => { setTab(nv.id); if (nv.id === "docs") loadDocs(); setSidebarOpen(false); }}
             >
-              <span className="nav-bar" />
-              <span>{nv.icon}</span>
+              <Icon name={nv.icon} size={17} />
               <span className="nav-label">{nv.label}</span>
               {nv.badge && <span className="nav-badge">{nv.badge}</span>}
             </button>
           ))}
         </nav>
 
-        <div className="divider" />
-
-        <div>
-          <div className="sugg-label">Câu hỏi gợi ý</div>
-          <div className="suggestions">
-            {SUGGESTED.map((s) => (
-              <button
-                key={s}
-                className="chip"
-                onClick={() => { setTab("chat"); send(s); setSidebarOpen(false); }}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        </div>
-
         <div className="sidebar-footer">
-          <button
-            className="new-chat-btn"
-            onClick={newConversation}
-            disabled={messages.length === 0}
-          >
-            + Cuộc trò chuyện mới
-          </button>
-
-          <div className="status-row">
+          <div className="status-row" title={`Phiên: ${sessionId}`}>
             <span className="status-left">
               <span className={`dot ${healthDot}`} />
               <span className="health-label">{healthLabel}</span>
@@ -767,142 +886,191 @@ function App() {
               onClick={() => setTheme((t) => (t === "light" ? "dark" : "light"))}
               title="Đổi giao diện sáng / tối"
             >
-              {theme === "light" ? "◐ Tối" : "◑ Sáng"}
+              <Icon name={theme === "light" ? "moon" : "sun"} size={13} />
+              {theme === "light" ? "Tối" : "Sáng"}
             </button>
-          </div>
-
-          <div className="session-info">
-            <span className="session-label">Phiên:</span>
-            <span className="session-id">{sessionId}</span>
           </div>
         </div>
       </aside>
 
       {/* ── Main ── */}
       <main className="main">
-        <div className="header-bar">
-          <span className="header-title">{headerTitle}</span>
-          <span className="header-sub">{headerSub}</span>
-        </div>
-        {/* Chat */}
+        {!isLanding && (
+          <div className="header-bar">
+            <span className="header-title">{headerTitle}</span>
+            <span className="header-sub">{headerSub}</span>
+          </div>
+        )}
+
+        {/* Chat — ô nhập luôn ở cùng vị trí trong cây DOM (giữa hero và gợi ý
+            khi trang trống, dưới đáy khi đã có hội thoại) để textarea không bị
+            mount lại, không mất focus/nội dung khi chuyển qua lại. */}
         {tab === "chat" && (
-          <div className="panel chat-panel">
-            <div className="messages">
-              {messages.length === 0 && (
-                <div className="empty">
-                  <div className="empty-icon">⚖️</div>
-                  <div className="empty-title">{PRODUCT.chatTitle}</div>
-                  <div className="empty-sub">
-                    {PRODUCT.emptySub}
-                  </div>
-                </div>
-              )}
-
-              {messages.map((msg, i) => {
-                const noAnswer =
-                  msg.role === "assistant" && !msg.streaming && !msg.error &&
-                  (!msg.sources || msg.sources.length === 0);
-                const emptyWhileStreaming = msg.streaming && !msg.content;
-                return (
-                <div key={i} className={`msg-row ${msg.role}`}>
-                  <div className={`bubble ${noAnswer ? "bubble-noanswer" : ""} ${emptyWhileStreaming ? "typing" : ""}`}>
-                    {msg.role === "assistant" ? (
-                      <>
-                        {emptyWhileStreaming ? (
-                          <>
-                            <span /><span /><span />
-                            <span className="elapsed-timer">{(elapsedMs / 1000).toFixed(1)}s</span>
-                          </>
-                        ) : (
-                          <>
-                            {noAnswer && (
-                              <div className="noanswer-flag">
-                                <span className="noanswer-icon">🔍</span>
-                                <span>Không tìm thấy trong dữ liệu hiện có</span>
-                              </div>
-                            )}
-                            {msg.steps && msg.steps.length > 0 && (
-                              <ThinkingPanel steps={msg.steps} />
-                            )}
-                            <MdText text={msg.content} msgIndex={i} />
-                          </>
-                        )}
-                        {msg.sources && msg.sources.length > 0 && (
-                          <div className="sources-section">
-                            <div className="sources-label">Nguồn trích dẫn</div>
-                            <div className="sources-list">
-                              {msg.sources.map((src) => (
-                                <SourceCard key={src.index} src={src} msgIndex={i} />
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        {!noAnswer && !msg.streaming && (
-                          <AnswerActions
-                            bookmarked={isBookmarked(messages[i - 1]?.content ?? "", msg.content)}
-                            onCopy={() => copyAnswer(msg.content)}
-                            onToggleBookmark={() =>
-                              toggleBookmark(messages[i - 1]?.content ?? "", msg.content, msg.sources ?? [])
-                            }
-                          />
-                        )}
-                        <div className="msg-meta">
-                          {msg.used_llm && msg.used_llm !== "none" && (
-                            <span className="llm-badge">
-                              {msg.used_llm === "gemini" ? "Gemini" : msg.used_llm === "extractive_fallback" ? "Trích xuất trực tiếp" : msg.used_llm}
-                            </span>
-                          )}
-                          {msg.latency_ms && (
-                            <span className="latency">{msg.latency_ms}ms</span>
-                          )}
-                        </div>
-                      </>
-                    ) : (
-                      msg.content
+          <div className={`panel chat-panel${isLanding ? " is-landing" : ""}`}>
+            {isLanding ? (
+              <div className="hero">
+                <BrandMark size={48} />
+                <div className="hero-eyebrow">{PRODUCT.laws}</div>
+                <h1 className="hero-title">{PRODUCT.heroTitle}</h1>
+                <p className="hero-sub">{PRODUCT.emptySub}</p>
+              </div>
+            ) : (
+              <div className="messages">
+                {messages.map((msg, i) => {
+                  const noAnswer =
+                    msg.role === "assistant" && !msg.streaming && !msg.error && !msg.stopped &&
+                    (!msg.sources || msg.sources.length === 0);
+                  const emptyWhileStreaming = msg.streaming && !msg.content;
+                  return (
+                  <div key={i} className={`msg-row ${msg.role}`}>
+                    {msg.role === "user" && (
+                      <button
+                        className="edit-btn"
+                        onClick={() => fillComposer(msg.content)}
+                        title="Sửa rồi hỏi lại"
+                        aria-label="Sửa câu hỏi này"
+                      >
+                        <Icon name="edit" size={14} />
+                      </button>
                     )}
+                    <div className={`bubble ${noAnswer ? "bubble-noanswer" : ""} ${emptyWhileStreaming ? "typing" : ""}`}>
+                      {msg.role === "assistant" ? (
+                        <>
+                          {emptyWhileStreaming ? (
+                            <>
+                              <span /><span /><span />
+                              <span className="elapsed-timer">{(elapsedMs / 1000).toFixed(1)}s</span>
+                            </>
+                          ) : (
+                            <>
+                              {noAnswer && (
+                                <div className="noanswer-flag">
+                                  <Icon name="search" size={14} />
+                                  <span>Không tìm thấy trong dữ liệu hiện có</span>
+                                </div>
+                              )}
+                              {msg.steps && msg.steps.length > 0 && (
+                                <ThinkingPanel steps={msg.steps} />
+                              )}
+                              <MdText text={msg.content} msgIndex={i} />
+                            </>
+                          )}
+                          {msg.sources && msg.sources.length > 0 && (
+                            <div className="sources-section">
+                              <div className="sources-label">Nguồn trích dẫn</div>
+                              <div className="sources-list">
+                                {msg.sources.map((src) => (
+                                  <SourceCard key={src.index} src={src} msgIndex={i} />
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {!noAnswer && !msg.streaming && (
+                            <AnswerActions
+                              bookmarked={isBookmarked(messages[i - 1]?.content ?? "", msg.content)}
+                              onCopy={() => copyAnswer(msg.content)}
+                              onToggleBookmark={() =>
+                                toggleBookmark(messages[i - 1]?.content ?? "", msg.content, msg.sources ?? [])
+                              }
+                            />
+                          )}
+                          <div className="msg-meta">
+                            {msg.stopped && <span className="latency">Đã dừng</span>}
+                            {msg.used_llm && msg.used_llm !== "none" && (
+                              <span className="llm-badge">
+                                {msg.used_llm === "gemini" ? "Gemini" : msg.used_llm === "extractive_fallback" ? "Trích xuất trực tiếp" : msg.used_llm}
+                              </span>
+                            )}
+                            {msg.latency_ms && (
+                              <span className="latency">{(msg.latency_ms / 1000).toFixed(1)}s</span>
+                            )}
+                          </div>
+                        </>
+                      ) : (
+                        msg.content
+                      )}
+                    </div>
                   </div>
-                </div>
-                );
-              })}
+                  );
+                })}
 
-              {busy && tab === "chat" && !messages[messages.length - 1]?.streaming && (
-                <div className="msg-row assistant">
-                  <div className="bubble typing">
-                    <span /><span /><span />
-                    <span className="elapsed-timer">{(elapsedMs / 1000).toFixed(1)}s</span>
+                {busy && !messages[messages.length - 1]?.streaming && (
+                  <div className="msg-row assistant">
+                    <div className="bubble typing">
+                      <span /><span /><span />
+                      <span className="elapsed-timer">{(elapsedMs / 1000).toFixed(1)}s</span>
+                    </div>
                   </div>
-                </div>
-              )}
-              <div ref={bottomRef} />
-            </div>
+                )}
+                <div ref={bottomRef} />
+              </div>
+            )}
 
             <div className="input-bar">
-              <div className="input-bar-inner">
+              <div className="composer">
                 <textarea
-                  rows={2}
-                  placeholder={`Đặt câu hỏi về ${PRODUCT.scope}… (Enter để gửi)`}
+                  ref={inputRef}
+                  rows={1}
+                  aria-label="Câu hỏi"
+                  placeholder={`Hỏi về ${PRODUCT.scope}…`}
                   value={question}
-                  disabled={busy}
                   onChange={(e) => setQuestion(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
+                    if (e.key === "Escape" && busy) {
+                      e.preventDefault();
+                      cancel();
+                    } else if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
                       send(question);
                     }
                   }}
                 />
-                <button
-                  className="btn-primary"
-                  disabled={busy || !question.trim()}
-                  onClick={() => send(question)}
-                >
-                  Gửi ↵
-                </button>
+                {busy ? (
+                  <button className="send-btn stop" onClick={cancel} title="Dừng (Esc)">
+                    <Icon name="stop" size={12} />
+                    Dừng
+                  </button>
+                ) : (
+                  <button
+                    className="send-btn"
+                    disabled={!question.trim()}
+                    onClick={() => send(question)}
+                    aria-label="Gửi câu hỏi"
+                    title="Gửi (Enter)"
+                  >
+                    <Icon name="arrowUp" size={18} />
+                  </button>
+                )}
               </div>
-              <div className="input-disclaimer">
-                {PRODUCT.disclaimer}
+              <div className="input-hint">
+                <span className="kbd-hint">
+                  {busy ? "Esc để dừng — câu hỏi quay lại ô nhập để sửa" : "Enter để gửi · Shift + Enter để xuống dòng"}
+                </span>
+                <span>{PRODUCT.disclaimer}</span>
               </div>
             </div>
+
+            {isLanding && (
+              <div className="hero-extra">
+                <div className="sugg-label">Thử hỏi</div>
+                <div className="suggest-grid">
+                  {SUGGESTED.map((s) => (
+                    <button key={s.q} className="suggest-card" onClick={() => fillComposer(s.q)}>
+                      <span className="suggest-topic">{s.topic}</span>
+                      <span className="suggest-q">{s.q}</span>
+                    </button>
+                  ))}
+                </div>
+                <ul className="highlights">
+                  {HIGHLIGHTS.map((h) => (
+                    <li key={h.text}>
+                      <Icon name={h.icon} size={14} />
+                      {h.text}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         )}
 
@@ -911,7 +1079,7 @@ function App() {
           <div className="panel">
             {docs.length === 0 ? (
               <div className="empty">
-                <div className="empty-icon">📭</div>
+                <div className="empty-icon"><Icon name="book" size={22} /></div>
                 <div className="empty-title">Chưa có văn bản nào</div>
                 <div className="empty-sub">Tải lên PDF để bắt đầu</div>
               </div>
@@ -940,10 +1108,10 @@ function App() {
           <div className="panel">
             {bookmarks.length === 0 ? (
               <div className="empty">
-                <div className="empty-icon">🔖</div>
+                <div className="empty-icon"><Icon name="bookmark" size={22} /></div>
                 <div className="empty-title">Chưa lưu câu hỏi nào</div>
                 <div className="empty-sub">
-                  Bấm "🔖 Lưu" dưới một câu trả lời để xem lại sau
+                  Bấm "Lưu" dưới một câu trả lời để xem lại sau
                 </div>
               </div>
             ) : (
@@ -962,12 +1130,15 @@ function App() {
                         </div>
                       </div>
                     )}
-                    <button
-                      className="icon-btn"
-                      onClick={() => setBookmarks((prev) => prev.filter((x) => x.id !== b.id))}
-                    >
-                      🗑️ Bỏ lưu
-                    </button>
+                    <div className="answer-actions">
+                      <button
+                        className="icon-btn"
+                        onClick={() => setBookmarks((prev) => prev.filter((x) => x.id !== b.id))}
+                      >
+                        <Icon name="trash" size={14} />
+                        Bỏ lưu
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -997,9 +1168,9 @@ function App() {
                   if (f) handleUpload(f);
                 }}
               />
-              <div className="upload-icon">📄</div>
+              <div className="empty-icon"><Icon name="file" size={22} /></div>
               <div className="upload-text">
-                {busy ? "Đang xử lý…" : "Kéo thả PDF hoặc click để chọn"}
+                {busy ? "Đang xử lý…" : "Kéo thả PDF hoặc bấm để chọn"}
               </div>
               <div className="upload-sub">Hỗ trợ: Luật, Nghị định, Thông tư, Quyết định — tối đa 20MB</div>
             </div>
