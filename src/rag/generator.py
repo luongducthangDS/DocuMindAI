@@ -63,6 +63,9 @@ _CITATION_SUFFIX = "\n\n**Nguồn trích dẫn:**\n{citations}"
 _MAX_CHUNK_CHARS = 3_000   # ~750 tokens per chunk
 _MAX_TOTAL_CHARS = 15_000  # ~3750 tokens — expanded to support top_k=20 candidate set
 _EXTRACTIVE_CHARS_PER_SOURCE = 700
+# Không có LLM chọn lọc thì mỗi chunk dán ra là một "nguồn" người dùng phải tự
+# đọc — 5 nguồn, có cả biểu mẫu/phụ lục, là đống trích dẫn chứ không phải câu trả lời.
+_EXTRACTIVE_MAX_SOURCES = 3
 
 # Abstain gate calibrated for the CROSS-ENCODER reranker score (production path):
 # relevant chunks score well above 0.05, OOC chunks below.
@@ -196,12 +199,20 @@ def _build_extractive_answer(query: str, chunks: list[RetrievedChunk]) -> str:
     if not chunks:
         return "Tôi không tìm thấy văn bản pháp luật liên quan đến câu hỏi này."
 
+    # Chunk biểu mẫu/phụ lục (Mẫu số..., "Nơi nhận...") không có header "Điều" —
+    # khớp từ khoá nhưng không trả lời được gì. Chỉ giữ lại khi không còn gì khác.
+    # Giữ số thứ tự GỐC: _cited_sources ánh xạ [i] về chunks[i-1] của danh sách gốc.
+    numbered = list(enumerate(chunks, 1))
+    articles = [(i, c) for i, c in numbered if (c.metadata.get("dieu_header") or "").startswith("Điều")]
+    picked = (articles or numbered)[:_EXTRACTIVE_MAX_SOURCES]
+
     lines = [
-        "Tôi đã tìm thấy các quy định liên quan trong dữ liệu hiện có, nhưng dịch vụ LLM đang tạm thời không phản hồi. Dưới đây là phần trích xuất trực tiếp từ nguồn để bạn vẫn có thể tham khảo:",
+        "Hệ thống tạm thời không tóm tắt được câu trả lời (dịch vụ LLM quá tải). "
+        "Dưới đây là các điều khoản liên quan nhất, trích nguyên văn:",
         "",
     ]
 
-    for i, chunk in enumerate(chunks[:5], 1):
+    for i, chunk in picked:
         title = chunk.metadata.get("title") or "Văn bản pháp luật"
         dieu = chunk.metadata.get("dieu_header") or ""
         text = " ".join((chunk.text or "").split())

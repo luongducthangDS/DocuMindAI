@@ -83,6 +83,23 @@ class TestGenerator:
         result = generate_answer("cau hoi", chunks)
         assert result["used_llm"] == "extractive_fallback"
 
+    @patch("src.rag.generator._call_gemini", side_effect=Exception("quota exhausted"))
+    def test_extractive_fallback_skips_forms_and_caps_sources(self, mock_gemini):
+        """Fallback không dán cả 5 chunk: bỏ biểu mẫu, tối đa 3 nguồn, số [i] khớp chunk gốc."""
+        from src.rag.generator import generate_answer
+
+        headers = ["Điều 38. Điều kiện hưởng", "Mẫu số 23", "Điều 39. Mức hưởng",
+                   "Điều 15. Mức hưởng", "Điều 8. Thời gian đóng"]
+        chunks = [
+            RetrievedChunk(text=f"noi dung {h}", score=0.8,
+                           metadata={"title": "Law", "dieu_header": h, "source_url": ""})
+            for h in headers
+        ]
+        result = generate_answer("cau hoi", chunks)
+        cited = [s["dieu_header"] for s in result["sources"]]
+        assert cited == ["Điều 38. Điều kiện hưởng", "Điều 39. Mức hưởng", "Điều 15. Mức hưởng"]
+        assert "Mẫu số" not in result["answer"]
+
     def test_build_context_includes_all_chunks(self):
         from src.rag.generator import _build_context
 
