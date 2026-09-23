@@ -177,6 +177,15 @@ class TestQdrantTranslation:
     def test_empty_where_is_none(self):
         assert where_to_qdrant_filter(None) is None
 
+    def test_every_filter_key_has_payload_index(self):
+        # Qdrant Cloud strict mode trả 400 cho filter trên field chưa index —
+        # production từng trả 0 chunk cho mọi câu hỏi vì thiếu đúng các index này.
+        from src.rag.vector_backend import QDRANT_PAYLOAD_INDEXES
+
+        f = where_to_qdrant_filter(RetrievalContext(tenant_id="acme").to_where())
+        keys = {c.key for c in (f.must or []) + (f.must_not or [])}
+        assert keys <= set(QDRANT_PAYLOAD_INDEXES)
+
 
 class TestAmbientContext:
     def test_default_is_public_not_unrestricted(self):

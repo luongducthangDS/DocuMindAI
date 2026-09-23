@@ -65,6 +65,7 @@ def migrate(ids, docs, metas, embs) -> int:
     from llama_index.vector_stores.qdrant import QdrantVectorStore
 
     from src.rag.embedder import get_qdrant_client_and_collection
+    from src.rag.vector_backend import ensure_qdrant_payload_indexes
 
     qclient, collection_name = get_qdrant_client_and_collection(timeout=120)
 
@@ -99,6 +100,8 @@ def migrate(ids, docs, metas, embs) -> int:
         qclient.delete(collection_name=collection_name, points_selector=qm.PointIdsList(points=stale))
         logger.info("Xoá {} point thừa khỏi Qdrant", len(stale))
 
+    ensure_qdrant_payload_indexes(qclient, collection_name)
+
     count = qclient.count(collection_name=collection_name, exact=True).count
     logger.info("Migration xong: {} points trong Qdrant collection '{}'", count, collection_name)
     return count
@@ -125,6 +128,18 @@ def verify(docs, metas, embs, chroma_client, chroma_collection) -> None:
             i, match, docs[i][:50],
         )
 
+    # Query có filter ACL/hiệu lực như production — không có bước này thì thiếu
+    # payload index (strict mode Qdrant Cloud → 400) vẫn qua verify.
+    from src.rag.context import RetrievalContext
+
+    try:
+        hits = direct_query(qdrant_backend, embs[0], top_k=3, where=RetrievalContext().to_where())
+        logger.info("Query có filter production: {} hit", len(hits))
+        all_ok = all_ok and bool(hits)
+    except Exception as exc:  # noqa: BLE001
+        logger.error("Query có filter production lỗi: {}", exc)
+        all_ok = False
+
     if all_ok:
         logger.info("VERIFY OK — Qdrant trả kết quả nhất quán với ChromaDB nguồn.")
     else:
@@ -135,6 +150,8 @@ def verify(docs, metas, embs, chroma_client, chroma_collection) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--verify", action="store_true", help="So sánh song song Chroma vs Qdrant sau migrate")
+    parser.add_argument("--indexes-only", action="store_true",
+                        help="Chỉ tạo payload index còn thiếu trên collection Qdrant hiện có, không upload")
     args = parser.parse_args()
 
     from src.config import get_settings
@@ -143,6 +160,13 @@ def main() -> None:
     if not settings.qdrant_url:
         logger.error("QDRANT_URL chưa set trong .env — xem hướng dẫn ở đầu file này.")
         sys.exit(1)
+
+    if args.indexes_only:
+        from src.rag.embedder import get_qdrant_client_and_collection
+        from src.rag.vector_backend import ensure_qdrant_payload_indexes
+
+        ensure_qdrant_payload_indexes(*get_qdrant_client_and_collection(timeout=120))
+        return
 
     ids, docs, metas, embs, chroma_client, chroma_collection = load_chroma_corpus()
     migrate(ids, docs, metas, embs)

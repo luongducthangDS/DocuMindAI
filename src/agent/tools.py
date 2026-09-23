@@ -79,11 +79,12 @@ async def summarize_document(
     context = "\n\n".join(r.get("text", "") for r in results)
     focus_note = f" Tập trung vào: {focus}." if focus else ""
 
-    from src.rag.generator import _SYSTEM_PROMPT, gemini_generate
+    from src.rag.generator import _GEMINI_ANSWER_TIMEOUT_S, _SYSTEM_PROMPT, gemini_generate
 
     try:
         return gemini_generate(
-            f"{_SYSTEM_PROMPT}\n\nTóm tắt văn bản sau.{focus_note}\n\n{context}"
+            f"{_SYSTEM_PROMPT}\n\nTóm tắt văn bản sau.{focus_note}\n\n{context}",
+            timeout=_GEMINI_ANSWER_TIMEOUT_S,
         )
     except Exception as exc:
         logger.error("summarize_document LLM call failed: {}", exc)
@@ -110,7 +111,7 @@ async def compare_documents(
     if not ctx_a and not ctx_b:
         return "Không tìm thấy nội dung để so sánh."
 
-    from src.rag.generator import _SYSTEM_PROMPT, gemini_generate
+    from src.rag.generator import _GEMINI_ANSWER_TIMEOUT_S, _SYSTEM_PROMPT, gemini_generate
 
     prompt = (
         f"So sánh {doc_a} và {doc_b} về khía cạnh: {aspect}\n\n"
@@ -120,7 +121,7 @@ async def compare_documents(
     )
 
     try:
-        return gemini_generate(f"{_SYSTEM_PROMPT}\n\n{prompt}")
+        return gemini_generate(f"{_SYSTEM_PROMPT}\n\n{prompt}", timeout=_GEMINI_ANSWER_TIMEOUT_S)
     except Exception as exc:
         logger.error("compare_documents failed: {}", exc)
         return f"Lỗi khi so sánh: {exc}"

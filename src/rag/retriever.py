@@ -73,7 +73,7 @@ def build_hybrid_retriever(
     from llama_index.core.retrievers import QueryFusionRetriever
     from llama_index.retrievers.bm25 import BM25Retriever
 
-    vector_retriever = index.as_retriever(similarity_top_k=top_k)
+    vector_retriever = _DenseOrSkip(index.as_retriever(similarity_top_k=top_k))
 
     try:
         bm25_retriever = BM25Retriever.from_defaults(
@@ -239,6 +239,36 @@ def retrieve_direct_chroma(query: str, top_k: int = 5, ctx=None) -> list[Retriev
         return []
 
 
+class _DenseOrSkip:
+    """Nhánh dense trả rỗng khi câu hỏi chưa embed được ngay (quota Gemini).
+
+    Server API bật fail_fast_queries nên embedder ném EmbeddingUnavailable thay
+    vì ngủ chờ quota. Khi đó RRF chỉ còn BM25: câu trả lời kém hơn một chút nhưng
+    về trong vài giây, thay vì treo request tới vài phút. Lỗi khác vẫn ném ra như cũ.
+    """
+
+    def __init__(self, base_retriever):
+        self._base = base_retriever
+
+    def retrieve(self, query) -> list["NodeWithScore"]:
+        from src.rag.embedder import EmbeddingUnavailable
+
+        try:
+            return self._base.retrieve(query)
+        except EmbeddingUnavailable as exc:
+            logger.warning("Dense leg skipped (embedding unavailable), BM25 only: {}", exc)
+            return []
+
+    async def aretrieve(self, query) -> list["NodeWithScore"]:
+        from src.rag.embedder import EmbeddingUnavailable
+
+        try:
+            return await self._base.aretrieve(query)
+        except EmbeddingUnavailable as exc:
+            logger.warning("Dense leg skipped (embedding unavailable), BM25 only: {}", exc)
+            return []
+
+
 class _ScreenedRetriever:
     """Drops chunks the caller may not see, before they reach fusion.
 
@@ -285,7 +315,7 @@ def retrieve_with_context(query: str, ctx, top_k: int = 20, top_n: int = 8) -> l
         chunks = retrieve_direct_chroma(query, top_k=top_n, ctx=ctx)
         return [c for c in chunks if ctx.allows(c.metadata)]
 
-    dense = index.as_retriever(similarity_top_k=top_k, filters=ctx.to_llama_filters())
+    dense = _DenseOrSkip(index.as_retriever(similarity_top_k=top_k, filters=ctx.to_llama_filters()))
 
     retrievers = [dense]
     if _bm25_retriever is not None:

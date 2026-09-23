@@ -107,6 +107,31 @@ class TestRetrieveWithContext:
         got = r_module.retrieve_with_context("q", RetrievalContext(), top_n=8)
         assert len(got) == 8
 
+    def test_embedding_quota_falls_back_to_bm25_without_sleeping(self, monkeypatch):
+        """Hết quota embed: server không được ngủ chờ (từng làm 1 câu hỏi mất 231s),
+        mà phải trả kết quả BM25 ngay. Dùng VectorStoreIndex thật để chắc chắn
+        llama_index không bọc EmbeddingUnavailable thành lỗi khác."""
+        import time as time_mod
+        from unittest.mock import patch
+
+        from llama_index.core import VectorStoreIndex
+
+        from src.rag.embedder import _GeminiAPIEmbedding
+
+        embedder = _GeminiAPIEmbedding(model_name="gemini-embedding-001", api_keys=["k1", "k2"])
+        embedder.fail_fast_queries = True
+        for key in ("k1", "k2"):
+            embedder._cooldown[key] = time_mod.monotonic() + 65  # vướng quota phút
+
+        monkeypatch.setattr(r_module, "_active_index", VectorStoreIndex(nodes=[], embed_model=embedder))
+        monkeypatch.setattr(r_module, "_bm25_retriever", FakeRetriever([node("bm25_hit")]))
+        monkeypatch.setattr(r_module, "_reranker_instance", None)
+
+        with patch("src.rag.embedder.time.sleep") as slept:
+            got = r_module.retrieve_with_context("q", RetrievalContext())
+        slept.assert_not_called()
+        assert [c.metadata["clause_uid"] for c in got] == ["bm25_hit"]
+
     def test_no_index_falls_back_but_still_screens(self, monkeypatch):
         from src.rag.retriever import RetrievedChunk
 

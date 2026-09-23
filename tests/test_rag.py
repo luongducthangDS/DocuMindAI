@@ -143,7 +143,7 @@ class _FakeModel:
         self._texts = texts
         self._delay = delay
 
-    def generate_content(self, prompt, stream=True):
+    def generate_content(self, prompt, stream=True, **kwargs):
         return _FakeStream(self._texts, delay=self._delay)
 
 
@@ -214,6 +214,40 @@ class TestStreamAnswerConcurrency:
             ticker_task.cancel()
 
         assert ticks >= 10
+
+
+class TestGeminiOverload:
+    """Gemini 503 từng làm 1 lời gọi treo tới 600s: SDK tự retry ngầm trên cùng
+    cặp, vòng xoay (key, model) không bao giờ chạy (Render 2026-09-23)."""
+
+    def test_overloaded_model_and_exhausted_key_are_skipped_without_sdk_retry(self, monkeypatch):
+        import src.rag.generator as gen
+
+        monkeypatch.setattr(gen, "_PAIR_DOWN_UNTIL", {})
+        monkeypatch.setattr(gen, "_GEMINI_PAIR_CURSOR", 0)
+        monkeypatch.setattr(gen, "_gemini_keys", lambda: ["k1", "k2"])
+        calls = []
+
+        def fake_generate(prompt, **kwargs):
+            pair = (configure.call_args.kwargs["api_key"], model_cls.call_args.args[0])
+            calls.append(pair)
+            assert kwargs["request_options"]["retry"] is None
+            assert kwargs["request_options"]["timeout"]
+            if pair[1] == "m1":
+                raise RuntimeError("503 This model is currently experiencing high demand")
+            if pair == ("k1", "m2"):
+                raise RuntimeError("429 You exceeded your current quota")
+            return MagicMock(text="ok", usage_metadata=None)
+
+        with patch("google.generativeai.configure") as configure, \
+             patch("google.generativeai.GenerativeModel") as model_cls, \
+             patch("src.rag.generator.record_generation"):
+            model_cls.return_value.generate_content.side_effect = fake_generate
+            assert gen.gemini_generate("q", models=["m1", "m2"]) == "ok"
+            assert gen.gemini_generate("q", models=["m1", "m2"]) == "ok"
+
+        # 503 => cả m1 bị bỏ (k2/m1 không gọi); 429 => chỉ k1/m2; lần 2 đi thẳng k2/m2.
+        assert calls == [("k1", "m1"), ("k1", "m2"), ("k2", "m2"), ("k2", "m2")]
 
 
 class TestQueryComplexityRouting:
@@ -504,6 +538,39 @@ class TestGeminiEmbedderKeyRotation:
         with patch("src.rag.embedder.time.sleep") as slept:
             slept.side_effect = lambda _: embedder._cooldown.update(k1=0.0)
             assert embedder._reserve_key(["xin chào"]) == "k1"
+        slept.assert_called_once()
+
+    def test_fail_fast_query_on_429_raises_without_backoff(self):
+        """Server API: mọi key 429 -> EmbeddingUnavailable ngay, mỗi key thử đúng
+        một lần, không qua tenacity (từng làm một câu hỏi mất 231s)."""
+        from src.rag.embedder import EmbeddingUnavailable
+
+        embedder = self._make()
+        embedder.fail_fast_queries = True
+        used = []
+
+        def always_429(key, texts, task_type):
+            used.append(key)
+            raise RuntimeError("429 quota exceeded")
+
+        with patch.object(type(embedder), "_call_api", staticmethod(always_429)), \
+                patch("src.rag.embedder.time.sleep") as slept:
+            with pytest.raises(EmbeddingUnavailable):
+                embedder._get_query_embedding("cau hoi")
+        slept.assert_not_called()
+        assert used == ["k1", "k2"]
+
+    def test_query_without_fail_fast_still_waits_for_quota(self):
+        """Eval/ingest (cờ tắt) vẫn chờ quota như cũ."""
+        import time as time_mod
+
+        embedder = self._make(keys=("k1",))
+        embedder._cooldown["k1"] = time_mod.monotonic() + 30
+
+        with patch.object(type(embedder), "_call_api", staticmethod(lambda k, t, tt: [[0.1]])), \
+                patch("src.rag.embedder.time.sleep") as slept:
+            slept.side_effect = lambda _: embedder._cooldown.update(k1=0.0)
+            assert embedder._get_query_embedding("cau hoi") == [0.1]
         slept.assert_called_once()
 
     @pytest.mark.asyncio

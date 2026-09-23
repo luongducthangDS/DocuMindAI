@@ -9,6 +9,7 @@ import asyncio
 import queue
 import re
 import threading
+import time
 from datetime import datetime, timezone
 from typing import AsyncIterator
 
@@ -225,12 +226,70 @@ def _gemini_keys() -> list[str]:
 def _gemini_pairs(models: list[str] | None = None) -> list[tuple[str, str]]:
     """(api_key, model) pairs, model-major: try all 3 keys for a model before
     moving on. Spreads generation load across keys + models so we don't exhaust
-    one key's daily RPD (the old bug — generation only ever hit key #1)."""
+    one key's daily RPD (the old bug — generation only ever hit key #1).
+    Bỏ qua cặp đang trong cooldown (xem _cool_down)."""
     s = get_settings()
     if models is None:
         models = [m.strip() for m in s.gemini_generation_models.split(",") if m.strip()]
     keys = _gemini_keys()
-    return [(k, m) for m in models for k in keys]
+    return [(k, m) for m in models for k in keys if not _is_down(k, m)]
+
+
+# SDK google-generativeai mặc định TỰ retry 503 tới 600s (và timeout 600s) trên
+# CÙNG một cặp — Gemini quá tải là 1 lời gọi treo 1–6 phút, vòng xoay (key, model)
+# không bao giờ được chạy. Đo thật trên Render 2026-09-23: query >3 phút không về.
+# Tắt retry ngầm. Call nhỏ (thêm dấu, router, grade: 2–7s khi khoẻ) timeout ngắn;
+# riêng câu trả lời chính cần đủ cho văn bản dài (stream: deadline cả luồng).
+_GEMINI_TIMEOUT_S = 20
+_GEMINI_ANSWER_TIMEOUT_S = 45
+# Cặp vừa lỗi tạm thời bị bỏ qua một lúc: 1 câu hỏi gọi Gemini 3–5 lần (dấu,
+# router, grade, generate...), không thì lần nào cũng chờ lại đúng cặp đang treo.
+# ponytail: cooldown cố định, không phân biệt 429 phút/ngày — đủ để chặn treo.
+_PAIR_COOLDOWN_S = 120
+_PAIR_DOWN_UNTIL: dict[tuple[str, str], float] = {}
+_MODEL_WIDE_MARKERS = ("503", "504", "unavailable", "deadline", "timed out", "timeout")
+_TRANSIENT_MARKERS = ("quota", "429", "not found", "exhaust", "rate") + _MODEL_WIDE_MARKERS
+
+
+def _is_transient(exc: Exception) -> bool:
+    err = str(exc).lower()
+    return any(t in err for t in _TRANSIENT_MARKERS)
+
+
+def _is_down(api_key: str, model_name: str) -> bool:
+    return _PAIR_DOWN_UNTIL.get((api_key, model_name), 0) > time.monotonic()
+
+
+def _cool_down(api_key: str, model_name: str, exc: Exception) -> None:
+    """429 = quota của riêng key đó. 503/504/timeout = model quá tải, key nào cũng
+    như nhau (đo 2026-09-23) → cooldown cả model, khỏi chờ timeout lần lượt 3 key.
+    Không gia hạn cặp đang cooldown — traffic liên tục sẽ giữ nó down mãi."""
+    err = str(exc).lower()
+    keys = _gemini_keys() if any(t in err for t in _MODEL_WIDE_MARKERS) else [api_key]
+    until = time.monotonic() + _PAIR_COOLDOWN_S
+    for k in keys:
+        if not _is_down(k, model_name):
+            _PAIR_DOWN_UNTIL[(k, model_name)] = until
+
+
+def gemini_call(api_key: str, model_name: str, prompt: str,
+                timeout: float = _GEMINI_TIMEOUT_S, **kwargs):
+    """Lời gọi generate_content DUY NHẤT tới Gemini: timeout cứng, không retry
+    ngầm, lỗi tạm thời thì cho cặp vào cooldown rồi ném lại cho caller xoay tiếp.
+    (Lỗi xảy ra lúc lặp stream nằm ngoài hàm này — stream_answer tự _cool_down.)"""
+    import google.generativeai as genai
+
+    if _is_down(api_key, model_name):
+        raise RuntimeError(f"Gemini {model_name}: unavailable (cooldown)")
+    try:
+        genai.configure(api_key=api_key)
+        return genai.GenerativeModel(model_name).generate_content(
+            prompt, request_options={"retry": None, "timeout": timeout}, **kwargs
+        )
+    except Exception as exc:
+        if _is_transient(exc):
+            _cool_down(api_key, model_name, exc)
+        raise
 
 
 # Round-robin cursor so consecutive generations start at DIFFERENT (key, model)
@@ -240,7 +299,8 @@ _GEMINI_PAIR_CURSOR = 0
 
 
 def gemini_generate(
-    prompt: str, models: list[str] | None = None, log_input: str | None = None
+    prompt: str, models: list[str] | None = None, log_input: str | None = None,
+    timeout: float = _GEMINI_TIMEOUT_S,
 ) -> str:
     """Sinh văn bản qua Gemini, xoay vòng (key, model) cho tới khi một cặp trả lời.
 
@@ -253,11 +313,9 @@ def gemini_generate(
     đổi thực sự (câu hỏi, lịch sử). Không có nó, mọi lần gọi đều lộ nguyên văn
     template tĩnh trong "input" — làm trace không đọc được (phần thay đổi chìm
     giữa hàng chục dòng rules không đổi). `prompt` gửi cho Gemini KHÔNG đổi."""
-    import google.generativeai as genai
-
     pairs = _gemini_pairs(models)
     if not pairs:
-        raise RuntimeError("No GOOGLE_API_KEY configured for Gemini generation")
+        raise RuntimeError("Gemini: không còn cặp (key, model) nào dùng được (thiếu key hoặc đều đang cooldown)")
 
     global _GEMINI_PAIR_CURSOR
     n = len(pairs)
@@ -266,9 +324,8 @@ def gemini_generate(
     for offset in range(n):
         api_key, model_name = pairs[(start + offset) % n]
         try:
-            genai.configure(api_key=api_key)
             t0 = datetime.now(timezone.utc)
-            response = genai.GenerativeModel(model_name).generate_content(prompt)
+            response = gemini_call(api_key, model_name, prompt, timeout=timeout)
             t1 = datetime.now(timezone.utc)
             if response.text:
                 usage = getattr(response, "usage_metadata", None)
@@ -287,8 +344,7 @@ def gemini_generate(
                 _GEMINI_PAIR_CURSOR = (start + offset + 1) % n
                 return response.text
         except Exception as exc:
-            err = str(exc).lower()
-            if any(t in err for t in ("quota", "429", "not found", "exhaust", "rate")):
+            if _is_transient(exc):
                 logger.debug("Gemini {} (key…{}) unavailable, rotating: {}",
                              model_name, api_key[-4:], str(exc)[:100])
                 last_exc = exc
@@ -320,6 +376,7 @@ def _call_gemini(
         f"{_SYSTEM_PROMPT}\n\n{variable_part}",
         models=models,
         log_input=variable_part,
+        timeout=_GEMINI_ANSWER_TIMEOUT_S,
     )
 
 
@@ -431,11 +488,8 @@ def _stream_chunks_in_thread(model_name: str, api_key: str, prompt: str, q: queu
     — đo được thật: 1 request WS treo là kéo theo 1 request REST hoàn toàn
     không liên quan chờ tới hơn 1 phút. Đẩy từng chunk qua queue để phía async
     chỉ `await asyncio.to_thread(q.get)` — nhường lại event loop trong lúc chờ."""
-    import google.generativeai as genai
-
     try:
-        genai.configure(api_key=api_key)
-        stream = genai.GenerativeModel(model_name).generate_content(prompt, stream=True)
+        stream = gemini_call(api_key, model_name, prompt, timeout=_GEMINI_ANSWER_TIMEOUT_S, stream=True)
         for chunk in stream:
             if chunk.text:
                 q.put(("token", chunk.text))
@@ -520,6 +574,8 @@ async def stream_answer(
         if stream_exc is not None:
             logger.warning("Gemini stream {} (key…{}) failed: {}",
                            model_name, api_key[-4:], str(stream_exc)[:150])
+            if _is_transient(stream_exc):
+                _cool_down(api_key, model_name, stream_exc)
             if streamed:
                 return  # nửa câu trả lời đã ra — không nối thêm từ cặp khác
             continue  # chưa có chữ nào ra — thử cặp (key, model) kế tiếp

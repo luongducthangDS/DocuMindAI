@@ -54,6 +54,14 @@ class EmbeddingModelMismatch(RuntimeError):
     """
 
 
+class EmbeddingUnavailable(RuntimeError):
+    """Không embed được lúc này vì mọi key đều đang vướng quota.
+
+    Ở chế độ fail-fast (xem fail_fast_queries), lỗi này được ném NGAY thay vì ngủ
+    chờ, để retriever bỏ nhánh dense mà chạy BM25.
+    """
+
+
 # Free tier Gemini Embedding chặn ở HAI trần cùng lúc, đo thực tế 2026-09-18:
 #   - số CONTENT, không phải số HTTP request (5 request × 20 content = 100 rồi 429),
 #     nên gộp batch to không giảm mức tiêu thụ, chỉ giảm số lần đi mạng;
@@ -82,6 +90,11 @@ class _GeminiAPIEmbedding(BaseEmbedding):
     _sent: List[deque] = PrivateAttr()  # mỗi key một bucket (timestamp, tokens) đã gửi
     _cooldown: dict = PrivateAttr()  # key -> thời điểm được dùng lại sau khi dính 429
     _strikes: dict = PrivateAttr()   # key -> số lần 429 liên tiếp
+    # Server API bật cờ này (src/api/main.py). Khi đó embed CÂU HỎI mà gặp quota sẽ báo
+    # EmbeddingUnavailable ngay, không ngủ chờ + tenacity backoff nữa. Đã đo thật:
+    # một câu hỏi phải chờ 231s rồi mới trả lời. Ingest/eval để False, vẫn chờ quota
+    # như cũ vì ở đó chờ là đúng.
+    fail_fast_queries: bool = False
 
     def __init__(self, model_name: str, api_keys: List[str], **kwargs):
         # 50 là mức đã đo được với chunk thật của corpus (~900 ký tự/chunk): 100
@@ -96,8 +109,9 @@ class _GeminiAPIEmbedding(BaseEmbedding):
         self._cooldown = {}
         self._strikes = {}
 
-    def _reserve_key(self, texts: List[str]) -> str:
-        """Chọn key còn chỗ trong phút cho lô sắp gửi, chờ nếu mọi key đều đầy.
+    def _reserve_key(self, texts: List[str], wait: bool = True) -> str:
+        """Chọn key còn chỗ trong phút cho lô sắp gửi, chờ nếu mọi key đều đầy
+        (wait=False: không chờ, ném EmbeddingUnavailable).
 
         Quota tính theo project chứ không theo key, nên nhiều key ở nhiều project
         cộng dồn được trần — mỗi key vì thế cần bucket riêng. Chủ động chờ thay vì
@@ -130,9 +144,13 @@ class _GeminiAPIEmbedding(BaseEmbedding):
             # _MAX_QUOTA_WAIT → đã cạn quota NGÀY. Ngủ tiếp là treo tiến trình cả
             # tiếng mà log không nói vì sao; báo lỗi để người chạy quyết định.
             if not waits or (not minute_waits and min(cooldowns) > _MAX_QUOTA_WAIT):
-                raise RuntimeError(
+                raise EmbeddingUnavailable(
                     f"Cả {len(self._keys)} key Gemini đều cạn quota (mỗi project 1000 embed/ngày). "
                     "Thêm key ở project khác vào GOOGLE_API_KEY_2/_3, bật billing, hoặc chờ quota reset."
+                )
+            if not wait:
+                raise EmbeddingUnavailable(
+                    f"Mọi key Gemini đang vướng quota, phải chờ {min(waits):.0f}s — bỏ qua"
                 )
             logger.info("Gemini embed: mọi key đều đang chờ quota, chờ {:.0f}s ({} content / ~{} token)",
                         min(waits), len(texts), tokens)
@@ -141,6 +159,9 @@ class _GeminiAPIEmbedding(BaseEmbedding):
     # Lưới an toàn cho 429 còn lọt qua cả vòng xoay key (trần phút của mọi key).
     @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=2, min=15, max=70))
     def _embed(self, texts: List[str], task_type: str) -> List[List[float]]:
+        return self._embed_once(texts, task_type, wait=True)
+
+    def _embed_once(self, texts: List[str], task_type: str, wait: bool) -> List[List[float]]:
         """Thử lần lượt từng key khả dụng trước khi chịu thua.
 
         Đổi key là việc tức thì, còn backoff của tenacity chờ hàng chục giây; để
@@ -149,7 +170,7 @@ class _GeminiAPIEmbedding(BaseEmbedding):
         """
         last_exc: Exception | None = None
         for _ in range(len(self._keys)):
-            key = self._reserve_key(texts)
+            key = self._reserve_key(texts, wait=wait)
             try:
                 return self._call_api(key, texts, task_type)
             except Exception as exc:  # noqa: BLE001 — phân loại ngay bên dưới
@@ -163,6 +184,8 @@ class _GeminiAPIEmbedding(BaseEmbedding):
                 self._cooldown[key] = time.monotonic() + (3600 if strikes >= 3 else 65)
                 logger.warning("Key Gemini ...{} dính 429 (lần {}), nghỉ {}s",
                                key[-6:], strikes, 3600 if strikes >= 3 else 65)
+        if not wait:
+            raise EmbeddingUnavailable(str(last_exc)[:200]) from last_exc
         raise last_exc  # type: ignore[misc]
 
     def _call_api(self, key: str, texts: List[str], task_type: str) -> List[List[float]]:
@@ -180,6 +203,8 @@ class _GeminiAPIEmbedding(BaseEmbedding):
     # task_type tách bạch có chủ đích: Gemini sinh vector KHÁC NHAU cho cùng một
     # chuỗi tuỳ retrieval_query (lúc hỏi) hay retrieval_document (lúc index).
     def _get_query_embedding(self, query: str) -> List[float]:
+        if self.fail_fast_queries:
+            return self._embed_once([query], "retrieval_query", wait=False)[0]
         return self._embed([query], "retrieval_query")[0]
 
     def _get_text_embedding(self, text: str) -> List[float]:

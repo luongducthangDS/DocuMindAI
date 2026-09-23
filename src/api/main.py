@@ -166,6 +166,12 @@ def _init_rag_sync() -> None:
     existing_nodes = _load_nodes_from_backend(backend)
     logger.info("Loaded {} nodes from {} for BM25 index", len(existing_nodes), backend.provider)
 
+    # Hết quota thì embed câu hỏi phải báo lỗi ngay (retriever chuyển sang chỉ chạy
+    # BM25), không được ngủ chờ vài phút trong khi người dùng đang đợi câu trả lời.
+    # Cờ này đặt SAU khi mở backend: lúc mở, Qdrant phải embed một chuỗi để dò số
+    # chiều, và bước khởi động đó vẫn được phép chờ quota.
+    embedder.fail_fast_queries = True
+
     # Expose to other modules
     r_module._active_index = index
     r_module._active_retriever = build_hybrid_retriever(

@@ -101,6 +101,27 @@ def where_to_qdrant_filter(where: dict | None):
     return qm.Filter(must=must or None, must_not=must_not or None)
 
 
+# Qdrant Cloud bật strict mode: lọc trên field chưa có payload index là 400
+# "Index required but not found" — mọi truy hồi rơi về 0 chunk. Phải phủ đủ mọi
+# key RetrievalContext.to_where() phát ra (test_access_control canh việc này).
+QDRANT_PAYLOAD_INDEXES = {
+    "tenant_id": "keyword",
+    "acl_label": "keyword",
+    "status": "keyword",
+    "effective_from_i": "integer",
+    "effective_to_i": "integer",
+}
+
+
+def ensure_qdrant_payload_indexes(client, collection_name: str) -> None:
+    """Tạo payload index cho các field filter (idempotent — index có rồi thì bỏ qua)."""
+    existing = client.get_collection(collection_name).payload_schema or {}
+    for field, schema in QDRANT_PAYLOAD_INDEXES.items():
+        if field not in existing:
+            client.create_payload_index(collection_name, field_name=field, field_schema=schema, wait=True)
+            logger.info("Qdrant: tạo payload index {} ({})", field, schema)
+
+
 def count_chunks(backend: Backend) -> int:
     if backend.provider == "qdrant":
         return backend.client.count(collection_name=backend.collection, exact=True).count

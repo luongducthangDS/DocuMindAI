@@ -184,9 +184,7 @@ def _contextualize_query(query: str, history: list[dict]) -> str:
     log_input = f"Câu hỏi: {query}\n\nLịch sử:\n{history_block or '(không có)'}"
 
     try:
-        import google.generativeai as genai
-
-        from src.rag.generator import _gemini_pairs
+        from src.rag.generator import _gemini_pairs, gemini_call
 
         # contextualize_node sits on the critical path before router/retrieval
         # for every follow-up turn — unlike generate_answer (the terminal step,
@@ -199,8 +197,7 @@ def _contextualize_query(query: str, history: list[dict]) -> str:
         for api_key, model_name in _gemini_pairs()[:_MAX_GEMINI_ATTEMPTS]:
             t0 = datetime.now(timezone.utc)
             try:
-                genai.configure(api_key=api_key)
-                response = genai.GenerativeModel(model_name).generate_content(prompt)
+                response = gemini_call(api_key, model_name, prompt)
                 rewritten = (response.text or "").strip().strip('"')
                 if rewritten:
                     usage = getattr(response, "usage_metadata", None)
@@ -249,9 +246,7 @@ def _restore_diacritics(query: str) -> str:
     """Trả lại câu có dấu. Giữ nguyên câu gốc nếu Gemini không dùng được hoặc
     trả về câu lệch số từ (dấu hiệu model diễn giải lại thay vì thêm dấu)."""
     try:
-        import google.generativeai as genai
-
-        from src.rag.generator import _gemini_pairs
+        from src.rag.generator import _gemini_pairs, gemini_call
 
         # Cùng lý do với contextualize_node: node này nằm trên critical path
         # trước retrieval, nên chặn ở 2 lần thử thay vì quét hết mọi cặp.
@@ -259,8 +254,7 @@ def _restore_diacritics(query: str) -> str:
         for api_key, model_name in _gemini_pairs()[:2]:
             t0 = datetime.now(timezone.utc)
             try:
-                genai.configure(api_key=api_key)
-                response = genai.GenerativeModel(model_name).generate_content(prompt)
+                response = gemini_call(api_key, model_name, prompt)
                 restored = (response.text or "").strip().strip('"')
                 if restored and abs(len(restored.split()) - len(query.split())) <= 1:
                     usage = getattr(response, "usage_metadata", None)
