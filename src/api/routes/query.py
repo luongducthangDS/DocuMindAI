@@ -226,12 +226,22 @@ async def whoami(request: Request) -> dict:
     }
 
 
+async def _send_step(websocket: WebSocket, enabled: bool, label: str, detail: str, started: float) -> None:
+    """Một bước tiến trình, cùng dạng ThinkingStep của REST ({label, detail, ms})."""
+    if enabled:
+        ms = int((time.perf_counter() - started) * 1000)
+        await websocket.send_json({"step": {"label": label, "detail": detail, "ms": ms}})
+
+
 @router.websocket("/ws/{session_id}")
 async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
     """
     WebSocket endpoint for streaming token-by-token responses.
-    Client sends: {"query": "..."}
-    Server sends: token chunks, then {"done": true, "sources": [...]}
+    Client sends: {"query": "...", "progress": true}
+    Server sends: [{"step": {...}} ...] token chunks, then {"done": true, "sources": [...]}
+
+    "progress" là opt-in: client cũ coi mọi JSON không có done/error là token
+    và sẽ in thẳng {"step": ...} ra khung chat.
     """
     # Validate session_id before accepting
     import re
@@ -256,6 +266,7 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
             data = await websocket.receive_json()
             raw_query = data.get("query", "").strip()
             query = raw_query
+            progress = bool(data.get("progress"))
 
             # min 2 — không phải 3: khớp đúng /api/v1/query (QueryRequest.query)
             # và với chính danh sách lời chào ngắn nhất của _SMALLTALK_RE ("hi",
@@ -309,6 +320,7 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
             )
 
             history = session.as_messages()
+            t_step = time.perf_counter()
             from src.agent.graph import (
                 _contextualize_query,
                 _needs_diacritics,
@@ -319,6 +331,10 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
                 query = _restore_diacritics(query)
             if history:
                 query = _contextualize_query(query, history[-6:])
+            await _send_step(
+                websocket, progress, "Phân tích câu hỏi",
+                query if query != raw_query else "Giữ nguyên câu hỏi", t_step,
+            )
 
             # Import retriever to get chunks
             # Per-message as_of so a client can ask the same question at two
@@ -341,6 +357,7 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
             # fall back to the public default.
             ws_ctx_token = set_current_context(turn_ctx)
             try:
+                t_step = time.perf_counter()
                 try:
                     from src.rag.retriever import retrieve_with_context
 
@@ -354,7 +371,17 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
                     from src.rag.retriever import retrieve_direct_chroma
 
                     chunks = retrieve_direct_chroma(query, ctx=turn_ctx)
+                await _send_step(websocket, progress, "Tìm kiếm tài liệu", f"{len(chunks)} đoạn liên quan", t_step)
+                # Lọc hiệu lực đã đẩy xuống vector store cùng lượt truy hồi ở trên
+                # (RetrievalContext) — bước này chỉ báo mốc đã dùng, không tốn thêm thời gian.
+                as_of = turn_ctx.as_of_date
+                await _send_step(
+                    websocket, progress, "Lọc theo hiệu lực",
+                    f"Áp dụng tại {'/'.join(reversed(as_of.split('-')))}" if as_of else "Quy định hiện hành",
+                    time.perf_counter(),
+                )
 
+                t_step = time.perf_counter()
                 answer_parts = []
                 async for token in stream_answer(query, chunks):
                     await websocket.send_text(token)
@@ -366,6 +393,8 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
                 reset_current_context(ws_ctx_token)
 
             full_answer = "".join(answer_parts)
+            sources = _cited_sources(full_answer, chunks)
+            await _send_step(websocket, progress, "Tổng hợp câu trả lời", f"{len(sources)} trích dẫn", t_step)
             end_trace(ctx, lf_token, "documind-ws-query", raw_query, full_answer)
             _, invalid_citations = validate_citations(full_answer, len(chunks))
             if invalid_citations:
@@ -388,7 +417,7 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
             # hiển thị mâu thuẫn: trả lời "không tìm thấy" nhưng vẫn liệt kê nguồn.
             await websocket.send_json({
                 "done": True,
-                "sources": _cited_sources(full_answer, chunks),
+                "sources": sources,
             })
 
     except WebSocketDisconnect:

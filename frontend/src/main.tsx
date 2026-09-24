@@ -237,6 +237,8 @@ const ICON_PATHS = {
   clock: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2",
   shield: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
   calendar: "M3 5h18v16H3zM16 3v4M8 3v4M3 10h18",
+  chevronDown: "M6 9l6 6 6-6",
+  chevronRight: "M9 6l6 6-6 6",
 };
 type IconName = keyof typeof ICON_PATHS;
 
@@ -402,35 +404,85 @@ function MdText({ text, msgIndex }: { text: string; msgIndex: number }) {
   return <div className="md">{nodes}</div>;
 }
 
-// ── Thinking panel ────────────────────────────────────────────────────────────
-const STEP_ICONS: Record<string, string> = {
-  "Phân loại câu hỏi": "🔍",
-  "Tìm kiếm tài liệu": "📚",
-  "Tổng hợp câu trả lời": "🤖",
-};
+// ── Agent trace (tiến trình xử lý) ───────────────────────────────────────────
+// Nhãn bước khớp đúng label backend phát: REST trả cả mảng steps lúc xong
+// (src/agent/graph.py), WS phát từng {"step": ...} ngay khi xong bước
+// (src/api/routes/query.py::websocket_stream). Nhãn lạ vẫn hiện trong nhật ký.
+const STAGES: { id: string; label: string; short: string; steps: string[] }[] = [
+  { id: "understand", label: "Hiểu câu hỏi", short: "Hiểu", steps: ["Phân tích câu hỏi", "Khôi phục dấu tiếng Việt", "Diễn giải câu hỏi theo ngữ cảnh", "Phân loại câu hỏi"] },
+  { id: "retrieve", label: "Truy hồi điều khoản", short: "Truy hồi", steps: ["Tìm kiếm tài liệu", "Đánh giá độ liên quan", "Tìm lại với truy vấn khác"] },
+  { id: "filter", label: "Lọc hiệu lực", short: "Hiệu lực", steps: ["Lọc theo hiệu lực"] },
+  { id: "answer", label: "Soạn trả lời", short: "Trả lời", steps: ["Tổng hợp câu trả lời", "Kiểm định tuân thủ"] },
+];
 
-function ThinkingPanel({ steps }: { steps: ThinkingStep[] }) {
-  const [open, setOpen] = React.useState(false);
-  if (!steps || steps.length === 0) return null;
+type StageState = "done" | "running" | "pending" | "skipped";
+
+function fmtMs(ms: number) {
+  return ms >= 1000 ? `${(ms / 1000).toFixed(1)}s` : `${ms}ms`;
+}
+
+function AgentTrace({ steps, running, elapsedMs, totalMs }: {
+  steps: ThinkingStep[];
+  running: boolean;
+  elapsedMs: number;
+  totalMs?: number;
+}) {
+  const [open, setOpen] = useState(false);
+  const hit = STAGES.map((st) => steps.filter((s) => st.steps.includes(s.label)));
+  const lastHit = hit.reduce((acc, h, i) => (h.length ? i : acc), -1);
+  const states: StageState[] = STAGES.map((_, i) => {
+    if (hit[i].length) return "done";
+    if (i < lastHit) return "skipped"; // vd. chào hỏi: bỏ qua truy hồi
+    if (!running) return lastHit >= 0 ? "skipped" : "pending";
+    return i === lastHit + 1 ? "running" : "pending";
+  });
+  const doneCount = states.filter((x) => x === "done").length;
+  const stepsMs = steps.reduce((a, s) => a + s.ms, 0);
+  const total = totalMs ?? stepsMs;
+  const showLog = open || running;
+
   return (
-    <div className="thinking-panel">
-      <button className="thinking-toggle" onClick={() => setOpen(!open)}>
-        <span className="thinking-icon">{open ? "▾" : "▸"}</span>
-        <span>Quá trình xử lý</span>
-        <span className="thinking-count">{steps.length} bước</span>
-      </button>
-      {open && (
-        <div className="thinking-steps">
-          {steps.map((s, i) => (
-            <div key={i} className="thinking-step">
-              <span className="step-icon">{STEP_ICONS[s.label] ?? "⚙️"}</span>
-              <div className="step-body">
-                <span className="step-label">{s.label}</span>
-                {s.detail && <span className="step-detail">{s.detail}</span>}
-              </div>
-              <span className="step-ms">{s.ms}ms</span>
-            </div>
-          ))}
+    <div className={`trace${running ? " is-running" : ""}`}>
+      <ol className="trace-stepper" aria-label="Tiến trình xử lý">
+        {STAGES.map((st, i) => {
+          const ms = hit[i].reduce((a, s) => a + s.ms, 0);
+          return (
+            <li key={st.id} className={`trace-stage ${states[i]}`}>
+              <span className="trace-node" aria-hidden="true">
+                {states[i] === "done" ? <Icon name="check" size={11} /> : i + 1}
+              </span>
+              <span className="trace-text">
+                <span className="trace-no">Bước {i + 1}</span>
+                <span className="trace-label">{st.label}</span>
+                <span className="trace-label trace-label-short">{st.short}</span>
+                <span className="trace-ms">
+                  {states[i] === "done" ? fmtMs(ms) : states[i] === "running" ? fmtMs(Math.max(0, elapsedMs - stepsMs)) : states[i] === "skipped" ? "bỏ qua" : "chờ"}
+                </span>
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+      {steps.length > 0 && (
+        <div className="trace-log-wrap">
+          {!running && (
+            <button className="trace-toggle" onClick={() => setOpen(!open)} aria-expanded={open}>
+              <Icon name={open ? "chevronDown" : "chevronRight"} size={12} />
+              {doneCount}/{STAGES.length} giai đoạn · {steps.length} bước · {fmtMs(total)}
+            </button>
+          )}
+          {showLog && (
+            <ol className="trace-log">
+              {steps.map((s, i) => (
+                <li key={i} className="trace-row">
+                  <span className="trace-row-dot" aria-hidden="true" />
+                  <span className="trace-row-label">{s.label}</span>
+                  {s.detail && <span className="trace-row-detail">{s.detail}</span>}
+                  <span className="trace-row-ms">{fmtMs(s.ms)}</span>
+                </li>
+              ))}
+            </ol>
+          )}
         </div>
       )}
     </div>
@@ -762,20 +814,31 @@ function App() {
 
     ws.onopen = () => {
       clearTimeout(openTimeout);
-      ws.send(JSON.stringify({ query: q, as_of_date: asOfDate || null }));
+      ws.send(JSON.stringify({ query: q, as_of_date: asOfDate || null, progress: true }));
     };
 
     ws.onmessage = (ev) => {
       if (reqId !== reqRef.current) return;
       const data = ev.data as string;
-      let control: { done?: boolean; error?: string; sources?: Source[] } | null = null;
+      let control: { done?: boolean; error?: string; sources?: Source[]; step?: ThinkingStep } | null = null;
       try {
         const parsed = JSON.parse(data);
-        if (parsed && typeof parsed === "object" && ("done" in parsed || "error" in parsed)) {
+        if (parsed && typeof parsed === "object" && ("done" in parsed || "error" in parsed || "step" in parsed)) {
           control = parsed;
         }
       } catch {
         // Không parse được JSON => token trả lời thô, không phải control message.
+      }
+
+      if (control?.step) {
+        const step = control.step;
+        setMessages((m) => {
+          const next = [...m];
+          const last = next[next.length - 1];
+          next[next.length - 1] = { ...last, steps: [...(last.steps ?? []), step] };
+          return next;
+        });
+        return;
       }
 
       if (control) {
@@ -984,12 +1047,10 @@ function App() {
 
       {/* ── Main ── */}
       <main className="main">
-        {!isLanding && (
-          <div className="header-bar">
-            <span className="header-title">{headerTitle}</span>
-            <span className="header-sub">{headerSub}</span>
-          </div>
-        )}
+        <div className="header-bar">
+          <span className="header-title">{headerTitle}</span>
+          <span className="header-sub">{headerSub}</span>
+        </div>
 
         {/* Chat — ô nhập luôn ở cùng vị trí trong cây DOM (giữa hero và gợi ý
             khi trang trống, dưới đáy khi đã có hội thoại) để textarea không bị
@@ -1010,7 +1071,6 @@ function App() {
                   const noAnswer =
                     msg.role === "assistant" && !msg.streaming && !msg.error && !msg.stopped &&
                     (!msg.sources || msg.sources.length === 0);
-                  const emptyWhileStreaming = msg.streaming && !msg.content;
                   return (
                   <div key={i} className={`msg-row ${msg.role}`}>
                     {msg.role === "user" && (
@@ -1023,28 +1083,28 @@ function App() {
                         <Icon name="edit" size={14} />
                       </button>
                     )}
-                    <div className={`bubble ${noAnswer ? "bubble-noanswer" : ""} ${emptyWhileStreaming ? "typing" : ""}`}>
+                    <div className={`bubble ${noAnswer ? "bubble-noanswer" : ""}`}>
                       {msg.role === "assistant" ? (
                         <>
-                          {emptyWhileStreaming ? (
-                            <>
-                              <span /><span /><span />
-                              <span className="elapsed-timer">{(elapsedMs / 1000).toFixed(1)}s</span>
-                            </>
-                          ) : (
-                            <>
-                              {noAnswer && (
-                                <div className="noanswer-flag">
-                                  <Icon name="search" size={14} />
-                                  <span>Không tìm thấy trong dữ liệu hiện có</span>
-                                </div>
-                              )}
-                              {msg.steps && msg.steps.length > 0 && (
-                                <ThinkingPanel steps={msg.steps} />
-                              )}
-                              <MdText text={msg.content} msgIndex={i} />
-                            </>
+                          {(msg.streaming || (msg.steps && msg.steps.length > 0)) && (
+                            <AgentTrace
+                              steps={msg.steps ?? []}
+                              running={!!msg.streaming}
+                              elapsedMs={elapsedMs}
+                              totalMs={msg.latency_ms}
+                            />
                           )}
+                          {noAnswer && (
+                            <div className="noanswer-flag">
+                              <Icon name="search" size={14} />
+                              <span>Không tìm thấy trong dữ liệu hiện có</span>
+                            </div>
+                          )}
+                          {msg.content ? (
+                            <MdText text={msg.content} msgIndex={i} />
+                          ) : msg.streaming ? (
+                            <div className="skeleton" aria-hidden="true"><span /><span /><span /></div>
+                          ) : null}
                           {msg.sources && msg.sources.length > 0 && (
                             <div className="sources-section">
                               <div className="sources-label">Nguồn trích dẫn</div>
@@ -1097,11 +1157,13 @@ function App() {
                   );
                 })}
 
+                {/* Đường REST: backend chỉ trả các bước lúc xong hẳn — trong lúc chờ
+                    chỉ biết đang ở giai đoạn đầu, không bịa tiến độ các bước sau. */}
                 {busy && !messages[messages.length - 1]?.streaming && (
                   <div className="msg-row assistant">
-                    <div className="bubble typing">
-                      <span /><span /><span />
-                      <span className="elapsed-timer">{(elapsedMs / 1000).toFixed(1)}s</span>
+                    <div className="bubble">
+                      <AgentTrace steps={[]} running elapsedMs={elapsedMs} />
+                      <div className="skeleton" aria-hidden="true"><span /><span /><span /></div>
                     </div>
                   </div>
                 )}
