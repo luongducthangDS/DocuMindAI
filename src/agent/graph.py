@@ -274,6 +274,28 @@ def _restore_diacritics(query: str) -> str:
     return query
 
 
+# Người dùng hỏi bằng từ dân dã ("rút tiền BHXH"), văn bản viết thuật ngữ
+# ("hưởng bảo hiểm xã hội một lần"). BM25 khớp nhầm "rút tiền ký quỹ", dense lệch
+# sang "thời điểm hưởng lương hưu" → Điều 70 Luật 41/2024 không lọt top-8 và
+# generator từ chối đúng quy trình. Chỉ NỐI THÊM thuật ngữ, không thay câu gốc.
+# ponytail: bảng tay, thêm dòng khi log có câu trượt vì lệch từ ngữ.
+_LEGAL_TERM_EXPANSIONS: list[tuple[re.Pattern, str]] = [
+    (re.compile(r"\brút\b.*\b(bhxh|bảo hiểm xã hội|bảo hiểm)\b|\b(bhxh|bảo hiểm xã hội)\b.*\brút\b", re.I),
+     "hưởng bảo hiểm xã hội một lần"),
+    (re.compile(r"\bbhxh\b", re.I), "bảo hiểm xã hội"),
+    (re.compile(r"\bbhtn\b", re.I), "bảo hiểm thất nghiệp"),
+    (re.compile(r"\bbhyt\b", re.I), "bảo hiểm y tế"),
+    (re.compile(r"\bnghỉ (đẻ|sinh)\b", re.I), "chế độ thai sản"),
+    (re.compile(r"\bđuổi việc\b", re.I), "sa thải đơn phương chấm dứt hợp đồng lao động"),
+]
+
+
+def _expand_legal_terms(query: str) -> str:
+    extra = [term for pat, term in _LEGAL_TERM_EXPANSIONS
+             if pat.search(query) and term.lower() not in query.lower()]
+    return f"{query} ({'; '.join(extra)})" if extra else query
+
+
 def contextualize_node(state: AgentState) -> dict:
     """Resolve context-dependent follow-ups (e.g. 'các trường hợp khác là gì?')
     into standalone questions before intent routing/retrieval, using prior
@@ -400,7 +422,7 @@ def retrieve_node(state: AgentState) -> dict:
 
     t0 = time.time()  # fix: must be defined before try/except
     t0_dt = datetime.now(timezone.utc)
-    query = state["query"]
+    query = _expand_legal_terms(state["query"])
 
     try:
         retriever = getattr(r_module, "_active_retriever", None)

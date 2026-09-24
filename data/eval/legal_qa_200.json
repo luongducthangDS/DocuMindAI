@@ -1078,7 +1078,9 @@
     "source_clause": "",
     "expect_contains": [
       [
-        "không tìm thấy"
+        "không tìm thấy",
+        "chưa tìm thấy",
+        "ngoài phạm vi"
       ]
     ],
     "expect_absent": [
@@ -1104,7 +1106,9 @@
     "source_clause": "",
     "expect_contains": [
       [
-        "không tìm thấy"
+        "không tìm thấy",
+        "chưa tìm thấy",
+        "ngoài phạm vi"
       ]
     ],
     "expect_absent": [
@@ -1128,7 +1132,9 @@
     "source_clause": "",
     "expect_contains": [
       [
-        "không tìm thấy"
+        "không tìm thấy",
+        "chưa tìm thấy",
+        "ngoài phạm vi"
       ]
     ],
     "expect_absent": [

@@ -159,7 +159,7 @@ def mrr(
 # ── OOC refusal rate ──────────────────────────────────────────────────────────
 
 _REFUSAL_PATTERNS = [
-    r"không\s+(?:tìm\s+thấy|có\s+thông\s+tin|có\s+dữ\s+liệu)",
+    r"(?:không|chưa)\s+(?:tìm\s+thấy|có\s+thông\s+tin|có\s+dữ\s+liệu)",
     r"ngoài\s+phạm\s+vi",
     r"chưa\s+có\s+trong\s+(?:cơ\s+sở|corpus|dữ\s+liệu)",
     r"không\s+thể\s+(?:trả\s+lời|cung\s+cấp)",

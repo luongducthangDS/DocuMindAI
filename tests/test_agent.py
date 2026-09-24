@@ -649,3 +649,18 @@ class TestDiacriticRestore:
         mock_restore.assert_called_once()
         assert result["query"] == "Thời gian thử việc tối đa là bao lâu"
         assert result["steps"][-1]["label"] == "Khôi phục dấu tiếng Việt"
+
+
+class TestExpandLegalTerms:
+    def test_colloquial_withdrawal_maps_to_lump_sum(self):
+        from src.agent.graph import _expand_legal_terms
+
+        out = _expand_legal_terms("khi nào tôi được rút tiền BHXH")
+        assert out.startswith("khi nào tôi được rút tiền BHXH")
+        assert "hưởng bảo hiểm xã hội một lần" in out
+
+    def test_legal_wording_left_untouched(self):
+        from src.agent.graph import _expand_legal_terms
+
+        q = "Nghỉ việc đúng luật cần báo trước bao nhiêu ngày?"
+        assert _expand_legal_terms(q) == q

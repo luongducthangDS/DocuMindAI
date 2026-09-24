@@ -324,6 +324,22 @@ nav { display: flex; flex-direction: column; gap: 2px; }
   font-weight: 600;
   color: var(--yellow);
 }
+.clarify { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin-top: 10px; }
+.clarify-label { font-size: 12px; font-weight: 600; color: var(--text2); }
+.clarify-option {
+  padding: 8px 12px;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+  color: var(--text1);
+  font: inherit;
+  font-size: 14px;
+  transition: border-color .15s, background .15s;
+}
+.clarify-option:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-soft); }
+.clarify-option:disabled { opacity: .6; cursor: default; }
 @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 /* Chữ chưa về: 3 vạch nhấp nháy thay cho khung trống. */

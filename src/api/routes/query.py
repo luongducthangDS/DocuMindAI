@@ -323,6 +323,7 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
             t_step = time.perf_counter()
             from src.agent.graph import (
                 _contextualize_query,
+                _expand_legal_terms,
                 _needs_diacritics,
                 _restore_diacritics,
             )
@@ -358,19 +359,21 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
             ws_ctx_token = set_current_context(turn_ctx)
             try:
                 t_step = time.perf_counter()
+                # Câu mở rộng thuật ngữ chỉ dùng để truy hồi; LLM vẫn nhận câu gốc.
+                search_query = _expand_legal_terms(query)
                 try:
                     from src.rag.retriever import retrieve_with_context
 
-                    chunks = await asyncio.to_thread(retrieve_with_context, query, turn_ctx)
+                    chunks = await asyncio.to_thread(retrieve_with_context, search_query, turn_ctx)
                     if not chunks:
                         from src.rag.retriever import retrieve_direct_chroma
 
-                        chunks = retrieve_direct_chroma(query, ctx=turn_ctx)
+                        chunks = retrieve_direct_chroma(search_query, ctx=turn_ctx)
                 except Exception as exc:
                     logger.warning("Retrieval failed in WS handler: {}", exc)
                     from src.rag.retriever import retrieve_direct_chroma
 
-                    chunks = retrieve_direct_chroma(query, ctx=turn_ctx)
+                    chunks = retrieve_direct_chroma(search_query, ctx=turn_ctx)
                 await _send_step(websocket, progress, "Tìm kiếm tài liệu", f"{len(chunks)} đoạn liên quan", t_step)
                 # Lọc hiệu lực đã đẩy xuống vector store cùng lượt truy hồi ở trên
                 # (RetrievalContext) — bước này chỉ báo mốc đã dùng, không tốn thêm thời gian.

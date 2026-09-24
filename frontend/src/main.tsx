@@ -242,6 +242,21 @@ const ICON_PATHS = {
 };
 type IconName = keyof typeof ICON_PATHS;
 
+// Khuôn "hỏi lại" của generator (rule 4, src/rag/generator.py): phần sau tiêu đề
+// này là các câu hỏi đã diễn đạt lại — hiện thành nút để người dùng chọn.
+const CLARIFY_HEADER = "**Bạn muốn hỏi cụ thể:**";
+
+function splitClarify(text: string): { body: string; options: string[] } {
+  const i = text.indexOf(CLARIFY_HEADER);
+  if (i < 0) return { body: text, options: [] };
+  const options = text
+    .slice(i + CLARIFY_HEADER.length)
+    .split("\n")
+    .map((l) => l.replace(/^\s*[-*]\s+/, "").trim())
+    .filter((l) => l.endsWith("?"));
+  return { body: text.slice(0, i).trim(), options };
+}
+
 function Icon({ name, size = 16 }: { name: IconName; size?: number }) {
   const filled = name === "stop";
   return (
@@ -1071,6 +1086,7 @@ function App() {
                   const noAnswer =
                     msg.role === "assistant" && !msg.streaming && !msg.error && !msg.stopped &&
                     (!msg.sources || msg.sources.length === 0);
+                  const clarify = msg.role === "assistant" ? splitClarify(msg.content) : null;
                   return (
                   <div key={i} className={`msg-row ${msg.role}`}>
                     {msg.role === "user" && (
@@ -1097,14 +1113,24 @@ function App() {
                           {noAnswer && (
                             <div className="noanswer-flag">
                               <Icon name="search" size={14} />
-                              <span>Không tìm thấy trong dữ liệu hiện có</span>
+                              <span>{clarify?.options.length ? "Cần làm rõ câu hỏi" : "Không tìm thấy trong dữ liệu hiện có"}</span>
                             </div>
                           )}
                           {msg.content ? (
-                            <MdText text={msg.content} msgIndex={i} />
+                            <MdText text={clarify ? clarify.body : msg.content} msgIndex={i} />
                           ) : msg.streaming ? (
                             <div className="skeleton" aria-hidden="true"><span /><span /><span /></div>
                           ) : null}
+                          {clarify && clarify.options.length > 0 && (
+                            <div className="clarify">
+                              <div className="clarify-label">Bạn muốn hỏi cụ thể:</div>
+                              {clarify.options.map((o) => (
+                                <button key={o} className="clarify-option" disabled={busy} onClick={() => send(o)}>
+                                  {o}
+                                </button>
+                              ))}
+                            </div>
+                          )}
                           {msg.sources && msg.sources.length > 0 && (
                             <div className="sources-section">
                               <div className="sources-label">Nguồn trích dẫn</div>

@@ -80,7 +80,9 @@ class TestHardSetShape:
         for q in hard:
             if q["expected_behavior"] == "refuse":
                 assert not q["source_doc"] and not q["source_clause"], q["id"]
-                assert ["không tìm thấy"] in q["expect_contains"], q["id"]
+                # Generator hỏi lại thay vì từ chối cụt (rule 4) — chấp nhận cả khuôn mới.
+                assert any("không tìm thấy" in g and "chưa tìm thấy" in g
+                           for g in q["expect_contains"]), q["id"]
 
     def test_boundary_pairs_straddle_one_day(self, hard):
         """A boundary pair is only a boundary test if its two dates are adjacent."""
