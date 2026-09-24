@@ -49,7 +49,7 @@ services:
       # re-embed cả corpus thì chạy ở máy dev rồi migrate, đừng chạy trên Render.
       # Khong dung 2.5-flash/2.5-flash-lite: Google da dong cho API key tao moi (404).
       - key: GEMINI_GENERATION_MODELS
-        value: gemini-3.5-flash,gemini-3.1-flash-lite
+        value: gemini-3.1-flash-lite,gemini-3.5-flash-lite,gemini-3.5-flash
       # Corpus nằm ở Qdrant Cloud (migrate 2026-09-19: 1149 chunks, 3072-dim,
       # verify top-1 khớp ChromaDB nguồn). Disk Render ephemeral nên ChromaDB local
       # trong container luôn rỗng — đừng quay lại provider chroma ở production.
