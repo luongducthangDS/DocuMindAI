@@ -6,6 +6,7 @@ GET /api/v1/metrics  — query stats
 
 from __future__ import annotations
 
+import asyncio
 import sqlite3
 import time
 
@@ -44,64 +45,93 @@ async def health_check() -> HealthResponse:
 
 
 async def _check_vector_store() -> ServiceStatus:
-    """Fast vector store health check — avoids loading the embedding model."""
-    settings = get_settings()
-    if (settings.vector_store_provider or "chroma").lower() == "qdrant":
-        return await _check_qdrant()
-    return await _check_chroma()
+    """Mở collection thật rồi đếm chunk — không suy ra sức khoẻ từ sự tồn tại của file.
 
+    Bản cũ chỉ kiểm `chroma.sqlite3` có tồn tại và lớn hơn 1KB. Ngày 2026-09-21
+    collection `documind_legal` hỏng metadata (KeyError '_type' ngay lúc mở), mọi
+    query trả 0 chunk và trả lời "không tìm thấy văn bản", nhưng health vẫn báo
+    xanh — kiểu hỏng tệ nhất, vì bảng điều khiển nói bình thường trong khi không
+    câu hỏi nào được phục vụ.
 
-async def _check_qdrant() -> ServiceStatus:
-    try:
-        settings = get_settings()
-        if not settings.qdrant_url:
-            return ServiceStatus(name="qdrant", healthy=False, detail="QDRANT_URL not set")
-
-        from qdrant_client import QdrantClient
-
-        client = QdrantClient(url=settings.qdrant_url, api_key=settings.qdrant_api_key or None)
-        collections = {c.name for c in client.get_collections().collections}
-        if settings.qdrant_collection in collections:
-            return ServiceStatus(name="qdrant", healthy=True, detail=f"Collection '{settings.qdrant_collection}' reachable")
-        return ServiceStatus(name="qdrant", healthy=False, detail=f"Collection '{settings.qdrant_collection}' not found")
-    except Exception as exc:
-        return ServiceStatus(name="qdrant", healthy=False, detail=str(exc)[:100])
-
-
-async def _check_chroma() -> ServiceStatus:
-    """Fast chroma health check — avoids loading the embedding model."""
-    try:
-        settings = get_settings()
-        if not settings.chroma_host:
-            # Local persistent mode: just verify SQLite db file exists and is non-empty.
-            # Avoids loading the 120MB embedding model on every health poll.
-            sqlite_file = settings.data_dir / "chroma_db" / "chroma.sqlite3"
-            if sqlite_file.exists() and sqlite_file.stat().st_size > 1024:
-                return ServiceStatus(
-                    name="chromadb",
-                    healthy=True,
-                    detail=f"Local persistent mode ({sqlite_file.stat().st_size // 1024} KB)",
-                )
-            local_path = settings.data_dir / "chroma_db"
-            if local_path.exists():
-                return ServiceStatus(name="chromadb", healthy=True, detail="Local persistent mode")
-            return ServiceStatus(name="chromadb", healthy=False, detail="Local ChromaDB missing")
-
-        import chromadb
-        from chromadb.config import Settings as ChromaSettings
-
-        client = chromadb.HttpClient(
-            host=settings.chroma_host,
-            port=settings.chroma_port,
-            settings=ChromaSettings(anonymized_telemetry=False),
+    Một hàm cho cả hai provider: `vector_backend` sinh ra chính để chỗ gọi không
+    phải phân nhánh chroma/qdrant, health check không nên là ngoại lệ.
+    """
+    name = "qdrant" if _provider() == "qdrant" else "chromadb"
+    count, error = await asyncio.to_thread(_probe_vector_store)
+    if error:
+        return ServiceStatus(name=name, healthy=False, detail=error)
+    if count <= 0:
+        return ServiceStatus(
+            name=name, healthy=False, detail="Collection mở được nhưng rỗng — chưa ingest corpus"
         )
-        client.heartbeat()
-        return ServiceStatus(name="chromadb", healthy=True, detail="HTTP connection OK")
+    return ServiceStatus(name=name, healthy=True, detail=f"{count} chunks")
+
+
+def _provider() -> str:
+    return (get_settings().vector_store_provider or "chroma").lower()
+
+
+# Đo trên máy dev 2026-09-21: một lần probe mất 4.1s vì CHROMA_HOST trỏ tới server
+# không chạy — get_chroma_collection() chờ hết timeout HTTP rồi mới fallback local.
+# HEALTHCHECK trong Dockerfile bỏ cuộc sau 5s, nên probe mỗi lần poll là hẹn giờ cho
+# một health check chập chờn. Nhớ kết quả trong TTL ngắn: tình trạng corpus không
+# đổi theo từng giây, và cái giá là sau khi ingest xong health còn báo hỏng thêm
+# tối đa ngần này giây.
+_PROBE_TTL_SECONDS = 15.0
+_probe_cache: tuple[float, tuple[int, str]] | None = None
+
+
+def _reset_probe_cache() -> None:
+    """Dùng trong test — mỗi ca phải thấy tầng vector store mà chính nó dựng."""
+    global _probe_cache
+    _probe_cache = None
+
+
+def _count_qdrant_readonly() -> int:
+    """Đếm điểm mà KHÔNG đi qua get_backend().
+
+    get_backend() gọi get_qdrant_client_and_collection(), và hàm đó tạo collection
+    khi thiếu — kèm get_embedding_dim(), vốn embed một chuỗi rỗng để hỏi chiều
+    vector. Nghĩa là một cú GET /health (endpoint public, ai gọi cũng được) sẽ dựng
+    collection trên cluster và đốt một lệnh Gemini. Health check chỉ được đọc.
+    """
+    from qdrant_client import QdrantClient
+
+    settings = get_settings()
+    if not settings.qdrant_url:
+        raise RuntimeError("VECTOR_STORE_PROVIDER=qdrant nhưng QDRANT_URL chưa được set")
+
+    client = QdrantClient(url=settings.qdrant_url, api_key=settings.qdrant_api_key or None)
+    return client.count(collection_name=settings.qdrant_collection, exact=True).count
+
+
+def _probe_vector_store() -> tuple[int, str]:
+    """(chunk_count, detail_lỗi). Chặn luồng — luôn gọi qua asyncio.to_thread.
+
+    Chi tiết lỗi chỉ giữ tên exception, theo đúng lối của a664ea4: /health là
+    endpoint public, nguyên văn lỗi chromadb/qdrant lộ đường dẫn máy chủ. Bản đầy
+    đủ nằm ở log server.
+    """
+    global _probe_cache
+    now = time.monotonic()
+    if _probe_cache is not None and now - _probe_cache[0] < _PROBE_TTL_SECONDS:
+        return _probe_cache[1]
+
+    try:
+        if _provider() == "qdrant":
+            result = (_count_qdrant_readonly(), "")
+        else:
+            # Chroma: get_or_create dựng collection rỗng nếu thiếu — với file local
+            # thì vô hại, và kết quả vẫn là đỏ ("rỗng"), đúng sự thật phục vụ.
+            from src.rag.vector_backend import count_chunks, get_backend
+
+            result = (count_chunks(get_backend()), "")
     except Exception as exc:
-        local_path = get_settings().data_dir / "chroma_db"
-        if local_path.exists():
-            return ServiceStatus(name="chromadb", healthy=True, detail="Local persistent mode")
-        return ServiceStatus(name="chromadb", healthy=False, detail=str(exc)[:100])
+        logger.error("Vector store health probe failed: {}", exc)
+        result = (0, f"Không mở được collection ({type(exc).__name__}) — xem log server")
+
+    _probe_cache = (now, result)
+    return result
 
 
 def _check_llm() -> ServiceStatus:
@@ -117,9 +147,14 @@ def _check_sqlite() -> ServiceStatus:
         conn = sqlite3.connect(str(settings.sqlite_db))
         conn.execute("SELECT 1").fetchone()
         conn.close()
-        return ServiceStatus(name="sqlite", healthy=True, detail=str(settings.sqlite_db))
+        return ServiceStatus(name="sqlite", healthy=True, detail="connected")
     except Exception as exc:
-        return ServiceStatus(name="sqlite", healthy=False, detail=str(exc)[:80])
+        # Cùng lối với a664ea4 và _probe_vector_store: /health là endpoint public,
+        # nguyên văn lỗi sqlite kèm luôn đường dẫn file trên máy chủ.
+        logger.error("SQLite health check failed: {}", exc)
+        return ServiceStatus(
+            name="sqlite", healthy=False, detail=f"{type(exc).__name__} — xem log server"
+        )
 
 
 @router.get("/metrics", response_model=MetricsResponse)
@@ -162,13 +197,5 @@ async def get_metrics() -> MetricsResponse:
 
 
 async def _count_corpus_chunks() -> int:
-    import asyncio
-
-    def _count_sync() -> int:
-        try:
-            from src.rag.vector_backend import get_backend, count_chunks
-            return count_chunks(get_backend())
-        except Exception:
-            return 0
-
-    return await asyncio.to_thread(_count_sync)
+    count, _ = await asyncio.to_thread(_probe_vector_store)
+    return count
