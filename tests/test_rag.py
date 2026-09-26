@@ -617,3 +617,54 @@ class TestGeminiEmbedderKeyRotation:
 
         assert result == [0.1, 0.2]
         assert ticks >= 10
+
+class TestChromaHttpFailFast:
+    """CHROMA_HOST trỏ server không chạy là mặc định ở local dev — không được
+    bắt request đầu tiên trả giá 4.2s heartbeat cho điều đã biết trước."""
+
+    def test_closed_port_is_reported_closed_quickly(self):
+        import socket
+        import time
+
+        from src.rag.embedder import _port_is_open
+
+        # Cổng 0 không bao giờ lắng nghe được; lấy một cổng đóng thật để chắc chắn.
+        with socket.socket() as s:
+            s.bind(("127.0.0.1", 0))
+            closed_port = s.getsockname()[1]
+
+        t0 = time.perf_counter()
+        assert _port_is_open("127.0.0.1", closed_port, timeout=0.5) is False
+        assert time.perf_counter() - t0 < 2.0
+
+    def test_open_port_is_reported_open(self):
+        import socket
+
+        from src.rag.embedder import _port_is_open
+
+        with socket.socket() as server:
+            server.bind(("127.0.0.1", 0))
+            server.listen(1)
+            assert _port_is_open("127.0.0.1", server.getsockname()[1]) is True
+
+    def test_http_client_is_not_built_when_port_is_closed(self, monkeypatch):
+        """Bằng chứng thật sự: chromadb.HttpClient không được gọi."""
+        import chromadb
+
+        from src.config import get_settings
+        from src.rag import embedder
+
+        settings = get_settings()
+        monkeypatch.setattr(settings, "chroma_host", "127.0.0.1", raising=False)
+        monkeypatch.setattr(settings, "chroma_port", 1, raising=False)
+        monkeypatch.setattr(embedder, "_port_is_open", lambda *_a, **_k: False)
+
+        def fail(*_args, **_kwargs):
+            raise AssertionError("HttpClient không được dựng khi cổng đóng")
+
+        monkeypatch.setattr(chromadb, "HttpClient", fail)
+        # conftest trỏ DATA_DIR sang tmp_path nên collection rỗng — điều được
+        # khẳng định ở đây là đã đi thẳng xuống PersistentClient, không qua HTTP.
+        client, collection = embedder.get_chroma_collection(verify=False)
+        assert collection.name == get_settings().chroma_collection
+        assert isinstance(client, chromadb.api.client.Client)

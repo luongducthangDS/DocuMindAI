@@ -291,6 +291,18 @@ def assert_store_matches_model(collection_metadata: dict | None, *, where: str =
         )
 
 
+def _port_is_open(host: str, port: int, timeout: float = 0.5) -> bool:
+    """True nếu có thứ gì đang lắng nghe ở host:port. Không ném lỗi."""
+    import socket
+
+    try:
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
+    except OSError:
+        logger.warning("ChromaDB HTTP {}:{} không lắng nghe, dùng local PersistentClient", host, port)
+        return False
+
+
 def get_chroma_collection(*, verify: bool = True):
     """
     Return ChromaDB collection.
@@ -308,8 +320,13 @@ def get_chroma_collection(*, verify: bool = True):
     settings = get_settings()
     chroma_settings = ChromaSettings(anonymized_telemetry=False)
 
-    # Try HTTP server only when explicitly configured.
-    if settings.chroma_host:
+    # Try HTTP server only when explicitly configured AND actually listening.
+    # heartbeat() của chromadb tự retry nên mất ~4.2s khi cổng đóng — mà CHROMA_HOST
+    # trỏ vào server không chạy là trạng thái thường ngày ở local dev. Probe TCP
+    # hạ xuống ~1.0s (đo 2026-09-21): "localhost" phân giải ra cả ::1 lẫn 127.0.0.1
+    # nên create_connection thử lần lượt, tốn 2× timeout. Vẫn để 0.5s/lần thay vì
+    # ngắn hơn, để CHROMA_HOST trỏ máy chủ thật ở xa không bị báo nhầm là chết.
+    if settings.chroma_host and _port_is_open(settings.chroma_host, settings.chroma_port):
         try:
             client = chromadb.HttpClient(
                 host=settings.chroma_host,
