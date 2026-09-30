@@ -162,6 +162,45 @@ def check_prompt_injection(query: str) -> GuardResult:
         return GuardResult(blocked=False, reason="guard_error")
 
 
+# ── PII redaction (Nghị định 13/2023/NĐ-CP) ────────────────────────────────────
+# Áp ở mọi chỗ ghi ra ngoài process: loguru (src/logger.py), chat_history.jsonl,
+# Langfuse (src/langfuse_otel.py). KHÔNG áp lên câu hỏi gửi LLM hay lịch sử
+# session — đó là dữ liệu chức năng, che đi thì câu trả lời sai.
+#
+# ponytail: regex bắt dạng viết liền. "0912 345 678" hay CCCD có dấu cách lọt qua;
+# ngược lại một số tiền 9 chữ số viết liền ("150000000") bị che nhầm — chỉ trong
+# log, chấp nhận được. Cần độ phủ cao hơn thì dùng NER, không thêm regex.
+# Lookaround thay cho \b: "CCCD001099012345" không có ranh giới từ giữa chữ và số,
+# còn "\b" trước "+84" không bao giờ khớp.
+_EMAIL_RE = re.compile(
+    r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@"
+    r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+"
+)
+_PHONE_RE = re.compile(r"(?<![\d+])(?:\+84|0)[35789]\d{8}(?!\d)")
+_NATIONAL_ID_RE = re.compile(r"(?<!\d)(?:\d{12}|\d{9})(?!\d)")  # CCCD 12 số / CMND 9 số
+
+
+def redact_pii(text: str | None) -> str:
+    """Email → phone → ID, theo thứ tự đó: SĐT 10 số không bao giờ khớp mẫu 9/12 số."""
+    if not text:
+        return text or ""
+    text = _EMAIL_RE.sub("[REDACTED_EMAIL]", text)
+    text = _PHONE_RE.sub("[REDACTED_PHONE]", text)
+    return _NATIONAL_ID_RE.sub("[REDACTED_ID]", text)
+
+
+def truncate_ip(ip: str | None) -> str:
+    """'192.168.1.123' → '192.168.1.0/24'; IPv6 giữ /48. Không phải IP → 'unknown'."""
+    import ipaddress
+
+    try:
+        addr = ipaddress.ip_address((ip or "").strip())
+    except ValueError:
+        return "unknown"
+    prefix = 24 if addr.version == 4 else 48
+    return str(ipaddress.ip_network(f"{addr}/{prefix}", strict=False))
+
+
 # ── Citation validation ────────────────────────────────────────────────────────
 
 # Matches [N] or [NN] but NOT [Khoản 1] or [Điều 5] style text

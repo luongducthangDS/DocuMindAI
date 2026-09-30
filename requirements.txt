@@ -1,11 +1,10 @@
-# CPU-only PyTorch (avoids ~2GB CUDA download — Render has no GPU)
---extra-index-url https://download.pytorch.org/whl/cpu
+# Reranker local (torch, sentence-transformers) nằm ở requirements-rerank.txt —
+# production tắt reranker (Render 512MB), không cài ~1.3GB torch vào image.
 
 # ── Core RAG ──────────────────────────────────────────────────────────────────
 llama-index-core==0.14.22
 llama-index-workflows==2.20.0
 llama-index-instrumentation==0.5.0
-llama-index-embeddings-huggingface==0.7.0
 llama-index-retrievers-bm25==0.7.1
 llama-index-vector-stores-chroma==0.5.5
 llama-index-vector-stores-qdrant==0.10.1  # dùng khi VECTOR_STORE_PROVIDER=qdrant
@@ -22,20 +21,15 @@ langsmith==0.1.120
 # ── LLM Provider (Gemini duy nhất — embedding + generation) ───────────────────
 google-generativeai==0.7.2
 
-# ── Reranker (CPU-only torch; embedding đi qua API, không nạp model) ──────────
-sentence-transformers==3.1.1
-torch==2.4.1+cpu
-transformers==4.44.2
-
 # ── Vector DB ─────────────────────────────────────────────────────────────────
 chromadb==0.6.3
 qdrant-client==1.18.0  # dùng khi VECTOR_STORE_PROVIDER=qdrant
 
 # ── Backend ───────────────────────────────────────────────────────────────────
-fastapi==0.115.0
+fastapi==0.115.6  # >=0.115.3: kéo starlette >=0.40 (CVE-2024-47874, multipart DoS)
 uvicorn[standard]==0.30.6
 websockets==13.0.1
-python-multipart==0.0.12
+python-multipart==0.0.20  # >=0.0.18: CVE-2024-53981
 slowapi==0.1.9
 aiofiles==24.1.0
 

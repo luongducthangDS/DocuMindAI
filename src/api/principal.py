@@ -27,6 +27,7 @@ from src.rag.context import DEFAULT_ACL_LABEL, PUBLIC_TENANT, RetrievalContext
 TENANTS_PATH = Path(__file__).resolve().parents[2] / "data" / "tenants" / "tenants.json"
 
 API_KEY_HEADER = "x-api-key"
+ADMIN_KEY_HEADER = "x-admin-key"
 
 
 @dataclass(frozen=True)
@@ -109,6 +110,29 @@ def context_from_headers(headers, as_of_date: str | None = None) -> RetrievalCon
         acl_labels=matched.acl_labels,
         as_of_date=as_of_date,
     )
+
+
+def admin_key_valid(headers) -> bool:
+    """Khoá vận hành (API_SECRET_KEY), tách khỏi key tenant: tenant đọc, admin ghi corpus."""
+    from src.config import get_settings
+
+    secret = get_settings().api_secret_key
+    presented = headers.get(ADMIN_KEY_HEADER) or ""
+    # Secret rỗng = chưa cấu hình → từ chối tất cả: compare_digest("", "") là True.
+    # So bytes: compare_digest ném TypeError với str không phải ASCII.
+    return bool(secret) and hmac.compare_digest(presented.encode(), secret.encode())
+
+
+def require_admin(request: Request) -> None:
+    """Dependency cho route ghi/tốn LLM. Đọc request.headers thay vì `Header(...)`:
+    thiếu một `Header(...)` bắt buộc là 422 (lỗi validate), không phải 401.
+
+    Lưu ý: FastAPI đọc body TRƯỚC khi chạy dependency — route nhận file phải tự
+    parse body sau dependency này (xem documents.upload_document).
+    """
+    if not admin_key_valid(request.headers):
+        logger.warning("Admin route rejected: {} {}", request.method, request.url.path)
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
 
 
 def resolve_context(request: Request, as_of_date: str | None = None) -> RetrievalContext:

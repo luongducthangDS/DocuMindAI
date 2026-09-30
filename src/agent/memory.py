@@ -17,6 +17,7 @@ from pathlib import Path
 from loguru import logger
 
 from src.config import get_settings
+from src.guardrails import redact_pii, truncate_ip
 
 
 @dataclass
@@ -167,8 +168,9 @@ class LongTermMemory:
                    VALUES (?, ?, ?, ?, ?, ?)""",
                 (
                     session_id,
-                    query[:500],          # truncate long queries
-                    answer_snippet[:300], # truncate for storage
+                    # Log vận hành, không phải lịch sử hội thoại — che PII (NĐ 13/2023).
+                    redact_pii(query)[:500],
+                    redact_pii(answer_snippet)[:300],
                     latency_ms,
                     used_llm,
                     now,
@@ -192,8 +194,8 @@ class LongTermMemory:
                    (filename, file_size_bytes, indexed_chunks, status, error_detail,
                     ip_address, user_agent, created_at)
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-                (filename[:260], file_size_bytes, indexed_chunks, status,
-                 error_detail, ip_address, user_agent, now),
+                (redact_pii(filename)[:260], file_size_bytes, indexed_chunks, status,
+                 error_detail, truncate_ip(ip_address) if ip_address else None, user_agent, now),
             )
 
     def log_error(

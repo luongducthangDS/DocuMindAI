@@ -18,6 +18,8 @@ def setup_logger() -> None:
     settings.logs_dir.mkdir(parents=True, exist_ok=True)
 
     logger.remove()
+    # Che PII trên MỌI sink (console, file, Render log) — patcher chạy trước sink.
+    logger.configure(patcher=_redact_pii_patcher)
 
     # Console — human-readable in dev, JSON in prod
     if settings.environment == "development":
@@ -45,6 +47,12 @@ def setup_logger() -> None:
         format="{time:YYYY-MM-DDTHH:mm:ssZ} | {level} | {name}:{line} | {message}",
         filter=_redact_secrets,
     )
+
+
+def _redact_pii_patcher(record: dict) -> None:
+    from src.guardrails import redact_pii
+
+    record["message"] = redact_pii(record["message"])
 
 
 def _redact_secrets(record: dict) -> bool:

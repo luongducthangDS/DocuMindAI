@@ -490,7 +490,9 @@ class TestSchemas:
         with pytest.raises(ValidationError):
             QueryRequest(query="valid question here", session_id="invalid session!")
 
-    def test_report_request_sanitizes_filename(self):
+    def test_report_request_ignores_client_filename(self):
+        """Tên file báo cáo do server đặt (token ngẫu nhiên) — client không còn
+        tham số nào để chọn tên, nên không traversal/ghi đè/đoán tên được."""
         from src.api.schemas import ReportRequest
 
         req = ReportRequest(
@@ -498,9 +500,8 @@ class TestSchemas:
             query="test query",
             filename="../../../etc/passwd",
         )
-        assert ".." not in req.filename
-        assert "/" not in req.filename
-        assert "etc" in req.filename or req.filename  # sanitized but not empty
+        assert "filename" not in ReportRequest.model_fields
+        assert not hasattr(req, "filename")
 
 
 # ── as_of_date plumbing (temporal-retrieval) ──────────────────────────────────

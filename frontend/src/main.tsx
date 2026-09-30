@@ -9,6 +9,7 @@ interface Source {
   dieu_header: string;
   source_url: string;
   score: number;
+  source?: string; // "user_upload" = tài liệu người dùng tải lên, không phải văn bản chính thức
 }
 
 interface ThinkingStep {
@@ -544,14 +545,20 @@ function AnswerActions({
 
 // ── Source card ────────────────────────────────────────────────────────────────
 function SourceCard({ src, msgIndex, idPrefix = "" }: { src: Source; msgIndex: number; idPrefix?: string }) {
+  const isUpload = src.source === "user_upload";
   return (
     <div className="source-card" id={idPrefix + sourceDomId(msgIndex, src.index)}>
       <div className="source-header">
         <span className="source-index">[{src.index}]</span>
+        {isUpload && (
+          <span className="source-badge-upload" title="Không phải văn bản pháp luật chính thức">
+            Tài liệu người dùng
+          </span>
+        )}
         {src.dieu_header && <span className="source-dieu">{src.dieu_header}</span>}
       </div>
       <div className="source-title">{src.title || PRODUCT.sourceFallback}</div>
-      {src.source_url && (
+      {src.source_url && !isUpload && (
         <a href={src.source_url} target="_blank" rel="noreferrer" className="source-link">
           Xem nguồn →
         </a>

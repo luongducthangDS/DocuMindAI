@@ -7,11 +7,13 @@ from __future__ import annotations
 import asyncio
 import json
 import time
+from collections import OrderedDict
 from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, Request, WebSocket, WebSocketDisconnect, status
+from starlette.requests import HTTPConnection
 from loguru import logger
 
 from src.agent.graph import run_agent
@@ -19,10 +21,19 @@ from src.agent.memory import ShortTermMemory, get_long_term_memory
 from src.api.principal import InvalidApiKey, context_from_headers, resolve_context
 from src.api.schemas import ComplianceVerdict, QueryRequest, QueryResponse, SourceItem, ThinkingStep
 from src.config import DOMAIN_NAME, get_settings
-from src.guardrails import check_prompt_injection, validate_citations
+from src.guardrails import check_prompt_injection, redact_pii, truncate_ip, validate_citations
 from src.langfuse_otel import end_trace, start_trace
-from src.rag.context import PUBLIC_TENANT, reset_current_context, set_current_context
-from src.rag.generator import _cited_sources, stream_answer
+from src.rag.context import (
+    PUBLIC_TENANT,
+    degraded_flags,
+    mark_degraded,
+    reset_current_context,
+    reset_degraded,
+    set_current_context,
+    start_degraded,
+)
+from src.rag.generator import _cited_sources, stream_answer, trace_answer
+from src.rag.temporal import today_iso
 
 _CHAT_LOG: Path | None = None
 
@@ -38,7 +49,17 @@ def _get_chat_log() -> Path:
     return _CHAT_LOG
 
 
+_PII_LOG_FIELDS = ("query", "answer", "error", "guard_reason")
+
+
 def _log_chat(entry: dict) -> None:
+    """Một chỗ ghi duy nhất cho chat_history.jsonl — che PII + cắt IP ở đây (NĐ 13/2023)."""
+    entry = dict(entry)
+    for key in _PII_LOG_FIELDS:
+        if isinstance(entry.get(key), str):
+            entry[key] = redact_pii(entry[key])
+    if "ip" in entry:
+        entry["ip"] = truncate_ip(entry["ip"])
     try:
         with _get_chat_log().open("a", encoding="utf-8") as f:
             f.write(json.dumps(entry, ensure_ascii=False) + "\n")
@@ -48,24 +69,93 @@ def _log_chat(entry: dict) -> None:
 router = APIRouter(prefix="/api/v1", tags=["query"])
 
 
-def _get_client_ip(request: Request) -> str:
-    """Proxy-aware IP extraction — respects X-Forwarded-For (Render/Cloudflare)."""
+def _get_client_ip(request: HTTPConnection) -> str:
+    """Proxy-aware IP extraction — the LAST X-Forwarded-For entry, not the first.
+
+    Proxy nối địa chỉ nó thấy vào CUỐI header; mọi thứ bên trái là client tự
+    khai. Lấy phần tử đầu = để client chọn bucket rate limit và IP trong audit
+    log (đổi header mỗi request là vượt RATE_LIMIT_PER_MINUTE).
+
+    ponytail: giả định đúng MỘT proxy tin cậy (Render) phía trước. Thêm một tầng
+    nữa (Cloudflare → Render) thì phần tử cuối là IP của tầng đó và cả site chung
+    một bucket — khi ấy lấy phần tử thứ N từ phải, N = số proxy tin cậy.
+    """
     forwarded = request.headers.get("x-forwarded-for", "")
-    if forwarded:
-        return forwarded.split(",")[0].strip()[:45]
+    last_hop = forwarded.split(",")[-1].strip()
+    if last_hop:
+        return last_hop[:45]
     return (request.client.host if request.client else "unknown")[:45]
 
-# In-process session store — not shared across workers/instances.
-_sessions: dict[str, ShortTermMemory] = {}
+
+# ── WebSocket abuse limits (R3) ───────────────────────────────────────────────
+# SlowAPI chỉ bọc HTTP. Một socket đã mở gửi bao nhiêu câu cũng được, mỗi câu
+# 2–4 lời gọi Gemini (thêm dấu, contextualize, embed, generate) → cạn quota của
+# mọi người dùng thật.
+# ponytail: đếm trong RAM — đúng với 1 uvicorn worker (Render). Nhiều worker hoặc
+# nhiều instance thì mỗi process đếm riêng; khi đó chuyển bộ đếm sang Redis.
+WS_MAX_CONNECTIONS_PER_IP = 3
+WS_MESSAGES_PER_MINUTE = 6
+_ws_open_by_ip: dict[str, int] = {}
 
 
-def _get_session(session_id: str) -> ShortTermMemory:
-    if session_id not in _sessions:
-        # session_id=... => hydrate từ SQLite nếu worker này chưa từng thấy
-        # session này trong RAM (vd. sau restart/redeploy, hoặc worker khác
-        # trong cluster nhiều process) — không còn mất ngữ cảnh câm lặng.
-        _sessions[session_id] = ShortTermMemory(max_turns=10, session_id=session_id)
-    return _sessions[session_id]
+class _TokenBucket:
+    """Đầy `per_minute` token, hồi đều theo thời gian — cho phép dồn `per_minute` câu rồi chờ."""
+
+    def __init__(self, per_minute: int, clock=time.monotonic) -> None:
+        self.capacity = float(per_minute)
+        self.tokens = float(per_minute)
+        self.rate = per_minute / 60.0
+        self.clock = clock
+        self.updated = clock()
+
+    def take(self) -> bool:
+        now = self.clock()
+        self.tokens = min(self.capacity, self.tokens + (now - self.updated) * self.rate)
+        self.updated = now
+        if self.tokens >= 1.0:
+            self.tokens -= 1.0
+            return True
+        return False
+
+
+def _ws_origin_allowed(origin: str | None) -> bool:
+    """Chặn Cross-Site WebSocket Hijacking: trình duyệt LUÔN gửi Origin.
+
+    Không có Origin = client không phải trình duyệt (curl, SDK) — không mang
+    credential ngầm nào của nạn nhân, nên không phải CSWSH; vẫn chịu token bucket.
+    """
+    return not origin or origin in get_settings().cors_origins
+
+
+def _release_ws_slot(ip: str) -> None:
+    n = _ws_open_by_ip.get(ip, 0) - 1
+    if n > 0:
+        _ws_open_by_ip[ip] = n
+    else:
+        _ws_open_by_ip.pop(ip, None)
+
+# In-process session cache — not shared across workers/instances. LRU có trần:
+# session bị đẩy ra chỉ mất cache, lượt sau hydrate lại từ SQLite.
+MAX_SESSIONS = 1000
+_sessions: OrderedDict[tuple[str, str], ShortTermMemory] = OrderedDict()
+
+
+def _get_session(tenant_id: str, session_id: str) -> ShortTermMemory:
+    """Lịch sử khoá theo (tenant, session_id). session_id do client tự khai —
+    khoá trần thì tenant này đọc được lịch sử tenant kia qua bước contextualize
+    (mặc định cũ "default" còn cho mọi client không gửi id chung một lịch sử)."""
+    key = (tenant_id, session_id)
+    if key in _sessions:
+        _sessions.move_to_end(key)
+        return _sessions[key]
+    # public giữ khoá SQLite cũ để lịch sử web hiện có không mất; tenant khác có
+    # tiền tố. session_id chỉ gồm [A-Za-z0-9_-] nên "acme:x" không thể trùng khoá public.
+    store_id = session_id if tenant_id == PUBLIC_TENANT else f"{tenant_id}:{session_id}"
+    # Hydrate từ SQLite nếu worker này chưa thấy session (sau restart/redeploy).
+    _sessions[key] = ShortTermMemory(max_turns=10, session_id=store_id)
+    while len(_sessions) > MAX_SESSIONS:
+        _sessions.popitem(last=False)
+    return _sessions[key]
 
 
 @router.post("/query", response_model=QueryResponse, status_code=status.HTTP_200_OK)
@@ -77,7 +167,8 @@ async def query_endpoint(request: Request, body: QueryRequest) -> QueryResponse:
     t0 = time.time()
     ip = _get_client_ip(request)
     ua = request.headers.get("user-agent", "")[:200]
-    session = _get_session(body.session_id)
+    retrieval_ctx = resolve_context(request, body.as_of_date)
+    session = _get_session(retrieval_ctx.tenant_id, body.session_id)
 
     # Guardrail: prompt injection check
     guard = check_prompt_injection(body.query)
@@ -112,7 +203,7 @@ async def query_endpoint(request: Request, body: QueryRequest) -> QueryResponse:
             session_id=body.session_id,
             history=session.as_messages(),
             as_of_date=body.as_of_date,
-            retrieval_ctx=resolve_context(request, body.as_of_date),
+            retrieval_ctx=retrieval_ctx,
         )
     except HTTPException:
         # ensure_rag_initialized() đã trả sẵn 503 kèm loại lỗi — giữ nguyên,
@@ -162,6 +253,7 @@ async def query_endpoint(request: Request, body: QueryRequest) -> QueryResponse:
             dieu_header=s.get("dieu_header", ""),
             source_url=s.get("source_url", ""),
             score=float(s.get("score", 0)),
+            source=str(s.get("source", "")),
         )
         for i, s in enumerate(result.get("sources", []))
     ]
@@ -179,6 +271,7 @@ async def query_endpoint(request: Request, body: QueryRequest) -> QueryResponse:
         "user_agent": ua,
         "guard_triggered": False,
         "invalid_citations": invalid_citations,
+        "degraded": result.get("degraded", []),
     })
 
     steps = [
@@ -207,6 +300,7 @@ async def query_endpoint(request: Request, body: QueryRequest) -> QueryResponse:
         retry_count=result.get("retry_count", 0),
         grade_reason=result.get("grade_reason", ""),
         compliance=compliance,
+        degraded=result.get("degraded", []),
     )
 
 
@@ -250,6 +344,12 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
         await websocket.close(code=1008, reason="Invalid session_id")
         return
 
+    origin = websocket.headers.get("origin")
+    if not _ws_origin_allowed(origin):
+        logger.warning("WS rejected: origin {!r} not in ALLOWED_ORIGINS", origin)
+        await websocket.close(code=1008, reason="Origin not allowed")
+        return
+
     await websocket.accept()
     try:
         ws_ctx = context_from_headers(websocket.headers)
@@ -258,12 +358,25 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
         logger.warning("WS rejected: bad API key, session={}", session_id)
         await websocket.close(code=4401, reason="API key không hợp lệ.")
         return
-    session = _get_session(session_id)
+    client_ip = _get_client_ip(websocket)
+    if _ws_open_by_ip.get(client_ip, 0) >= WS_MAX_CONNECTIONS_PER_IP:
+        logger.warning("WS rejected: {} already has {} open sockets", client_ip, WS_MAX_CONNECTIONS_PER_IP)
+        await websocket.close(code=1008, reason="Too many connections")
+        return
+    # Kiểm và tăng liền nhau, không await xen giữa → nguyên tử trong asyncio.
+    # Trả slot ở `finally` cuối hàm.
+    _ws_open_by_ip[client_ip] = _ws_open_by_ip.get(client_ip, 0) + 1
+    bucket = _TokenBucket(WS_MESSAGES_PER_MINUTE)
     logger.info("WebSocket connected: session={} tenant={}", session_id, ws_ctx.tenant_id)
 
     try:
         while True:
             data = await websocket.receive_json()
+            if not bucket.take():
+                await websocket.send_json({
+                    "error": f"Quá nhiều câu hỏi — tối đa {WS_MESSAGES_PER_MINUTE} câu/phút, vui lòng chờ.",
+                })
+                continue
             raw_query = data.get("query", "").strip()
             query = raw_query
             progress = bool(data.get("progress"))
@@ -319,19 +432,28 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
                 tags=["legal-qa", "feature:websocket-chat", f"env:{get_settings().environment}"],
             )
 
+            # Browsers cannot set headers on a WebSocket handshake (the WebSocket
+            # constructor takes a URL and subprotocols, nothing else), so the UI
+            # sends its key inside the message. A header, when present, still
+            # works for non-browser clients. Resolved per turn: the key in the
+            # message is what this question is asked under — and whose history
+            # it reads, so it is resolved BEFORE the session is looked up.
+            msg_key = str(data.get("api_key") or "").strip()
+            try:
+                base_ctx = context_from_headers({"x-api-key": msg_key}) if msg_key else ws_ctx
+            except InvalidApiKey as exc:
+                await websocket.send_json({"error": str(exc)})
+                end_trace(ctx, lf_token, "documind-ws-query", raw_query, "")
+                continue
+            session = _get_session(base_ctx.tenant_id, session_id)
+
             history = session.as_messages()
             t_step = time.perf_counter()
-            from src.agent.graph import (
-                _contextualize_query,
-                _expand_legal_terms,
-                _needs_diacritics,
-                _restore_diacritics,
-            )
+            from src.agent.graph import _expand_legal_terms, _normalize_query
 
-            if _needs_diacritics(query):
-                query = _restore_diacritics(query)
-            if history:
-                query = _contextualize_query(query, history[-6:])
+            # Thêm dấu + diễn giải theo ngữ cảnh: tối đa 1 lời gọi Gemini đồng bộ (tới
+            # 20s × vài cặp key/model) — trong thread, không thì đứng cả event loop.
+            query = await asyncio.to_thread(_normalize_query, query, history[-6:])
             await _send_step(
                 websocket, progress, "Phân tích câu hỏi",
                 query if query != raw_query else "Giữ nguyên câu hỏi", t_step,
@@ -340,40 +462,31 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
             # Import retriever to get chunks
             # Per-message as_of so a client can ask the same question at two
             # points in time on one socket; falls back to the connection default.
-            # Browsers cannot set headers on a WebSocket handshake (the WebSocket
-            # constructor takes a URL and subprotocols, nothing else), so the UI
-            # sends its key inside the message. A header, when present, still
-            # works for non-browser clients. Resolved per turn: the key in the
-            # message is what this question is asked under.
-            msg_key = str(data.get("api_key") or "").strip()
-            try:
-                base_ctx = context_from_headers({"x-api-key": msg_key}) if msg_key else ws_ctx
-            except InvalidApiKey as exc:
-                await websocket.send_json({"error": str(exc)})
-                end_trace(ctx, lf_token, "documind-ws-query", raw_query, "")
-                continue
             turn_ctx = replace(base_ctx, as_of_date=(data.get("as_of_date") or "").strip() or None)
             # The WS path streams without going through run_agent, so it sets the
             # ambient context itself — otherwise anything this turn reaches would
             # fall back to the public default.
             ws_ctx_token = set_current_context(turn_ctx)
+            degraded_token = start_degraded()
             try:
                 t_step = time.perf_counter()
+                t_retrieve = datetime.now(timezone.utc)
                 # Câu mở rộng thuật ngữ chỉ dùng để truy hồi; LLM vẫn nhận câu gốc.
                 search_query = _expand_legal_terms(query)
-                try:
-                    from src.rag.retriever import retrieve_with_context
+                from src.rag.retriever import retrieve_direct_chroma, retrieve_with_context, trace_retrieval
 
+                retrieval_path = "hybrid"
+                try:
                     chunks = await asyncio.to_thread(retrieve_with_context, search_query, turn_ctx)
                     if not chunks:
-                        from src.rag.retriever import retrieve_direct_chroma
-
-                        chunks = retrieve_direct_chroma(search_query, ctx=turn_ctx)
+                        chunks = await asyncio.to_thread(retrieve_direct_chroma, search_query, ctx=turn_ctx)
+                        retrieval_path = "direct"
                 except Exception as exc:
                     logger.warning("Retrieval failed in WS handler: {}", exc)
-                    from src.rag.retriever import retrieve_direct_chroma
-
-                    chunks = retrieve_direct_chroma(search_query, ctx=turn_ctx)
+                    mark_degraded("retriever_error")
+                    chunks = await asyncio.to_thread(retrieve_direct_chroma, search_query, ctx=turn_ctx)
+                    retrieval_path = f"error_fallback:{type(exc).__name__}"
+                trace_retrieval(search_query, chunks, retrieval_path, turn_ctx, t_retrieve)
                 await _send_step(websocket, progress, "Tìm kiếm tài liệu", f"{len(chunks)} đoạn liên quan", t_step)
                 # Lọc hiệu lực đã đẩy xuống vector store cùng lượt truy hồi ở trên
                 # (RetrievalContext) — bước này chỉ báo mốc đã dùng, không tốn thêm thời gian.
@@ -393,12 +506,21 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
                 # In a finally: one socket serves many turns, and a turn that
                 # raised mid-stream would otherwise leave its context set for
                 # whatever runs next on this connection.
+                degraded = degraded_flags()
+                reset_degraded(degraded_token)
                 reset_current_context(ws_ctx_token)
 
             full_answer = "".join(answer_parts)
             sources = _cited_sources(full_answer, chunks)
             await _send_step(websocket, progress, "Tổng hợp câu trả lời", f"{len(sources)} trích dẫn", t_step)
-            end_trace(ctx, lf_token, "documind-ws-query", raw_query, full_answer)
+            audit_flags = trace_answer(full_answer, sources, {"chunks": len(chunks)}) or []
+            end_trace(ctx, lf_token, "documind-ws-query", raw_query, full_answer,
+                      extra_tags=[f"degraded:{f}" for f in degraded]
+                      + [f"as_of:{turn_ctx.as_of_date or today_iso()}",
+                         f"as_of_src:{'request' if turn_ctx.as_of_date else 'today'}"]
+                      + audit_flags)
+            if degraded:
+                logger.warning("DEGRADED WS answer session={} flags={}", session_id, degraded)
             _, invalid_citations = validate_citations(full_answer, len(chunks))
             if invalid_citations:
                 logger.warning(
@@ -421,6 +543,7 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
             await websocket.send_json({
                 "done": True,
                 "sources": sources,
+                "degraded": degraded,
             })
 
     except WebSocketDisconnect:
@@ -431,3 +554,5 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
             await websocket.send_json({"error": "Server error. Please reconnect."})
         except Exception:
             pass
+    finally:
+        _release_ws_slot(client_ip)

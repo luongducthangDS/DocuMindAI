@@ -25,6 +25,20 @@ from src.rag.retriever import RetrievedChunk
 # the reranker/heuristic score is already unambiguous.
 _CONFIDENT_SCORE_MULTIPLIER = 2.0
 
+# Không có reranker (Render, và máy dev từ 09-23) thì điểm chunk là RRF ~0.01–0.03,
+# không nói được gì tuyệt đối — trước đây vì thế MỌI câu đều hỏi LLM judge. Cosine
+# của nhánh dense thì có thang tuyệt đối. Ngưỡng đo trên legal_qa_200, gemini-embedding-001
+# (reports/agent_budget_*.json): cosine của model này dồn trong khoảng hẹp — gold lọt
+# top-8 có p10 0.755 / p50 0.790 / min 0.688, câu ngoài phạm vi p50 0.737 — nên 0.82/0.45
+# kiểu "trông hợp lý" gần như không bao giờ khớp (0.82: 13/199 câu).
+# CONFIDENT = ngay dưới p10 của nhóm có gold. Baseline cho thấy judge LLM chấm
+# "irrelevant" 11/14 câu mà gold đứng top-8 (đa số hạng 1) — tức ở vùng cao nó chỉ
+# thêm reformulate + grade + embed, không cứu được câu nào.
+# HOPELESS = dưới mọi câu có gold; thực tế chỉ còn các lượt truy hồi rỗng/lệch hẳn.
+# Đổi EMBEDDING_MODEL là phải đo lại (eval/agent_budget_eval.py).
+CONFIDENT_COSINE = 0.75
+HOPELESS_COSINE = 0.60
+
 _JUDGE_PROMPT = """Câu hỏi: {query}
 
 Các đoạn văn bản tìm được:
@@ -85,7 +99,7 @@ def _call_judge_llm(query: str, chunks: list[RetrievedChunk]) -> dict | None:
         from src.rag.generator import gemini_generate
 
         models = [m.strip() for m in settings.gemini_judge_models.split(",") if m.strip()]
-        parsed = _parse_judge_response(gemini_generate(prompt, models=models))
+        parsed = _parse_judge_response(gemini_generate(prompt, models=models, name="grade-chunks"))
         if parsed is not None:
             return parsed
     except Exception as exc:
@@ -110,6 +124,14 @@ def grade_chunks(query: str, chunks: list[RetrievedChunk]) -> dict:
     # threshold is actually meaningful; otherwise always defer to the LLM judge.
     if threshold > 0 and best_score >= threshold * _CONFIDENT_SCORE_MULTIPLIER:
         return {"relevant": True, "reason": f"Điểm liên quan cao ({best_score:.3f})"}
+
+    if threshold == 0:
+        dense = [c.dense_score for c in chunks if c.dense_score is not None]
+        best_cos = max(dense) if dense else None
+        if best_cos is not None and best_cos >= CONFIDENT_COSINE:
+            return {"relevant": True, "reason": f"Độ tương đồng cao (cos {best_cos:.3f})"}
+        if best_cos is not None and best_cos < HOPELESS_COSINE:
+            return {"relevant": False, "reason": f"Độ tương đồng quá thấp (cos {best_cos:.3f})"}
 
     judged = _call_judge_llm(query, chunks)
     if judged is None:

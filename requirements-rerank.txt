@@ -1,0 +1,11 @@
+# Reranker cross-encoder chạy LOCAL (BAAI/bge-reranker-v2-m3, src/rag/retriever.py).
+# KHÔNG cài vào image production: Render free 512MB, render.yaml đặt ENABLE_RERANKER=false.
+# Thiếu các gói này thì retriever log "Reranker unavailable" và cắt theo thứ hạng RRF.
+#   pip install -r requirements-rerank.txt
+# CPU-only PyTorch (tránh ~2GB CUDA — không có GPU)
+--extra-index-url https://download.pytorch.org/whl/cpu
+-r requirements.txt
+
+sentence-transformers==3.1.1
+torch==2.4.1+cpu
+transformers==4.44.2

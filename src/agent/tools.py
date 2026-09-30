@@ -6,6 +6,9 @@ Each tool is a plain async function decorated for LangGraph/LangChain.
 from __future__ import annotations
 
 import asyncio
+import secrets
+import time
+from pathlib import Path
 from typing import Annotated, Any
 
 from langchain_core.tools import tool
@@ -44,6 +47,7 @@ async def search_legal_docs(
         # would retrieve across every tenant and every repealed clause, bypassing
         # the filters the graph's own retrieve path applies.
         from src.rag.context import current_context
+        from src.rag.generator import chunk_origin
         from src.rag.retriever import nodes_to_chunks, retrieve_with_context
 
         ctx = current_context()
@@ -56,6 +60,7 @@ async def search_legal_docs(
                 "title": c.metadata.get("title", ""),
                 "dieu": c.metadata.get("dieu_header", ""),
                 "url": c.metadata.get("source_url", ""),
+                "origin": chunk_origin(c.metadata),
             }
             for c in chunks
         ]
@@ -76,15 +81,26 @@ async def summarize_document(
     if not results or "error" in results[0]:
         return f"Không tìm thấy văn bản: {doc_title}"
 
-    context = "\n\n".join(r.get("text", "") for r in results)
+    from src.rag.generator import (
+        _GEMINI_ANSWER_TIMEOUT_S,
+        _SYSTEM_PROMPT,
+        gemini_generate,
+        spotlight_documents,
+    )
+
+    context = spotlight_documents([
+        (str(i), r.get("origin", "official"), r.get("text", ""))
+        for i, r in enumerate(results, 1)
+    ])
     focus_note = f" Tập trung vào: {focus}." if focus else ""
 
-    from src.rag.generator import _GEMINI_ANSWER_TIMEOUT_S, _SYSTEM_PROMPT, gemini_generate
-
     try:
+        request = f"Tóm tắt văn bản sau.{focus_note}\n\n{context}"
         return gemini_generate(
-            f"{_SYSTEM_PROMPT}\n\nTóm tắt văn bản sau.{focus_note}\n\n{context}",
+            f"{_SYSTEM_PROMPT}\n\n{request}",
             timeout=_GEMINI_ANSWER_TIMEOUT_S,
+            log_input=request,
+            name="summarize-document",
         )
     except Exception as exc:
         logger.error("summarize_document LLM call failed: {}", exc)
@@ -105,23 +121,32 @@ async def compare_documents(
         search_legal_docs.ainvoke({"query": f"{doc_b} {aspect}", "top_k": 5}),
     )
 
-    ctx_a = "\n".join(r.get("text", "") for r in results_a if "error" not in r)
-    ctx_b = "\n".join(r.get("text", "") for r in results_b if "error" not in r)
+    from src.rag.generator import (
+        _GEMINI_ANSWER_TIMEOUT_S,
+        _SYSTEM_PROMPT,
+        gemini_generate,
+        spotlight_documents,
+    )
 
-    if not ctx_a and not ctx_b:
+    # 300 ký tự × 5 kết quả mỗi bên ≈ ngân sách 1500 ký tự/bên như bản cũ.
+    docs = [
+        (f"{side}{i}", r.get("origin", "official"), r.get("text", "")[:300])
+        for side, results in (("A", results_a), ("B", results_b))
+        for i, r in enumerate((r for r in results if "error" not in r), 1)
+    ]
+    if not docs:
         return "Không tìm thấy nội dung để so sánh."
 
-    from src.rag.generator import _GEMINI_ANSWER_TIMEOUT_S, _SYSTEM_PROMPT, gemini_generate
-
     prompt = (
-        f"So sánh {doc_a} và {doc_b} về khía cạnh: {aspect}\n\n"
-        f"**{doc_a}:**\n{ctx_a[:1500]}\n\n"
-        f"**{doc_b}:**\n{ctx_b[:1500]}\n\n"
+        f"So sánh {doc_a} và {doc_b} về khía cạnh: {aspect}\n"
+        f"Tài liệu id bắt đầu bằng A thuộc {doc_a}, id bắt đầu bằng B thuộc {doc_b}.\n\n"
+        f"{spotlight_documents(docs)}\n\n"
         "Trình bày dưới dạng bảng so sánh nếu có thể."
     )
 
     try:
-        return gemini_generate(f"{_SYSTEM_PROMPT}\n\n{prompt}", timeout=_GEMINI_ANSWER_TIMEOUT_S)
+        return gemini_generate(f"{_SYSTEM_PROMPT}\n\n{prompt}", timeout=_GEMINI_ANSWER_TIMEOUT_S,
+                               log_input=prompt, name="compare-documents")
     except Exception as exc:
         logger.error("compare_documents failed: {}", exc)
         return f"Lỗi khi so sánh: {exc}"
@@ -156,21 +181,37 @@ async def extract_articles(
 
 # ── Tool 5: Generate PDF Report ────────────────────────────────────────────────
 
-@tool
-async def generate_pdf_report(
-    title: Annotated[str, "Tiêu đề báo cáo"],
-    query: Annotated[str, "Nội dung/chủ đề chính của báo cáo"],
-    output_filename: Annotated[str, "Tên file đầu ra (không cần .pdf)"] = "report",
-) -> str:
-    """Tạo báo cáo PDF tổng hợp từ nhiều văn bản pháp luật liên quan."""
+# Báo cáo có thể chứa nội dung tenant — tên file là capability URL, không phải
+# tên người gọi tự đặt (tên đoán được = IDOR, tên trùng = ghi đè báo cáo người khác).
+REPORT_TTL_S = 24 * 3600
+
+
+def purge_expired_reports(reports_dir: Path, now: float | None = None) -> int:
+    """Xoá PDF quá REPORT_TTL_S. Gọi lúc tạo và lúc tải — không cần scheduler."""
+    cutoff = (now if now is not None else time.time()) - REPORT_TTL_S
+    removed = 0
+    for f in reports_dir.glob("*.pdf"):
+        try:
+            if f.stat().st_mtime < cutoff:
+                f.unlink()
+                removed += 1
+        except OSError:
+            pass  # file vừa bị request khác xoá — không sao
+    return removed
+
+
+async def create_report_file(title: str, query: str) -> Path:
+    """Dựng báo cáo PDF với tên ngẫu nhiên (128 bit). Dùng chung cho tool và route."""
+    from src.config import get_settings
     from src.report.generator import create_legal_report
+
+    purge_expired_reports(get_settings().reports_dir)
 
     results = await search_legal_docs.ainvoke({"query": query, "top_k": 8})
     summary = await summarize_document.ainvoke({"doc_title": query, "focus": ""})
 
-    # Sanitize filename — prevent path traversal
-    safe_name = "".join(c if c.isalnum() or c in "_-" else "_" for c in output_filename)
-    safe_name = safe_name[:60]
+    # token_urlsafe chỉ dùng [A-Za-z0-9_-] — khớp regex của route tải báo cáo.
+    safe_name = secrets.token_urlsafe(16)
 
     chunks = [
         RetrievedChunk(
@@ -192,6 +233,16 @@ async def generate_pdf_report(
         chunks=chunks,
         filename=safe_name,
     )
+    return path
+
+
+@tool
+async def generate_pdf_report(
+    title: Annotated[str, "Tiêu đề báo cáo"],
+    query: Annotated[str, "Nội dung/chủ đề chính của báo cáo"],
+) -> str:
+    """Tạo báo cáo PDF tổng hợp từ nhiều văn bản pháp luật liên quan."""
+    path = await create_report_file(title, query)
     # Trả URL tải chứ không phải đường dẫn tuyệt đối trên server: client không
     # mở được "D:\...\reports\x.pdf", và trên Render nó còn lộ layout filesystem.
     # Route tải đã có sẵn: GET /api/v1/reports/{filename}.

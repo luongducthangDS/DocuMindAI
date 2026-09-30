@@ -48,7 +48,7 @@ def test_progress_steps_are_sent_in_order_when_requested():
     # Bước tổng hợp đến sau toàn bộ token, trước "done".
     synth = next(i for i, f in enumerate(frames) if "Tổng hợp câu trả lời" in f)
     assert frames.index("5.310.000 đồng [1]") < synth == len(frames) - 2
-    assert json.loads(frames[-1]) == {"done": True, "sources": [{"index": 1}]}
+    assert json.loads(frames[-1]) == {"done": True, "sources": [{"index": 1}], "degraded": []}
 
 
 def test_no_step_frames_for_legacy_clients():

@@ -5,7 +5,7 @@ Loader module: HuggingFace dataset + uploaded PDF/plain-text files.
 import io
 import json
 from pathlib import Path
-from typing import Iterator
+from typing import BinaryIO, Iterator
 
 from loguru import logger
 
@@ -68,12 +68,32 @@ def iter_hf_dataset(
     logger.info("HF dataset loaded: {} documents processed", count)
 
 
-def load_pdf(file_bytes: bytes, filename: str) -> dict | None:
+# Thời gian extract tăng theo số trang, và một thread đã quá timeout thì không huỷ
+# được (asyncio.to_thread) — giới hạn trang là thứ thật sự chặn trần CPU/RAM.
+MAX_PDF_PAGES = 300
+
+
+class PdfTooManyPages(ValueError):
+    """ValueError để route trả 400 như các lỗi validate khác."""
+
+
+def load_pdf(source: bytes | BinaryIO, filename: str) -> dict | None:
     """
     Extract text from uploaded PDF. Uses pdfplumber (better for structured docs).
+    `source` là bytes hoặc file nhị phân seek được — route upload truyền thẳng file
+    tạm Starlette đã spool ra disk, không nạp cả file vào RAM.
     Returns None if extraction fails or result is too short.
+    Raises PdfTooManyPages above MAX_PDF_PAGES, before any page is parsed.
     """
-    _validate_pdf_bytes(file_bytes)
+    if isinstance(source, (bytes, bytearray)):
+        _validate_pdf_bytes(source)
+        stream: BinaryIO = io.BytesIO(source)
+    else:
+        stream = source
+        size = stream.seek(0, io.SEEK_END)
+        stream.seek(0)
+        _validate_pdf_bytes(stream.read(5), size=size)
+        stream.seek(0)
 
     try:
         import pdfplumber  # lazy import
@@ -81,13 +101,19 @@ def load_pdf(file_bytes: bytes, filename: str) -> dict | None:
         raise RuntimeError("Install 'pdfplumber': pip install pdfplumber") from e
 
     try:
-        with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
+        with pdfplumber.open(stream) as pdf:
+            if len(pdf.pages) > MAX_PDF_PAGES:
+                raise PdfTooManyPages(
+                    f"PDF có {len(pdf.pages)} trang, vượt giới hạn {MAX_PDF_PAGES} trang"
+                )
             pages_text = []
             for page in pdf.pages:
                 text = page.extract_text(x_tolerance=2, y_tolerance=2)
                 if text:
                     pages_text.append(text)
             full_text = "\n".join(pages_text)
+    except PdfTooManyPages:
+        raise
     except Exception as exc:
         logger.error("PDF extraction failed for {}: {}", filename, exc)
         return None
@@ -136,14 +162,15 @@ def iter_raw_json_dir(raw_dir: Path) -> Iterator[dict]:
             yield doc
 
 
-def _validate_pdf_bytes(data: bytes) -> None:
-    """Reject non-PDF and oversized uploads."""
+def _validate_pdf_bytes(data: bytes, size: int | None = None) -> None:
+    """Reject non-PDF and oversized uploads. `size` = tổng kích thước khi `data` chỉ là phần đầu file."""
     settings = get_settings()
+    size = len(data) if size is None else size
 
-    if len(data) > settings.max_upload_bytes:
+    if size > settings.max_upload_bytes:
         raise ValueError(
             f"File exceeds {settings.max_upload_size_mb} MB limit "
-            f"({len(data) / 1_048_576:.1f} MB)"
+            f"({size / 1_048_576:.1f} MB)"
         )
 
     # PDF magic bytes: %PDF-

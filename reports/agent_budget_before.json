@@ -1,0 +1,625 @@
+{
+  "summary": {
+    "n": 30,
+    "accuracy": 0.7333,
+    "citation_groundedness": 1.0,
+    "citation_validity": 1.0,
+    "llm_calls_mean": 3.533,
+    "gemini_total_mean": 6.0,
+    "share_gemini_total_le_2": 0.0667,
+    "llm_calls_by_purpose": {
+      "router": 27,
+      "grade": 35,
+      "reformulate": 14,
+      "answer": 22,
+      "other": 8
+    },
+    "latency_ms_p50": 5085,
+    "latency_ms_p95": 6200,
+    "errors": 0
+  },
+  "rows": [
+    {
+      "id": "g2_a050",
+      "category": "ngoai_pham_vi",
+      "correct": true,
+      "llm_calls": 5,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 2,
+        "reformulate": 1,
+        "answer": 1
+      },
+      "embeds": 2,
+      "gemini_total": 7,
+      "intent": "simple_qa",
+      "grade": "irrelevant",
+      "retry_count": 1,
+      "degraded": [],
+      "latency_ms": 5855,
+      "error": null,
+      "answer": "Câu hỏi này nằm ngoài phạm vi pháp luật lao động và bảo hiểm xã hội Việt Nam."
+    },
+    {
+      "id": "g2_d026",
+      "category": "vay_von",
+      "correct": true,
+      "llm_calls": 3,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 1,
+        "answer": 1
+      },
+      "embeds": 1,
+      "gemini_total": 4,
+      "intent": "simple_qa",
+      "grade": "relevant",
+      "retry_count": 0,
+      "degraded": [],
+      "latency_ms": 2983,
+      "error": null,
+      "answer": "Đối tượng được vay vốn từ Quỹ quốc gia về việc làm bao gồm **doanh nghiệp nhỏ và vừa, hợp tác xã, tổ hợp tác, hộ kinh doanh** và **người lao động** [2].\n\nTrong đó, các đối tượng này được hưởng mức **lãi suất thấp hơn** nếu thuộc các trường hợp sau:\n- Đối với doanh nghiệp, hợp tác xã, tổ hợp tác, hộ kinh doanh: Sử dụng nhiều lao động là **người khuyết tật** hoặc **người dân tộc thiểu số** [2].\n- Đối với cá nhân: Là **người dân tộc thiểu số** đang sinh sống tại vùng có điều kiện kinh tế - xã hội đặc biệt khó khăn hoặc là **người khuyết tật** [2]."
+    },
+    {
+      "id": "g2_b009",
+      "category": "ho_tro_dong_bhxh_tu_nguyen",
+      "correct": false,
+      "llm_calls": 5,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 2,
+        "reformulate": 1,
+        "answer": 1
+      },
+      "embeds": 2,
+      "gemini_total": 7,
+      "intent": "simple_qa",
+      "grade": "irrelevant",
+      "retry_count": 1,
+      "degraded": [],
+      "latency_ms": 5759,
+      "error": null,
+      "answer": "Tôi chưa tìm thấy quy định khớp với câu hỏi này.\n\nNội dung tại Điều 14 của các tài liệu được cung cấp quy định về chế độ đối với người tham gia bảo hiểm xã hội tự nguyện không đủ điều kiện hưởng lương hưu và chưa đủ tuổi hưởng trợ cấp hưu trí xã hội, không quy định về mức hỗ trợ tiền đóng bảo hiểm xã hội tự nguyện. Quy định về mức hỗ trợ tiền đóng bảo hiểm xã hội tự nguyện cho các đối tượng (bao gồm hộ nghèo) được nêu tại Điều 5 của tài liệu đính kèm.\n\n**Bạn muốn hỏi cụ thể:**\n- Mức hỗ trợ tiền đóng bảo hiểm xã hội tự nguyện cho người thuộc hộ nghèo là bao nhiêu phần trăm?"
+    },
+    {
+      "id": "ld_t06a",
+      "category": "bhxh_dong_gop",
+      "correct": true,
+      "llm_calls": 5,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 2,
+        "reformulate": 1,
+        "answer": 1
+      },
+      "embeds": 2,
+      "gemini_total": 7,
+      "intent": "simple_qa",
+      "grade": "irrelevant",
+      "retry_count": 1,
+      "degraded": [],
+      "latency_ms": 5085,
+      "error": null,
+      "answer": "Mức tiền lương tháng tối đa làm căn cứ đóng bảo hiểm xã hội bắt buộc bằng **20 lần mức lương cơ sở** [1]."
+    },
+    {
+      "id": "g2_a018",
+      "category": "tien_luong",
+      "correct": true,
+      "llm_calls": 3,
+      "llm_by_purpose": {
+        "router": 1,
+        "other": 2
+      },
+      "embeds": 8,
+      "gemini_total": 11,
+      "intent": "compliance_check",
+      "grade": "unknown",
+      "retry_count": 0,
+      "degraded": [],
+      "latency_ms": 5610,
+      "error": null,
+      "answer": "Công ty **không được phép** ép buộc người lao động chi tiêu lương vào việc mua hàng hóa, sử dụng dịch vụ của người sử dụng lao động hoặc của đơn vị khác do người sử dụng lao động chỉ định [1].\n\nTheo quy định, người sử dụng lao động không được hạn chế hoặc can thiệp vào quyền tự quyết chi tiêu lương của người lao động [1]."
+    },
+    {
+      "id": "g2_b032",
+      "category": "huu_tri",
+      "correct": false,
+      "llm_calls": 5,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 2,
+        "reformulate": 1,
+        "answer": 1
+      },
+      "embeds": 2,
+      "gemini_total": 7,
+      "intent": "simple_qa",
+      "grade": "irrelevant",
+      "retry_count": 1,
+      "degraded": [],
+      "latency_ms": 5360,
+      "error": null,
+      "answer": "Tôi chưa tìm thấy quy định khớp với câu hỏi này. Nội dung bạn cung cấp không đề cập đến \"Điều 74 Luật Bảo hiểm xã hội 2024\".\n\n**Bạn muốn hỏi cụ thể:**\n- Mức hưởng lương hưu của lao động nam có thời gian đóng bảo hiểm xã hội tự nguyện từ đủ 15 năm đến dưới 20 năm được tính như thế nào theo quy định hiện hành?"
+    },
+    {
+      "id": "g2_b026",
+      "category": "tu_tuat",
+      "correct": true,
+      "llm_calls": 3,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 1,
+        "answer": 1
+      },
+      "embeds": 1,
+      "gemini_total": 4,
+      "intent": "simple_qa",
+      "grade": "relevant",
+      "retry_count": 0,
+      "degraded": [],
+      "latency_ms": 2656,
+      "error": null,
+      "answer": "Mức trợ cấp tuất hằng tháng đối với mỗi thân nhân bằng **50%** mức tham chiếu; trường hợp thân nhân không có người trực tiếp nuôi dưỡng thì bằng **70%** mức tham chiếu [1]."
+    },
+    {
+      "id": "g2_b005",
+      "category": "tro_cap_huu_tri_xa_hoi",
+      "correct": true,
+      "llm_calls": 3,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 1,
+        "answer": 1
+      },
+      "embeds": 1,
+      "gemini_total": 4,
+      "intent": "simple_qa",
+      "grade": "relevant",
+      "retry_count": 0,
+      "degraded": [],
+      "latency_ms": 2697,
+      "error": null,
+      "answer": "Công dân Việt Nam phải từ đủ **75 tuổi** trở lên mới đủ điều kiện hưởng trợ cấp hưu trí xã hội theo diện thông thường [1]."
+    },
+    {
+      "id": "g2_a029",
+      "category": "nghi_ngoi",
+      "correct": true,
+      "llm_calls": 3,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 1,
+        "answer": 1
+      },
+      "embeds": 1,
+      "gemini_total": 4,
+      "intent": "simple_qa",
+      "grade": "relevant",
+      "retry_count": 0,
+      "degraded": [],
+      "latency_ms": 3138,
+      "error": null,
+      "answer": "Mỗi tuần, người lao động được nghỉ liên tục tối thiểu **24 giờ** [1]."
+    },
+    {
+      "id": "g2_b024",
+      "category": "tu_tuat",
+      "correct": true,
+      "llm_calls": 5,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 2,
+        "reformulate": 1,
+        "answer": 1
+      },
+      "embeds": 2,
+      "gemini_total": 7,
+      "intent": "simple_qa",
+      "grade": "irrelevant",
+      "retry_count": 1,
+      "degraded": [],
+      "latency_ms": 5767,
+      "error": null,
+      "answer": "Mức trợ cấp mai táng được tính bằng **10 lần mức tham chiếu** tại tháng mà người thuộc đối tượng quy định chết [1], [2].\n\nLưu ý: Theo các văn bản được cung cấp, đơn vị tính được quy định là **mức tham chiếu**, không sử dụng thuật ngữ \"tháng lương cơ sở\" [1], [2]."
+    },
+    {
+      "id": "g2_a043",
+      "category": "tuoi_nghi_huu",
+      "correct": true,
+      "llm_calls": 5,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 2,
+        "reformulate": 1,
+        "answer": 1
+      },
+      "embeds": 2,
+      "gemini_total": 7,
+      "intent": "simple_qa",
+      "grade": "irrelevant",
+      "retry_count": 1,
+      "degraded": [],
+      "latency_ms": 6146,
+      "error": null,
+      "answer": "Tuổi nghỉ hưu của lao động nam trong điều kiện lao động bình thường tăng đến **62 tuổi** vào năm **2028** [1, 2].\n\nĐối với năm **2026**, tuổi nghỉ hưu của lao động nam trong điều kiện lao động bình thường là **61 tuổi 6 tháng** [1]."
+    },
+    {
+      "id": "g2_c011",
+      "category": "bhxh_mot_lan",
+      "correct": true,
+      "llm_calls": 5,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 2,
+        "reformulate": 1,
+        "answer": 1
+      },
+      "embeds": 2,
+      "gemini_total": 7,
+      "intent": "simple_qa",
+      "grade": "irrelevant",
+      "retry_count": 1,
+      "degraded": [],
+      "latency_ms": 5306,
+      "error": null,
+      "answer": "Mức hưởng bảo hiểm xã hội (BHXH) một lần được tính dựa trên số năm đã đóng BHXH, với công thức cụ thể như sau [1]:\n\n- **1,5 tháng** mức bình quân tiền lương tháng đóng BHXH cho những năm đóng **trước năm 2014** [1].\n- **02 tháng** mức bình quân tiền lương tháng đóng BHXH cho những năm đóng **từ năm 2014 trở đi** [1].\n- Đối với trường hợp thời gian đóng BHXH **chưa đủ 01 năm**, mức hưởng bằng số tiền đã đóng, với mức tối đa bằng **02 tháng** mức bình quân tiền lương tháng đóng BHXH [1].\n\n**Lưu ý:** Mức hưởng này không bao gồm số tiền Nhà nước hỗ trợ đóng BHXH tự nguyện, trừ trường hợp người lao"
+    },
+    {
+      "id": "g2_a007",
+      "category": "dinh_cong",
+      "correct": true,
+      "llm_calls": 3,
+      "llm_by_purpose": {
+        "router": 1,
+        "other": 2
+      },
+      "embeds": 8,
+      "gemini_total": 11,
+      "intent": "compliance_check",
+      "grade": "unknown",
+      "retry_count": 0,
+      "degraded": [],
+      "latency_ms": 3312,
+      "error": null,
+      "answer": "Đình công bắt buộc phải là sự ngừng việc **tự nguyện** và **có tổ chức** của người lao động [1].\n\nTheo quy định, đây là hành động nhằm đạt được yêu cầu trong quá trình giải quyết tranh chấp lao động, phải do tổ chức đại diện người lao động có quyền thương lượng tập thể tổ chức và lãnh đạo [1]. Pháp luật không ghi nhận hành động tự phát của một nhóm nhỏ người lao động là đình công hợp pháp."
+    },
+    {
+      "id": "g2_b031",
+      "category": "huu_tri",
+      "correct": true,
+      "llm_calls": 3,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 1,
+        "answer": 1
+      },
+      "embeds": 1,
+      "gemini_total": 4,
+      "intent": "simple_qa",
+      "grade": "relevant",
+      "retry_count": 0,
+      "degraded": [],
+      "latency_ms": 2831,
+      "error": null,
+      "answer": "Bác Năm cần có thời gian đóng bảo hiểm xã hội từ đủ **15 năm** trở lên để được hưởng lương hưu hằng tháng [2].\n\nNgoài điều kiện về thời gian đóng nêu trên, bác Năm còn phải đáp ứng điều kiện về độ tuổi nghỉ hưu theo quy định tại khoản 2 Điều 169 của Bộ luật Lao động [2]."
+    },
+    {
+      "id": "lh_m05b",
+      "category": "huu_tri",
+      "correct": false,
+      "llm_calls": 0,
+      "llm_by_purpose": {},
+      "embeds": 0,
+      "gemini_total": 0,
+      "intent": "compliance_check",
+      "grade": "unknown",
+      "retry_count": 0,
+      "degraded": [],
+      "latency_ms": 14,
+      "error": null,
+      "answer": "✅ **Đạt điều kiện.** Số giờ làm thêm nằm trong trần 200 giờ/năm theo Điều 107 khoản 2 điểm c Bộ luật Lao động 45/2019/QH14. Lưu ý: một số ngành, nghề được làm thêm tới 300 giờ/năm theo khoản 3 Điều 107 — cần đối chiếu danh mục ngành nghề.\n\n**Nguồn:** Bộ luật Lao động 45/2019/QH14 — Điều 107 khoản 2 điểm c"
+    },
+    {
+      "id": "g2_a024",
+      "category": "tien_luong",
+      "correct": false,
+      "llm_calls": 3,
+      "llm_by_purpose": {
+        "router": 1,
+        "other": 2
+      },
+      "embeds": 8,
+      "gemini_total": 11,
+      "intent": "compliance_check",
+      "grade": "unknown",
+      "retry_count": 0,
+      "degraded": [],
+      "latency_ms": 3423,
+      "error": null,
+      "answer": "Công ty **có thể thưởng cho người lao động bằng tiền, tài sản hoặc các hình thức khác** mà không bắt buộc chỉ được trả bằng tiền mặt [1].\n\nViệc thưởng được thực hiện dựa trên các căn cứ sau:\n- **Căn cứ thưởng:** Dựa vào kết quả sản xuất, kinh doanh và mức độ hoàn thành công việc của người lao động [1].\n- **Quy chế thưởng:** Do người sử dụng lao động quyết định và phải công khai tại nơi làm việc sau khi tham khảo ý kiến của tổ chức đại diện người lao động tại cơ sở (nếu có) [1]."
+    },
+    {
+      "id": "g2_d016",
+      "category": "bhtn",
+      "correct": true,
+      "llm_calls": 3,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 1,
+        "answer": 1
+      },
+      "embeds": 1,
+      "gemini_total": 4,
+      "intent": "simple_qa",
+      "grade": "relevant",
+      "retry_count": 0,
+      "degraded": [],
+      "latency_ms": 3512,
+      "error": null,
+      "answer": "Mức hỗ trợ kinh phí đào tạo, bồi dưỡng, nâng cao trình độ kỹ năng nghề cho người sử dụng lao động tối đa là **01 triệu đồng/người/tháng** [1].\n\nQuy định này áp dụng tại thời điểm 2017-04-12 với các điều kiện chi tiết như sau:\n- Mức hỗ trợ cụ thể được tính theo **tháng**, dựa trên thời gian học thực tế của từng nghề hoặc khóa học nhưng **không quá 06 tháng** [1].\n- Đối với các ngày lẻ trong khóa học: Dưới **15 ngày** tính là **½ tháng**, từ đủ **15 ngày** trở lên tính là **01 tháng** [1].\n- Nếu chi phí thực tế của khóa đào tạo cao hơn mức hỗ trợ này, phần kinh phí vượt quá do **người sử dụng la"
+    },
+    {
+      "id": "ld_t13a",
+      "category": "tien_luong",
+      "correct": true,
+      "llm_calls": 3,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 1,
+        "answer": 1
+      },
+      "embeds": 1,
+      "gemini_total": 4,
+      "intent": "simple_qa",
+      "grade": "relevant",
+      "retry_count": 0,
+      "degraded": [],
+      "latency_ms": 3140,
+      "error": null,
+      "answer": "Người lao động làm thêm giờ vào ngày thường được trả lương ít nhất bằng **150%** so với tiền lương giờ thực trả hoặc đơn giá tiền lương sản phẩm của ngày làm việc bình thường [1], [3]."
+    },
+    {
+      "id": "g2_c020",
+      "category": "tu_tuat",
+      "correct": true,
+      "llm_calls": 5,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 2,
+        "reformulate": 1,
+        "answer": 1
+      },
+      "embeds": 2,
+      "gemini_total": 7,
+      "intent": "simple_qa",
+      "grade": "irrelevant",
+      "retry_count": 1,
+      "degraded": [],
+      "latency_ms": 5583,
+      "error": null,
+      "answer": "Thời hạn nộp hồ sơ giải quyết chế độ tử tuất đối với thân nhân người lao động đang đóng bảo hiểm xã hội bắt buộc là **90 ngày** kể từ ngày người lao động chết [1].\n\nTheo quy định này, thân nhân có trách nhiệm nộp hồ sơ cho người sử dụng lao động trong thời hạn nêu trên [1]."
+    },
+    {
+      "id": "g2_a016",
+      "category": "giup_viec_gia_dinh",
+      "correct": true,
+      "llm_calls": 5,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 2,
+        "reformulate": 1,
+        "answer": 1
+      },
+      "embeds": 2,
+      "gemini_total": 7,
+      "intent": "simple_qa",
+      "grade": "irrelevant",
+      "retry_count": 1,
+      "degraded": [],
+      "latency_ms": 14974,
+      "error": null,
+      "answer": "Người sử dụng lao động phải giao kết hợp đồng lao động bằng **văn bản** với lao động là người giúp việc gia đình [1].\n\nVề thời hạn báo trước khi đơn phương chấm dứt hợp đồng lao động, quy định cụ thể như sau (tại thời điểm ngày 14/04/2026):\n\n*   **Thời hạn báo trước:** Hai bên có quyền đơn phương chấm dứt hợp đồng lao động bất kỳ khi nào nhưng phải báo trước **ít nhất 15 ngày** [1], [2].\n*   **Trường hợp không phải báo trước:** Người lao động và người sử dụng lao động có quyền đơn phương chấm dứt hợp đồng không cần báo trước trong các trường hợp đặc biệt được quy định tại điểm d khoản 1 Điều 1"
+    },
+    {
+      "id": "g2_b038",
+      "category": "bhxh_tu_nguyen",
+      "correct": false,
+      "llm_calls": 1,
+      "llm_by_purpose": {
+        "router": 1
+      },
+      "embeds": 7,
+      "gemini_total": 8,
+      "intent": "compliance_check",
+      "grade": "unknown",
+      "retry_count": 0,
+      "degraded": [],
+      "latency_ms": 809,
+      "error": null,
+      "answer": "❌ **Không đạt điều kiện.** Mức lương thử việc thấp hơn 85% mức lương của công việc — trái với Điều 26 Bộ luật Lao động 45/2019/QH14.\n\n**Nguồn:** Bộ luật Lao động 45/2019/QH14 — Điều 26"
+    },
+    {
+      "id": "g2_c016",
+      "category": "tu_nguyen",
+      "correct": true,
+      "llm_calls": 6,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 2,
+        "reformulate": 2,
+        "answer": 1
+      },
+      "embeds": 2,
+      "gemini_total": 8,
+      "intent": "simple_qa",
+      "grade": "irrelevant",
+      "retry_count": 1,
+      "degraded": [],
+      "latency_ms": 5613,
+      "error": null,
+      "answer": "Mức hỗ trợ đối với người tham gia bảo hiểm xã hội tự nguyện thuộc hộ nghèo là **30%** mức đóng bảo hiểm xã hội hằng tháng dựa trên mức chuẩn hộ nghèo của khu vực nông thôn [1].\n\nThời gian hỗ trợ tùy thuộc vào thời gian tham gia thực tế nhưng **không quá 10 năm (120 tháng)** [1]."
+    },
+    {
+      "id": "lh_b01a",
+      "category": "luong_toi_thieu",
+      "correct": true,
+      "llm_calls": 5,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 2,
+        "reformulate": 1,
+        "answer": 1
+      },
+      "embeds": 2,
+      "gemini_total": 7,
+      "intent": "simple_qa",
+      "grade": "irrelevant",
+      "retry_count": 1,
+      "degraded": [],
+      "latency_ms": 5407,
+      "error": null,
+      "answer": "Mức lương tối thiểu tháng đối với người lao động làm việc tại doanh nghiệp thuộc **vùng II** là **4.410.000 đồng/tháng** [1]."
+    },
+    {
+      "id": "g2_a031",
+      "category": "nghi_hang_nam",
+      "correct": true,
+      "llm_calls": 3,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 1,
+        "answer": 1
+      },
+      "embeds": 1,
+      "gemini_total": 4,
+      "intent": "simple_qa",
+      "grade": "relevant",
+      "retry_count": 0,
+      "degraded": [],
+      "latency_ms": 6200,
+      "error": null,
+      "answer": "Số ngày nghỉ hằng năm của người lao động được tăng thêm **01 ngày** cho mỗi **05 năm** làm việc cho một người sử dụng lao động [1]."
+    },
+    {
+      "id": "ld_t13b",
+      "category": "tien_luong",
+      "correct": true,
+      "llm_calls": 3,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 1,
+        "answer": 1
+      },
+      "embeds": 1,
+      "gemini_total": 4,
+      "intent": "simple_qa",
+      "grade": "relevant",
+      "retry_count": 0,
+      "degraded": [],
+      "latency_ms": 4717,
+      "error": null,
+      "answer": "Người lao động làm thêm giờ vào ngày thường được trả lương ít nhất bằng **150%** tiền lương giờ thực trả hoặc đơn giá tiền lương sản phẩm của ngày làm việc bình thường [1], [3]."
+    },
+    {
+      "id": "ld_t10a",
+      "category": "bhtn",
+      "correct": true,
+      "llm_calls": 3,
+      "llm_by_purpose": {
+        "router": 1,
+        "other": 2
+      },
+      "embeds": 1,
+      "gemini_total": 4,
+      "intent": "compliance_check",
+      "grade": "unknown",
+      "retry_count": 0,
+      "degraded": [],
+      "latency_ms": 4165,
+      "error": null,
+      "answer": "Người lao động phải **chưa tìm được việc làm** trong thời hạn **15 ngày** kể từ ngày nộp hồ sơ đề nghị hưởng trợ cấp thất nghiệp [1], [2].\n\nCụ thể:\n- **Thời điểm hưởng:** Được tính từ **ngày thứ 16** kể từ ngày nộp hồ sơ hợp lệ [2], [5].\n- **Trường hợp tìm được việc làm:** Nếu trong thời hạn **15 ngày làm việc** kể từ ngày nộp hồ sơ mà người lao động tìm được việc làm, người lao động phải thông báo ngay cho trung tâm dịch vụ việc làm nơi đã nộp hồ sơ [3]."
+    },
+    {
+      "id": "g2_a036",
+      "category": "boi_thuong_thiet_hai",
+      "correct": false,
+      "llm_calls": 0,
+      "llm_by_purpose": {},
+      "embeds": 0,
+      "gemini_total": 0,
+      "intent": "compliance_check",
+      "grade": "unknown",
+      "retry_count": 0,
+      "degraded": [],
+      "latency_ms": 16,
+      "error": null,
+      "answer": "✅ **Đạt điều kiện.** Mức lương đạt mức lương tối thiểu tháng vùng I là 5.310.000 đồng/tháng theo Điều 3 khoản 1 Nghị định 293/2025/NĐ-CP (hiệu lực từ 01/01/2026). Với thời điểm trước 01/01/2026, mức áp dụng là 4.960.000 đồng/tháng theo Nghị định 74/2024/NĐ-CP.\n\n**Nguồn:** Nghị định 293/2025/NĐ-CP — Điều 3 khoản 1"
+    },
+    {
+      "id": "g2_b022",
+      "category": "bhxh_mot_lan",
+      "correct": false,
+      "llm_calls": 0,
+      "llm_by_purpose": {},
+      "embeds": 7,
+      "gemini_total": 7,
+      "intent": "compliance_check",
+      "grade": "unknown",
+      "retry_count": 0,
+      "degraded": [],
+      "latency_ms": 17,
+      "error": null,
+      "answer": "✅ **Đạt điều kiện.** Số ngày nghỉ hằng năm đạt mức tối thiểu 12 ngày làm việc đối với người làm việc đủ 12 tháng trong điều kiện bình thường theo Điều 113 khoản 1 điểm a Bộ luật Lao động 45/2019/QH14.\n\n**Nguồn:** Bộ luật Lao động 45/2019/QH14 — Điều 113 khoản 1 điểm a"
+    },
+    {
+      "id": "g2_c005",
+      "category": "thai_san",
+      "correct": true,
+      "llm_calls": 5,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 2,
+        "reformulate": 1,
+        "answer": 1
+      },
+      "embeds": 2,
+      "gemini_total": 7,
+      "intent": "simple_qa",
+      "grade": "irrelevant",
+      "retry_count": 1,
+      "degraded": [],
+      "latency_ms": 5510,
+      "error": null,
+      "answer": "Lao động nam đang đóng bảo hiểm xã hội khi vợ sinh con được nghỉ việc hưởng chế độ thai sản với thời gian như sau:\n\n- **05 ngày làm việc**: Trường hợp vợ sinh con thông thường [1].\n- **07 ngày làm việc**: Trường hợp vợ sinh con phải phẫu thuật hoặc sinh con dưới 32 tuần tuổi [1].\n- **10 ngày làm việc**: Trường hợp vợ sinh đôi; nếu sinh ba trở lên thì cứ thêm mỗi con được nghỉ thêm **03 ngày làm việc** [1].\n- **14 ngày làm việc**: Trường hợp vợ sinh đôi trở lên mà phải phẫu thuật [1].\n\nThời gian nghỉ việc hưởng chế độ thai sản nêu trên được tính trong khoảng thời gian **30 ngày đầu** kể từ ngày"
+    },
+    {
+      "id": "g2_d006",
+      "category": "bhtn",
+      "correct": false,
+      "llm_calls": 5,
+      "llm_by_purpose": {
+        "router": 1,
+        "grade": 2,
+        "reformulate": 1,
+        "answer": 1
+      },
+      "embeds": 2,
+      "gemini_total": 7,
+      "intent": "simple_qa",
+      "grade": "irrelevant",
+      "retry_count": 1,
+      "degraded": [],
+      "latency_ms": 5257,
+      "error": null,
+      "answer": "Tôi chưa tìm thấy quy định khớp với câu hỏi này.\n\n**Bạn muốn hỏi cụ thể:**\n- Mức hỗ trợ học phí cho người lao động tham gia khóa đào tạo nghề dưới 03 tháng?"
+    }
+  ],
+  "meta": {
+    "gold": "data\\eval\\legal_qa_200.json",
+    "sample": 30,
+    "seed": 0,
+    "pin_model": "gemini-3.1-flash-lite",
+    "embed_cache": true
+  }
+}

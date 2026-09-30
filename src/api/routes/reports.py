@@ -6,32 +6,29 @@ Report routes:
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import FileResponse
 from loguru import logger
 
+from src.api.principal import require_admin
 from src.api.schemas import ReportRequest, ReportResponse
 from src.config import get_settings
 
 router = APIRouter(prefix="/api/v1", tags=["reports"])
 
 
-@router.post("/report/create", response_model=ReportResponse)
+@router.post("/report/create", response_model=ReportResponse, dependencies=[Depends(require_admin)])
 async def create_report(body: ReportRequest) -> ReportResponse:
     """
-    Trigger report generation. Heavy work runs in background thread.
-    Returns download URL immediately after enqueuing.
+    Generate a PDF report (admin: X-Admin-Key — mỗi báo cáo tốn vài lời gọi LLM).
+    Tên file do server đặt ngẫu nhiên; file tự xoá sau 24h.
     """
     from src.api.main import ensure_rag_initialized
-    from src.agent.tools import generate_pdf_report
+    from src.agent.tools import create_report_file
 
     try:
         await ensure_rag_initialized()
-        result_msg = await generate_pdf_report.ainvoke({
-            "title": body.title,
-            "query": body.query,
-            "output_filename": body.filename,
-        })
+        path = await create_report_file(body.title, body.query)
     except Exception as exc:
         logger.error("Report generation failed: {}", exc)
         raise HTTPException(
@@ -39,14 +36,13 @@ async def create_report(body: ReportRequest) -> ReportResponse:
             detail="Report generation failed. Please retry.",
         )
 
-    safe_name = body.filename + ".pdf"
-    download_url = f"/api/v1/reports/{safe_name}"
+    download_url = f"/api/v1/reports/{path.name}"
 
     return ReportResponse(
         status="success",
-        filename=safe_name,
+        filename=path.name,
         download_url=download_url,
-        message=result_msg,
+        message=f"Báo cáo đã tạo: {download_url}",
     )
 
 
@@ -65,6 +61,9 @@ async def download_report(filename: str) -> FileResponse:
         )
 
     settings = get_settings()
+    from src.agent.tools import purge_expired_reports
+
+    purge_expired_reports(settings.reports_dir)  # hết 24h thì 404, kể cả chưa ai tạo báo cáo mới
     file_path = (settings.reports_dir / filename).resolve()
 
     # Double-check the resolved path stays in reports_dir

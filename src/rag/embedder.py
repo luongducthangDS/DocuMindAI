@@ -191,11 +191,12 @@ class _GeminiAPIEmbedding(BaseEmbedding):
     def _call_api(self, key: str, texts: List[str], task_type: str) -> List[List[float]]:
         import google.generativeai as genai
 
-        genai.configure(api_key=key)
         name = self.model_name if self.model_name.startswith("models/") else f"models/{self.model_name}"
         # API từ chối chuỗi rỗng; get_embedding_dim() lại dò chiều bằng đúng chuỗi đó.
         payload = [t if t.strip() else " " for t in texts]
-        result = genai.embed_content(model=name, content=payload, task_type=task_type)
+        result = genai.embed_content(
+            model=name, content=payload, task_type=task_type, client=genai_client(key)
+        )
         self._strikes[key] = 0
         emb = result["embedding"]
         return emb if isinstance(emb[0], list) else [emb]
@@ -228,6 +229,20 @@ class _GeminiAPIEmbedding(BaseEmbedding):
 
     async def _aget_text_embeddings(self, texts: List[str]) -> List[List[float]]:
         return await asyncio.to_thread(self._get_text_embeddings, texts)
+
+
+@lru_cache(maxsize=None)
+def genai_client(api_key: str):
+    """GenerativeServiceClient riêng cho từng API key, dùng chung giữa các thread.
+
+    Không dùng genai.configure(): đó là trạng thái global của module, nên khi nhiều
+    thread gọi song song (stream + embed + router...), request của thread này có thể
+    đi bằng key mà thread kia vừa đặt — 429 bị tính cho nhầm cặp, cooldown khoá sai.
+    Client gRPC an toàn khi dùng chung giữa các thread; 3 key = 3 client, cache mãi.
+    """
+    import google.ai.generativelanguage as glm
+
+    return glm.GenerativeServiceClient(client_options={"api_key": api_key})
 
 
 @lru_cache(maxsize=1)

@@ -10,7 +10,7 @@ $backendCmd = @"
 `$env:ANONYMIZED_TELEMETRY='false'
 Set-Location '$root'
 Write-Host 'Starting backend... (~25s to load models)' -ForegroundColor Cyan
-python -m uvicorn src.api.main:app --host 0.0.0.0 --port 8081 --reload
+& '$root\.venv\Scripts\python.exe' -m uvicorn src.api.main:app --host 0.0.0.0 --port 8081 --reload
 "@
 
 $frontendCmd = @"

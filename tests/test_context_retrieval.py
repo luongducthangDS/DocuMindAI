@@ -102,6 +102,17 @@ class TestRetrieveWithContext:
         got = r_module.retrieve_with_context("q", RetrievalContext(tenant_id="acme"))
         assert [c.metadata["clause_uid"] for c in got] == ["ok"]
 
+    def test_each_chunk_keeps_the_raw_score_of_the_leg_that_found_it(self, singletons):
+        """RRF ghi đè điểm trên node — điểm thô từng nhánh phải giữ lại cho trace."""
+        singletons(
+            dense_nodes=[node("both", score=0.9), node("dense_only", score=0.8)],
+            bm25_nodes=[node("both", score=7.5), node("bm25_only", score=3.25)],
+        )
+        got = {c.metadata["clause_uid"]: c for c in r_module.retrieve_with_context("q", RetrievalContext())}
+        assert got["both"].bm25_score == 7.5 and got["both"].dense_score is not None
+        assert got["dense_only"].bm25_score is None and got["dense_only"].dense_score is not None
+        assert got["bm25_only"].bm25_score == 3.25 and got["bm25_only"].dense_score is None
+
     def test_without_reranker_truncates_to_top_n(self, singletons):
         singletons(dense_nodes=[node(f"n{i}", score=1 - i / 100) for i in range(12)])
         got = r_module.retrieve_with_context("q", RetrievalContext(), top_n=8)

@@ -5,10 +5,14 @@ BM25, fused via RRF. Optional cross-encoder reranker for precision.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from loguru import logger
+
+from src.langfuse_otel import non_fatal, record_span, tracing_active
+from src.rag.context import mark_degraded
 
 # Module-level singletons — set by api/main.py at startup
 _active_retriever = None
@@ -38,6 +42,14 @@ class RetrievedChunk:
     text: str
     score: float
     metadata: dict
+    # Cosine của nhánh dense (cùng thang cho Chroma/Qdrant, xem _as_cosine). `score`
+    # là điểm RRF (~0.01–0.03) khi không có reranker — không nói được gì tuyệt đối;
+    # grader cần một thang có nghĩa để quyết định có phải hỏi LLM hay không.
+    # None = chunk chỉ BM25 tìm ra, hoặc đường truy hồi không đi qua dense.
+    dense_score: float | None = None
+    # Điểm BM25 thô (thang không chuẩn hoá) — chỉ để trace: RRF chỉ dùng thứ hạng, nên
+    # điểm này không đi vào quyết định nào. None = nhánh BM25 không tìm ra chunk này.
+    bm25_score: float | None = None
 
     @property
     def citation_label(self) -> str:
@@ -194,6 +206,52 @@ class _TruncatedRetriever:
         return nodes[: self._top_n]
 
 
+def chunk_ref(meta: dict) -> dict:
+    """Metadata chunk → định danh đủ để tra ngược (văn bản, điều, khoản, hiệu lực),
+    KHÔNG kèm nội dung: trace giữ nhẹ, nội dung tra lại được từ `id` (version_id)."""
+    from src.rag.generator import chunk_origin  # lazy: generator import module này
+
+    ref = {"doc": meta.get("so_hieu") or meta.get("title") or "?"}
+    if meta.get("dieu") not in (None, ""):
+        ref["article"] = f"Điều {meta['dieu']}"
+    elif meta.get("dieu_header"):
+        ref["article"] = str(meta["dieu_header"])[:80]
+    for key, name in (("khoan", "clause"), ("effective_from", "from"),
+                      ("effective_to", "to"), ("version_id", "id")):
+        if meta.get(key) not in (None, ""):
+            ref[name] = meta[key]
+    if chunk_origin(meta) != "official":
+        ref["origin"] = chunk_origin(meta)  # tài liệu người dùng tải lên, không phải luật
+    return ref
+
+
+@non_fatal
+def trace_retrieval(query: str, chunks: list[RetrievedChunk], path: str, ctx, started_at) -> None:
+    """Span retrieve-documents: hạng, điểm, định danh từng chunk — đủ để trả lời "lỗi ở
+    retrieval hay generation, có lấy phải bản hết hiệu lực không" chỉ từ trace.
+
+    `path`: "hybrid" (dense + BM25), "direct" (hybrid rỗng → hỏi thẳng vector store),
+    "error_fallback:<Lỗi>" (hybrid ném lỗi). `cosine` (dense) và `bm25` (điểm BM25 thô)
+    chỉ có khi nhánh tương ứng tìm ra chunk đó — thiếu một trong hai là chỉ nhánh kia tìm ra."""
+    from datetime import datetime, timezone
+
+    if not tracing_active():
+        return
+    record_span("retrieve-documents", "retriever", query, {
+        "path": path,
+        "as_of": ctx.effective_as_of if ctx is not None else None,
+        "tenant": ctx.tenant_id if ctx is not None else None,
+        "score": "vector" if path != "hybrid" else ("rerank" if _reranker_active else "rrf"),
+        "chunks": [
+            {"rank": i, "score": round(c.score, 4),
+             **({"cosine": round(c.dense_score, 3)} if c.dense_score is not None else {}),
+             **({"bm25": round(c.bm25_score, 2)} if c.bm25_score is not None else {}),
+             **chunk_ref(c.metadata)}
+            for i, c in enumerate(chunks, 1)
+        ],
+    }, started_at, datetime.now(timezone.utc))
+
+
 def nodes_to_chunks(nodes: list["NodeWithScore"]) -> list[RetrievedChunk]:
     return [
         RetrievedChunk(
@@ -249,23 +307,32 @@ class _DenseOrSkip:
 
     def __init__(self, base_retriever):
         self._base = base_retriever
+        # node_id -> điểm thô của nhánh dense ở lần gọi gần nhất; RRF ghi đè điểm này
+        # trên node sau fusion nên phải giữ lại từ đây.
+        self.scores: dict[str, float] = {}
+
+    def _remember(self, nodes: list) -> list:
+        self.scores = {n.node.node_id: float(n.score or 0) for n in nodes}
+        return nodes
 
     def retrieve(self, query) -> list["NodeWithScore"]:
         from src.rag.embedder import EmbeddingUnavailable
 
         try:
-            return self._base.retrieve(query)
+            return self._remember(self._base.retrieve(query))
         except EmbeddingUnavailable as exc:
             logger.warning("Dense leg skipped (embedding unavailable), BM25 only: {}", exc)
+            mark_degraded("dense_skipped")
             return []
 
     async def aretrieve(self, query) -> list["NodeWithScore"]:
         from src.rag.embedder import EmbeddingUnavailable
 
         try:
-            return await self._base.aretrieve(query)
+            return self._remember(await self._base.aretrieve(query))
         except EmbeddingUnavailable as exc:
             logger.warning("Dense leg skipped (embedding unavailable), BM25 only: {}", exc)
+            mark_degraded("dense_skipped")
             return []
 
 
@@ -282,9 +349,14 @@ class _ScreenedRetriever:
     def __init__(self, base_retriever, ctx):
         self._base = base_retriever
         self._ctx = ctx
+        # node_id -> điểm thô của nhánh này; RRF ghi đè điểm trên node sau fusion
+        # (như _DenseOrSkip.scores). Tạo mới mỗi request nên không dùng chung giữa các thread.
+        self.scores: dict[str, float] = {}
 
     def _screen(self, nodes: list) -> list:
-        return [n for n in nodes if self._ctx.allows(n.node.metadata or {})]
+        visible = [n for n in nodes if self._ctx.allows(n.node.metadata or {})]
+        self.scores = {n.node.node_id: float(n.score or 0) for n in visible}
+        return visible
 
     def retrieve(self, query) -> list["NodeWithScore"]:
         return self._screen(self._base.retrieve(query))
@@ -318,8 +390,9 @@ def retrieve_with_context(query: str, ctx, top_k: int = 20, top_n: int = 8) -> l
     dense = _DenseOrSkip(index.as_retriever(similarity_top_k=top_k, filters=ctx.to_llama_filters()))
 
     retrievers = [dense]
-    if _bm25_retriever is not None:
-        retrievers.append(_ScreenedRetriever(_bm25_retriever, ctx))
+    sparse = _ScreenedRetriever(_bm25_retriever, ctx) if _bm25_retriever is not None else None
+    if sparse is not None:
+        retrievers.append(sparse)
 
     if len(retrievers) == 1:
         nodes = dense.retrieve(query)
@@ -350,4 +423,25 @@ def retrieve_with_context(query: str, ctx, top_k: int = 20, top_n: int = 8) -> l
     else:
         visible = visible[:top_n]
 
-    return nodes_to_chunks(visible)
+    chunks = nodes_to_chunks(visible)
+    from src.config import get_settings
+
+    provider = (get_settings().vector_store_provider or "chroma").lower()
+    for chunk, node in zip(chunks, visible):
+        raw = dense.scores.get(node.node.node_id)
+        chunk.dense_score = _as_cosine(raw, provider) if raw is not None else None
+        chunk.bm25_score = sparse.scores.get(node.node.node_id) if sparse is not None else None
+    return chunks
+
+
+def _as_cosine(raw: float, provider: str) -> float:
+    """Điểm thô của nhánh dense → cosine, cùng một thang cho mọi provider.
+
+    llama-index ChromaVectorStore 0.5.x trả exp(-distance), distance = 1 - cos
+    (collection hnsw:space=cosine); Qdrant trả thẳng cosine. Ngưỡng của grader đặt
+    trên cosine — không quy đổi thì cùng một câu hỏi qua hai provider rơi vào hai
+    nhánh grade khác nhau (test_llm_budget đo trên Chroma thật).
+    """
+    if provider == "chroma":
+        return 1.0 + math.log(raw) if raw > 0 else -1.0
+    return raw

@@ -116,6 +116,10 @@ class Settings(BaseSettings):
     environment: str = "development"
     allowed_origins: str = "http://localhost:8501"
 
+    # Khoá quản trị cho /upload và /reload (header X-Admin-Key). Rỗng = hai route
+    # đó luôn 401 — đóng hẳn chứ không mở hẳn. Render tự sinh (render.yaml).
+    api_secret_key: str = ""
+
     # Rate limiting
     rate_limit_per_minute: int = 10
 
@@ -139,7 +143,7 @@ class Settings(BaseSettings):
     sqlite_db: Path = Path("./data/documind.db")
 
     # Ingestion
-    max_upload_size_mb: int = 50
+    max_upload_size_mb: int = 10
     chunk_size: int = 512
     chunk_overlap: int = 64
 

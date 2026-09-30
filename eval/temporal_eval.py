@@ -237,7 +237,9 @@ def judge_faithfulness(answer: str, chunks: list) -> float | None:
         return None
     context = "\n\n".join(c.text[:3000] for c in chunks)[:15000]
     try:
-        raw = gemini_generate(_JUDGE_PROMPT.format(context=context, answer=answer))
+        # name: trên Langfuse, lời gọi judge của eval không lẫn với generation của app.
+        raw = gemini_generate(_JUDGE_PROMPT.format(context=context, answer=answer),
+                              name="eval-judge-faithfulness")
         m = re.search(r"\{.*?\}", raw, re.S)
         verdict = json.loads(m.group(0)) if m else {}
         claims, supported = int(verdict["claims"]), int(verdict["supported"])

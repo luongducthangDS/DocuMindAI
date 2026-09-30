@@ -222,3 +222,34 @@ def set_current_context(ctx: RetrievalContext):
 
 def reset_current_context(token) -> None:
     _current_context.reset(token)
+
+
+# ── Degraded flags ────────────────────────────────────────────────────────────
+# Một lượt trả lời bị suy giảm (dense bị bỏ vì hết quota embed, LLM hỏng phải trích
+# nguyên văn...) vẫn trông như câu trả lời bình thường có trích dẫn — nên phải gắn cờ
+# ra response và trace, không chỉ ghi log. Cờ được đặt sâu trong retriever/generator,
+# thường ở thread khác (to_thread, run_in_executor của LangGraph): ContextVar được
+# COPY sang thread nhưng list bên trong là cùng một object, nên mark ở đâu cũng ghi
+# vào đúng list của lượt đó.
+
+_degraded: ContextVar[list[str] | None] = ContextVar("documind_degraded", default=None)
+
+
+def start_degraded():
+    """Mở danh sách cờ cho một lượt hỏi. Trả token — reset trong finally."""
+    return _degraded.set([])
+
+
+def mark_degraded(flag: str) -> None:
+    """Ghi một cờ cho lượt hiện tại; ngoài một lượt (script, eval) thì bỏ qua."""
+    flags = _degraded.get()
+    if flags is not None and flag not in flags:
+        flags.append(flag)
+
+
+def degraded_flags() -> list[str]:
+    return list(_degraded.get() or [])
+
+
+def reset_degraded(token) -> None:
+    _degraded.reset(token)

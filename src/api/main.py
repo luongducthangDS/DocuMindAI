@@ -24,6 +24,7 @@ import src.logger  # noqa: F401 — initializes loguru
 from src.api.routes import documents, health, query, reports
 from src.api.routes.query import _get_client_ip
 from src.config import get_settings
+from src.langfuse_otel import set_index_version
 
 # React build output (frontend/vite.config.ts → outDir: "../dist")
 DIST_DIR = Path(__file__).resolve().parents[2] / "dist"
@@ -150,8 +151,10 @@ def _init_rag_sync() -> None:
 
     backend = get_backend()
     collection_name = backend.collection.name if backend.provider == "chroma" else backend.collection
-    logger.info("Vector store '{}' ({}) has {} chunks",
-                collection_name, backend.provider, count_chunks(backend))
+    count = count_chunks(backend)
+    logger.info("Vector store '{}' ({}) has {} chunks", collection_name, backend.provider, count)
+    # Mọi trace từ đây mang metadata "index" — câu trả lời sai chạy trên index nào.
+    set_index_version(f"{backend.provider}/{collection_name}/{settings.embedding_model}/{count}")
 
     vector_store = make_llamaindex_vector_store(backend)
     storage_ctx = StorageContext.from_defaults(vector_store=vector_store)

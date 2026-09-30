@@ -2,6 +2,11 @@
 
 Project hướng dẫn cho Claude Code. Đọc file này trước khi làm bất cứ gì.
 
+**Sai lầm & bài học:** khi phát hiện một **quyết định kỹ thuật sai** (chọn công nghệ, kiến
+trúc, ngưỡng, dữ liệu) hoặc một **lần xử lý sai** (kể cả của Claude: đoán thay vì đo, báo
+"đã verify" khi chưa) — thêm một mục vào `docs/LESSONS.md` **trong cùng commit** với bản
+sửa. Không ghi bug lặt vặt. Định dạng và luật ghi ở đầu file đó.
+
 ## Project overview
 
 AI agent RAG tra cứu **pháp luật lao động và bảo hiểm xã hội Việt Nam** — Bộ luật Lao động,
@@ -45,7 +50,10 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
 - **Reranker local đang KHÔNG chạy** (2026-09-23): Windows Smart App Control chặn DLL `pyarrow`
   → `sentence_transformers` không import được → retriever log "Reranker unavailable" và bỏ qua.
   Report nào ghi rerank phải xem `meta.reranker_active`, không tin `ENABLE_RERANKER`.
-- Test suite: 284/284 tests passed (đo 2026-09-23).
+  torch/sentence-transformers/transformers **không** còn trong `requirements.txt` (2026-09-27,
+  image production không cài ~1.3GB này) — muốn chạy reranker: `pip install -r requirements-rerank.txt`.
+- Test suite: 621/621 tests passed (đo 2026-09-30). Test không gửi trace ra Langfuse/LangSmith
+  (`conftest.py::patch_settings` xoá key).
 
 **Stack:**
 - Backend: FastAPI + LangGraph agent + vector store qua `VECTOR_STORE_PROVIDER`
@@ -202,6 +210,29 @@ logs/
   `opentelemetry-api/sdk` với `chromadb` trong venv này — đã thử thật, phá 17 test). Một trace
   = một lượt `run_agent()`/1 câu hỏi WS, span con cho retrieve (`retriever`), mọi lời gọi Gemini
   (`generation`, kèm model/token/cost), compliance-check (`tool`).
+  Trace ghi *quyết định kèm lý do* (`tests/test_trace_decisions.py`): mọi span có `environment` +
+  `release` (git SHA, `-dirty` = code chưa commit), trace có metadata `index`
+  (provider/collection/model/số chunk); tag `route:<vì sao ra intent>`, `as_of:`/`as_of_src:`,
+  `abstained`/`uncited`/`invalid_citation`; span `retrieve-documents` (từng chunk: văn bản, điều,
+  khoản, hiệu lực, điểm RRF/rerank + `cosine` dense + `bm25` thô — không kèm nội dung),
+  `temporal-filter` (đoạn bị loại + lý do),
+  `compliance-check` (tiêu chí, khớp bằng từ khoá hay embedding, số trích được), `post-process`
+  (`[n]` → điều nào). Lượt thử Gemini lỗi mà vòng xoay còn đi tiếp = WARNING, hết vòng = ERROR.
+  Dựng payload trace không bao giờ được làm hỏng câu trả lời (`langfuse_otel.non_fatal`).
+  Gửi: thread daemon, gửi lại 429/5xx/lỗi mạng, 4xx thì bỏ — mọi batch bị bỏ đều log WARNING
+  (key sai = `HTTP 401`); lúc thoát `atexit` chờ tổng tối đa 5s rồi log số batch còn dở.
+  Đọc trace bằng code: CHỈ `GET /api/public/v2/observations?fromStartTime=&toStartTime=`
+  (`fields=core,basic,io,metadata,trace_context`) — org tạo sau 16/09/2026 bị chặn
+  `/api/public/traces` (410 `LEGACY_API_UNAVAILABLE_FOR_NEW_ORGANIZATION`).
+- `LANGCHAIN_API_KEY` / `LANGCHAIN_TRACING_V2` / `LANGCHAIN_PROJECT` — LangSmith, chạy song song
+  Langfuse (bật cả hai = mỗi câu hỏi trace 2 nơi). Kiểm tra e2e (gọi Gemini + LangSmith thật):
+  `python scripts/smoke_langsmith_e2e.py --n 15` (câu lấy từ gold set, mỗi chủ đề một câu).
+  Trên LangSmith mọi lời gọi LLM là run `gemini-generate` (`@traceable` trên `gemini_generate`),
+  mục đích thấy qua node cha. Langfuse xếp generation phẳng nên đặt tên theo mục đích:
+  `route-intent`, `contextualize-query`, `restore-diacritics`, `grade-chunks`, `reformulate-query`,
+  `generate-answer`(`-stream`), `extract-compliance-value`, `summarize-document`,
+  `compare-documents`, `eval-judge-faithfulness` — lời gọi mới phải truyền `name=`
+  (`test_every_llm_call_site_names_its_purpose` chặn).
 
 ## Các lưu ý kỹ thuật
 

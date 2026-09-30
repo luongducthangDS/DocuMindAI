@@ -6,6 +6,7 @@ Strict validation to reject malformed input at the boundary.
 from __future__ import annotations
 
 import re
+import uuid
 from datetime import date
 from typing import Literal
 
@@ -20,7 +21,10 @@ class QueryRequest(BaseModel):
     # graph.py::_SMALLTALK_RE ("hi", "ok"): 3 từng chặn "hi" trước khi kịp
     # tới nhánh smalltalk, trả về lỗi validate khó hiểu ngay câu hỏi đầu tiên.
     query: str = Field(..., min_length=2, max_length=1000)
-    session_id: str = Field(default="default", max_length=64)
+    # Thiếu session_id = một phiên mới, riêng (uuid; trả lại trong response để
+    # client dùng tiếp). Mặc định cũ "default" cho mọi client không gửi id chung
+    # MỘT lịch sử, và lịch sử đó đi thẳng vào prompt contextualize.
+    session_id: str = Field(default_factory=lambda: str(uuid.uuid4()), max_length=64)
     stream: bool = False
     # Mốc thời điểm tra cứu (ISO YYYY-MM-DD). Thiếu = quy định hiện hành hôm nay.
     as_of_date: str | None = Field(default=None, max_length=10)
@@ -63,6 +67,8 @@ class SourceItem(BaseModel):
     dieu_header: str = ""
     source_url: str = ""
     score: float = 0.0
+    # "user_upload" → UI gắn nhãn "Tài liệu người dùng"; rỗng/khác = corpus chính thức.
+    source: str = ""
 
 
 class ThinkingStep(BaseModel):
@@ -89,6 +95,10 @@ class QueryResponse(BaseModel):
     retry_count: int = 0
     grade_reason: str = ""
     compliance: ComplianceVerdict | None = None
+    # Rỗng = đường đầy đủ. "dense_skipped": hết quota embed, chỉ BM25;
+    # "extractive_fallback": mọi cặp Gemini hỏng, trả lời là trích nguyên văn;
+    # "retriever_error": hybrid retriever ném lỗi, rơi về truy vấn vector trực tiếp.
+    degraded: list[str] = []
 
 
 # ── Documents ──────────────────────────────────────────────────────────────────
@@ -121,14 +131,7 @@ class IngestResponse(BaseModel):
 class ReportRequest(BaseModel):
     title: str = Field(..., min_length=3, max_length=200)
     query: str = Field(..., min_length=3, max_length=500)
-    filename: str = Field(default="report", max_length=60)
-
-    @field_validator("filename")
-    @classmethod
-    def safe_filename(cls, v: str) -> str:
-        # Only allow safe characters — prevent path traversal
-        safe = re.sub(r"[^a-zA-Z0-9_-]", "_", v)
-        return safe[:60] or "report"
+    # Không có `filename`: server tự đặt tên ngẫu nhiên (src/agent/tools.py::create_report_file).
 
 
 class ReportResponse(BaseModel):

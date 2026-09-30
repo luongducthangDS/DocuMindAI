@@ -24,13 +24,28 @@ from loguru import logger
 from src.agent.memory import LongTermMemory, ShortTermMemory
 from src.agent.tools import ALL_TOOLS
 from src.config import DOMAIN_NAME, DOMAIN_SCOPE, DOMAIN_TOPICS, get_settings
-from src.langfuse_otel import end_trace, record_generation, record_span, start_trace
-from src.rag.generator import _cited_sources, generate_answer, stream_answer
+from src.langfuse_otel import (
+    end_trace,
+    non_fatal,
+    record_generation,
+    record_span,
+    start_trace,
+    tracing_active,
+)
+from src.rag.generator import _cited_sources, generate_answer, stream_answer, trace_answer
 from src.rag.grader import grade_chunks
 from src.ingestion.manifest import corpus_earliest_point_in_time
-from src.rag.context import PUBLIC_CONTEXT, reset_current_context, set_current_context
-from src.rag.retriever import nodes_to_chunks, retrieve_direct_chroma
-from src.rag.temporal import is_out_of_range, today_iso, versions_in_force
+from src.rag.context import (
+    PUBLIC_CONTEXT,
+    degraded_flags,
+    mark_degraded,
+    reset_current_context,
+    reset_degraded,
+    set_current_context,
+    start_degraded,
+)
+from src.rag.retriever import chunk_ref, nodes_to_chunks, retrieve_direct_chroma, trace_retrieval
+from src.rag.temporal import is_in_force, is_out_of_range, today_iso, versions_in_force
 
 # Hard cap on retrieval retries — bounds the only cycle in the graph so
 # genuinely out-of-corpus questions still terminate instead of looping.
@@ -75,6 +90,9 @@ class AgentState(TypedDict):
     grade: Literal["relevant", "irrelevant", "unknown"]
     grade_reason: str
     compliance_result: dict | None
+    # Vì sao router ra intent đó: smalltalk / keyword / short_query /
+    # legal_term_no_digit (luật nhanh) hay llm / llm_invalid / llm_error / no_api_key.
+    route_source: str
     # temporal-retrieval: mốc thời điểm tra cứu (ISO) + cờ nằm ngoài khoảng
     # thời gian corpus phủ được. Cả hai luôn có mặt trong state.
     as_of_date: str
@@ -153,6 +171,8 @@ lập về phí thường niên, TUYỆT ĐỐI không ghép "lãi suất vay" v
 Lịch sử hội thoại:
 {history_block}
 
+Nếu câu hỏi cuối viết KHÔNG DẤU, đồng thời khôi phục đầy đủ dấu tiếng Việt cho nó (giữ nguyên chữ số và từ viết tắt như BHXH, BHTN, ND-CP, QH14).
+
 Câu hỏi cuối cùng: {query}
 
 Chỉ trả về câu hỏi đã viết lại (hoặc giữ nguyên), không giải thích."""
@@ -210,6 +230,9 @@ def _contextualize_query(query: str, history: list[dict]) -> str:
                     return rewritten
             except Exception as exc:
                 logger.debug("contextualize_node Gemini {} failed: {}", model_name, str(exc)[:100])
+                record_generation("contextualize-query", model_name, log_input, "",
+                                  t0, datetime.now(timezone.utc), error=f"{type(exc).__name__}: {exc}",
+                                  level="WARNING")  # hỏng thì dùng câu gốc, không phải lỗi câu hỏi
                 continue
     except Exception as exc:
         logger.warning("contextualize_node Gemini unavailable: {}", exc)
@@ -267,12 +290,29 @@ def _restore_diacritics(query: str) -> str:
                     return restored
             except Exception as exc:
                 logger.debug("restore_diacritics Gemini {} failed: {}", model_name, str(exc)[:100])
+                record_generation("restore-diacritics", model_name, query, "",
+                                  t0, datetime.now(timezone.utc), error=f"{type(exc).__name__}: {exc}",
+                                  level="WARNING")  # hỏng thì dùng câu gốc, không phải lỗi câu hỏi
                 continue
     except Exception as exc:
         logger.warning("restore_diacritics Gemini unavailable: {}", exc)
 
     return query
 
+
+
+def _normalize_query(query: str, history: list[dict]) -> str:
+    """Câu hỏi độc lập, có dấu — với TỐI ĐA MỘT lời gọi LLM.
+
+    Có lịch sử: _CONTEXTUALIZE_PROMPT vừa viết lại theo ngữ cảnh vừa thêm dấu, nên
+    không gọi _restore_diacritics trước nữa (trước đây là 2 lời gọi nối tiếp trên
+    critical path). Lượt đầu có dấu sẵn: không gọi gì.
+    """
+    if history:
+        return _contextualize_query(query, history)
+    if _needs_diacritics(query):
+        return _restore_diacritics(query)
+    return query
 
 # Người dùng hỏi bằng từ dân dã ("rút tiền BHXH"), văn bản viết thuật ngữ
 # ("hưởng bảo hiểm xã hội một lần"). BM25 khớp nhầm "rút tiền ký quỹ", dense lệch
@@ -307,27 +347,15 @@ def contextualize_node(state: AgentState) -> dict:
     query = original
     new_steps: list[dict] = []
 
-    if _needs_diacritics(query):
-        restored = _restore_diacritics(query)
-        if restored != query:
-            logger.info("Khôi phục dấu: '{}' -> '{}'", query[:60], restored[:60])
-            new_steps.append({
-                "label": "Khôi phục dấu tiếng Việt",
-                "detail": restored,
-                "ms": int((time.time() - t0) * 1000),
-            })
-            query = restored
-
-    if history:
-        rewritten = _contextualize_query(query, history)
-        if rewritten != query:
-            logger.info("Contextualized follow-up: '{}' -> '{}'", query[:60], rewritten[:60])
-            new_steps.append({
-                "label": "Diễn giải câu hỏi theo ngữ cảnh",
-                "detail": rewritten,
-                "ms": int((time.time() - t0) * 1000),
-            })
-            query = rewritten
+    normalized = _normalize_query(query, history)
+    if normalized != query:
+        logger.info("Chuẩn hoá câu hỏi: '{}' -> '{}'", query[:60], normalized[:60])
+        new_steps.append({
+            "label": "Diễn giải câu hỏi theo ngữ cảnh" if history else "Khôi phục dấu tiếng Việt",
+            "detail": normalized,
+            "ms": int((time.time() - t0) * 1000),
+        })
+        query = normalized
 
     if query == original:
         return {"tried_queries": [query]}
@@ -348,6 +376,7 @@ def router_node(state: AgentState) -> dict:
     if _SMALLTALK_RE.match(query):
         return {
             "intent": "smalltalk",
+            "route_source": "smalltalk",
             "answer": _SMALLTALK_ANSWER,
             "sources": [],
             "retrieved_chunks": [],
@@ -358,27 +387,37 @@ def router_node(state: AgentState) -> dict:
         }
 
     keyword_intent = _keyword_classify(query)
-    word_count = len(query.split())
-    if keyword_intent != "simple_qa" or word_count <= 6:
-        logger.info("Router (keyword fast-path): {} | '{}'", keyword_intent, query[:60])
-        intent = keyword_intent
+    fast_path = (
+        "keyword" if keyword_intent != "simple_qa"
+        else "short_query" if len(query.split()) <= 6
+        else "legal_term_no_digit" if _is_plain_legal_question(query)
+        else ""
+    )
+    if fast_path:
+        logger.info("Router (fast-path {}): {} | '{}'", fast_path, keyword_intent, query[:60])
+        intent, route = keyword_intent, fast_path
     else:
+        route = "llm"
         try:
             if settings.google_api_key:
                 from src.rag.generator import gemini_generate
 
                 intent_raw = gemini_generate(
                     f"{_ROUTER_PROMPT}\n\nCâu hỏi: {query}",
-                    log_input=f"[Phân loại ý định] {query}",
+                    log_input=query,
+                    name="route-intent",
                 ).strip().lower()
             else:
-                intent_raw = keyword_intent
+                intent_raw, route = keyword_intent, "no_api_key"
         except Exception as exc:
             logger.warning("Router LLM failed, using keyword classify: {}", exc)
-            intent_raw = keyword_intent
+            intent_raw, route = keyword_intent, "llm_error"
 
         valid = {"simple_qa", "compare", "summarize", "report", "compliance_check", "unknown"}
-        intent = intent_raw if intent_raw in valid else "simple_qa"
+        if intent_raw in valid:
+            intent = intent_raw
+        else:
+            intent, route = "simple_qa", "llm_invalid"
 
     _INTENT_LABEL = {
         "simple_qa": "Tra cứu quy định",
@@ -393,12 +432,39 @@ def router_node(state: AgentState) -> dict:
     steps = state.get("steps") or []
     return {
         "intent": intent,
+        "route_source": route,
         "steps": steps + [{"label": "Phân loại câu hỏi", "detail": _INTENT_LABEL.get(intent, intent), "ms": ms}],
     }
 
 
 _COMPLIANCE_PHRASES = ("có được", "có đủ điều kiện", "có bị", "có đạt", "quá", "vượt quá")
 _COMPLIANCE_NUMBER_RE = re.compile(r"\d")
+
+
+# Câu có thuật ngữ lao động/BHXH rõ ràng mà _keyword_classify không bắt được intent
+# đặc biệt nào → tra cứu thường, khỏi hỏi router LLM. Router LLM chỉ đổi được đường
+# đi khi phát hiện compare/summarize/report/compliance mà từ khoá bỏ sót; "unknown"
+# vẫn đi retrieve như simple_qa. Chủ đề lấy từ DOMAIN_TOPICS (nguồn sự thật phạm vi).
+_LEGAL_TERMS = tuple(t.strip() for t in DOMAIN_TOPICS.split(",") if t.strip()) + (
+    "điều", "khoản", "luật", "nghị định", "thông tư", "lương tối thiểu", "thử việc",
+    "bhxh", "bhtn", "người lao động", "người sử dụng lao động", "thai sản", "ốm đau",
+)
+
+
+def _has_legal_term(query: str) -> bool:
+    q = query.lower()
+    return any(t in q for t in _LEGAL_TERMS)
+
+
+def _is_plain_legal_question(query: str) -> bool:
+    """Có thuật ngữ lao động và KHÔNG có chữ số → tra cứu thường, bỏ router LLM.
+
+    Chữ số giữ lại cho router: kiểm định tuân thủ (compliance_check, phán ✅/❌) luôn
+    xoay quanh một con số ("25% ... có đúng không?"). Đo baseline (reports/
+    agent_budget_before.json): router LLM còn xếp nhầm câu có/không không số
+    ("có được ép... không?") vào compliance_check — bỏ router ở đó không mất gì.
+    """
+    return _has_legal_term(query) and not _COMPLIANCE_NUMBER_RE.search(query)
 
 
 def _keyword_classify(query: str) -> str:
@@ -443,12 +509,13 @@ def retrieve_node(state: AgentState) -> dict:
             from src.rag.retriever import retrieve_with_context
 
             chunks = retrieve_with_context(query, rctx)
+            path = "hybrid"
             if not chunks:
                 chunks = retrieve_direct_chroma(query, ctx=rctx)
+                path = "direct"
             ms = int((time.time() - t0) * 1000)
             detail = f"Tìm thấy {len(chunks)} đoạn (tenant={rctx.tenant_id}, mốc {rctx.effective_as_of})"
-            record_span("retrieve-documents", "retriever", query, detail,
-                        t0_dt, datetime.now(timezone.utc))
+            trace_retrieval(query, chunks, path, rctx, t0_dt)
             steps = state.get("steps") or []
             return {
                 "retrieved_chunks": chunks,
@@ -474,9 +541,11 @@ def retrieve_node(state: AgentState) -> dict:
             nodes = retriever.retrieve(query)
 
         chunks = nodes_to_chunks(nodes)
+        path = "hybrid"
         if not chunks:
             logger.warning("Retriever returned no chunks, trying direct Chroma fallback")
             chunks = retrieve_direct_chroma(query, ctx=state.get("retrieval_ctx"))
+            path = "direct"
 
         ms = int((time.time() - t0) * 1000)
         seen: dict[str, int] = {}
@@ -485,7 +554,7 @@ def retrieve_node(state: AgentState) -> dict:
             seen[key] = seen.get(key, 0) + 1
         doc_summary = ", ".join(f"{k} ({v} đoạn)" for k, v in list(seen.items())[:3])
         detail = f"Tìm thấy {len(chunks)} đoạn" + (f" — {doc_summary}" if doc_summary else "")
-        record_span("retrieve-documents", "retriever", query, detail, t0_dt, datetime.now(timezone.utc))
+        trace_retrieval(query, chunks, path, state.get("retrieval_ctx"), t0_dt)
 
         steps = state.get("steps") or []
         return {
@@ -495,10 +564,11 @@ def retrieve_node(state: AgentState) -> dict:
 
     except Exception as exc:
         logger.error("retrieve_node failed: {}", exc)
+        mark_degraded("retriever_error")
         chunks = retrieve_direct_chroma(query, ctx=state.get("retrieval_ctx"))
         ms = int((time.time() - t0) * 1000)
         detail = f"Fallback ({type(exc).__name__}): {len(chunks)} đoạn"
-        record_span("retrieve-documents", "retriever", query, detail, t0_dt, datetime.now(timezone.utc))
+        trace_retrieval(query, chunks, f"error_fallback:{type(exc).__name__}", state.get("retrieval_ctx"), t0_dt)
         steps = state.get("steps") or []
         return {
             "retrieved_chunks": chunks,
@@ -513,6 +583,22 @@ def retrieve_node(state: AgentState) -> dict:
         }
 
 
+@non_fatal
+def _trace_temporal_filter(chunks: list, filtered: list, as_of: str, started_at: datetime) -> None:
+    """Đoạn nào bị loại và vì sao: hết hiệu lực tại as_of, hay trùng điều với bản mới hơn."""
+    if not tracing_active():
+        return
+    kept = {id(c) for c in filtered}
+    record_span("temporal-filter", "span", {"as_of": as_of, "in": len(chunks)}, {
+        "kept": len(filtered),
+        "dropped": [
+            {**chunk_ref(c.metadata),
+             "reason": "out_of_force" if not is_in_force(c.metadata, as_of) else "superseded"}
+            for c in chunks if id(c) not in kept
+        ],
+    }, started_at, datetime.now(timezone.utc))
+
+
 def temporal_filter_node(state: AgentState) -> dict:
     """Keep only the clause versions in force at `as_of_date`.
 
@@ -520,6 +606,7 @@ def temporal_filter_node(state: AgentState) -> dict:
     rerank) stays untouched — the boundary set in SPEC-temporal-retrieval.
     """
     t0 = time.time()
+    t0_dt = datetime.now(timezone.utc)
     chunks = state.get("retrieved_chunks") or []
     as_of = state.get("as_of_date") or today_iso()
     earliest = corpus_earliest_point_in_time()
@@ -528,6 +615,9 @@ def temporal_filter_node(state: AgentState) -> dict:
         # Before the corpus starts there is no lawful basis to answer from.
         # Drop the chunks rather than let the generator answer a 2010 question
         # with today's law; the flag tells it to state the coverage limit.
+        record_span("temporal-filter", "span", {"as_of": as_of, "in": len(chunks)},
+                    {"kept": 0, "reason": f"before_corpus (corpus từ {earliest})"},
+                    t0_dt, datetime.now(timezone.utc))
         ms = int((time.time() - t0) * 1000)
         steps = state.get("steps") or []
         logger.info("as_of_date {} is before corpus coverage ({})", as_of, earliest)
@@ -542,6 +632,7 @@ def temporal_filter_node(state: AgentState) -> dict:
         }
 
     filtered = versions_in_force(chunks, as_of)
+    _trace_temporal_filter(chunks, filtered, as_of, t0_dt)
     ms = int((time.time() - t0) * 1000)
     steps = state.get("steps") or []
     detail = f"Đang tra theo mốc {as_of} — giữ {len(filtered)}/{len(chunks)} đoạn"
@@ -601,6 +692,7 @@ def reformulate_node(state: AgentState) -> dict:
             candidate = (gemini_generate(
                 _REFORMULATE_PROMPT.format(query=query, tried="; ".join(tried)),
                 log_input=f"Gốc: {query} | Đã thử: {'; '.join(tried) or '(chưa thử lần nào)'}",
+                name="reformulate-query",
             ) or "").strip().strip('"')
             if candidate and candidate not in tried:
                 new_query = candidate
@@ -793,12 +885,22 @@ async def compliance_check_node(state: AgentState) -> dict:
     from src.rag.compliance import check_compliance
 
     try:
-        result = check_compliance(state["query"])
+        result = check_compliance(state["query"], as_of_date=state.get("as_of_date") or None)
     except Exception as exc:
         logger.error("compliance_check_node failed: {}", exc)
+        record_span("compliance-check", "tool", state["query"],
+                    {"error": f"{type(exc).__name__}: {exc}", "next": "rag_fallback"},
+                    t0_dt, datetime.now(timezone.utc), level="ERROR")
         return await _fallback_to_retrieval_answer(state)
 
-    if result["verdict"] in ("no_match", "insufficient_info"):
+    fallback = result["verdict"] in ("no_match", "insufficient_info")
+    # Mọi nhánh, kể cả khi rơi về RAG: tiêu chí nào khớp, khớp bằng từ khoá nào hay
+    # embedding, trích được số nào — thiếu mấy thứ này thì một ✅/❌ sai không lần ra được.
+    record_span("compliance-check", "tool", state["query"], {
+        **{k: result.get(k) for k in ("verdict", "criterion_id", "match", "extracted_value", "citation")},
+        "next": "rag_fallback" if fallback else "verdict",
+    }, t0_dt, datetime.now(timezone.utc))
+    if fallback:
         # no_match: no curated criterion matches this situation at all.
         # insufficient_info: a criterion matched by keyword (e.g. "lãi suất")
         # but no number was extractable — this also fires on genuinely
@@ -813,16 +915,13 @@ async def compliance_check_node(state: AgentState) -> dict:
 
     answer = _render_compliance_answer(result)
     ms = int((time.time() - t0) * 1000)
-    record_span(
-        "compliance-check", "tool", state["query"],
-        f"{result['verdict']}: {answer}", t0_dt, datetime.now(timezone.utc),
-    )
     steps = state.get("steps") or []
     citation = result.get("citation") or {}
     sources = (
         [{
             "index": 1,
             "title": citation.get("title", ""),
+            "so_hieu": citation.get("so_hieu", ""),
             "dieu_header": citation.get("dieu_khoan", ""),
             "source_url": citation.get("source_url", ""),
             "score": 1.0,
@@ -850,7 +949,6 @@ async def report_node(state: AgentState) -> dict:
         result = await generate_pdf_report.ainvoke({
             "title": f"Báo cáo: {query[:60]}",
             "query": query,
-            "output_filename": "auto_report",
         })
         return {
             "answer": result,
@@ -1008,6 +1106,7 @@ async def run_agent(
         "grade": "unknown",
         "grade_reason": "",
         "compliance_result": None,
+        "route_source": "",
         "as_of_date": as_of,
         "time_out_of_range": is_out_of_range(as_of, corpus_earliest_point_in_time()),
         # as_of always comes from the parameter, never from the caller's context:
@@ -1024,13 +1123,33 @@ async def run_agent(
     # Also published as ambient context so LLM-invoked tools (search_legal_docs)
     # filter identically to the graph's own retrieve node.
     ctx_token = set_current_context(initial_state["retrieval_ctx"])
+    degraded_token = start_degraded()
     try:
         result = await graph.ainvoke(initial_state)
     finally:
+        degraded = degraded_flags()
+        reset_degraded(degraded_token)
         reset_current_context(ctx_token)
+        audit_flags: list[str] = []
+        if result.get("answer") and result.get("intent") != "smalltalk":
+            # Người dùng thực sự thấy căn cứ nào — ghi TRƯỚC end_trace (còn trong trace).
+            audit_flags = trace_answer(result["answer"], result.get("sources") or [], {
+                "used_llm": result.get("used_llm", ""),
+                "chunks": len(result.get("retrieved_chunks") or []),
+            }) or []
         end_trace(
             ctx, token, "documind-agent-query", query,
             result.get("answer", ""),
-            extra_tags=[f"feature:{result.get('intent', 'unknown')}"],
+            extra_tags=[f"feature:{result.get('intent', 'unknown')}"]
+            + ([f"route:{result['route_source']}"] if result.get("route_source") else [])
+            + [f"degraded:{f}" for f in degraded]
+            # Mốc tra cứu phải đọc được ngay trên trace, kèm nguồn: client gửi
+            # (eval/gold set gán sẵn) hay mặc định hôm nay — không thì một mốc
+            # 2024 trong prompt trông như bug chọn ngày.
+            + [f"as_of:{as_of}", f"as_of_src:{'request' if (as_of_date or '').strip() else 'today'}"]
+            + audit_flags,
         )
+    if degraded:
+        logger.warning("DEGRADED answer session={} flags={}", session_id, degraded)
+    result["degraded"] = degraded
     return result

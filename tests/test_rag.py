@@ -195,7 +195,7 @@ class TestStreamAnswerConcurrency:
         assert "".join(tokens) == "Xin chao"
         mock_record.assert_called_once()
         args = mock_record.call_args.args
-        assert args[0] == "gemini-generate-stream"
+        assert args[0] == "generate-answer-stream"
         assert args[3] == "Xin chao"  # output_text
         assert mock_record.call_args.kwargs["prompt_tokens"] == 5
         assert mock_record.call_args.kwargs["completion_tokens"] == 7
@@ -237,6 +237,29 @@ class TestGeminiOverload:
     """Gemini 503 từng làm 1 lời gọi treo tới 600s: SDK tự retry ngầm trên cùng
     cặp, vòng xoay (key, model) không bao giờ chạy (Render 2026-09-23)."""
 
+    def test_failed_attempts_are_traced_as_errors(self, monkeypatch):
+        """Bước tổng hợp 44s xoay vòng 503 từng không để lại span nào trên
+        Langfuse (reports/daily/2026-09-24.md) — lần thử lỗi cũng phải được ghi."""
+        import src.rag.generator as gen
+
+        monkeypatch.setattr(gen, "_GEMINI_PAIR_CURSOR", 0)
+        monkeypatch.setattr(gen, "_gemini_pairs", lambda models=None: [("k1", "m1"), ("k2", "m2")])
+        results = iter([RuntimeError("429 quota exceeded"), MagicMock(text="ok", usage_metadata=None)])
+
+        def fake_call(*args, **kwargs):
+            r = next(results)
+            if isinstance(r, Exception):
+                raise r
+            return r
+
+        with patch("src.rag.generator.gemini_call", side_effect=fake_call), \
+             patch("src.rag.generator.record_generation") as mock_record:
+            assert gen.gemini_generate("p") == "ok"
+
+        failed, succeeded = mock_record.call_args_list
+        assert failed.args[1] == "m1" and "429" in failed.kwargs["error"]
+        assert succeeded.args[1] == "m2" and "error" not in succeeded.kwargs
+
     def test_overloaded_model_and_exhausted_key_are_skipped_without_sdk_retry(self, monkeypatch):
         import src.rag.generator as gen
 
@@ -246,7 +269,8 @@ class TestGeminiOverload:
         calls = []
 
         def fake_generate(prompt, **kwargs):
-            pair = (configure.call_args.kwargs["api_key"], model_cls.call_args.args[0])
+            # Key đi theo client gắn vào model (genai_client), không qua genai.configure.
+            pair = (model_cls.return_value._client.api_key, model_cls.call_args.args[0])
             calls.append(pair)
             assert kwargs["request_options"]["retry"] is None
             assert kwargs["request_options"]["timeout"]
@@ -256,7 +280,7 @@ class TestGeminiOverload:
                 raise RuntimeError("429 You exceeded your current quota")
             return MagicMock(text="ok", usage_metadata=None)
 
-        with patch("google.generativeai.configure") as configure, \
+        with patch("src.rag.embedder.genai_client", lambda k: MagicMock(api_key=k)), \
              patch("google.generativeai.GenerativeModel") as model_cls, \
              patch("src.rag.generator.record_generation"):
             model_cls.return_value.generate_content.side_effect = fake_generate
@@ -341,7 +365,7 @@ class _ImmediateThread:
     """Stand-in cho threading.Thread chạy target NGAY (đồng bộ) thay vì
     thread thật — để test có thể assert kết quả mà không cần join()."""
 
-    def __init__(self, target=None, daemon=None):
+    def __init__(self, target=None, daemon=None, name=None):
         self._target = target
 
     def start(self):
@@ -413,6 +437,35 @@ class TestLangfuseTracing:
         assert '"input":10' in attrs["langfuse.observation.usage_details"]["stringValue"]
 
     @patch("src.langfuse_otel.get_settings")
+    def test_error_generation_marked_error_level(self, mock_settings):
+        from datetime import datetime, timezone
+
+        from src.langfuse_otel import record_generation
+
+        mock_settings.return_value.langfuse_public_key = "pk-test"
+        mock_settings.return_value.langfuse_secret_key = "sk-test"
+        mock_settings.return_value.langfuse_host = "https://cloud.langfuse.com"
+        captured = {}
+
+        def fake_post(url, json=None, **_kw):
+            captured["json"] = json
+            return MagicMock()  # ok=truthy: gửi thành công, không gửi lại
+
+        with patch("threading.Thread", _ImmediateThread), \
+             patch("requests.post", side_effect=fake_post):
+            record_generation(
+                "gemini-generate", "m", "p", "",
+                datetime.now(timezone.utc), datetime.now(timezone.utc),
+                error="RuntimeError: 503 high demand",
+            )
+
+        span = captured["json"]["resourceSpans"][0]["scopeSpans"][0]["spans"][0]
+        attrs = {a["key"]: a["value"]["stringValue"] for a in span["attributes"]}
+        assert attrs["langfuse.observation.level"] == "ERROR"
+        assert "503" in attrs["langfuse.observation.status_message"]
+        assert span["status"]["code"] == 2
+
+    @patch("src.langfuse_otel.get_settings")
     def test_network_error_does_not_raise(self, mock_settings):
         from datetime import datetime, timezone
 
@@ -423,11 +476,87 @@ class TestLangfuseTracing:
         mock_settings.return_value.langfuse_host = "https://cloud.langfuse.com"
 
         with patch("threading.Thread", _ImmediateThread), \
+             patch("src.langfuse_otel._RETRY_BACKOFF_S", (0, 0)), \
              patch("requests.post", side_effect=ConnectionError("boom")):
             record_generation(  # không raise ra ngoài — quan sát là best-effort
                 "gemini-generate", "m", "p", "o",
                 datetime.now(timezone.utc), datetime.now(timezone.utc),
             )
+
+    @pytest.mark.parametrize("statuses, posts, dropped", [
+        ([503, 200], 2, False),       # quá tải tạm thời → gửi lại, tới nơi, không cảnh báo
+        ([401], 1, True),             # key sai → gửi lại vô ích, nhưng KHÔNG được mất im lặng
+        ([429, 503, 503], 3, True),   # hết lượt gửi lại → bỏ, có cảnh báo
+    ])
+    def test_delivery_retries_transient_and_logs_drops(self, monkeypatch, statuses, posts, dropped):
+        from types import SimpleNamespace
+
+        from loguru import logger
+
+        import src.langfuse_otel as lf
+
+        monkeypatch.setattr(lf, "_RETRY_BACKOFF_S", (0, 0))
+        codes = iter(statuses)
+        posted, warnings = [], []
+
+        def fake_post(*_a, **_kw):
+            code = next(codes)
+            posted.append(code)
+            return SimpleNamespace(ok=code < 300, status_code=code, text="x")
+
+        sink = logger.add(lambda m: warnings.append(m.record["message"]), level="WARNING")
+        try:
+            with patch("requests.post", fake_post):
+                lf._deliver("https://langfuse.test/api/public/otel/v1/traces", {}, ("pk", "sk"))
+        finally:
+            logger.remove(sink)
+        assert len(posted) == posts
+        assert bool(warnings) == dropped
+        if dropped:
+            assert f"HTTP {statuses[-1]}" in warnings[0]
+
+    @staticmethod
+    def _exit_right_after_send(marker, send_seconds: float, flush_cap: float = 5.0) -> tuple[float, str]:
+        """Process con: gửi 1 batch mất `send_seconds` rồi thoát NGAY; batch gửi xong thì
+        tạo `marker`. Trả về (số giây process sống — cả khởi động + import, stderr)."""
+        import os
+        import subprocess
+        import sys
+        import time
+        from pathlib import Path
+
+        code = (
+            "import time, requests\n"
+            "from types import SimpleNamespace\n"
+            "import src.langfuse_otel as lf\n"
+            "def slow_post(*_a, **_kw):\n"
+            f"    time.sleep({send_seconds})  # script đã tới dòng cuối trong lúc đang gửi\n"
+            f"    open({str(marker)!r}, 'w').close()\n"
+            "    return SimpleNamespace(ok=True)\n"
+            "lf._auth = lambda: ('pk', 'sk', 'https://langfuse.test')\n"
+            f"lf._EXIT_FLUSH_S = {flush_cap}\n"
+            "requests.post = slow_post\n"
+            "lf._send_batch([{'spanId': 'x'}])\n"
+        )
+        t0 = time.monotonic()
+        proc = subprocess.run([sys.executable, "-c", code], cwd=Path(__file__).resolve().parents[1],
+                              check=True, timeout=60, capture_output=True, encoding="utf-8",
+                              errors="replace", env={**os.environ, "PYTHONIOENCODING": "utf-8"})
+        return time.monotonic() - t0, proc.stderr
+
+    def test_batch_sent_right_before_exit_is_not_lost(self, tmp_path):
+        """Script eval/smoke gửi trace rồi thoát ngay: phải gửi xong trước khi process tắt
+        (thread daemon trần từng bị giết giữa chừng — mất trace cuối)."""
+        self._exit_right_after_send(tmp_path / "sent", send_seconds=0.5)
+        assert (tmp_path / "sent").exists()
+
+    def test_exit_wait_is_capped_when_send_hangs(self, tmp_path):
+        """DNS treo (timeout của requests không bao): lúc thoát chỉ chờ tới trần rồi bỏ,
+        không giữ process lại suốt thời gian treo — và nói ra là đã bỏ."""
+        alive, stderr = self._exit_right_after_send(tmp_path / "sent", send_seconds=30, flush_cap=0.5)
+        assert not (tmp_path / "sent").exists()
+        assert alive < 15  # khởi động + import vài giây, cộng trần 0,5s — không phải 30s
+        assert "1 batch trace chưa gửi xong" in stderr
 
     @patch("src.langfuse_otel.get_settings")
     def test_trace_nests_child_spans_under_root(self, mock_settings):

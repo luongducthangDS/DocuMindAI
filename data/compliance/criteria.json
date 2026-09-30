@@ -62,6 +62,7 @@
       "thử việc",
       "ngày",
       "tháng",
+      "tuần",
       "bao lâu",
       "kéo dài",
       "thời gian thử việc"
@@ -87,6 +88,7 @@
       "thử việc",
       "lương thử việc",
       "tiền lương thử việc",
+      "lương chính thức",
       "%",
       "phần trăm"
     ],
@@ -147,9 +149,24 @@
     "so_hieu": "Nghị định 293/2025/NĐ-CP",
     "dieu_khoan": "Điều 3 khoản 1",
     "source_url": "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-293-2025-nd-cp-46568/59713.htm",
+    "effective_from": "2026-01-01",
     "verdict_template": {
       "pass": "Mức lương đạt mức lương tối thiểu tháng vùng I là 5.310.000 đồng/tháng theo {dieu_khoan} {so_hieu} (hiệu lực từ 01/01/2026). Với thời điểm trước 01/01/2026, mức áp dụng là 4.960.000 đồng/tháng theo Nghị định 74/2024/NĐ-CP.",
       "fail": "Mức lương thấp hơn mức lương tối thiểu tháng vùng I là 5.310.000 đồng/tháng theo {dieu_khoan} {so_hieu} (hiệu lực từ 01/01/2026). Với thời điểm trước 01/01/2026, mức áp dụng là 4.960.000 đồng/tháng theo Nghị định 74/2024/NĐ-CP."
-    }
+    },
+    "versions": [
+      {
+        "effective_from": "2024-07-01",
+        "effective_to": "2026-01-01",
+        "value": 4.96,
+        "so_hieu": "Nghị định 74/2024/NĐ-CP",
+        "dieu_khoan": "Điều 3 khoản 1",
+        "source_url": "https://xaydungchinhsach.chinhphu.vn/toan-van-nghi-dinh-74-2024-nd-cp-quy-dinh-muc-luong-toi-thieu-vung-119240701122135822.htm",
+        "verdict_template": {
+          "pass": "Mức lương đạt mức lương tối thiểu tháng vùng I là 4.960.000 đồng/tháng theo {dieu_khoan} {so_hieu} (áp dụng từ 01/07/2024 đến hết 31/12/2025).",
+          "fail": "Mức lương thấp hơn mức lương tối thiểu tháng vùng I là 4.960.000 đồng/tháng theo {dieu_khoan} {so_hieu} (áp dụng từ 01/07/2024 đến hết 31/12/2025)."
+        }
+      }
+    ]
   }
 ]
