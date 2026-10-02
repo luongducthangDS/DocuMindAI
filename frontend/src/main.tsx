@@ -95,7 +95,7 @@ const api = {
   },
   async documents(): Promise<{ total: number; documents: Document[] }> {
     const r = await fetch(`${BASE}/documents`);
-    if (!r.ok) throw new Error("Failed to load documents");
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
     return r.json();
   },
   async health() {
@@ -621,6 +621,7 @@ function App() {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>(loadStoredBookmarks);
   const [docs, setDocs] = useState<Document[]>([]);
   const [docsLoaded, setDocsLoaded] = useState(false);
+  const [docsError, setDocsError] = useState("");
   const [uploadStatus, setUploadStatus] = useState<string>("");
   const [health, setHealth] = useState<"ok" | "degraded" | "error" | "unknown">("unknown");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -746,8 +747,11 @@ function App() {
       const d = await api.documents();
       setDocs(d.documents ?? []);
       setDocsLoaded(true);
-    } catch {
+      setDocsError("");
+    } catch (e) {
+      // 503 = index rỗng/hỏng. Không được rơi về "Chưa có văn bản nào" — trông như hệ thống trống thật.
       setDocs([]);
+      setDocsError(e instanceof Error ? e.message : String(e));
     }
   }
 
@@ -1296,7 +1300,13 @@ function App() {
         {/* Docs */}
         {tab === "docs" && (
           <div className="panel">
-            {docs.length === 0 ? (
+            {docsError ? (
+              <div className="empty">
+                <div className="empty-icon"><Icon name="book" size={22} /></div>
+                <div className="empty-title">Không tải được danh sách văn bản</div>
+                <div className="empty-sub">Kho chỉ mục đang lỗi ({docsError}) — câu trả lời lúc này không đáng tin.</div>
+              </div>
+            ) : docs.length === 0 ? (
               <div className="empty">
                 <div className="empty-icon"><Icon name="book" size={22} /></div>
                 <div className="empty-title">Chưa có văn bản nào</div>

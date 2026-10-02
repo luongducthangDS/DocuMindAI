@@ -204,6 +204,24 @@ chọn sai lần hai.
 
 ## Vận hành / xử lý sự cố
 
+### Coi "mở được collection" là "khởi tạo xong" (→ 2026-10-02)
+- **Đã làm:** sau sự cố 2026-09-21 (xem "Thiết kế hỏng im lặng"), `ensure_rag_initialized`
+  trả 503 khi init *ném lỗi*, và `/health` báo đỏ khi collection rỗng. `_init_rag_sync` đếm
+  chunk, log ra, rồi chạy tiếp dù số đó là 0. Tab "Văn bản đã lập chỉ mục" đọc registry
+  upload trong RAM, không đọc index.
+- **Sai ở đâu:** chỉ chặn hỏng-kiểu-exception. Collection rỗng mở được bình thường nên init
+  "thành công", mọi câu hỏi nhận HTTP 200 + lời từ chối "ngoài phạm vi" — đúng kiểu hỏng
+  09-21 đã sửa, qua cửa khác. Health đỏ nhưng không ai nhìn health khi đang chat. Tab văn
+  bản luôn 0 nên con số 0 lúc index rỗng thật cũng không báo động gì.
+- **Cái giá:** `pd0r` (thiếu `VECTOR_STORE_PROVIDER` → Chroma rỗng trong container) trả lời
+  sai sáng 2026-10-02 mà không có dấu hiệu nào trên đường người dùng đi.
+- **Bài học:** điều kiện "sẵn sàng phục vụ" phải kiểm ngay trên đường phục vụ, không chỉ ở
+  endpoint giám sát. Và một chỉ số luôn sai (tab luôn 0) còn tệ hơn không có — nó dạy mọi
+  người bỏ qua đúng con số cần báo động.
+- **Giờ làm thế nào:** `_init_rag_sync` ném `EmptyCollection` khi 0 chunk → 503 cho REST,
+  WS, upload, reload, `/documents`; danh sách văn bản gom từ node của chính index
+  (`set_indexed_documents`), UI hiện lỗi thay vì "Chưa có văn bản nào" khi 503.
+
 ### Kiểm nhầm service Render rồi kết luận "không phải Render" (2026-10-02)
 - **Đã làm (Claude):** người dùng báo DocuMind trên Render không trả lời (collection rỗng).
   Claude lấy URL backend từ `frontend/.env.example` — một deploy cũ, không phải `pd0r` — thấy

@@ -8,7 +8,7 @@ Document management routes:
 from __future__ import annotations
 
 import asyncio
-import uuid
+from collections import Counter
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from loguru import logger
@@ -53,11 +53,41 @@ def _extract_and_chunk(source, filename: str):
     doc = load_pdf(source, filename)
     return doc, (chunk_by_dieu(doc["content"], doc) if doc else [])
 
-# In-memory document registry (replaced by DB in production)
-_doc_registry: dict[str, DocumentMeta] = {}
-# Owning tenant per registry entry. Kept beside the registry rather than as a
-# DocumentMeta field so the public response schema does not change.
-_doc_tenant: dict[str, str] = {}
+# Văn bản đang có trong index, gom từ chính các node nạp cho BM25 (init, reload,
+# sau upload). Bản trước chỉ đọc registry upload trong RAM: corpus ingest bằng
+# script không bao giờ hiện, tab "Văn bản đã lập chỉ mục" luôn báo 0 dù index đủ.
+# Mỗi phần tử: (tenant_id, DocumentMeta) — tenant giữ ngoài schema response.
+_indexed_docs: list[tuple[str, DocumentMeta]] = []
+
+
+def set_indexed_documents(nodes: list) -> None:
+    """Gom node theo (tenant, doc_id) — doc_id thiếu (PDF upload) thì theo title."""
+    groups: dict[tuple[str, str], dict] = {}
+    counts: Counter = Counter()
+    for node in nodes:
+        m = node.metadata
+        key = (m.get("tenant_id") or "public", m.get("doc_id") or m.get("title", ""))
+        groups.setdefault(key, m)
+        counts[key] += 1
+
+    global _indexed_docs
+    _indexed_docs = sorted(
+        (
+            (tenant, DocumentMeta(
+                id=doc_id,
+                title=m.get("title") or doc_id,
+                doc_type=m.get("doc_type", ""),
+                source=m.get("source", ""),
+                url=m.get("source_url") or m.get("url", ""),
+                so_hieu=m.get("so_hieu", ""),
+                ngay_ban_hanh=m.get("ngay_ban_hanh", ""),
+                chunk_count=counts[(tenant, doc_id)],
+            ))
+            for (tenant, doc_id), m in groups.items()
+        ),
+        key=lambda td: td[1].ngay_ban_hanh,
+        reverse=True,
+    )
 
 
 def _upload_label(ctx) -> str:
@@ -188,17 +218,8 @@ async def upload_document(request: Request) -> IngestResponse:
             message="No valid chunks extracted from document",
         )
 
+    # _index_chunks rebuild retriever → set_indexed_documents, danh sách tự có file này.
     indexed = await _index_chunks(chunks, doc, ctx=ctx)
-    doc_id = str(uuid.uuid4())
-    _doc_tenant[doc_id] = ctx.tenant_id
-    _doc_registry[doc_id] = DocumentMeta(
-        id=doc_id,
-        title=doc["title"],
-        doc_type=doc.get("doc_type", "uploaded_pdf"),
-        source="user_upload",
-        url=doc.get("url", ""),
-        chunk_count=indexed,
-    )
 
     get_long_term_memory().log_upload(
         filename=filename,
@@ -219,15 +240,18 @@ async def upload_document(request: Request) -> IngestResponse:
 
 @router.get("/documents", response_model=DocumentListResponse)
 async def list_documents(request: Request) -> DocumentListResponse:
-    """List the uploaded documents the caller's tenant may see.
+    """List the indexed documents (corpus + uploads) the caller's tenant may see.
 
     Filtering the chunks is not enough on its own: a listing that returned every
     tenant's uploads would still disclose what other tenants hold — titles are
     often the sensitive part ("Phương án cắt giảm lao động 2026").
     """
+    from src.api.main import ensure_rag_initialized
+
+    # Index rỗng/hỏng thì 503, không trả "0 văn bản" như thể hệ thống trống thật.
+    await ensure_rag_initialized()
     visible = set(resolve_context(request).visible_tenants)
-    docs = [d for doc_id, d in _doc_registry.items()
-            if _doc_tenant.get(doc_id, "public") in visible]
+    docs = [d for tenant, d in _indexed_docs if tenant in visible]
     return DocumentListResponse(total=len(docs), documents=docs)
 
 
@@ -311,6 +335,7 @@ def _rebuild_retriever(r_module) -> None:
 
         backend = get_backend()
         nodes = _load_nodes_from_backend(backend)
+        set_indexed_documents(nodes)
         r_module._active_retriever = build_hybrid_retriever(
             r_module._active_index, nodes=nodes, rerank=get_settings().enable_reranker
         )

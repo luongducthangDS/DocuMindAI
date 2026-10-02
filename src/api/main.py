@@ -101,6 +101,10 @@ async def ensure_rag_initialized() -> None:
             ) from exc
 
 
+class EmptyCollection(RuntimeError):
+    """Tên lớp đi thẳng vào detail 503 — đọc là biết index rỗng, không phải lỗi mở."""
+
+
 _BM25_NODE_CAP = 10_000  # cap BM25 corpus to avoid memory blowup on large collections
 
 
@@ -153,6 +157,13 @@ def _init_rag_sync() -> None:
     collection_name = backend.collection.name if backend.provider == "chroma" else backend.collection
     count = count_chunks(backend)
     logger.info("Vector store '{}' ({}) has {} chunks", collection_name, backend.provider, count)
+    if count <= 0:
+        # Collection rỗng vẫn mở được, nên init từng "thành công" và mọi câu hỏi bị
+        # từ chối như ngoài phạm vi — HTTP 200, không dấu hiệu gì (pd0r 2026-10-02).
+        # Ném ra để ensure_rag_initialized trả 503 cho cả REST, WS, upload, reload.
+        raise EmptyCollection(
+            f"'{collection_name}' ({backend.provider}) có 0 chunk — chưa ingest/migrate corpus"
+        )
     # Mọi trace từ đây mang metadata "index" — câu trả lời sai chạy trên index nào.
     set_index_version(f"{backend.provider}/{collection_name}/{settings.embedding_model}/{count}")
 
@@ -168,6 +179,8 @@ def _init_rag_sync() -> None:
     # Load existing nodes from the vector store for the BM25 corpus
     existing_nodes = _load_nodes_from_backend(backend)
     logger.info("Loaded {} nodes from {} for BM25 index", len(existing_nodes), backend.provider)
+    from src.api.routes.documents import set_indexed_documents
+    set_indexed_documents(existing_nodes)
 
     # Hết quota thì embed câu hỏi phải báo lỗi ngay (retriever chuyển sang chỉ chạy
     # BM25), không được ngủ chờ vài phút trong khi người dùng đang đợi câu trả lời.

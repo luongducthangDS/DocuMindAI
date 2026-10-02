@@ -188,19 +188,19 @@ class TestWhoami:
 
 class TestDocumentListingIsTenantScoped:
     @pytest.fixture(autouse=True)
-    def registry(self, monkeypatch):
+    def indexed(self, monkeypatch):
+        from unittest.mock import AsyncMock
+
         from src.api.routes import documents
-        from src.api.schemas import DocumentMeta
 
-        def meta(i, title):
-            return DocumentMeta(id=i, title=title, doc_type="pdf", source="user_upload")
-
-        monkeypatch.setattr(documents, "_doc_registry", {
-            "1": meta("1", "Public doc"),
-            "2": meta("2", "Acme plan"),
-            "3": meta("3", "Globex layoffs"),
-        })
-        monkeypatch.setattr(documents, "_doc_tenant", {"1": "public", "2": "acme", "3": "globex"})
+        monkeypatch.setattr("src.api.main.ensure_rag_initialized", AsyncMock())
+        monkeypatch.setattr(documents, "_indexed_docs", [])
+        # Upload PDF không có doc_id — gom theo title.
+        documents.set_indexed_documents([
+            TextNode(text="x", metadata={"tenant_id": "public", "title": "Public doc"}),
+            TextNode(text="x", metadata={"tenant_id": "acme", "title": "Acme plan"}),
+            TextNode(text="x", metadata={"tenant_id": "globex", "title": "Globex layoffs"}),
+        ])
 
     def titles(self, client, key=None):
         headers = {"x-api-key": key} if key else {}
@@ -211,3 +211,46 @@ class TestDocumentListingIsTenantScoped:
 
     def test_tenant_sees_public_and_own_not_others(self, client):
         assert self.titles(client, "demo-acme-0000") == {"Public doc", "Acme plan"}
+
+
+def test_listing_groups_corpus_chunks_by_doc_id(client, monkeypatch):
+    """Corpus ingest bằng script phải hiện trong danh sách — trước đây luôn 0."""
+    from unittest.mock import AsyncMock
+
+    from src.api.routes import documents
+
+    monkeypatch.setattr("src.api.main.ensure_rag_initialized", AsyncMock())
+    monkeypatch.setattr(documents, "_indexed_docs", [])
+    blld = {"doc_id": "45-2019-QH14", "so_hieu": "45/2019/QH14", "title": "Bộ luật Lao động",
+            "ngay_ban_hanh": "2019-11-20"}
+    luong = {"doc_id": "293-2025-ND-CP", "so_hieu": "293/2025/NĐ-CP", "title": "Lương tối thiểu",
+             "ngay_ban_hanh": "2025-11-10"}
+    documents.set_indexed_documents(
+        [TextNode(text="x", metadata=blld)] * 3 + [TextNode(text="x", metadata=luong)]
+    )
+
+    body = client.get("/api/v1/documents").json()
+    assert body["total"] == 2
+    assert [(d["so_hieu"], d["chunk_count"]) for d in body["documents"]] == [
+        ("293/2025/NĐ-CP", 1), ("45/2019/QH14", 3),  # mới ban hành trước
+    ]
+
+
+def test_empty_collection_is_503_not_zero_documents(client, monkeypatch):
+    """Collection rỗng mở được bình thường — init phải từ chối, không "thành công"
+    rồi để mọi câu hỏi bị từ chối như ngoài phạm vi (pd0r 2026-10-02)."""
+    from types import SimpleNamespace
+
+    import src.api.main as main
+
+    monkeypatch.setattr(main, "_rag_initialized", False)
+    monkeypatch.setattr("llama_index.core.Settings", SimpleNamespace())
+    monkeypatch.setattr("src.rag.embedder.get_embedder", lambda: object())
+    monkeypatch.setattr("src.rag.vector_backend.get_backend",
+                        lambda: SimpleNamespace(provider="qdrant", collection="documind_legal"))
+    monkeypatch.setattr("src.rag.vector_backend.count_chunks", lambda _b: 0)
+
+    r = client.get("/api/v1/documents")
+    assert r.status_code == 503
+    assert "EmptyCollection" in r.json()["detail"]
+    assert main._rag_initialized is False  # request sau tự thử lại

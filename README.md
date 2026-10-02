@@ -9,7 +9,7 @@
 [![ChromaDB](https://img.shields.io/badge/ChromaDB-0.6-FF6F00.svg)](https://www.trychroma.com)
 [![React 19](https://img.shields.io/badge/React-19.0-61DAFB.svg?logo=react&logoColor=black)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-6.0-646CFF.svg?logo=vite&logoColor=white)](https://vitejs.dev)
-[![Test Suite](https://img.shields.io/badge/Tests-622%2F622%20Passing-brightgreen.svg)](tests/)
+[![Test Suite](https://img.shields.io/badge/Tests-624%2F624%20Passing-brightgreen.svg)](tests/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **Demo:** [documindai-pd0r.onrender.com](https://documindai-pd0r.onrender.com) — UI và API cùng một service Render free tier, câu hỏi đầu tiên sau khi server ngủ có thể mất khoảng một phút để khởi động.
@@ -302,7 +302,7 @@ khiến hệ thống từ chối nhầm, và ~15% câu bị từ chối thừa �
 | **Reranker** | `BAAI/bge-reranker-v2-m3` | Cross-encoder đa ngữ hàng đầu, xếp hạng điều khoản luật với độ chính xác cao. |
 | **API backend** | FastAPI + WebSockets + Pydantic v2 | I/O bất đồng bộ hoàn toàn, streaming hai chiều, tự sinh schema OpenAPI. |
 | **Giao diện** | React 19 + TypeScript + Vite | Console nền tối, ngăn xem trước nguồn, bảng thử nghiệm kiểm tra tuân thủ. |
-| **Kiểm thử** | Pytest + Pytest-Cov + Pytest-Asyncio | 622/622 test pass (đo 2026-10-02, chạy offline) gồm unit, tích hợp và rào chắn. |
+| **Kiểm thử** | Pytest + Pytest-Cov + Pytest-Asyncio | 624/624 test pass (đo 2026-10-02, chạy offline) gồm unit, tích hợp và rào chắn. |
 
 ---
 
