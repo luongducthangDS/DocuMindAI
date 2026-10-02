@@ -20,7 +20,7 @@ Cách tiếp cận kỹ thuật: tái dùng toàn bộ hạ tầng hiện có (L
 
 **Testing**: pytest. Đo thực tế ngày 2026-09-18: **216 passed** trong 67s (`pytest -q`, interpreter `Python310`, bỏ addopts coverage). Eval riêng: `eval/run_evals.py`, `eval/temporal_eval.py`, `eval/embedding_ab.py`.
 
-**Target Platform**: Backend Linux container (Render), frontend static (Vercel); dev trên Windows 11 qua `start.ps1`
+**Target Platform**: Một Linux container trên Render phục vụ cả backend lẫn frontend tĩnh; dev trên Windows 11 qua `start.ps1`
 
 **Project Type**: Web service + SPA (backend `src/`, frontend `frontend/`)
 

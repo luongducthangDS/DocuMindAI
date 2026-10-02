@@ -1,7 +1,7 @@
 # Render Blueprint — DocuMind AI backend (FastAPI + ChromaDB local, Docker).
 # Dùng: Render dashboard → New → Blueprint → point vào repo này.
-# Dùng chung Dockerfile hiện có (multi-stage, đã build sẵn React vào /app/dist —
-# phần static đó không dùng tới khi frontend deploy riêng ở Vercel, vô hại nếu để lại).
+# Dùng chung Dockerfile hiện có (multi-stage, build sẵn React vào /app/dist) — một
+# service phục vụ cả UI lẫn API cùng domain, không cần CORS cho UI của chính nó.
 #
 # LƯU Ý QUAN TRỌNG: Render free/starter web service có disk ephemeral — tài liệu
 # người dùng upload qua /api/v1/upload sẽ MẤT khi service restart/redeploy vì
@@ -29,10 +29,6 @@ services:
         generateValue: true
       - key: ENVIRONMENT
         value: production
-      # Domain frontend thật trên Vercel (project docu-mind-ai). Sai giá trị này
-      # => preflight CORS trả 400, UI không gọi được API dù backend khoẻ.
-      - key: ALLOWED_ORIGINS
-        value: https://docu-mind-ai-blue.vercel.app
       # Phai khop model da index corpus (nhan ghi trong metadata collection).
       # Lech nhan => EmbeddingModelMismatch luc khoi dong, khong chay tiep.
       - key: EMBEDDING_MODEL

@@ -73,11 +73,10 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
 - Local dev: như cũ, không đổi gì (`.\start.ps1`)
 - Production: **chỉ Render, một service** (2026-10-02): `https://documindai-pd0r.onrender.com`
   (service `DocuMindAI`, `srv-daron9h7lnhs73e89nkg`) phục vụ cả UI (Dockerfile build React vào
-  `dist/`) lẫn API, cùng domain — **không cần Vercel**, không cần `VITE_API_URL`/`ALLOWED_ORIGINS`
+  `dist/`) lẫn API, cùng domain — không cần `VITE_API_URL`/`ALLOWED_ORIGINS`
   cho UI của chính nó. Service này tạo tay, KHÔNG qua Blueprint: env trong `render.yaml` không
   tự áp, phải điền ở dashboard (thiếu `VECTOR_STORE_PROVIDER=qdrant` = Chroma rỗng trong
   container; thiếu `ENVIRONMENT=production` = trace mang nhãn `development`, `/docs` mở).
-  `documind-ai-backend-ulk9`/`-edyo` và Vercel `docu-mind-ai-blue` là deploy cũ — đừng kiểm ở đó.
 - Đã xoá CI/CD Railway (`.github/workflows/deploy.yml`, `railway.toml`, `deploy_railway.ps1`,
   `scripts/start_railway.sh`) — không còn dùng Railway ở bất kỳ đâu trong repo
 - Không dùng Supabase/Postgres — dự án không có bảng quan hệ nào (chỉ log JSONL)
@@ -259,7 +258,7 @@ for k in ("HF_HOME", "HF_HUB_CACHE", "TRANSFORMERS_CACHE", "SENTENCE_TRANSFORMER
 
 **Cache HuggingFace:** mọi entrypoint gọi `use_local_hf_cache()` từ `src/hf_env.py` — không tự set biến env HF nữa (trước đây 8 bản sao, 4 biến thể, đã gây lỗi thật). Riêng embedder truyền `cache_folder` thẳng làm tham số vì `huggingface_hub` đóng băng đường dẫn cache ngay lúc import, mọi thao tác env sau đó là quá muộn.
 
-**Vite proxy:** `frontend/vite.config.ts` proxy `/api` → `http://localhost:8081`. Nếu đổi port backend phải cập nhật cả đây. Khi deploy tách domain (Vercel), frontend dùng `VITE_API_URL` thay vì proxy — xem `frontend/.env.example`.
+**Vite proxy:** `frontend/vite.config.ts` proxy `/api` → `http://localhost:8081`. Nếu đổi port backend phải cập nhật cả đây. Production một service Render cùng domain nên không cần `VITE_API_URL` — chỉ set khi tách frontend ra domain khác (`frontend/.env.example`).
 
 **Vector store provider:** mặc định `chroma`. Đổi sang Qdrant Cloud: chạy
 `python scripts/migrate_chroma_to_qdrant.py --verify`, rồi set `VECTOR_STORE_PROVIDER=qdrant`

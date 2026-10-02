@@ -220,7 +220,7 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     # X-API-Key: tenant credential (src/api/principal.py). Without it here the
     # browser preflight rejects the header whenever frontend and backend sit on
-    # different origins (Vercel -> Render), and every call silently goes anonymous.
+    # different origins, and every call silently goes anonymous.
     allow_headers=["Content-Type", "Authorization", "X-API-Key"],
 )
 app.add_middleware(GZipMiddleware, minimum_size=1000)

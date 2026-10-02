@@ -347,7 +347,7 @@ ba lớp: system prompt, ngưỡng abstain, và citation validation.
 [main.py:173](../src/api/main.py#L173), [config.py:75](../src/config.py#L75)
 
 **7.6 CORS** — trình duyệt chỉ cho frontend gọi backend khác origin khi backend khai báo cho phép.
-Liên quan trực tiếp tới deploy tách domain Vercel/Render.
+Chỉ liên quan khi frontend ở domain khác; production một service Render cùng domain.
 [main.py:189](../src/api/main.py#L189)
 
 **7.7 Lifespan / warm-up** — nạp model và dựng retriever lúc khởi động thay vì lúc request đầu, vì
@@ -472,8 +472,8 @@ khi deploy tách domain thì dùng `VITE_API_URL` thay proxy.
 ~2GB CUDA cho máy không GPU.
 `requirements.txt` dòng đầu, `Dockerfile`
 
-**10.7 Render / Vercel** — backend container trên Render, frontend tĩnh trên Vercel.
-`render.yaml`, `frontend/vercel.json`
+**10.7 Render** — một container phục vụ cả UI (React build sẵn) lẫn API, cùng domain.
+`render.yaml`, `Dockerfile`
 
 **10.8 Cold start** — instance ngủ dậy phải nạp lại model; đây là lý do reranker có thể **nạp hỏng**
 trên gói free và kích hoạt đúng bug §4.6.

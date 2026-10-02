@@ -124,8 +124,8 @@ def _ws_origin_allowed(origin: str | None, host: str | None = None) -> bool:
 
     Không có Origin = client không phải trình duyệt (curl, SDK) — không mang
     credential ngầm nào của nạn nhân, nên không phải CSWSH; vẫn chịu token bucket.
-    Origin trùng Host = chính UI do server này phục vụ (Render một service, không
-    Vercel) — cũng không phải CSWSH. Thiếu nhánh này, UI same-origin bị 403 ở mọi
+    Origin trùng Host = chính UI do server này phục vụ (Render một
+    service) — cũng không phải CSWSH. Thiếu nhánh này, UI same-origin bị 403 ở mọi
     lần mở WS và lặng lẽ lùi về REST, mất stream (đo 2026-10-02 trên pd0r).
     So netloc, không so scheme: Render kết thúc TLS ở proxy.
     """

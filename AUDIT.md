@@ -35,7 +35,7 @@ trước khi đo, vì cả 5 phase đều neo vào những con số này:
 | Đề bài nói | Thực tế trong repo | Bằng chứng |
 |---|---|---|
 | "RAGAS faithfulness 0.87, failure rate 12.9% trên 50 câu" | **Không tái lập được.** Report sinh ra số này đã bị xoá vì đo trên corpus 36 chunk ngân hàng (chính Ted xoá và ghi lý do trong commit message) | commit `a7e37e1` |
-| "Docker trên Railway" | Railway đã gỡ sạch khỏi repo; deploy hiện tại là Render (backend) + Vercel (frontend) | `render.yaml`, `frontend/vercel.json`, `CLAUDE.md` |
+| "Docker trên Railway" | Railway đã gỡ sạch khỏi repo; deploy hiện tại là một service Render phục vụ cả UI lẫn API | `render.yaml`, `CLAUDE.md` |
 | "5 intent routes" | 6 intent (`simple_qa`, `compare`, `summarize`, `report`, `compliance_check`, `unknown`) — nhưng `unknown` không có nhánh riêng, nó cũng đi vào retrieval | `src/agent/graph.py:745-753` |
 | "LangGraph StateGraph" | Đúng, nhưng graph có **12 node** (nhiều hơn mô tả), gồm `do_contextualize`, `do_temporal_filter`, `do_grade`, `do_reformulate` | `src/agent/graph.py:770-804` |
 

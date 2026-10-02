@@ -110,7 +110,7 @@ Từ `SPEC.md` (6) + rải trong module spec. Cần Ted trước/trong Phase tư
 3. **T15/T16 — ngưỡng `confidence`** prefilter↔LLM: chốt 0.85 giờ hay tinh chỉnh sau T25 eval? (đề xuất: 0.85 tạm, chỉnh sau).
 4. **T19 — question library:** sinh bằng LLM (offline, review từng câu) hay viết tay 100%? 40–60 câu.
 5. **T21 — compliance:** giữ hardcode `criteria.json` ~6 tiêu chí, hay mở tới ~12 (thêm nghỉ phép năm, lương thử việc 85%, BHXH một lần, mức hưởng BHTN 60%)?
-6. **Deploy demo sống** (Render/Vercel): trong initiative này hay module riêng sau? (memory `portfolio-cv-selection`: demo 1 sống + 2 video).
+6. **Deploy demo sống** (Render): trong initiative này hay module riêng sau? (memory `portfolio-cv-selection`: demo 1 sống + 2 video).
 
 ## Definition of Done (mọi task)
 

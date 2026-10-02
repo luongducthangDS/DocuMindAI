@@ -224,7 +224,7 @@ Không có chu trình. Interface giữa các module ghi trong spec của module 
 3. **scope-gate:** ngưỡng `confidence` prefilter ↔ LLM (đề xuất 0.85) — chốt sau khi có eval hay chốt trước?
 4. **question-library:** sinh câu hỏi bằng LLM (1 lần, offline, người review) hay viết tay hoàn toàn? 40–60 câu.
 5. **compliance-criteria:** giữ `compliance_check` là rule engine hardcode (như bản ngân hàng) hay mở rộng cho tra công thức + liệt kê dữ liệu thiếu (khớp `NEEDS_PERSONAL_DATA`)?
-6. **Deploy:** bản demo sống (Render/Vercel) có nằm trong initiative này không, hay để sau (memory `portfolio-cv-selection` nói demo 1 sống + 2 video)?
+6. **Deploy:** bản demo sống (Render) có nằm trong initiative này không, hay để sau (memory `portfolio-cv-selection` nói demo 1 sống + 2 video)?
 
 ---
 

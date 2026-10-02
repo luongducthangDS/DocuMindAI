@@ -49,12 +49,12 @@ interface Document {
 }
 
 // ── API ────────────────────────────────────────────────────────────────────────
-// VITE_API_URL: set khi frontend và backend deploy tách domain (vd. Vercel + Render).
+// VITE_API_URL: set khi frontend và backend deploy tách domain.
 // Không set -> mặc định "/api/v1" (dev local qua Vite proxy, hoặc same-origin).
 const API_URL = import.meta.env.VITE_API_URL ?? "";
 const BASE = `${API_URL}/api/v1`;
 // Cùng origin (API_URL rỗng, dev local qua Vite proxy) -> lấy origin hiện tại;
-// khác domain (production, Vercel gọi Render) -> đổi scheme của chính API_URL.
+// khác domain (frontend và backend tách nhau) -> đổi scheme của chính API_URL.
 // "https"→"wss", "http"→"ws" (regex chỉ khớp 4 ký tự "http" ở đầu, phần "s"
 // còn lại của "https" giữ nguyên).
 const WS_BASE = `${(API_URL || (typeof window !== "undefined" ? window.location.origin : "")).replace(/^http/, "ws")}/api/v1`;

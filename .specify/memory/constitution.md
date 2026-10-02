@@ -99,7 +99,8 @@ them could be current, and a reader cannot tell which.
 - Retrieval is hybrid by construction: BM25 + dense + RRF fusion + cross-encoder rerank.
 - No new runtime dependency may be added to satisfy a feature that existing components
   (LLM client, embedder, config) can serve.
-- Production deployment targets exactly two services: frontend on Vercel, backend on Render.
+- Production deployment targets exactly one Render service serving both UI and API on the same
+  origin (2026-10-02).
   No other deployment target may be reintroduced without an amendment.
 - Persistence is files and vector store only — no relational database.
 

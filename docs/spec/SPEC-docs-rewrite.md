@@ -46,4 +46,4 @@ Viết lại README.md + EVALUATION.md cho vertical lao động + định vị (
 
 1. Có giữ tên "DocuMind AI" không, hay đổi tên phản ánh vertical lao động? (đề xuất: giữ — brand đã có, thêm tagline).
 2. README song ngữ hay chỉ tiếng Việt? (memory: CV nhắm thị trường VN → tiếng Việt chính, English summary ngắn ở đầu là đủ).
-3. Demo sống (link Render/Vercel) đưa vào README luôn hay chờ module deploy riêng? (Open question #6 `SPEC.md`).
+3. Demo sống (link Render) đưa vào README luôn hay chờ module deploy riêng? (Open question #6 `SPEC.md`).
