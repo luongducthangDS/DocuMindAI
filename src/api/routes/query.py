@@ -11,6 +11,7 @@ from collections import OrderedDict
 from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from fastapi import APIRouter, HTTPException, Request, WebSocket, WebSocketDisconnect, status
 from starlette.requests import HTTPConnection
@@ -118,13 +119,19 @@ class _TokenBucket:
         return False
 
 
-def _ws_origin_allowed(origin: str | None) -> bool:
+def _ws_origin_allowed(origin: str | None, host: str | None = None) -> bool:
     """Chặn Cross-Site WebSocket Hijacking: trình duyệt LUÔN gửi Origin.
 
     Không có Origin = client không phải trình duyệt (curl, SDK) — không mang
     credential ngầm nào của nạn nhân, nên không phải CSWSH; vẫn chịu token bucket.
+    Origin trùng Host = chính UI do server này phục vụ (Render một service, không
+    Vercel) — cũng không phải CSWSH. Thiếu nhánh này, UI same-origin bị 403 ở mọi
+    lần mở WS và lặng lẽ lùi về REST, mất stream (đo 2026-10-02 trên pd0r).
+    So netloc, không so scheme: Render kết thúc TLS ở proxy.
     """
-    return not origin or origin in get_settings().cors_origins
+    if not origin or origin in get_settings().cors_origins:
+        return True
+    return bool(host) and urlsplit(origin).netloc == host
 
 
 def _release_ws_slot(ip: str) -> None:
@@ -345,7 +352,7 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
         return
 
     origin = websocket.headers.get("origin")
-    if not _ws_origin_allowed(origin):
+    if not _ws_origin_allowed(origin, websocket.headers.get("host")):
         logger.warning("WS rejected: origin {!r} not in ALLOWED_ORIGINS", origin)
         await websocket.close(code=1008, reason="Origin not allowed")
         return

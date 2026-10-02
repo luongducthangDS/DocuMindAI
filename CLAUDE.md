@@ -52,7 +52,7 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   Report nào ghi rerank phải xem `meta.reranker_active`, không tin `ENABLE_RERANKER`.
   torch/sentence-transformers/transformers **không** còn trong `requirements.txt` (2026-09-27,
   image production không cài ~1.3GB này) — muốn chạy reranker: `pip install -r requirements-rerank.txt`.
-- Test suite: 621/621 tests passed (đo 2026-09-30). Test không gửi trace ra Langfuse/LangSmith
+- Test suite: 622/622 tests passed (đo 2026-10-02). Test không gửi trace ra Langfuse/LangSmith
   (`conftest.py::patch_settings` xoá key).
 
 **Stack:**
@@ -71,8 +71,13 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
 
 **Deploy (2026-07, theo default-tech-stack skill):**
 - Local dev: như cũ, không đổi gì (`.\start.ps1`)
-- Production: **chỉ Render** — frontend → Vercel (`frontend/vercel.json`, env `VITE_API_URL`),
-  backend → Render (`render.yaml`, dùng chung Dockerfile hiện có)
+- Production: **chỉ Render, một service** (2026-10-02): `https://documindai-pd0r.onrender.com`
+  (service `DocuMindAI`, `srv-daron9h7lnhs73e89nkg`) phục vụ cả UI (Dockerfile build React vào
+  `dist/`) lẫn API, cùng domain — **không cần Vercel**, không cần `VITE_API_URL`/`ALLOWED_ORIGINS`
+  cho UI của chính nó. Service này tạo tay, KHÔNG qua Blueprint: env trong `render.yaml` không
+  tự áp, phải điền ở dashboard (thiếu `VECTOR_STORE_PROVIDER=qdrant` = Chroma rỗng trong
+  container; thiếu `ENVIRONMENT=production` = trace mang nhãn `development`, `/docs` mở).
+  `documind-ai-backend-ulk9`/`-edyo` và Vercel `docu-mind-ai-blue` là deploy cũ — đừng kiểm ở đó.
 - Đã xoá CI/CD Railway (`.github/workflows/deploy.yml`, `railway.toml`, `deploy_railway.ps1`,
   `scripts/start_railway.sh`) — không còn dùng Railway ở bất kỳ đâu trong repo
 - Không dùng Supabase/Postgres — dự án không có bảng quan hệ nào (chỉ log JSONL)

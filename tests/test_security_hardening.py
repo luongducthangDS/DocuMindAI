@@ -289,7 +289,10 @@ class TestWebSocketLimits:
                 pass
         assert exc.value.code == 1008
 
-    @pytest.mark.parametrize("headers", [{"origin": "https://app.example"}, {}])
+    # http://testserver = Host mặc định của TestClient: UI do chính server phục vụ
+    # (Render một service) phải mở được WS dù không có trong ALLOWED_ORIGINS.
+    @pytest.mark.parametrize("headers", [{"origin": "https://app.example"}, {},
+                                         {"origin": "http://testserver"}])
     def test_allowed_origin_and_non_browser_clients_pass(self, ws_app, headers):
         with TestClient(ws_app).websocket_connect("/api/v1/ws/s1", headers=headers) as ws:
             assert "too short" in _ping(ws)["error"]
