@@ -206,21 +206,21 @@ chọn sai lần hai.
 
 ### Kiểm nhầm service Render rồi kết luận "không phải Render" (2026-10-02)
 - **Đã làm (Claude):** người dùng báo DocuMind trên Render không trả lời (collection rỗng).
-  Claude lấy URL backend từ `frontend/.env.example` (`ulk9`), thấy khoẻ, rồi đọc các trace
-  `chroma/documind_legal/…/0` mang nhãn `development` là "máy dev, không phải Render". Sau đó
-  còn khuyên sửa `VITE_API_URL` trên Vercel.
-- **Sai ở đâu:** đoán danh tính service từ một file ví dụ thay vì hỏi/liệt kê — có tới 3 service
-  (`ulk9` ở tài khoản Render khác, `edyo`, `pd0r`). Service thật `pd0r` tạo tay, không qua
+  Claude lấy URL backend từ `frontend/.env.example` — một deploy cũ, không phải `pd0r` — thấy
+  khoẻ, rồi đọc các trace `chroma/documind_legal/…/0` mang nhãn `development` là "máy dev,
+  không phải Render".
+- **Sai ở đâu:** đoán danh tính service từ một file ví dụ thay vì hỏi/liệt kê — lúc đó còn
+  nhiều deploy cũ chạy song song (nay đã xoá hết). Service thật `pd0r` tạo tay, không qua
   Blueprint nên thiếu `VECTOR_STORE_PROVIDER` và `ENVIRONMENT`: chạy Chroma rỗng và gắn nhãn
   `development` — tức nhãn "development" chính là *triệu chứng*, bị đọc thành *bằng chứng
-  ngoại phạm*. Còn `pd0r` tự phục vụ UI cùng domain, Vercel không liên quan.
+  ngoại phạm*.
 - **Cái giá:** một vòng chẩn đoán sai, người dùng phải tự chỉ URL; khi đã đúng service, WS từ
   chính UI vẫn bị 403 (origin same-domain không có trong `ALLOWED_ORIGINS`), UI lặng lẽ lùi
   về REST, mất stream.
 - **Bài học:** xác định *đang đo cái gì* trước khi đo: hỏi URL hoặc `render services`. Nhãn
   sinh từ giá trị mặc định (environment, provider) không chứng minh nơi chạy — mặc định chính
   là thứ lộ ra khi cấu hình thiếu.
-- **Giờ làm thế nào:** CLAUDE.md ghi đúng service production và ghi chú deploy cũ;
+- **Giờ làm thế nào:** repo chỉ còn một link deploy (`pd0r`, ghi ở CLAUDE.md/README);
   `.env.example` không còn URL cụ thể; `_ws_origin_allowed` nhận origin trùng `Host`.
 
 ### Gửi trace kiểu bắn-rồi-quên: thread daemon, không kiểm mã HTTP (→ 2026-09-30)
