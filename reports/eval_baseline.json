@@ -9,7 +9,10 @@
     ],
     "retrieval_only": true,
     "corpus_earliest_point_in_time": "2015-01-01",
-    "retriever": "hybrid BM25 + dense, RRF fusion, cross-encoder rerank → top-8",
+    "retriever": "hybrid BM25 + dense, RRF fusion → top-8",
+    "reranker_active": false,
+    "index": "qdrant/documind_legal/gemini-embedding-001/1151",
+    "git_sha": "34c2977",
     "embed_cache": true
   },
   "rows": [
@@ -21,7 +24,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 15,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -52,7 +55,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 58
+          "retrieve_ms": 250
         }
       }
     },
@@ -64,7 +67,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 16,
+      "retrieve_ms": 244,
       "arms": {
         "no_temporal": {
           "context": {
@@ -95,7 +98,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 63
+          "retrieve_ms": 249
         }
       }
     },
@@ -107,7 +110,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 546,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -138,7 +141,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 67
+          "retrieve_ms": 247
         }
       }
     },
@@ -150,7 +153,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 19,
+      "retrieve_ms": 249,
       "arms": {
         "no_temporal": {
           "context": {
@@ -181,7 +184,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 66
+          "retrieve_ms": 246
         }
       }
     },
@@ -193,7 +196,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 480,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -224,7 +227,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 59
+          "retrieve_ms": 249
         }
       }
     },
@@ -236,7 +239,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 18,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -267,7 +270,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 63
+          "retrieve_ms": 250
         }
       }
     },
@@ -279,7 +282,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 497,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -310,7 +313,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 64
+          "retrieve_ms": 248
         }
       }
     },
@@ -322,7 +325,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 18,
+      "retrieve_ms": 245,
       "arms": {
         "no_temporal": {
           "context": {
@@ -353,7 +356,7 @@
             "clean": false,
             "n_chunks": 8
           },
-          "retrieve_ms": 65
+          "retrieve_ms": 247
         }
       }
     },
@@ -365,7 +368,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 612,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -396,7 +399,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 56
+          "retrieve_ms": 244
         }
       }
     },
@@ -408,7 +411,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 16,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -439,7 +442,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 61
+          "retrieve_ms": 253
         }
       }
     },
@@ -451,7 +454,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 504,
+      "retrieve_ms": 254,
       "arms": {
         "no_temporal": {
           "context": {
@@ -482,7 +485,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 58
+          "retrieve_ms": 251
         }
       }
     },
@@ -494,7 +497,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 17,
+      "retrieve_ms": 255,
       "arms": {
         "no_temporal": {
           "context": {
@@ -525,7 +528,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 63
+          "retrieve_ms": 253
         }
       }
     },
@@ -537,7 +540,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 497,
+      "retrieve_ms": 244,
       "arms": {
         "no_temporal": {
           "context": {
@@ -568,7 +571,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 73
+          "retrieve_ms": 245
         }
       }
     },
@@ -580,7 +583,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 17,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -611,7 +614,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 57
+          "retrieve_ms": 250
         }
       }
     },
@@ -623,7 +626,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 526,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -654,7 +657,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 76
+          "retrieve_ms": 245
         }
       }
     },
@@ -666,7 +669,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 23,
+      "retrieve_ms": 244,
       "arms": {
         "no_temporal": {
           "context": {
@@ -697,7 +700,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 58
+          "retrieve_ms": 252
         }
       }
     },
@@ -709,7 +712,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 496,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -740,7 +743,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 54
+          "retrieve_ms": 250
         }
       }
     },
@@ -752,7 +755,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 16,
+      "retrieve_ms": 250,
       "arms": {
         "no_temporal": {
           "context": {
@@ -783,7 +786,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 60
+          "retrieve_ms": 246
         }
       }
     },
@@ -795,7 +798,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 490,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -826,7 +829,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 69
+          "retrieve_ms": 266
         }
       }
     },
@@ -838,7 +841,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 17,
+      "retrieve_ms": 255,
       "arms": {
         "no_temporal": {
           "context": {
@@ -869,7 +872,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 64
+          "retrieve_ms": 266
         }
       }
     },
@@ -881,7 +884,7 @@
       "temporal_kind": "clause_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 509,
+      "retrieve_ms": 258,
       "arms": {
         "no_temporal": {
           "context": {
@@ -912,7 +915,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 64
+          "retrieve_ms": 253
         }
       }
     },
@@ -924,7 +927,7 @@
       "temporal_kind": "clause_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 17,
+      "retrieve_ms": 249,
       "arms": {
         "no_temporal": {
           "context": {
@@ -955,7 +958,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 61
+          "retrieve_ms": 259
         }
       }
     },
@@ -967,7 +970,7 @@
       "temporal_kind": "clause_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 481,
+      "retrieve_ms": 250,
       "arms": {
         "no_temporal": {
           "context": {
@@ -998,7 +1001,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 64
+          "retrieve_ms": 243
         }
       }
     },
@@ -1010,7 +1013,7 @@
       "temporal_kind": "clause_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 17,
+      "retrieve_ms": 252,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1041,7 +1044,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 69
+          "retrieve_ms": 247
         }
       }
     },
@@ -1053,7 +1056,7 @@
       "temporal_kind": "control",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 514,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1084,7 +1087,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 63
+          "retrieve_ms": 248
         }
       }
     },
@@ -1096,7 +1099,7 @@
       "temporal_kind": "control",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 17,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1127,7 +1130,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 61
+          "retrieve_ms": 249
         }
       }
     },
@@ -1139,7 +1142,7 @@
       "temporal_kind": "control",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 508,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1170,7 +1173,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 65
+          "retrieve_ms": 250
         }
       }
     },
@@ -1182,7 +1185,7 @@
       "temporal_kind": "control",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 17,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1213,7 +1216,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 63
+          "retrieve_ms": 252
         }
       }
     },
@@ -1225,7 +1228,7 @@
       "temporal_kind": "out_of_range",
       "expected_behavior": "time_out_of_range",
       "has_gold": false,
-      "retrieve_ms": 510,
+      "retrieve_ms": 254,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1250,7 +1253,7 @@
             "clean": true,
             "n_chunks": 0
           },
-          "retrieve_ms": 19
+          "retrieve_ms": 240
         }
       }
     },
@@ -1262,7 +1265,7 @@
       "temporal_kind": "out_of_range",
       "expected_behavior": "time_out_of_range",
       "has_gold": false,
-      "retrieve_ms": 590,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1287,7 +1290,7 @@
             "clean": true,
             "n_chunks": 0
           },
-          "retrieve_ms": 12
+          "retrieve_ms": 246
         }
       }
     },
@@ -1299,7 +1302,7 @@
       "temporal_kind": "multi_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 491,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1330,7 +1333,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 59
+          "retrieve_ms": 245
         }
       }
     },
@@ -1342,7 +1345,7 @@
       "temporal_kind": "multi_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 534,
+      "retrieve_ms": 244,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1373,7 +1376,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 65
+          "retrieve_ms": 246
         }
       }
     },
@@ -1385,7 +1388,7 @@
       "temporal_kind": "multi_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 519,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1416,7 +1419,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 59
+          "retrieve_ms": 245
         }
       }
     },
@@ -1428,7 +1431,7 @@
       "temporal_kind": "multi_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 492,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1459,7 +1462,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 61
+          "retrieve_ms": 248
         }
       }
     },
@@ -1471,7 +1474,7 @@
       "temporal_kind": "multi_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 523,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1502,7 +1505,7 @@
             "clean": false,
             "n_chunks": 8
           },
-          "retrieve_ms": 68
+          "retrieve_ms": 243
         }
       }
     },
@@ -1514,7 +1517,7 @@
       "temporal_kind": "multi_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 16,
+      "retrieve_ms": 244,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1545,7 +1548,7 @@
             "clean": false,
             "n_chunks": 8
           },
-          "retrieve_ms": 62
+          "retrieve_ms": 251
         }
       }
     },
@@ -1557,7 +1560,7 @@
       "temporal_kind": "table_lookup",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 513,
+      "retrieve_ms": 254,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1588,7 +1591,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 63
+          "retrieve_ms": 255
         }
       }
     },
@@ -1600,7 +1603,7 @@
       "temporal_kind": "boundary",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 471,
+      "retrieve_ms": 250,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1631,7 +1634,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 59
+          "retrieve_ms": 257
         }
       }
     },
@@ -1643,7 +1646,7 @@
       "temporal_kind": "boundary",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 16,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1674,7 +1677,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 60
+          "retrieve_ms": 260
         }
       }
     },
@@ -1686,7 +1689,7 @@
       "temporal_kind": "boundary",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 585,
+      "retrieve_ms": 259,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1717,7 +1720,7 @@
             "clean": false,
             "n_chunks": 8
           },
-          "retrieve_ms": 57
+          "retrieve_ms": 250
         }
       }
     },
@@ -1729,7 +1732,7 @@
       "temporal_kind": "boundary",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 16,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1760,7 +1763,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 62
+          "retrieve_ms": 252
         }
       }
     },
@@ -1772,7 +1775,7 @@
       "temporal_kind": "out_of_scope",
       "expected_behavior": "refuse",
       "has_gold": false,
-      "retrieve_ms": 582,
+      "retrieve_ms": 259,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1803,7 +1806,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 68
+          "retrieve_ms": 253
         }
       }
     },
@@ -1815,7 +1818,7 @@
       "temporal_kind": "out_of_scope",
       "expected_behavior": "refuse",
       "has_gold": false,
-      "retrieve_ms": 480,
+      "retrieve_ms": 251,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1846,7 +1849,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 67
+          "retrieve_ms": 246
         }
       }
     },
@@ -1858,7 +1861,7 @@
       "temporal_kind": "out_of_scope",
       "expected_behavior": "refuse",
       "has_gold": false,
-      "retrieve_ms": 484,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1889,7 +1892,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 70
+          "retrieve_ms": 251
         }
       }
     },
@@ -1901,7 +1904,7 @@
       "temporal_kind": "false_premise",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 497,
+      "retrieve_ms": 250,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1932,7 +1935,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 59
+          "retrieve_ms": 248
         }
       }
     },
@@ -1944,7 +1947,7 @@
       "temporal_kind": "false_premise",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 490,
+      "retrieve_ms": 245,
       "arms": {
         "no_temporal": {
           "context": {
@@ -1975,7 +1978,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 61
+          "retrieve_ms": 249
         }
       }
     },
@@ -1987,7 +1990,7 @@
       "temporal_kind": "compliance",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 485,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2018,7 +2021,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 68
+          "retrieve_ms": 246
         }
       }
     },
@@ -2030,7 +2033,7 @@
       "temporal_kind": "compliance",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 526,
+      "retrieve_ms": 250,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2061,7 +2064,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 69
+          "retrieve_ms": 246
         }
       }
     },
@@ -2073,7 +2076,7 @@
       "temporal_kind": "compliance",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 16,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2104,7 +2107,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 60
+          "retrieve_ms": 247
         }
       }
     },
@@ -2116,7 +2119,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 455,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2147,7 +2150,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 63
+          "retrieve_ms": 252
         }
       }
     },
@@ -2159,7 +2162,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 505,
+      "retrieve_ms": 251,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2190,7 +2193,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 71
+          "retrieve_ms": 251
         }
       }
     },
@@ -2202,7 +2205,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 500,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2233,7 +2236,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 71
+          "retrieve_ms": 250
         }
       }
     },
@@ -2245,7 +2248,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 481,
+      "retrieve_ms": 255,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2276,7 +2279,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 68
+          "retrieve_ms": 253
         }
       }
     },
@@ -2288,7 +2291,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 493,
+      "retrieve_ms": 249,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2319,7 +2322,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 73
+          "retrieve_ms": 252
         }
       }
     },
@@ -2331,7 +2334,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 466,
+      "retrieve_ms": 250,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2362,7 +2365,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 64
+          "retrieve_ms": 247
         }
       }
     },
@@ -2374,7 +2377,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 548,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2405,7 +2408,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 65
+          "retrieve_ms": 248
         }
       }
     },
@@ -2417,7 +2420,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 501,
+      "retrieve_ms": 252,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2448,7 +2451,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 61
+          "retrieve_ms": 248
         }
       }
     },
@@ -2460,7 +2463,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 455,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2491,7 +2494,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 64
+          "retrieve_ms": 243
         }
       }
     },
@@ -2503,7 +2506,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 471,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2534,7 +2537,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 61
+          "retrieve_ms": 248
         }
       }
     },
@@ -2546,7 +2549,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 522,
+      "retrieve_ms": 252,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2577,7 +2580,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 73
+          "retrieve_ms": 246
         }
       }
     },
@@ -2589,7 +2592,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 463,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2620,7 +2623,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 65
+          "retrieve_ms": 250
         }
       }
     },
@@ -2632,7 +2635,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 533,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2663,7 +2666,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 71
+          "retrieve_ms": 249
         }
       }
     },
@@ -2675,7 +2678,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 506,
+      "retrieve_ms": 260,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2706,7 +2709,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 70
+          "retrieve_ms": 250
         }
       }
     },
@@ -2718,7 +2721,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 551,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2749,7 +2752,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 54
+          "retrieve_ms": 256
         }
       }
     },
@@ -2761,7 +2764,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 512,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2792,7 +2795,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 73
+          "retrieve_ms": 250
         }
       }
     },
@@ -2804,7 +2807,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 488,
+      "retrieve_ms": 250,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2835,7 +2838,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 59
+          "retrieve_ms": 251
         }
       }
     },
@@ -2847,7 +2850,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 499,
+      "retrieve_ms": 245,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2878,7 +2881,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 62
+          "retrieve_ms": 246
         }
       }
     },
@@ -2890,7 +2893,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 485,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2921,7 +2924,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 64
+          "retrieve_ms": 250
         }
       }
     },
@@ -2933,7 +2936,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 446,
+      "retrieve_ms": 244,
       "arms": {
         "no_temporal": {
           "context": {
@@ -2964,7 +2967,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 59
+          "retrieve_ms": 248
         }
       }
     },
@@ -2976,7 +2979,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 510,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3007,7 +3010,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 67
+          "retrieve_ms": 248
         }
       }
     },
@@ -3019,7 +3022,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 488,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3050,7 +3053,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 71
+          "retrieve_ms": 249
         }
       }
     },
@@ -3062,7 +3065,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 505,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3093,7 +3096,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 75
+          "retrieve_ms": 249
         }
       }
     },
@@ -3105,7 +3108,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 450,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3136,7 +3139,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 62
+          "retrieve_ms": 244
         }
       }
     },
@@ -3148,7 +3151,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 455,
+      "retrieve_ms": 244,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3179,7 +3182,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 62
+          "retrieve_ms": 248
         }
       }
     },
@@ -3191,7 +3194,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 482,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3222,7 +3225,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 68
+          "retrieve_ms": 243
         }
       }
     },
@@ -3234,7 +3237,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 471,
+      "retrieve_ms": 249,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3265,7 +3268,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 76
+          "retrieve_ms": 249
         }
       }
     },
@@ -3277,7 +3280,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 469,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3308,7 +3311,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 64
+          "retrieve_ms": 246
         }
       }
     },
@@ -3320,7 +3323,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 486,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3351,7 +3354,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 61
+          "retrieve_ms": 248
         }
       }
     },
@@ -3363,7 +3366,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 484,
+      "retrieve_ms": 244,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3394,7 +3397,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 72
+          "retrieve_ms": 256
         }
       }
     },
@@ -3406,7 +3409,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 484,
+      "retrieve_ms": 251,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3437,7 +3440,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 68
+          "retrieve_ms": 247
         }
       }
     },
@@ -3449,7 +3452,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 488,
+      "retrieve_ms": 250,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3480,7 +3483,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 70
+          "retrieve_ms": 252
         }
       }
     },
@@ -3492,7 +3495,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 514,
+      "retrieve_ms": 258,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3523,7 +3526,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 68
+          "retrieve_ms": 248
         }
       }
     },
@@ -3535,7 +3538,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 488,
+      "retrieve_ms": 249,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3566,7 +3569,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 65
+          "retrieve_ms": 252
         }
       }
     },
@@ -3578,7 +3581,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 452,
+      "retrieve_ms": 264,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3609,7 +3612,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 63
+          "retrieve_ms": 248
         }
       }
     },
@@ -3621,7 +3624,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 468,
+      "retrieve_ms": 249,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3652,7 +3655,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 60
+          "retrieve_ms": 248
         }
       }
     },
@@ -3664,7 +3667,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 514,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3695,7 +3698,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 68
+          "retrieve_ms": 250
         }
       }
     },
@@ -3707,7 +3710,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 471,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3738,7 +3741,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 67
+          "retrieve_ms": 249
         }
       }
     },
@@ -3750,7 +3753,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 513,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3781,7 +3784,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 66
+          "retrieve_ms": 246
         }
       }
     },
@@ -3793,7 +3796,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 463,
+      "retrieve_ms": 249,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3824,7 +3827,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 63
+          "retrieve_ms": 247
         }
       }
     },
@@ -3836,7 +3839,7 @@
       "temporal_kind": "multi_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 435,
+      "retrieve_ms": 245,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3867,7 +3870,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 58
+          "retrieve_ms": 248
         }
       }
     },
@@ -3879,7 +3882,7 @@
       "temporal_kind": "multi_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 440,
+      "retrieve_ms": 245,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3910,7 +3913,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 71
+          "retrieve_ms": 246
         }
       }
     },
@@ -3922,7 +3925,7 @@
       "temporal_kind": "multi_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 498,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3953,7 +3956,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 62
+          "retrieve_ms": 253
         }
       }
     },
@@ -3965,7 +3968,7 @@
       "temporal_kind": "multi_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 477,
+      "retrieve_ms": 250,
       "arms": {
         "no_temporal": {
           "context": {
@@ -3996,7 +3999,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 70
+          "retrieve_ms": 256
         }
       }
     },
@@ -4008,7 +4011,7 @@
       "temporal_kind": "multi_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 496,
+      "retrieve_ms": 257,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4039,7 +4042,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 63
+          "retrieve_ms": 259
         }
       }
     },
@@ -4051,7 +4054,7 @@
       "temporal_kind": "false_premise",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 484,
+      "retrieve_ms": 258,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4082,7 +4085,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 60
+          "retrieve_ms": 251
         }
       }
     },
@@ -4094,7 +4097,7 @@
       "temporal_kind": "false_premise",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 508,
+      "retrieve_ms": 245,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4125,7 +4128,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 61
+          "retrieve_ms": 247
         }
       }
     },
@@ -4137,7 +4140,7 @@
       "temporal_kind": "false_premise",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 459,
+      "retrieve_ms": 251,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4168,7 +4171,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 73
+          "retrieve_ms": 244
         }
       }
     },
@@ -4180,7 +4183,7 @@
       "temporal_kind": "out_of_scope",
       "expected_behavior": "refuse",
       "has_gold": false,
-      "retrieve_ms": 444,
+      "retrieve_ms": 243,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4211,7 +4214,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 63
+          "retrieve_ms": 261
         }
       }
     },
@@ -4223,7 +4226,7 @@
       "temporal_kind": "out_of_scope",
       "expected_behavior": "refuse",
       "has_gold": false,
-      "retrieve_ms": 469,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4254,7 +4257,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 62
+          "retrieve_ms": 249
         }
       }
     },
@@ -4266,7 +4269,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 476,
+      "retrieve_ms": 250,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4297,7 +4300,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 71
+          "retrieve_ms": 252
         }
       }
     },
@@ -4309,7 +4312,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 505,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4340,7 +4343,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 63
+          "retrieve_ms": 249
         }
       }
     },
@@ -4352,7 +4355,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 519,
+      "retrieve_ms": 245,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4383,7 +4386,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 61
+          "retrieve_ms": 245
         }
       }
     },
@@ -4395,7 +4398,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 467,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4426,7 +4429,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 72
+          "retrieve_ms": 263
         }
       }
     },
@@ -4438,7 +4441,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 492,
+      "retrieve_ms": 251,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4469,7 +4472,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 70
+          "retrieve_ms": 252
         }
       }
     },
@@ -4481,7 +4484,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 462,
+      "retrieve_ms": 251,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4512,7 +4515,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 61
+          "retrieve_ms": 246
         }
       }
     },
@@ -4524,7 +4527,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 501,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4555,7 +4558,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 60
+          "retrieve_ms": 248
         }
       }
     },
@@ -4567,7 +4570,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 479,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4598,7 +4601,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 66
+          "retrieve_ms": 245
         }
       }
     },
@@ -4610,7 +4613,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 448,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4641,7 +4644,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 67
+          "retrieve_ms": 244
         }
       }
     },
@@ -4653,7 +4656,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 496,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4684,7 +4687,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 61
+          "retrieve_ms": 248
         }
       }
     },
@@ -4696,7 +4699,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 498,
+      "retrieve_ms": 249,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4727,7 +4730,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 59
+          "retrieve_ms": 250
         }
       }
     },
@@ -4739,7 +4742,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 481,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4770,7 +4773,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 56
+          "retrieve_ms": 245
         }
       }
     },
@@ -4782,7 +4785,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 533,
+      "retrieve_ms": 251,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4813,7 +4816,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 58
+          "retrieve_ms": 252
         }
       }
     },
@@ -4825,7 +4828,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 497,
+      "retrieve_ms": 254,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4856,7 +4859,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 58
+          "retrieve_ms": 252
         }
       }
     },
@@ -4868,7 +4871,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 511,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4899,7 +4902,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 60
+          "retrieve_ms": 246
         }
       }
     },
@@ -4911,7 +4914,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 474,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4942,7 +4945,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 60
+          "retrieve_ms": 246
         }
       }
     },
@@ -4954,7 +4957,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 501,
+      "retrieve_ms": 245,
       "arms": {
         "no_temporal": {
           "context": {
@@ -4985,7 +4988,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 64
+          "retrieve_ms": 252
         }
       }
     },
@@ -4997,7 +5000,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 491,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5028,7 +5031,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 56
+          "retrieve_ms": 260
         }
       }
     },
@@ -5040,7 +5043,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 503,
+      "retrieve_ms": 249,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5071,7 +5074,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 64
+          "retrieve_ms": 252
         }
       }
     },
@@ -5083,7 +5086,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 478,
+      "retrieve_ms": 265,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5114,7 +5117,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 61
+          "retrieve_ms": 253
         }
       }
     },
@@ -5126,7 +5129,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 503,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5157,7 +5160,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 66
+          "retrieve_ms": 247
         }
       }
     },
@@ -5169,7 +5172,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 475,
+      "retrieve_ms": 251,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5200,7 +5203,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 62
+          "retrieve_ms": 260
         }
       }
     },
@@ -5212,7 +5215,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 488,
+      "retrieve_ms": 253,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5243,7 +5246,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 59
+          "retrieve_ms": 256
         }
       }
     },
@@ -5255,7 +5258,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 480,
+      "retrieve_ms": 253,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5286,7 +5289,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 59
+          "retrieve_ms": 253
         }
       }
     },
@@ -5298,7 +5301,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 497,
+      "retrieve_ms": 252,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5329,7 +5332,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 62
+          "retrieve_ms": 255
         }
       }
     },
@@ -5341,7 +5344,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 437,
+      "retrieve_ms": 254,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5372,7 +5375,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 71
+          "retrieve_ms": 253
         }
       }
     },
@@ -5384,7 +5387,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 489,
+      "retrieve_ms": 249,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5415,7 +5418,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 66
+          "retrieve_ms": 249
         }
       }
     },
@@ -5427,7 +5430,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 502,
+      "retrieve_ms": 249,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5458,7 +5461,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 60
+          "retrieve_ms": 248
         }
       }
     },
@@ -5470,7 +5473,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 482,
+      "retrieve_ms": 244,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5501,7 +5504,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 69
+          "retrieve_ms": 245
         }
       }
     },
@@ -5513,7 +5516,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 493,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5544,7 +5547,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 69
+          "retrieve_ms": 243
         }
       }
     },
@@ -5556,7 +5559,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 492,
+      "retrieve_ms": 245,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5587,7 +5590,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 69
+          "retrieve_ms": 246
         }
       }
     },
@@ -5599,7 +5602,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 513,
+      "retrieve_ms": 250,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5630,7 +5633,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 68
+          "retrieve_ms": 261
         }
       }
     },
@@ -5642,7 +5645,7 @@
       "temporal_kind": "multi_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 501,
+      "retrieve_ms": 250,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5673,7 +5676,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 63
+          "retrieve_ms": 246
         }
       }
     },
@@ -5685,7 +5688,7 @@
       "temporal_kind": "multi_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 512,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5716,7 +5719,7 @@
             "clean": false,
             "n_chunks": 8
           },
-          "retrieve_ms": 70
+          "retrieve_ms": 252
         }
       }
     },
@@ -5728,7 +5731,7 @@
       "temporal_kind": "multi_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 504,
+      "retrieve_ms": 249,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5759,7 +5762,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 69
+          "retrieve_ms": 246
         }
       }
     },
@@ -5771,7 +5774,7 @@
       "temporal_kind": "multi_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 475,
+      "retrieve_ms": 253,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5802,7 +5805,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 65
+          "retrieve_ms": 256
         }
       }
     },
@@ -5814,7 +5817,7 @@
       "temporal_kind": "false_premise",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 417,
+      "retrieve_ms": 250,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5845,7 +5848,7 @@
             "clean": false,
             "n_chunks": 8
           },
-          "retrieve_ms": 59
+          "retrieve_ms": 248
         }
       }
     },
@@ -5857,7 +5860,7 @@
       "temporal_kind": "false_premise",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 478,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5888,7 +5891,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 70
+          "retrieve_ms": 245
         }
       }
     },
@@ -5900,7 +5903,7 @@
       "temporal_kind": "out_of_scope",
       "expected_behavior": "refuse",
       "has_gold": false,
-      "retrieve_ms": 560,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5931,7 +5934,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 64
+          "retrieve_ms": 246
         }
       }
     },
@@ -5943,7 +5946,7 @@
       "temporal_kind": "out_of_scope",
       "expected_behavior": "refuse",
       "has_gold": false,
-      "retrieve_ms": 518,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -5974,7 +5977,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 64
+          "retrieve_ms": 248
         }
       }
     },
@@ -5986,7 +5989,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 516,
+      "retrieve_ms": 244,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6017,7 +6020,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 62
+          "retrieve_ms": 244
         }
       }
     },
@@ -6029,7 +6032,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 486,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6060,7 +6063,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 65
+          "retrieve_ms": 242
         }
       }
     },
@@ -6072,7 +6075,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 493,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6103,7 +6106,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 61
+          "retrieve_ms": 245
         }
       }
     },
@@ -6115,7 +6118,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 484,
+      "retrieve_ms": 242,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6146,7 +6149,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 77
+          "retrieve_ms": 257
         }
       }
     },
@@ -6158,7 +6161,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 523,
+      "retrieve_ms": 250,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6189,7 +6192,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 55
+          "retrieve_ms": 247
         }
       }
     },
@@ -6201,7 +6204,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 497,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6232,7 +6235,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 62
+          "retrieve_ms": 247
         }
       }
     },
@@ -6244,7 +6247,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 459,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6275,7 +6278,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 73
+          "retrieve_ms": 247
         }
       }
     },
@@ -6287,7 +6290,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 547,
+      "retrieve_ms": 245,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6318,7 +6321,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 61
+          "retrieve_ms": 248
         }
       }
     },
@@ -6330,7 +6333,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 502,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6361,7 +6364,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 39
+          "retrieve_ms": 248
         }
       }
     },
@@ -6373,7 +6376,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 501,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6404,7 +6407,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 42
+          "retrieve_ms": 245
         }
       }
     },
@@ -6416,7 +6419,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 506,
+      "retrieve_ms": 244,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6447,7 +6450,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 69
+          "retrieve_ms": 247
         }
       }
     },
@@ -6459,7 +6462,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 515,
+      "retrieve_ms": 250,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6490,7 +6493,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 41
+          "retrieve_ms": 242
         }
       }
     },
@@ -6502,7 +6505,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 512,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6533,7 +6536,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 68
+          "retrieve_ms": 249
         }
       }
     },
@@ -6545,7 +6548,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 452,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6576,7 +6579,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 58
+          "retrieve_ms": 247
         }
       }
     },
@@ -6588,7 +6591,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 500,
+      "retrieve_ms": 245,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6619,7 +6622,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 46
+          "retrieve_ms": 246
         }
       }
     },
@@ -6631,7 +6634,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 483,
+      "retrieve_ms": 244,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6662,7 +6665,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 43
+          "retrieve_ms": 244
         }
       }
     },
@@ -6674,7 +6677,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 510,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6705,7 +6708,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 66
+          "retrieve_ms": 245
         }
       }
     },
@@ -6717,7 +6720,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 426,
+      "retrieve_ms": 251,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6748,7 +6751,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 78
+          "retrieve_ms": 245
         }
       }
     },
@@ -6760,7 +6763,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 578,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6791,7 +6794,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 72
+          "retrieve_ms": 245
         }
       }
     },
@@ -6803,7 +6806,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 473,
+      "retrieve_ms": 245,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6834,7 +6837,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 68
+          "retrieve_ms": 245
         }
       }
     },
@@ -6846,7 +6849,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 455,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6877,7 +6880,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 51
+          "retrieve_ms": 244
         }
       }
     },
@@ -6889,7 +6892,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 471,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6920,7 +6923,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 81
+          "retrieve_ms": 249
         }
       }
     },
@@ -6932,7 +6935,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 520,
+      "retrieve_ms": 252,
       "arms": {
         "no_temporal": {
           "context": {
@@ -6963,7 +6966,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 85
+          "retrieve_ms": 245
         }
       }
     },
@@ -6975,7 +6978,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 465,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7006,7 +7009,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 68
+          "retrieve_ms": 249
         }
       }
     },
@@ -7018,7 +7021,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 502,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7049,7 +7052,7 @@
             "clean": false,
             "n_chunks": 8
           },
-          "retrieve_ms": 54
+          "retrieve_ms": 250
         }
       }
     },
@@ -7061,7 +7064,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 465,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7092,7 +7095,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 81
+          "retrieve_ms": 248
         }
       }
     },
@@ -7104,7 +7107,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 541,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7135,7 +7138,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 48
+          "retrieve_ms": 244
         }
       }
     },
@@ -7147,7 +7150,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 455,
+      "retrieve_ms": 245,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7178,7 +7181,7 @@
             "clean": false,
             "n_chunks": 8
           },
-          "retrieve_ms": 69
+          "retrieve_ms": 246
         }
       }
     },
@@ -7190,7 +7193,7 @@
       "temporal_kind": "out_of_range",
       "expected_behavior": "time_out_of_range",
       "has_gold": false,
-      "retrieve_ms": 497,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7215,7 +7218,7 @@
             "clean": true,
             "n_chunks": 0
           },
-          "retrieve_ms": 22
+          "retrieve_ms": 242
         }
       }
     },
@@ -7227,7 +7230,7 @@
       "temporal_kind": "out_of_range",
       "expected_behavior": "time_out_of_range",
       "has_gold": false,
-      "retrieve_ms": 448,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7252,7 +7255,7 @@
             "clean": true,
             "n_chunks": 0
           },
-          "retrieve_ms": 23
+          "retrieve_ms": 240
         }
       }
     },
@@ -7264,7 +7267,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 494,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7295,7 +7298,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 63
+          "retrieve_ms": 244
         }
       }
     },
@@ -7307,7 +7310,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 460,
+      "retrieve_ms": 245,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7338,7 +7341,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 65
+          "retrieve_ms": 252
         }
       }
     },
@@ -7350,7 +7353,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 527,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7381,7 +7384,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 102
+          "retrieve_ms": 246
         }
       }
     },
@@ -7393,7 +7396,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 475,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7424,7 +7427,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 75
+          "retrieve_ms": 249
         }
       }
     },
@@ -7436,7 +7439,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 488,
+      "retrieve_ms": 249,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7467,7 +7470,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 78
+          "retrieve_ms": 249
         }
       }
     },
@@ -7479,7 +7482,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 510,
+      "retrieve_ms": 250,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7510,7 +7513,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 69
+          "retrieve_ms": 251
         }
       }
     },
@@ -7522,7 +7525,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 452,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7553,7 +7556,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 264
+          "retrieve_ms": 248
         }
       }
     },
@@ -7565,7 +7568,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 495,
+      "retrieve_ms": 249,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7596,7 +7599,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 76
+          "retrieve_ms": 251
         }
       }
     },
@@ -7608,7 +7611,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 457,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7639,7 +7642,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 64
+          "retrieve_ms": 248
         }
       }
     },
@@ -7651,7 +7654,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 477,
+      "retrieve_ms": 244,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7682,7 +7685,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 69
+          "retrieve_ms": 248
         }
       }
     },
@@ -7694,7 +7697,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 474,
+      "retrieve_ms": 246,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7725,7 +7728,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 86
+          "retrieve_ms": 252
         }
       }
     },
@@ -7737,7 +7740,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 553,
+      "retrieve_ms": 250,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7768,7 +7771,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 62
+          "retrieve_ms": 251
         }
       }
     },
@@ -7780,7 +7783,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 487,
+      "retrieve_ms": 263,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7811,7 +7814,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 53
+          "retrieve_ms": 271
         }
       }
     },
@@ -7823,7 +7826,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 472,
+      "retrieve_ms": 251,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7854,7 +7857,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 52
+          "retrieve_ms": 254
         }
       }
     },
@@ -7866,7 +7869,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 500,
+      "retrieve_ms": 256,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7897,7 +7900,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 46
+          "retrieve_ms": 250
         }
       }
     },
@@ -7909,7 +7912,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 478,
+      "retrieve_ms": 261,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7940,7 +7943,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 64
+          "retrieve_ms": 249
         }
       }
     },
@@ -7952,7 +7955,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 465,
+      "retrieve_ms": 259,
       "arms": {
         "no_temporal": {
           "context": {
@@ -7983,7 +7986,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 59
+          "retrieve_ms": 249
         }
       }
     },
@@ -7995,7 +7998,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 457,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -8026,7 +8029,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 50
+          "retrieve_ms": 257
         }
       }
     },
@@ -8038,7 +8041,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 476,
+      "retrieve_ms": 250,
       "arms": {
         "no_temporal": {
           "context": {
@@ -8069,7 +8072,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 64
+          "retrieve_ms": 247
         }
       }
     },
@@ -8081,7 +8084,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 493,
+      "retrieve_ms": 245,
       "arms": {
         "no_temporal": {
           "context": {
@@ -8112,7 +8115,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 56
+          "retrieve_ms": 242
         }
       }
     },
@@ -8124,7 +8127,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 499,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -8155,7 +8158,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 58
+          "retrieve_ms": 250
         }
       }
     },
@@ -8167,7 +8170,7 @@
       "temporal_kind": "single_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 477,
+      "retrieve_ms": 263,
       "arms": {
         "no_temporal": {
           "context": {
@@ -8198,7 +8201,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 69
+          "retrieve_ms": 257
         }
       }
     },
@@ -8210,7 +8213,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 430,
+      "retrieve_ms": 256,
       "arms": {
         "no_temporal": {
           "context": {
@@ -8241,7 +8244,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 69
+          "retrieve_ms": 253
         }
       }
     },
@@ -8253,7 +8256,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 488,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -8284,7 +8287,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 53
+          "retrieve_ms": 245
         }
       }
     },
@@ -8296,7 +8299,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 490,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -8327,7 +8330,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 73
+          "retrieve_ms": 249
         }
       }
     },
@@ -8339,7 +8342,7 @@
       "temporal_kind": "doc_version",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 476,
+      "retrieve_ms": 251,
       "arms": {
         "no_temporal": {
           "context": {
@@ -8370,7 +8373,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 40
+          "retrieve_ms": 250
         }
       }
     },
@@ -8382,7 +8385,7 @@
       "temporal_kind": "multi_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 491,
+      "retrieve_ms": 260,
       "arms": {
         "no_temporal": {
           "context": {
@@ -8413,7 +8416,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 91
+          "retrieve_ms": 249
         }
       }
     },
@@ -8425,7 +8428,7 @@
       "temporal_kind": "multi_clause",
       "expected_behavior": "answer",
       "has_gold": true,
-      "retrieve_ms": 502,
+      "retrieve_ms": 248,
       "arms": {
         "no_temporal": {
           "context": {
@@ -8456,7 +8459,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 67
+          "retrieve_ms": 250
         }
       }
     },
@@ -8468,7 +8471,7 @@
       "temporal_kind": "out_of_scope",
       "expected_behavior": "refuse",
       "has_gold": false,
-      "retrieve_ms": 466,
+      "retrieve_ms": 261,
       "arms": {
         "no_temporal": {
           "context": {
@@ -8499,7 +8502,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 67
+          "retrieve_ms": 259
         }
       }
     },
@@ -8511,7 +8514,7 @@
       "temporal_kind": "out_of_scope",
       "expected_behavior": "refuse",
       "has_gold": false,
-      "retrieve_ms": 489,
+      "retrieve_ms": 247,
       "arms": {
         "no_temporal": {
           "context": {
@@ -8542,7 +8545,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 42
+          "retrieve_ms": 252
         }
       }
     }
@@ -8561,8 +8564,8 @@
         "recall_at_5": 0.9032258064516129,
         "recall_at_8": 0.946236559139785,
         "mrr": 0.6708013312852023,
-        "retrieve_ms_p50": 488.0,
-        "retrieve_ms_p95": 547.0
+        "retrieve_ms_p50": 248.0,
+        "retrieve_ms_p95": 259.0
       },
       "temporal_filter": {
         "n": 199,
@@ -8576,8 +8579,8 @@
         "recall_at_5": 0.9354838709677419,
         "recall_at_8": 0.946236559139785,
         "mrr": 0.7781362007168459,
-        "retrieve_ms_p50": 488.0,
-        "retrieve_ms_p95": 547.0
+        "retrieve_ms_p50": 248.0,
+        "retrieve_ms_p95": 259.0
       },
       "pre_filter": {
         "n": 199,
@@ -8591,8 +8594,8 @@
         "recall_at_5": 0.9354838709677419,
         "recall_at_8": 0.956989247311828,
         "mrr": 0.7785906298003069,
-        "retrieve_ms_p50": 64.0,
-        "retrieve_ms_p95": 77.0
+        "retrieve_ms_p50": 248.0,
+        "retrieve_ms_p95": 259.0
       }
     },
     "by_kind": {
@@ -8609,8 +8612,8 @@
           "recall_at_5": 0.5,
           "recall_at_8": 0.5,
           "mrr": 0.375,
-          "retrieve_ms_p50": 16.0,
-          "retrieve_ms_p95": 585.0
+          "retrieve_ms_p50": 248.0,
+          "retrieve_ms_p95": 259.0
         },
         "temporal_filter": {
           "n": 4,
@@ -8624,8 +8627,8 @@
           "recall_at_5": 0.5,
           "recall_at_8": 0.5,
           "mrr": 0.5,
-          "retrieve_ms_p50": 16.0,
-          "retrieve_ms_p95": 585.0
+          "retrieve_ms_p50": 248.0,
+          "retrieve_ms_p95": 259.0
         },
         "pre_filter": {
           "n": 4,
@@ -8639,8 +8642,8 @@
           "recall_at_5": 0.5,
           "recall_at_8": 0.75,
           "mrr": 0.53125,
-          "retrieve_ms_p50": 59.0,
-          "retrieve_ms_p95": 62.0
+          "retrieve_ms_p50": 252.0,
+          "retrieve_ms_p95": 260.0
         }
       },
       "clause_version": {
@@ -8656,8 +8659,8 @@
           "recall_at_5": 1.0,
           "recall_at_8": 1.0,
           "mrr": 0.7083333333333333,
-          "retrieve_ms_p50": 17.0,
-          "retrieve_ms_p95": 509.0
+          "retrieve_ms_p50": 250.0,
+          "retrieve_ms_p95": 258.0
         },
         "temporal_filter": {
           "n": 4,
@@ -8671,8 +8674,8 @@
           "recall_at_5": 1.0,
           "recall_at_8": 1.0,
           "mrr": 1.0,
-          "retrieve_ms_p50": 17.0,
-          "retrieve_ms_p95": 509.0
+          "retrieve_ms_p50": 250.0,
+          "retrieve_ms_p95": 258.0
         },
         "pre_filter": {
           "n": 4,
@@ -8686,8 +8689,8 @@
           "recall_at_5": 1.0,
           "recall_at_8": 1.0,
           "mrr": 1.0,
-          "retrieve_ms_p50": 64.0,
-          "retrieve_ms_p95": 69.0
+          "retrieve_ms_p50": 247.0,
+          "retrieve_ms_p95": 259.0
         }
       },
       "compliance": {
@@ -8703,8 +8706,8 @@
           "recall_at_5": 1.0,
           "recall_at_8": 1.0,
           "mrr": 0.8333333333333334,
-          "retrieve_ms_p50": 485.0,
-          "retrieve_ms_p95": 526.0
+          "retrieve_ms_p50": 248.0,
+          "retrieve_ms_p95": 250.0
         },
         "temporal_filter": {
           "n": 3,
@@ -8718,8 +8721,8 @@
           "recall_at_5": 1.0,
           "recall_at_8": 1.0,
           "mrr": 1.0,
-          "retrieve_ms_p50": 485.0,
-          "retrieve_ms_p95": 526.0
+          "retrieve_ms_p50": 248.0,
+          "retrieve_ms_p95": 250.0
         },
         "pre_filter": {
           "n": 3,
@@ -8733,8 +8736,8 @@
           "recall_at_5": 1.0,
           "recall_at_8": 1.0,
           "mrr": 1.0,
-          "retrieve_ms_p50": 68.0,
-          "retrieve_ms_p95": 69.0
+          "retrieve_ms_p50": 246.0,
+          "retrieve_ms_p95": 247.0
         }
       },
       "control": {
@@ -8750,8 +8753,8 @@
           "recall_at_5": 1.0,
           "recall_at_8": 1.0,
           "mrr": 0.6666666666666666,
-          "retrieve_ms_p50": 17.0,
-          "retrieve_ms_p95": 514.0
+          "retrieve_ms_p50": 248.0,
+          "retrieve_ms_p95": 248.0
         },
         "temporal_filter": {
           "n": 4,
@@ -8765,8 +8768,8 @@
           "recall_at_5": 1.0,
           "recall_at_8": 1.0,
           "mrr": 0.6666666666666666,
-          "retrieve_ms_p50": 17.0,
-          "retrieve_ms_p95": 514.0
+          "retrieve_ms_p50": 248.0,
+          "retrieve_ms_p95": 248.0
         },
         "pre_filter": {
           "n": 4,
@@ -8780,8 +8783,8 @@
           "recall_at_5": 1.0,
           "recall_at_8": 1.0,
           "mrr": 0.6666666666666666,
-          "retrieve_ms_p50": 63.0,
-          "retrieve_ms_p95": 65.0
+          "retrieve_ms_p50": 249.0,
+          "retrieve_ms_p95": 252.0
         }
       },
       "doc_version": {
@@ -8797,8 +8800,8 @@
           "recall_at_5": 0.7857142857142857,
           "recall_at_8": 0.8928571428571429,
           "mrr": 0.5092687074829932,
-          "retrieve_ms_p50": 465.0,
-          "retrieve_ms_p95": 546.0
+          "retrieve_ms_p50": 248.0,
+          "retrieve_ms_p95": 255.0
         },
         "temporal_filter": {
           "n": 28,
@@ -8812,8 +8815,8 @@
           "recall_at_5": 0.8928571428571429,
           "recall_at_8": 0.8928571428571429,
           "mrr": 0.6845238095238094,
-          "retrieve_ms_p50": 465.0,
-          "retrieve_ms_p95": 546.0
+          "retrieve_ms_p50": 248.0,
+          "retrieve_ms_p95": 255.0
         },
         "pre_filter": {
           "n": 28,
@@ -8827,8 +8830,8 @@
           "recall_at_5": 0.8928571428571429,
           "recall_at_8": 0.8928571428571429,
           "mrr": 0.7214285714285714,
-          "retrieve_ms_p50": 63.0,
-          "retrieve_ms_p95": 76.0
+          "retrieve_ms_p50": 249.0,
+          "retrieve_ms_p95": 266.0
         }
       },
       "false_premise": {
@@ -8844,8 +8847,8 @@
           "recall_at_5": 0.8571428571428571,
           "recall_at_8": 0.8571428571428571,
           "mrr": 0.6904761904761905,
-          "retrieve_ms_p50": 484.0,
-          "retrieve_ms_p95": 508.0
+          "retrieve_ms_p50": 250.0,
+          "retrieve_ms_p95": 258.0
         },
         "temporal_filter": {
           "n": 7,
@@ -8859,8 +8862,8 @@
           "recall_at_5": 0.8571428571428571,
           "recall_at_8": 0.8571428571428571,
           "mrr": 0.7857142857142857,
-          "retrieve_ms_p50": 484.0,
-          "retrieve_ms_p95": 508.0
+          "retrieve_ms_p50": 250.0,
+          "retrieve_ms_p95": 258.0
         },
         "pre_filter": {
           "n": 7,
@@ -8874,8 +8877,8 @@
           "recall_at_5": 0.8571428571428571,
           "recall_at_8": 0.8571428571428571,
           "mrr": 0.7619047619047619,
-          "retrieve_ms_p50": 61.0,
-          "retrieve_ms_p95": 73.0
+          "retrieve_ms_p50": 248.0,
+          "retrieve_ms_p95": 251.0
         }
       },
       "multi_clause": {
@@ -8891,8 +8894,8 @@
           "recall_at_5": 0.7058823529411765,
           "recall_at_8": 0.8235294117647058,
           "mrr": 0.22457983193277314,
-          "retrieve_ms_p50": 496.0,
-          "retrieve_ms_p95": 534.0
+          "retrieve_ms_p50": 247.0,
+          "retrieve_ms_p95": 260.0
         },
         "temporal_filter": {
           "n": 17,
@@ -8906,8 +8909,8 @@
           "recall_at_5": 0.7647058823529411,
           "recall_at_8": 0.8235294117647058,
           "mrr": 0.2735294117647059,
-          "retrieve_ms_p50": 496.0,
-          "retrieve_ms_p95": 534.0
+          "retrieve_ms_p50": 247.0,
+          "retrieve_ms_p95": 260.0
         },
         "pre_filter": {
           "n": 17,
@@ -8921,8 +8924,8 @@
           "recall_at_5": 0.7058823529411765,
           "recall_at_8": 0.8235294117647058,
           "mrr": 0.2623249299719888,
-          "retrieve_ms_p50": 65.0,
-          "retrieve_ms_p95": 91.0
+          "retrieve_ms_p50": 248.0,
+          "retrieve_ms_p95": 259.0
         }
       },
       "out_of_range": {
@@ -8933,8 +8936,8 @@
           "context_distractor": 1.0,
           "context_clean": 0.0,
           "avg_chunks": 8.0,
-          "retrieve_ms_p50": 497.0,
-          "retrieve_ms_p95": 590.0
+          "retrieve_ms_p50": 248.0,
+          "retrieve_ms_p95": 254.0
         },
         "temporal_filter": {
           "n": 4,
@@ -8943,8 +8946,8 @@
           "context_distractor": 0.0,
           "context_clean": 1.0,
           "avg_chunks": 0.0,
-          "retrieve_ms_p50": 497.0,
-          "retrieve_ms_p95": 590.0
+          "retrieve_ms_p50": 248.0,
+          "retrieve_ms_p95": 254.0
         },
         "pre_filter": {
           "n": 4,
@@ -8953,8 +8956,8 @@
           "context_distractor": 0.0,
           "context_clean": 1.0,
           "avg_chunks": 0.0,
-          "retrieve_ms_p50": 19.0,
-          "retrieve_ms_p95": 23.0
+          "retrieve_ms_p50": 240.0,
+          "retrieve_ms_p95": 246.0
         }
       },
       "out_of_scope": {
@@ -8965,8 +8968,8 @@
           "context_distractor": 0.0,
           "context_clean": 1.0,
           "avg_chunks": 8.0,
-          "retrieve_ms_p50": 484.0,
-          "retrieve_ms_p95": 582.0
+          "retrieve_ms_p50": 247.0,
+          "retrieve_ms_p95": 261.0
         },
         "temporal_filter": {
           "n": 9,
@@ -8975,8 +8978,8 @@
           "context_distractor": 0.0,
           "context_clean": 1.0,
           "avg_chunks": 4.555555555555555,
-          "retrieve_ms_p50": 484.0,
-          "retrieve_ms_p95": 582.0
+          "retrieve_ms_p50": 247.0,
+          "retrieve_ms_p95": 261.0
         },
         "pre_filter": {
           "n": 9,
@@ -8985,8 +8988,8 @@
           "context_distractor": 0.0,
           "context_clean": 1.0,
           "avg_chunks": 8.0,
-          "retrieve_ms_p50": 64.0,
-          "retrieve_ms_p95": 70.0
+          "retrieve_ms_p50": 251.0,
+          "retrieve_ms_p95": 261.0
         }
       },
       "single_clause": {
@@ -9002,8 +9005,8 @@
           "recall_at_5": 0.9661016949152542,
           "recall_at_8": 0.9915254237288136,
           "mrr": 0.7742231638418079,
-          "retrieve_ms_p50": 488.0,
-          "retrieve_ms_p95": 533.0
+          "retrieve_ms_p50": 248.0,
+          "retrieve_ms_p95": 260.0
         },
         "temporal_filter": {
           "n": 118,
@@ -9017,8 +9020,8 @@
           "recall_at_5": 0.9830508474576272,
           "recall_at_8": 0.9915254237288136,
           "mrr": 0.8707627118644068,
-          "retrieve_ms_p50": 488.0,
-          "retrieve_ms_p95": 533.0
+          "retrieve_ms_p50": 248.0,
+          "retrieve_ms_p95": 260.0
         },
         "pre_filter": {
           "n": 118,
@@ -9032,8 +9035,8 @@
           "recall_at_5": 0.9915254237288136,
           "recall_at_8": 1.0,
           "mrr": 0.8646892655367231,
-          "retrieve_ms_p50": 64.0,
-          "retrieve_ms_p95": 78.0
+          "retrieve_ms_p50": 248.0,
+          "retrieve_ms_p95": 257.0
         }
       },
       "table_lookup": {
@@ -9049,8 +9052,8 @@
           "recall_at_5": 1.0,
           "recall_at_8": 1.0,
           "mrr": 1.0,
-          "retrieve_ms_p50": 513.0,
-          "retrieve_ms_p95": 513.0
+          "retrieve_ms_p50": 254.0,
+          "retrieve_ms_p95": 254.0
         },
         "temporal_filter": {
           "n": 1,
@@ -9064,8 +9067,8 @@
           "recall_at_5": 1.0,
           "recall_at_8": 1.0,
           "mrr": 1.0,
-          "retrieve_ms_p50": 513.0,
-          "retrieve_ms_p95": 513.0
+          "retrieve_ms_p50": 254.0,
+          "retrieve_ms_p95": 254.0
         },
         "pre_filter": {
           "n": 1,
@@ -9079,8 +9082,8 @@
           "recall_at_5": 1.0,
           "recall_at_8": 1.0,
           "mrr": 1.0,
-          "retrieve_ms_p50": 63.0,
-          "retrieve_ms_p95": 63.0
+          "retrieve_ms_p50": 255.0,
+          "retrieve_ms_p95": 255.0
         }
       }
     }

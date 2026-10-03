@@ -21,7 +21,8 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
 
 **Trạng thái hiện tại:**
 - Corpus lao động/BHXH: 20 văn bản tại `data/raw/lao_dong/` (+ `_versions/` cho bản sửa đổi
-  cấp khoản). Corpus ngân hàng cũ đã bỏ — `data/raw/banking_docs/` không còn tồn tại.
+  cấp khoản). Index có **19** `doc_id`: `18-VBHN-VPQH` là bản hợp nhất, nạp làm nội dung của `45-2019-QH14`
+  (`consolidated_from`) — `/documents` hiện 19 là đúng. Corpus ngân hàng cũ đã bỏ — `data/raw/banking_docs/` không còn tồn tại.
 - ChromaDB `data/chroma_db/` (collection `documind_legal`): **1151 chunks**, 3072-dim.
   Qdrant Cloud giữ bản sao để khôi phục — xem `scripts/restore_chroma_from_qdrant.py`.
 - `data/compliance/criteria.json`: 6 tiêu chí định lượng lao động (trần làm thêm giờ

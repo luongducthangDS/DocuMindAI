@@ -20,7 +20,7 @@
 
 **DocuMind AI** trả lời câu hỏi về **pháp luật lao động và bảo hiểm xã hội Việt Nam** — Bộ luật Lao động, Luật Bảo hiểm xã hội, Luật Việc làm cùng các nghị định, thông tư hướng dẫn. Hệ thống trả lời kèm trích dẫn tới từng điều khoản, từ chối câu hỏi nằm ngoài kho tài liệu đã nạp, và kiểm tra tình huống lao động cụ thể (trần làm thêm giờ, thời gian thử việc, lương tối thiểu) đối chiếu với ngưỡng luật định bằng logic tất định.
 
-Kho tài liệu gồm **20 văn bản / 1.151 chunk**, đánh chỉ mục tới cấp `Điều`/`Khoản` kèm mốc hiệu lực, nên cùng một câu hỏi có thể tra *tại một thời điểm* cho trước và được trả lời theo bản còn hiệu lực khi đó — nhiều văn bản trong số này đã bị sửa đổi, thay thế (lương tối thiểu, Luật BHXH 2024, Luật Việc làm 2025).
+Kho tài liệu gồm **20 văn bản nguồn / 1.151 chunk** (tab "Văn bản đã lập chỉ mục" hiện 19: bản hợp nhất `18/VBHN-VPQH` được nạp làm nội dung của Bộ luật Lao động `45/2019/QH14`), đánh chỉ mục tới cấp `Điều`/`Khoản` kèm mốc hiệu lực, nên cùng một câu hỏi có thể tra *tại một thời điểm* cho trước và được trả lời theo bản còn hiệu lực khi đó — nhiều văn bản trong số này đã bị sửa đổi, thay thế (lương tối thiểu, Luật BHXH 2024, Luật Việc làm 2025).
 
 ### Năng lực chính
 
@@ -132,17 +132,18 @@ graph TD
 
 ## 📚 Kho văn bản lao động & bảo hiểm xã hội
 
-20 văn bản chính thức (1.151 chunk) được cắt bằng bộ chunker pháp lý riêng
+20 văn bản nguồn (19 văn bản trong index, 1.151 chunk — `18/VBHN-VPQH` là bản hợp nhất, nạp làm
+nội dung của `45/2019/QH14`) được cắt bằng bộ chunker pháp lý riêng
 (`src/ingestion/chunker.py`) đúng ranh giới `Điều` / `Khoản`, mỗi chunk mang theo mốc hiệu lực
 của phiên bản nó thuộc về. File nguồn: [`data/raw/lao_dong/`](data/raw/lao_dong/).
 
 | Nhóm | Văn bản tiêu biểu | Nội dung chính |
 |---|---|---|
-| **Lao động** | `45/2019/QH14` (Bộ luật Lao động), `18/VBHN-VPQH`, `145/2020/NĐ-CP`, `10/2020/TT-BLĐTBXH` | Hợp đồng lao động, thử việc, tiền lương, thời giờ làm việc & làm thêm giờ, kỷ luật lao động, chấm dứt hợp đồng. |
+| **Lao động** | `45/2019/QH14` (Bộ luật Lao động, nội dung theo bản hợp nhất `18/VBHN-VPQH`), `145/2020/NĐ-CP`, `10/2020/TT-BLĐTBXH` | Hợp đồng lao động, thử việc, tiền lương, thời giờ làm việc & làm thêm giờ, kỷ luật lao động, chấm dứt hợp đồng. |
 | **Tiền lương tối thiểu** | `293/2025/NĐ-CP` (hiệu lực 01/01/2026), `74/2024/NĐ-CP` | Mức lương tối thiểu tháng/giờ theo 4 vùng — hai phiên bản cùng tồn tại trong index để tra cứu theo thời điểm. |
 | **Bảo hiểm xã hội** | `41/2024/QH15` (Luật BHXH 2024), `58/2014/QH13`, `158/2025/NĐ-CP`, `159/2025/NĐ-CP`, `115/2015/NĐ-CP`, `134/2015/NĐ-CP`, `59/2015/TT-BLĐTBXH`, `11–12/2025/TT-BNV` | BHXH bắt buộc & tự nguyện, chế độ ốm đau, thai sản, hưu trí, tử tuất. |
 | **Việc làm & BHTN** | `74/2025/QH15` (Luật Việc làm 2025), `38/2013/QH13`, `374/2025/NĐ-CP`, `28/2015/NĐ-CP` | Bảo hiểm thất nghiệp, trợ cấp thất nghiệp, hỗ trợ học nghề, dịch vụ việc làm. |
-| **Hưu trí & khác** | `135/2020/NĐ-CP`, `293/2025/NĐ-CP` | Lộ trình tuổi nghỉ hưu, điều kiện nghỉ hưu sớm. |
+| **Hưu trí & khác** | `135/2020/NĐ-CP` | Lộ trình tuổi nghỉ hưu, điều kiện nghỉ hưu sớm. |
 
 Một số văn bản thay thế lẫn nhau (Luật BHXH 2024 thay bản 2014, Luật Việc làm 2025 thay bản
 2013, NĐ 293/2025 thay NĐ 74/2024). Cả hai phiên bản đều nằm trong index — đó là điều khiến
