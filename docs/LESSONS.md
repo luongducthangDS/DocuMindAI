@@ -204,6 +204,24 @@ chọn sai lần hai.
 
 ## Vận hành / xử lý sự cố
 
+### Verify bản sửa trên Chroma local, báo xong cho pd0r chạy Qdrant (2026-10-03)
+- **Đã làm (Claude):** sửa tab "Văn bản đã lập chỉ mục" (mục ngay dưới), chạy thử trên index
+  local (Chroma) thấy 19 văn bản, báo "tab hiện 19 văn bản" rồi push.
+- **Sai ở đâu:** pd0r đọc Qdrant, và đường đọc Qdrant (`fetch_all_chunks`) bỏ `doc_id` vì
+  llama-index ghi đè nó thành chuỗi `"None"` — doc_id thật nằm trong `_node_content`. Danh
+  sách rơi về gom theo title: 14 văn bản, gộp đúng các cặp cũ/mới cùng tên (Luật BHXH
+  2014+2024, Luật Việc làm 2013+2025, lương tối thiểu 2024+2025) mà `as_of_date` tồn tại để
+  phân biệt. Đã có sẵn bài học cùng dạng ("Chọn embedding chỉ dựa trên A/B local").
+- **Cái giá:** một lần deploy hiện số sai lên production; người dùng phải tự phát hiện. Cùng
+  lỗi gốc làm BM25 node trên Qdrant thiếu `doc_id` trong khi dense hit có — có từ lúc
+  chuyển sang Qdrant, không ai thấy.
+- **Bài học:** hai provider = hai đường đọc; "đã verify" chỉ đúng cho đường đã chạy. Kiểm
+  bằng đúng provider production trước khi báo xong, và nói rõ đã kiểm trên provider nào.
+- **Giờ làm thế nào:** `_parse_qdrant_payload` (dùng chung cho `fetch_all_chunks` và
+  `direct_query`, trước là hai bản chép) lấy lại doc_id từ `_node_content`; test
+  `test_qdrant_chunks_keep_real_doc_id`; đã chạy trên Qdrant thật: 19 văn bản, số chunk
+  khớp Chroma.
+
 ### Coi "mở được collection" là "khởi tạo xong" (→ 2026-10-02)
 - **Đã làm:** sau sự cố 2026-09-21 (xem "Thiết kế hỏng im lặng"), `ensure_rag_initialized`
   trả 503 khi init *ném lỗi*, và `/health` báo đỏ khi collection rỗng. `_init_rag_sync` đếm

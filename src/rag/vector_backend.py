@@ -128,6 +128,31 @@ def count_chunks(backend: Backend) -> int:
     return backend.collection.count()
 
 
+def _parse_qdrant_payload(payload: dict) -> tuple[str, dict]:
+    """(text, metadata) từ payload Qdrant do llama-index ghi.
+
+    llama-index ghi đè doc_id phẳng bằng ref_doc_id (chuỗi "None"), nên bỏ ba key
+    ref đó đi — nhưng doc_id thật của corpus vẫn nằm trong `_node_content` và phải
+    lấy lại. Thiếu nó, /documents gom theo title và gộp nhầm bản cũ/mới cùng tên
+    (Luật BHXH 2014 + 2024), BM25 node lệch metadata so với dense hit — pd0r 2026-10-03.
+    """
+    try:
+        node = json.loads(payload.get("_node_content") or "{}")
+    except (json.JSONDecodeError, TypeError):
+        node = {}
+    if not isinstance(node, dict):
+        node = {}
+    metadata = {
+        k: v
+        for k, v in payload.items()
+        if not k.startswith("_") and k not in ("document_id", "doc_id", "ref_doc_id")
+    }
+    real_doc_id = (node.get("metadata") or {}).get("doc_id")
+    if real_doc_id:
+        metadata["doc_id"] = real_doc_id
+    return node.get("text", ""), metadata
+
+
 def fetch_all_chunks(backend: Backend, limit: int = 10_000) -> list[tuple[str, str, dict]]:
     """Return [(id, text, metadata), ...] for every chunk in the collection.
 
@@ -149,18 +174,7 @@ def fetch_all_chunks(backend: Backend, limit: int = 10_000) -> list[tuple[str, s
         out = []
         for p in points:
             payload = p.payload or {}
-            node_content = payload.get("_node_content")
-            text = ""
-            if node_content:
-                try:
-                    text = json.loads(node_content).get("text", "")
-                except (json.JSONDecodeError, TypeError):
-                    text = ""
-            metadata = {
-                k: v
-                for k, v in payload.items()
-                if not k.startswith("_") and k not in ("document_id", "doc_id", "ref_doc_id")
-            }
+            text, metadata = _parse_qdrant_payload(payload)
             if text:
                 out.append((str(p.id), text, metadata))
         return out
@@ -194,18 +208,7 @@ def direct_query(
         out = []
         for h in hits:
             payload = h.payload or {}
-            node_content = payload.get("_node_content")
-            text = ""
-            if node_content:
-                try:
-                    text = json.loads(node_content).get("text", "")
-                except (json.JSONDecodeError, TypeError):
-                    text = ""
-            metadata = {
-                k: v
-                for k, v in payload.items()
-                if not k.startswith("_") and k not in ("document_id", "doc_id", "ref_doc_id")
-            }
+            text, metadata = _parse_qdrant_payload(payload)
             if text:
                 out.append({"text": text, "metadata": metadata, "score": float(h.score or 0)})
         return out

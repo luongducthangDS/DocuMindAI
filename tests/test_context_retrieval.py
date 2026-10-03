@@ -254,3 +254,28 @@ def test_empty_collection_is_503_not_zero_documents(client, monkeypatch):
     assert r.status_code == 503
     assert "EmptyCollection" in r.json()["detail"]
     assert main._rag_initialized is False  # request sau tự thử lại
+
+
+def test_qdrant_chunks_keep_real_doc_id():
+    """llama-index ghi doc_id phẳng = "None"; doc_id thật nằm trong _node_content.
+    Mất nó thì /documents gộp bản cũ/mới cùng tên (pd0r 2026-10-03: 14 thay vì 19)."""
+    import json
+    from types import SimpleNamespace
+
+    from src.rag.vector_backend import fetch_all_chunks
+
+    def point(i, doc_id, title):
+        node = {"text": f"chunk {i}", "metadata": {"doc_id": doc_id, "title": title}}
+        return SimpleNamespace(id=i, payload={
+            "_node_content": json.dumps(node), "_node_type": "TextNode",
+            "doc_id": "None", "document_id": "None", "ref_doc_id": "None", "title": title,
+        })
+
+    points = [point(1, "58-2014-QH13", "Luật Bảo hiểm xã hội"),
+              point(2, "41-2024-QH15", "Luật Bảo hiểm xã hội")]
+    backend = SimpleNamespace(provider="qdrant", collection="c",
+                              client=SimpleNamespace(scroll=lambda **_: (points, None)))
+
+    metas = [m for _, _, m in fetch_all_chunks(backend)]
+    assert [m["doc_id"] for m in metas] == ["58-2014-QH13", "41-2024-QH15"]
+    assert all("document_id" not in m and "_node_content" not in m for m in metas)

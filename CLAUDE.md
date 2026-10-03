@@ -52,7 +52,7 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   Report nào ghi rerank phải xem `meta.reranker_active`, không tin `ENABLE_RERANKER`.
   torch/sentence-transformers/transformers **không** còn trong `requirements.txt` (2026-09-27,
   image production không cài ~1.3GB này) — muốn chạy reranker: `pip install -r requirements-rerank.txt`.
-- Test suite: 624/624 tests passed (đo 2026-10-02). Test không gửi trace ra Langfuse/LangSmith
+- Test suite: 625/625 tests passed (đo 2026-10-03). Test không gửi trace ra Langfuse/LangSmith
   (`conftest.py::patch_settings` xoá key).
 
 **Stack:**
