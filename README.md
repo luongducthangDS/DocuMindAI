@@ -9,7 +9,7 @@
 [![ChromaDB](https://img.shields.io/badge/ChromaDB-0.6-FF6F00.svg)](https://www.trychroma.com)
 [![React 19](https://img.shields.io/badge/React-19.0-61DAFB.svg?logo=react&logoColor=black)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-6.0-646CFF.svg?logo=vite&logoColor=white)](https://vitejs.dev)
-[![Test Suite](https://img.shields.io/badge/Tests-625%2F625%20Passing-brightgreen.svg)](tests/)
+[![Test Suite](https://img.shields.io/badge/Tests-626%2F626%20Passing-brightgreen.svg)](tests/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **Demo:** [documindai-pd0r.onrender.com](https://documindai-pd0r.onrender.com) — UI và API cùng một service Render free tier, câu hỏi đầu tiên sau khi server ngủ có thể mất khoảng một phút để khởi động.
@@ -20,7 +20,7 @@
 
 **DocuMind AI** trả lời câu hỏi về **pháp luật lao động và bảo hiểm xã hội Việt Nam** — Bộ luật Lao động, Luật Bảo hiểm xã hội, Luật Việc làm cùng các nghị định, thông tư hướng dẫn. Hệ thống trả lời kèm trích dẫn tới từng điều khoản, từ chối câu hỏi nằm ngoài kho tài liệu đã nạp, và kiểm tra tình huống lao động cụ thể (trần làm thêm giờ, thời gian thử việc, lương tối thiểu) đối chiếu với ngưỡng luật định bằng logic tất định.
 
-Kho tài liệu gồm **20 văn bản / 1.146 chunk**, đánh chỉ mục tới cấp `Điều`/`Khoản` kèm mốc hiệu lực, nên cùng một câu hỏi có thể tra *tại một thời điểm* cho trước và được trả lời theo bản còn hiệu lực khi đó — nhiều văn bản trong số này đã bị sửa đổi, thay thế (lương tối thiểu, Luật BHXH 2024, Luật Việc làm 2025).
+Kho tài liệu gồm **20 văn bản / 1.151 chunk**, đánh chỉ mục tới cấp `Điều`/`Khoản` kèm mốc hiệu lực, nên cùng một câu hỏi có thể tra *tại một thời điểm* cho trước và được trả lời theo bản còn hiệu lực khi đó — nhiều văn bản trong số này đã bị sửa đổi, thay thế (lương tối thiểu, Luật BHXH 2024, Luật Việc làm 2025).
 
 ### Năng lực chính
 
@@ -132,7 +132,7 @@ graph TD
 
 ## 📚 Kho văn bản lao động & bảo hiểm xã hội
 
-20 văn bản chính thức (~1.146 chunk) được cắt bằng bộ chunker pháp lý riêng
+20 văn bản chính thức (1.151 chunk) được cắt bằng bộ chunker pháp lý riêng
 (`src/ingestion/chunker.py`) đúng ranh giới `Điều` / `Khoản`, mỗi chunk mang theo mốc hiệu lực
 của phiên bản nó thuộc về. File nguồn: [`data/raw/lao_dong/`](data/raw/lao_dong/).
 
@@ -199,6 +199,8 @@ vi, trước mốc phủ corpus…). Mỗi câu trỏ tới `clause_uid` nguồn
 **nguyên văn** trong chunk nguồn và `as_of_date` nằm trong hiệu lực của chunk đó (199/199 đạt).
 
 Cấu hình đo = cấu hình production (Render: hybrid BM25 + dense, RRF, **không reranker**).
+Mọi số trong bảng lấy nguyên từ `summary.overall` / `summary.by_kind` của
+[`reports/eval_e2e.json`](reports/eval_e2e.json) — không tính lại trên tập con nào.
 "Trước" = truy hồi thường; "sau" = điều kiện hiệu lực `as_of_date` đẩy xuống vector store
 ([DEC-0003](docs/decisions/DEC-0003-retrieval-context-acl-tenant.md)).
 
@@ -208,18 +210,22 @@ Cấu hình đo = cấu hình production (Render: hybrid BM25 + dense, RRF, **kh
 | Recall@5 | 0.903 | **0.935** |
 | MRR | 0.671 | **0.779** |
 | Ngữ cảnh lẫn bản luật hết hiệu lực | 21.6% | **0.0%** |
-| Answer accuracy (169 câu cả hai arm đều gọi được LLM) | 0.763 | **0.935** |
+| Answer accuracy (199 câu) | 0.739 | **0.910** |
 | — riêng câu đổi phiên bản văn bản (n=28) | 0.36 | **1.00** |
-| Faithfulness (LLM judge, n≈160) | 0.975 | 0.957 |
+| Faithfulness (LLM judge; n=170 / 163 câu judge chấm được) | 0.976 | 0.958 |
 | Latency truy hồi p95 | 555 ms | 672 ms |
 | Latency end-to-end p50 / p95 | 4.6 s / 22.8 s | 4.6 s / 19.0 s |
 
 Đọc bảng cho đúng:
 - **p95 end-to-end bị chi phối bởi quota free tier Gemini**, không phải thời gian sinh: lượt
-  đo gặp hàng trăm lần 429, xoay key/model rồi chờ; ~25 câu/arm rơi xuống chế độ trích
-  nguyên văn (không LLM). Vì thế accuracy được so trên tập 169 câu cả hai arm đều do Gemini trả lời.
+  đo gặp hàng trăm lần 429, xoay key/model rồi chờ; 25 câu (trước) / 30 câu (sau) rơi xuống chế
+  độ trích nguyên văn (không LLM) và vẫn được chấm như mọi câu khác — accuracy là của hệ thống
+  đúng như người dùng gặp lúc đó, kể cả khi hết quota.
 - Faithfulness giảm nhẹ ở arm "sau" — chưa đủ mẫu để kết luận khác biệt; ghi đúng như đo.
 - Câu do Claude soạn (`drafted_by: claude`, `reviewed: false`) **chưa được người duyệt**.
+- Report này chạy trước khi harness ghi `meta.index`, nên không lưu provider/số chunk. Chạy
+  ngày 2026-09-23, sau khi đổi sang `gemini-embedding-001` (2026-09-19) → index 1.151 chunk;
+  provider không được ghi lại. Report từ nay mang `meta.index` + `meta.git_sha`.
 
 Tái lập (mỗi lần chạy là một run trong MLflow, experiment `documind-eval`, kèm git sha + cấu hình):
 
@@ -302,7 +308,7 @@ khiến hệ thống từ chối nhầm, và ~15% câu bị từ chối thừa �
 | **Reranker** | `BAAI/bge-reranker-v2-m3` | Cross-encoder đa ngữ hàng đầu, xếp hạng điều khoản luật với độ chính xác cao. |
 | **API backend** | FastAPI + WebSockets + Pydantic v2 | I/O bất đồng bộ hoàn toàn, streaming hai chiều, tự sinh schema OpenAPI. |
 | **Giao diện** | React 19 + TypeScript + Vite | Console nền tối, ngăn xem trước nguồn, bảng thử nghiệm kiểm tra tuân thủ. |
-| **Kiểm thử** | Pytest + Pytest-Cov + Pytest-Asyncio | 625/625 test pass (đo 2026-10-03, chạy offline) gồm unit, tích hợp và rào chắn. |
+| **Kiểm thử** | Pytest + Pytest-Cov + Pytest-Asyncio | 626/626 test pass (đo 2026-10-03, chạy offline) gồm unit, tích hợp và rào chắn. |
 
 ---
 

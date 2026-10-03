@@ -176,6 +176,22 @@ chọn sai lần hai.
 
 ## Dữ liệu & đánh giá
 
+### Tính lại số trên tập con ngoài harness, report không ghi đo trên index nào (09-23 → 10-03)
+- **Đã làm:** report `eval_e2e.json` có accuracy 0.739 → 0.910 (199 câu). README lại ghi
+  0.763 → 0.935, tính tay trên 169 câu cả hai arm đều gọi được Gemini; faithfulness cũng
+  lệch report ở số thứ ba. Report không ghi provider/số chunk; README ghi "1.146 chunk"
+  dù index đã là 1.151 từ 09-19.
+- **Sai ở đâu:** một phép đo có hai bộ số, cả hai đều "có file đứng sau" (xem mục
+  "Công bố số không có file kết quả" bên dưới) nhưng chỉ một bộ do harness sinh ra. Khi
+  được hỏi bộ nào là của lần chạy mới nhất, không ai trả lời được bằng chính report.
+- **Cái giá:** CV suýt mang số tập con mà không ghi điều kiện; phải đối chiếu lại toàn bảng.
+- **Bài học:** README chỉ trích nguyên `summary` của report. Muốn một cách tính khác thì
+  đưa nó vào harness để report sinh ra, không tính tay. Report phải tự nói nó đo trên
+  index nào — suy luận từ ngày chạy không phải bằng chứng.
+- **Giờ làm thế nào:** README theo `summary.overall` (0.739 → 0.910);
+  `test_readme_eval_table_quotes_the_report_verbatim` chặn lệch; `meta.index`
+  (provider/collection/model/số chunk, cùng chuỗi trace Langfuse) + `meta.git_sha` trong report.
+
 ### Dựng sản phẩm trên corpus không kiểm chứng được (07-29 → 09-11)
 - **Đã quyết:** đổi sang miền ngân hàng với 6 văn bản tự tóm lược, `manifest.json` trỏ URL
   sbv.gov.vn bịa ra.

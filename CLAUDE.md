@@ -39,7 +39,9 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   Claude soạn (`g2_*`, `reviewed: false`). Kiểm tra với index thật:
   `python eval/validate_gold.py data/eval/legal_qa_200.json`. Metric: recall@1/3/5/8, MRR,
   faithfulness (`--judge <arms>`), p50/p95; `--mlflow <run>` log vào MLflow (`mlflow.db`, gitignored);
-  `--embed-cache` chỉ dùng cho CI (latency khi đó không phải số thật). Kết quả: README mục Đánh giá.
+  `--embed-cache` chỉ dùng cho CI (latency khi đó không phải số thật). Kết quả: README mục Đánh giá —
+  chỉ trích nguyên `summary` của report, không tính tay trên tập con (test chặn); report ghi
+  `meta.index` (provider/collection/model/số chunk) + `meta.git_sha`.
 - CI: `.github/workflows/ci.yml` — pytest + retrieval eval trên Qdrant (reranker tắt như Render),
   gate bằng `eval/ci_gate.py` so với `reports/eval_baseline.json`. Cần secrets `GOOGLE_API_KEY*`,
   `QDRANT_URL`, `QDRANT_API_KEY`.
@@ -52,7 +54,7 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   Report nào ghi rerank phải xem `meta.reranker_active`, không tin `ENABLE_RERANKER`.
   torch/sentence-transformers/transformers **không** còn trong `requirements.txt` (2026-09-27,
   image production không cài ~1.3GB này) — muốn chạy reranker: `pip install -r requirements-rerank.txt`.
-- Test suite: 625/625 tests passed (đo 2026-10-03). Test không gửi trace ra Langfuse/LangSmith
+- Test suite: 626/626 tests passed (đo 2026-10-03). Test không gửi trace ra Langfuse/LangSmith
   (`conftest.py::patch_settings` xoá key).
 
 **Stack:**

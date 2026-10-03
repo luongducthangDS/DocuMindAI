@@ -73,3 +73,40 @@ def test_legal_qa_200_schema():
         assert q["expected_behavior"] in {"answer", "refuse", "time_out_of_range"}, q["id"]
         if q["expected_behavior"] != "answer":
             assert not (q["source_clause"] or q.get("source_clauses")), q["id"]
+
+
+def test_readme_eval_table_quotes_the_report_verbatim():
+    """Một phương pháp, một kết quả: README chỉ được trích nguyên số trong report.
+
+    2026-10-03: README ghi accuracy 0.763 → 0.935 (tính tay trên tập con 169 câu) trong
+    khi report ghi 0.739 → 0.910 cho đúng lần chạy đó — hai bộ số trôi nổi cho một phép đo.
+    """
+    import json
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    summary = json.loads((root / "reports/eval_e2e.json").read_text(encoding="utf-8"))["summary"]
+    readme_rows = [l for l in (root / "README.md").read_text(encoding="utf-8").splitlines()
+                   if l.startswith("| ")]
+
+    f3 = "{:.3f}".format
+    expected = {  # nhãn đầu dòng README → cách định dạng số của một arm
+        "Recall@1": lambda m: [f3(m["recall_at_1"])],
+        "Recall@5": lambda m: [f3(m["recall_at_5"])],
+        "MRR": lambda m: [f3(m["mrr"])],
+        "Ngữ cảnh lẫn bản luật hết hiệu lực": lambda m: [f"{m['context_distractor'] * 100:.1f}%"],
+        "Answer accuracy": lambda m: [f3(m["answer_accuracy"])],
+        "Faithfulness": lambda m: [f3(m["faithfulness"]), str(m["faithfulness_n"])],
+        "Latency truy hồi p95": lambda m: [f"{m['retrieve_ms_p95']:.0f} ms"],
+        "Latency end-to-end": lambda m: [f"{m['e2e_ms_p50'] / 1000:.1f} s / {m['e2e_ms_p95'] / 1000:.1f} s"],
+    }
+    for label, fmt in expected.items():
+        line = next(l for l in readme_rows if l.startswith(f"| {label}"))
+        for arm in ("no_temporal", "pre_filter"):
+            for value in fmt(summary["overall"][arm]):
+                assert value in line, f"README '{label}' thiếu {value} ({arm})"
+
+    doc_version = next(l for l in readme_rows if "đổi phiên bản văn bản" in l)
+    for arm in ("no_temporal", "pre_filter"):
+        m = summary["by_kind"]["doc_version"][arm]
+        assert f"{m['answer_accuracy']:.2f}" in doc_version and f"n={m['n']}" in doc_version

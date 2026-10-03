@@ -73,6 +73,7 @@ sys.path.insert(0, str(_REPO_ROOT))
 from loguru import logger  # noqa: E402
 
 import src.logger  # noqa: E402,F401 — init loguru sinks
+from src import langfuse_otel  # noqa: E402 — đọc _index_version lúc dựng meta
 from src.ingestion.manifest import corpus_earliest_point_in_time  # noqa: E402
 from src.rag.temporal import is_out_of_range, versions_in_force  # noqa: E402
 
@@ -413,6 +414,11 @@ def run(
             # Config can ask for the reranker while it silently fails to load
             # (missing torch/model, blocked DLL) — record what actually ran.
             "reranker_active": _reranker_active(),
+            # provider/collection/model/số chunk — đúng chuỗi _init_rag_sync gắn lên trace.
+            # Thiếu nó, report 2026-09-23 không trả lời được "đo trên 1146 hay 1151, Chroma
+            # hay Qdrant" và README phải suy luận.
+            "index": langfuse_otel._index_version,
+            "git_sha": _git("rev-parse", "--short", "HEAD"),
         },
         "rows": rows,
         "summary": summarise(rows, arms, retrieval_only),
@@ -594,6 +600,7 @@ def log_to_mlflow(report: dict, output: Path, run_name: str | None) -> None:
             "reranker_active": report["meta"].get("reranker_active"),  # actually loaded
             "reranker_model": s.reranker_model,
             "vector_store": s.vector_store_provider,
+            "index": report["meta"].get("index"),
             "embed_cache": report["meta"].get("embed_cache", False),
             "generation_models": s.gemini_generation_models,
         })
