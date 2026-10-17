@@ -21,7 +21,7 @@ NOT_TRANSIENT = [
     gexc.Forbidden("403 Forbidden"),
     gexc.Unauthenticated("Request had invalid authentication credentials"),
     RuntimeError("400 POST https://generativelanguage.googleapis.com/v1beta/models/"
-                 "gemini-2.5-flash:generateContent: API key not valid"),
+                 "gemini-3.8-flash:generateContent: API key not valid"),
     RuntimeError("400 Request contains an invalid argument: separate parts"),
     RuntimeError("403 Forbidden: accurate billing account required"),
     ValueError("Invalid operation: the response.text quick accessor requires a valid Part"),

@@ -24,7 +24,10 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   cấp khoản). Index có **19** `doc_id`: `18-VBHN-VPQH` là bản hợp nhất, nạp làm nội dung của `45-2019-QH14`
   (`consolidated_from`) — `/documents` hiện 19 là đúng. Corpus ngân hàng cũ đã bỏ — `data/raw/banking_docs/` không còn tồn tại.
 - ChromaDB `data/chroma_db/` (collection `documind_legal`): **1151 chunks**, 3072-dim.
-  Qdrant Cloud giữ bản sao để khôi phục — xem `scripts/restore_chroma_from_qdrant.py`.
+  Qdrant Cloud (production đọc từ đây) **vẫn giữ vector `gemini-embedding-001`** — đo 2026-10-17,
+  production + CI pin `EMBEDDING_MODEL=gemini-embedding-001` cho khớp. Chroma local đã là
+  `gemini-embedding-2`, nên `scripts/restore_chroma_from_qdrant.py` lúc này sẽ ghi vector SAI
+  model vào local. Chuyển production sang 2: migrate Chroma → Qdrant rồi đổi env Render + bỏ pin CI cùng lúc.
 - `data/compliance/criteria.json`: 6 tiêu chí định lượng lao động (trần làm thêm giờ
   năm/tháng, thời gian thử việc, lương thử việc 85%, nghỉ hằng năm, lương tối thiểu vùng I).
   Mọi tiêu chí phải trích dẫn văn bản CÓ trong `data/raw/lao_dong/` — có test chặn
@@ -55,21 +58,29 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   Report nào ghi rerank phải xem `meta.reranker_active`, không tin `ENABLE_RERANKER`.
   torch/sentence-transformers/transformers **không** còn trong `requirements.txt` (2026-09-27,
   image production không cài ~1.3GB này) — muốn chạy reranker: `pip install -r requirements-rerank.txt`.
-- Test suite: 626/626 tests passed (đo 2026-10-03). Test không gửi trace ra Langfuse/LangSmith
+- Test suite: 635 passed, 3 skipped khi không có Chroma local (đo 2026-10-17). Test không gửi trace ra Langfuse/LangSmith
   (`conftest.py::patch_settings` xoá key).
 
 **Stack:**
 - Backend: FastAPI + LangGraph agent + vector store qua `VECTOR_STORE_PROVIDER`
   (`chroma` mặc định local, hoặc `qdrant` cho Qdrant Cloud — xem `src/rag/vector_backend.py`)
-- Embedding: `gemini-embedding-001` (3072-dim) qua Gemini Embedding API — **không nạp
+- Embedding: `gemini-embedding-2` (3072-dim) qua Gemini Embedding API — **không nạp
   model nào vào RAM**. Model đọc từ `EMBEDDING_MODEL`, không hard-code. Lịch sử: chạy
-  model local `AITeamVN/Vietnamese_Embedding` (1024-dim) tới 2026-09-19.
+  model local `AITeamVN/Vietnamese_Embedding` (1024-dim) tới 2026-09-19; `gemini-embedding-001` tới 2026-10.
 - Retriever: Hybrid BM25 + dense vector + RRF fusion + cross-encoder reranker
   (reranker `BAAI/bge-reranker-v2-m3` vẫn chạy LOCAL — ngoại lệ duy nhất)
-- LLM: **chỉ Gemini** (2026-09-19). Mọi lời gọi đi qua
-  `src.rag.generator.gemini_generate`, xoay vòng (3 key × các model trong
-  `GEMINI_GENERATION_MODELS`); hết mọi cặp thì trích nguyên văn nguồn, không LLM.
-  Đã gỡ tuyệt đối Groq, OpenAI-compatible, embedding local và HF Inference API.
+- LLM: **FPT AI Marketplace chính, Gemini dự phòng** (2026-10-17). `_gemini_pairs` đặt các
+  cặp `("fpt", model)` từ `FPT_MODELS` lên đầu vòng xoay, nên mọi call site (`gemini_generate`,
+  `stream_answer`, contextualize/restore-diacritics trong graph) thử FPT trước; lỗi FPT nào
+  (kể cả 401) cũng cooldown model đó rồi rơi về Gemini (`gemini-3.8-flash`, phân loại
+  `gemini-3.5-flash-lite`, 3 key × `GEMINI_GENERATION_MODELS`); hết mọi cặp thì trích nguyên
+  văn nguồn. FPT gọi bằng `requests` tới `https://token-api.fpt.ai/v1/chat/completions`
+  (OpenAI-compatible; `mkp-api.fptcloud.com` trả 401 với key token-api), không cài
+  `openai`/`litellm`. Luôn gửi `chat_template_kwargs.enable_thinking=false`: bật suy luận thì
+  Qwen3.8-27B mất 23s cho câu 1 dòng (quá timeout 20s của router). `used_llm` = `fpt`/`gemini`
+  theo nhà cung cấp thật sự trả lời. Lượt gọi Qwen đầu tiên sau lúc nhàn rỗi có thể treo tới
+  timeout (đo 2026-10-17, phía FPT) → cooldown 120s, model kế tiếp gánh.
+  Round-robin cursor chỉ xoay phần Gemini. Đã gỡ Groq, embedding local và HF Inference API.
 - Frontend: React + Vite (port 5174), proxies `/api` → backend port 8081
 
 **Deploy (2026-07, theo default-tech-stack skill):**
@@ -203,10 +214,12 @@ logs/
 
 ## Config quan trọng (.env)
 
+- `FPT_API_KEY`, `FPT_MODELS` — LLM chính (FPT AI Marketplace); key rỗng = chỉ Gemini.
+  Test xoá `FPT_API_KEY` (`conftest.py::patch_settings`) để không gọi API thật.
 - `GOOGLE_API_KEY`, `GOOGLE_API_KEY_2`, `GOOGLE_API_KEY_3` — 3 Gemini keys
-- `GEMINI_JUDGE_MODELS` — danh sách model cho RAGAS eval (phân cách bằng dấu phẩy)
-- `GEMINI_GENERATION_MODELS` — danh sách model Gemini cho generation (xoay vòng với 3 key)
-- `EMBEDDING_MODEL=gemini-embedding-001` — nguồn sự thật duy nhất cho model
+- `GEMINI_JUDGE_MODELS` — danh sách model cho RAGAS eval & classification (mặc định `gemini-3.5-flash-lite`)
+- `GEMINI_GENERATION_MODELS` — danh sách model Gemini cho generation (mặc định `gemini-3.8-flash,gemini-3.5-flash-lite`)
+- `EMBEDDING_MODEL=gemini-embedding-2` — nguồn sự thật duy nhất cho model
   embedding. Đổi giá trị này **bắt buộc** chạy `python scripts/reembed_corpus.py --yes`;
   collection mang nhãn model đã index, lệch nhãn là `EmbeddingModelMismatch` lúc mở store.
 - `API_PORT=8081`
@@ -253,7 +266,7 @@ for k in ("HF_HOME", "HF_HUB_CACHE", "TRANSFORMERS_CACHE", "SENTENCE_TRANSFORMER
 
 **LLM temperature:** `0.0` (không phải 0.1) để citation ổn định giữa các lần chạy.
 
-**ChromaDB:** Dùng local `PersistentClient` (không cần server). HTTP server ở `localhost:8000` thường không chạy — `get_chroma_collection()` probe TCP 0.5s rồi đi thẳng xuống local, thay vì chờ `heartbeat()` hết 4.2s. Collection `documind_legal` đang có 1151 chunks (3072-dim, `gemini-embedding-001`), kèm metadata `embedding_model`/`embedding_dim` để phát hiện lệch model.
+**ChromaDB:** Dùng local `PersistentClient` (không cần server). HTTP server ở `localhost:8000` thường không chạy — `get_chroma_collection()` probe TCP 0.5s rồi đi thẳng xuống local, thay vì chờ `heartbeat()` hết 4.2s. Collection `documind_legal` đang có 1151 chunks (3072-dim, `gemini-embedding-2`), kèm metadata `embedding_model`/`embedding_dim` để phát hiện lệch model.
 
 **Pin chromadb là 0.6.3 — chạy đúng `.venv` của repo:** Python global của máy có chromadb 1.5.9; chỉ cần mở `data/chroma_db/` một lần bằng bản đó là store bị migrate tại chỗ (thêm cột `schema_str`, `config_json_str` về `{}`, `index_metadata.pickle` của HNSW thành dict) và 0.6.3 hết mở nổi — mọi truy vấn trả 0 chunk. Khôi phục: `python scripts/repair_chroma_config.py` để vá config, `python scripts/restore_chroma_from_qdrant.py --yes` để dựng lại chunk+vector từ Qdrant (không re-embed, ~15 phút vì Qdrant free tier ở sa-east-1).
 

@@ -129,7 +129,18 @@ def _wrap_with_reranker(base_retriever, top_n: int = 8):
     Adds cross-encoder reranker on top of fusion retriever.
     Uses small but effective MiniLM model — runs locally, no API.
     """
-    global _reranker_active
+    global _reranker_active, _reranker_instance
+    from src.config import get_settings
+
+    s = get_settings()
+    if s.fpt_api_key:
+        # FPT model id không có tiền tố org: "BAAI/bge-reranker-v2-m3" -> "bge-reranker-v2-m3".
+        reranker = _FptRerank(s.reranker_model.split("/")[-1], top_n=top_n)
+        logger.info("Reranker qua FPT API: {} (top_n={})", reranker.model, top_n)
+        _reranker_active = True
+        _reranker_instance = reranker
+        return _RerankedRetriever(base_retriever, reranker)
+
     # SentenceTransformerRerank không nhận cache_folder (chỉ có model/top_n/device/
     # trust_remote_code), nên ở đây buộc phải đi qua biến môi trường — khác với
     # embedder, nơi cache được truyền thẳng làm tham số.
@@ -142,9 +153,8 @@ def _wrap_with_reranker(base_retriever, top_n: int = 8):
 
     try:
         from llama_index.core.postprocessor import SentenceTransformerRerank
-        from src.config import get_settings
 
-        model_name = get_settings().reranker_model
+        model_name = s.reranker_model
         # Truyền đường dẫn cache đã resolve thay cho repo id khi model có sẵn: nếu chỉ
         # đưa repo id, thư viện tra cache theo HF_HOME đã đóng băng lúc import (ổ G:\
         # offline trên máy dev) và coi như model chưa tải, dù nó nằm trong repo.
@@ -155,7 +165,6 @@ def _wrap_with_reranker(base_retriever, top_n: int = 8):
         )
         logger.info("Cross-encoder reranker loaded: {} (top_n={})", model_name, top_n)
         _reranker_active = True
-        global _reranker_instance
         _reranker_instance = reranker
         return _RerankedRetriever(base_retriever, reranker)
 
@@ -167,6 +176,50 @@ def _wrap_with_reranker(base_retriever, top_n: int = 8):
         # meaningful gap to threshold on, so truncate to rank order instead
         # of returning the full top_k=20 pool.
         return _TruncatedRetriever(base_retriever, top_n=top_n)
+
+
+class _FptRerank:
+    """Cross-encoder qua FPT /v1/rerank — cùng giao diện postprocess_nodes với
+    SentenceTransformerRerank nhưng không nạp model nào vào RAM. relevance_score 0..1
+    cùng thang sigmoid với bản local (đo: đúng 0.95, sai 0.006) nên ngưỡng 0.05 của
+    generator giữ nguyên."""
+
+    def __init__(self, model: str, top_n: int = 8):
+        self.model = model
+        self.top_n = top_n
+
+    def postprocess_nodes(self, nodes, query_bundle=None):
+        if not nodes:
+            return nodes
+        import requests
+        from llama_index.core.schema import MetadataMode
+
+        from src.config import FPT_API_BASE, get_settings
+
+        try:
+            r = requests.post(
+                f"{FPT_API_BASE}/rerank",
+                headers={"Authorization": f"Bearer {get_settings().fpt_api_key}"},
+                json={"model": self.model, "query": query_bundle.query_str,
+                      # Cùng nội dung bản local chấm (metadata EMBED + text).
+                      "documents": [n.node.get_content(metadata_mode=MetadataMode.EMBED) for n in nodes]},
+                timeout=15,
+            )
+            r.raise_for_status()
+            results = sorted(r.json()["results"], key=lambda x: x["relevance_score"], reverse=True)
+        except Exception as exc:
+            # Giữ thứ tự RRF. Điểm khi đó ở thang RRF (~0.016) — cờ rerank_failed bảo
+            # generator tắt ngưỡng 0.05 cho lượt này, không thì mọi đoạn bị loại và câu
+            # trả lời thành "không tìm thấy" mà không ai biết vì sao.
+            logger.warning("FPT rerank lỗi, giữ thứ tự RRF: {}", exc)
+            mark_degraded("rerank_failed")
+            return nodes[: self.top_n]
+        out = []
+        for x in results[: self.top_n]:
+            n = nodes[x["index"]]
+            n.score = x["relevance_score"]
+            out.append(n)
+        return out
 
 
 class _RerankedRetriever:

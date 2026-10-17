@@ -19,6 +19,12 @@ services:
     plan: free
     healthCheckPath: /api/v1/health
     envVars:
+      # LLM chính: FPT AI Marketplace; rỗng = chỉ Gemini. Service tạo tay nên phải
+      # điền ở dashboard Render, file này không tự áp.
+      - key: FPT_API_KEY
+        sync: false
+      - key: FPT_MODELS
+        value: Qwen3.8-27B,DeepSeek-V4-Flash
       - key: GOOGLE_API_KEY
         sync: false
       - key: GOOGLE_API_KEY_2
@@ -29,8 +35,9 @@ services:
         generateValue: true
       - key: ENVIRONMENT
         value: production
-      # Phai khop model da index corpus (nhan ghi trong metadata collection).
-      # Lech nhan => EmbeddingModelMismatch luc khoi dong, khong chay tiep.
+      # Phải khớp model đã tạo vector trên Qdrant. Qdrant vẫn là gemini-embedding-001
+      # (đo 2026-10-17); check lúc mở collection chỉ so số chiều — 001 và 2 đều 3072 —
+      # nên đổi sang 2 trước khi migrate Qdrant = tìm kiếm rác, không có lỗi nào báo.
       - key: EMBEDDING_MODEL
         value: gemini-embedding-001
       - key: INITIALIZE_RAG_ON_STARTUP
@@ -41,11 +48,9 @@ services:
         value: "false"
       # Embedding đi qua Gemini Embedding API nên không model nào nạp vào RAM;
       # dùng chung GOOGLE_API_KEY với phần generation, không cần HF_TOKEN.
-      # Free tier chặn ~100 content + ~20k token/phút: đủ cho truy vấn lẻ, còn
-      # re-embed cả corpus thì chạy ở máy dev rồi migrate, đừng chạy trên Render.
-      # Khong dung 2.5-flash/2.5-flash-lite: Google da dong cho API key tao moi (404).
+      # Theo gemini.md: Default Model la gemini-3.8-flash, Lightweight la gemini-3.5-flash-lite.
       - key: GEMINI_GENERATION_MODELS
-        value: gemini-3.1-flash-lite,gemini-3.5-flash-lite,gemini-3.5-flash
+        value: gemini-3.8-flash,gemini-3.5-flash-lite
       # Corpus nằm ở Qdrant Cloud (migrate 2026-09-19: 1149 chunks, 3072-dim,
       # verify top-1 khớp ChromaDB nguồn). Disk Render ephemeral nên ChromaDB local
       # trong container luôn rỗng — đừng quay lại provider chroma ở production.

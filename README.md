@@ -29,7 +29,7 @@ Kho tài liệu gồm **20 văn bản nguồn / 1.151 chunk** (tab "Văn bản �
    - Giữ trạng thái nhiều lượt hội thoại một cách tất định, có bộ nhớ phiên.
 2. **Truy hồi lai hai pha + rerank bằng mạng nơ-ron**:
    - **Truy hồi thưa (sparse)**: Okapi BM25 để khớp chính xác thuật ngữ luật (ví dụ *"Điều 14 Thông tư 18/2024"*).
-   - **Truy hồi dày (dense)**: `gemini-embedding-001` (3072 chiều, gọi qua API — không nạp model vào RAM) để hiểu câu hỏi diễn đạt lại theo ngữ nghĩa.
+   - **Truy hồi dày (dense)**: `gemini-embedding-2` (3072 chiều, gọi qua API — không nạp model vào RAM) để hiểu câu hỏi diễn đạt lại theo ngữ nghĩa.
    - **Hợp nhất & rerank**: gộp bằng Reciprocal Rank Fusion (RRF) lấy top-20, chấm điểm lại bằng cross-encoder (`BAAI/bge-reranker-v2-m3`) để chọn top-8 chunk có độ chính xác cao nhất.
 3. **Bộ kiểm tra tuân thủ tự động (`compliance_check`)**:
    - Trích tham số bằng regex kết hợp LLM cho các ngưỡng kiểm tra định lượng.
@@ -291,7 +291,7 @@ khiến hệ thống từ chối nhầm, và ~15% câu bị từ chối thừa �
 | Khâu | Cơ chế |
 |---|---|
 | Truy hồi thưa | Okapi BM25 — khớp chính xác thuật ngữ luật / số hiệu điều khoản |
-| Truy hồi dày | `gemini-embedding-001` (3072 chiều, qua API) — khớp theo ngữ nghĩa |
+| Truy hồi dày | `gemini-embedding-2` (3072 chiều, qua API) — khớp theo ngữ nghĩa |
 | Hợp nhất | Reciprocal Rank Fusion trên cả hai danh sách ứng viên (top-20) |
 | Rerank | Cross-encoder `BAAI/bge-reranker-v2-m3` → top-8 (local; production tắt — Render free 512MB RAM) |
 | Rào chắn khi sinh | Từ chối câu ngoài kho · bắt buộc trích dẫn ở từng đoạn |
@@ -303,8 +303,8 @@ khiến hệ thống từ chối nhầm, và ~15% câu bị từ chối thừa �
 | Tầng | Công nghệ | Lý do chọn |
 |---|---|---|
 | **Điều phối tác tử** | LangGraph 0.2 + LlamaIndex 0.14 | Chuyển trạng thái tường minh có kiểu, test đơn vị được từng node, định tuyến ý định tất định (không phụ thuộc LLM). |
-| **LLM** | Google Gemini (các model flash-lite, khai trong `GEMINI_GENERATION_MODELS`) | Nhà cung cấp duy nhất: quota cộng dồn qua nhiều key, không cold-start, không cần GPU. Xoay vòng (key × model) thay cho fallback nhiều nhà cung cấp. |
-| **Embedding** | `gemini-embedding-001` (3072 chiều, qua API) | Không nạp model nào vào RAM nên chạy được trên host 512MB; dùng chung key với phần sinh câu trả lời. |
+| **LLM** | FPT AI Marketplace (chính: `FPT_MODELS`, mặc định `Qwen3.8-27B`, `DeepSeek-V4-Flash`); Google Gemini dự phòng (`gemini-3.8-flash`; phân loại/router: `gemini-3.5-flash-lite`) | FPT thử trước; lỗi thì rơi về vòng xoay (key × model) Gemini, quota cộng dồn qua nhiều key, không cần GPU. |
+| **Embedding** | `gemini-embedding-2` (3072 chiều, qua API) | Không nạp model nào vào RAM nên chạy được trên host 512MB; dùng chung key với phần sinh câu trả lời. |
 | **Vector store** | ChromaDB (local persistent) / Qdrant | Backend cắm-rút qua `VECTOR_STORE_PROVIDER` mà không phải viết lại phần ingest hay truy vấn. |
 | **Reranker** | `BAAI/bge-reranker-v2-m3` | Cross-encoder đa ngữ hàng đầu, xếp hạng điều khoản luật với độ chính xác cao. |
 | **API backend** | FastAPI + WebSockets + Pydantic v2 | I/O bất đồng bộ hoàn toàn, streaming hai chiều, tự sinh schema OpenAPI. |
@@ -336,7 +336,7 @@ Tạo file `.env`:
 GOOGLE_API_KEY=AIza_your_google_gemini_key_here
 GOOGLE_API_KEY_2=
 GOOGLE_API_KEY_3=
-EMBEDDING_MODEL=gemini-embedding-001
+EMBEDDING_MODEL=gemini-embedding-2
 VECTOR_STORE_PROVIDER=chroma
 ```
 

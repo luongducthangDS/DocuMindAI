@@ -62,15 +62,10 @@ class EmbeddingUnavailable(RuntimeError):
     """
 
 
-# Free tier Gemini Embedding chặn ở HAI trần cùng lúc, đo thực tế 2026-09-18:
-#   - số CONTENT, không phải số HTTP request (5 request × 20 content = 100 rồi 429),
-#     nên gộp batch to không giảm mức tiêu thụ, chỉ giảm số lần đi mạng;
-#   - số TOKEN mỗi phút — corpus này chunk ~900 ký tự nên 50 chunk/request đã chạm
-#     trần token dù mới 50/100 content.
-# Hai ngưỡng dưới đặt dưới trần thật để chừa biên, vì server đếm theo cửa sổ riêng
-# của nó chứ không phải cửa sổ trượt của tiến trình này.
-_GEMINI_CONTENTS_PER_MIN = 90
-_GEMINI_TOKENS_PER_MIN = 20_000
+# Free tier Gemini Embedding: gemini.md quy định gemini-embedding-2 có hạn mức lên tới 1,500 RPM & 1,000,000 TPM.
+# Đặt ngưỡng thận trọng để chừa biên: 1,000 contents/phút và 500,000 tokens/phút.
+_GEMINI_CONTENTS_PER_MIN = 1_000
+_GEMINI_TOKENS_PER_MIN = 500_000
 # Tiếng Việt có dấu tốn token hơn tiếng Anh; 3 ký tự/token là ước lượng thận trọng.
 _CHARS_PER_TOKEN = 3
 # Chờ lâu hơn mức này nghĩa là quota NGÀY đã hết — báo lỗi thay vì ngủ tiếp.

@@ -26,7 +26,9 @@ def patch_settings(tmp_path, monkeypatch):
     # mỗi lượt pytest đẩy 23 batch lên Langfuse (đo 2026-09-30), trộn trace giả
     # (key Gemini giả, dữ liệu giả) vào trace thật. Env rỗng đè .env vì
     # pydantic-settings ưu tiên env; LANGCHAIN_TRACING_V2 langsmith đọc thẳng os.environ.
-    for var in ("LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY", "LANGCHAIN_API_KEY"):
+    # FPT_API_KEY cũng vậy: có key thật thì _gemini_pairs chèn cặp FPT lên đầu và
+    # test gọi API thật thay vì mock Gemini.
+    for var in ("LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY", "LANGCHAIN_API_KEY", "FPT_API_KEY"):
         monkeypatch.setenv(var, "")
     monkeypatch.setenv("LANGCHAIN_TRACING_V2", "false")
 

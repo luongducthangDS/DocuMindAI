@@ -220,6 +220,22 @@ chọn sai lần hai.
 
 ## Vận hành / xử lý sự cố
 
+### Đổi model embedding ở local mà không đổi Qdrant, tin vào check số chiều (2026-10-17)
+- **Đã làm:** theo `gemini.md`, re-embed Chroma local sang `gemini-embedding-2` và đổi default
+  `EMBEDDING_MODEL` trong `config.py`, `.env.example`, `render.yaml` — nhưng không migrate
+  Qdrant (nơi production và CI đọc).
+- **Sai ở đâu:** check lúc mở collection Qdrant chỉ so số chiều, mà `001` và `2` đều 3072 →
+  lệch model không báo lỗi. Đo: cùng một chunk, vector Qdrant có cosine 1.0 với `001` và
+  0.02 với `2`. Đổi env Render theo `render.yaml` mới = dense trả rác, `/health` vẫn xanh.
+  `restore_chroma_from_qdrant.py` lúc này cũng ghi vector sai model về local.
+- **Cái giá:** chưa thành sự cố — production vẫn pin `001` qua env dashboard. Bắt được khi
+  soát env Render trước lúc đẩy FPT.
+- **Bài học:** model embedding là thuộc tính của *dữ liệu đã lưu*, không phải của code. Đổi
+  model = đổi mọi kho vector cùng lúc. Và check "cùng số chiều" không chứng minh cùng model.
+- **Giờ làm thế nào:** CI + `render.yaml` pin `gemini-embedding-001` tới khi migrate Qdrant
+  (Chroma → collection mới, đổi env Render + bỏ pin CI trong một lần). *Chưa có nhãn model
+  trên Qdrant để check theo tên.*
+
 ### Verify bản sửa trên Chroma local, báo xong cho pd0r chạy Qdrant (2026-10-03)
 - **Đã làm (Claude):** sửa tab "Văn bản đã lập chỉ mục" (mục ngay dưới), chạy thử trên index
   local (Chroma) thấy 19 văn bản, báo "tab hiện 19 văn bản" rồi push.

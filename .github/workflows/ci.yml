@@ -40,6 +40,9 @@ jobs:
       QDRANT_URL: ${{ secrets.QDRANT_URL }}
       QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
       ENABLE_RERANKER: "false"
+      # Qdrant vẫn giữ vector gemini-embedding-001 (đo 2026-10-17: cosine 1.0 với 001,
+      # 0.02 với 2). Default code đã là gemini-embedding-2 — bỏ pin này cùng lúc migrate Qdrant.
+      EMBEDDING_MODEL: gemini-embedding-001
       MLFLOW_TRACKING_URI: sqlite:///mlflow.db
     steps:
       - uses: actions/checkout@v4

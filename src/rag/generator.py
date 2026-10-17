@@ -1,24 +1,27 @@
 """
 LLM generation with mandatory citations.
-Nhà cung cấp duy nhất: Gemini (xoay vòng key × model, xem _call_gemini).
+Nhà cung cấp: FPT AI Marketplace trước, Gemini dự phòng (xoay vòng key × model,
+xem _gemini_pairs / gemini_call).
 """
 
 from __future__ import annotations
 
 import asyncio
+import json
 import queue
 import re
 import secrets
 import threading
 import time
 from datetime import datetime, timezone
+from types import SimpleNamespace
 from typing import AsyncIterator
 
 from loguru import logger
 
-from src.config import DOMAIN_NAME, DOMAIN_SCOPE, get_settings
+from src.config import DOMAIN_NAME, DOMAIN_SCOPE, FPT_API_BASE, get_settings
 from src.langfuse_otel import non_fatal, record_generation, record_span, tracing_active
-from src.rag.context import mark_degraded
+from src.rag.context import degraded_flags, mark_degraded
 from src.rag.retriever import RetrievedChunk, chunk_ref
 
 # LangSmith tracing — optional
@@ -136,6 +139,8 @@ def _effective_min_score() -> float:
     both found relevant content.
     """
     if not get_settings().enable_reranker:
+        return 0.0
+    if "rerank_failed" in degraded_flags():  # reranker API lỗi lượt này: điểm là RRF
         return 0.0
     import src.rag.retriever as r_module
     return _MIN_RELEVANCE_SCORE if getattr(r_module, "_reranker_active", False) else 0.0
@@ -337,7 +342,65 @@ def _gemini_pairs(models: list[str] | None = None) -> list[tuple[str, str]]:
     if models is None:
         models = [m.strip() for m in s.gemini_generation_models.split(",") if m.strip()]
     keys = _gemini_keys()
-    return [(k, m) for m in models for k in keys if not _is_down(k, m)]
+    # FPT đứng đầu, bất kể `models` (đó là lựa chọn model GEMINI cho phần dự phòng).
+    fpt = [(_FPT_KEY, m.strip()) for m in s.fpt_models.split(",")
+           if s.fpt_api_key and m.strip() and not _is_down(_FPT_KEY, m.strip())]
+    return fpt + [(k, m) for m in models for k in keys if not _is_down(k, m)]
+
+
+# Cặp FPT mang khoá giả này thay cho key thật: gemini_call rẽ nhánh theo nó, và key
+# thật không lọt vào log (`api_key[-4:]`) hay khoá cooldown.
+_FPT_KEY = "fpt"
+# Tắt suy luận: đo 2026-10-17, bật thì Qwen3.8-27B mất 23s/2913 token cho câu 1 dòng
+# (quá timeout 20s của router/thêm dấu), tắt thì 1.3s/36 token. Suy luận nếu có nằm ở
+# `reasoning_content` riêng, nên chỉ đọc `content`.
+_FPT_URL = f"{FPT_API_BASE}/chat/completions"
+
+
+def _fpt_call(model_name: str, prompt: str, timeout: float, stream: bool = False):
+    """Một lời gọi /chat/completions (OpenAI-compatible) tới FPT AI Marketplace.
+    Trả về object dáng response Gemini (.text, .usage_metadata) để mọi caller của
+    gemini_call dùng nguyên; stream=True trả iterator các object có .text."""
+    import requests
+
+    r = requests.post(
+        _FPT_URL,
+        headers={"Authorization": f"Bearer {get_settings().fpt_api_key}"},
+        json={"model": model_name, "messages": [{"role": "user", "content": prompt}],
+              "temperature": 0.0, "stream": stream,
+              "chat_template_kwargs": {"enable_thinking": False}},
+        timeout=timeout, stream=stream,
+    )
+    if r.status_code >= 400:
+        # Mã HTTP đứng đầu chuỗi để _error_kind phân loại y như lỗi Gemini.
+        raise RuntimeError(f"{r.status_code} FPT {model_name}: {r.text[:200]}")
+    if stream:
+        return _fpt_stream(r)
+    data = r.json()
+    usage = data.get("usage") or {}
+    return SimpleNamespace(
+        text=(data["choices"][0]["message"].get("content") or "").strip(),
+        usage_metadata=SimpleNamespace(
+            prompt_token_count=usage.get("prompt_tokens", 0),
+            candidates_token_count=usage.get("completion_tokens", 0),
+        ),
+    )
+
+
+def _fpt_stream(r):
+    # Đọc bytes rồi tự decode UTF-8: SSE thường không khai charset, requests sẽ đoán
+    # ISO-8859-1 và làm vỡ tiếng Việt nếu dùng decode_unicode.
+    for raw in r.iter_lines():
+        line = raw.decode("utf-8").strip()
+        if not line.startswith("data:"):
+            continue
+        payload = line[5:].strip()
+        if payload == "[DONE]":
+            break
+        choices = json.loads(payload).get("choices") or []
+        text = (choices[0].get("delta") or {}).get("content") if choices else None
+        if text:
+            yield SimpleNamespace(text=text)
 
 
 # SDK google-generativeai mặc định TỰ retry 503 tới 600s (và timeout 600s) trên
@@ -362,6 +425,35 @@ _MODEL_WIDE_CODES = frozenset({408, 500, 502, 503, 504})
 _LEADING_CODE_RE = re.compile(r"^\s*(\d{3})\b")
 _KEY_WORDS_RE = re.compile(r"\b(quota|exhausted|rate limit(ed)?|too many requests)\b")
 _MODEL_WIDE_WORDS_RE = re.compile(r"\b(unavailable|overloaded|high demand|deadline exceeded|timed out|timeout)\b")
+
+
+def _is_429(exc: Exception) -> bool:
+    """True nếu là mã lỗi 429 / RESOURCE_EXHAUSTED / quota exceeded."""
+    code = getattr(exc, "code", None)
+    if code == 429:
+        return True
+    m = _LEADING_CODE_RE.match(str(exc))
+    if m and int(m.group(1)) == 429:
+        return True
+    return bool(_KEY_WORDS_RE.search(str(exc).lower()))
+
+
+def _is_503(exc: Exception) -> bool:
+    """True nếu là mã lỗi 503 / Service Unavailable / High demand / overloaded."""
+    code = getattr(exc, "code", None)
+    if code == 503:
+        return True
+    m = _LEADING_CODE_RE.match(str(exc))
+    if m and int(m.group(1)) == 503:
+        return True
+    err = str(exc).lower()
+    return "503" in err or "overloaded" in err or "high demand" in err
+
+
+def _backoff_jitter_wait(attempt: int, base: float = 2.0, max_wait: float = 30.0) -> float:
+    """Exponential backoff with jitter: wait_time = (2 ** attempt) + random.uniform(0, 1)."""
+    import random
+    return min((base ** attempt) + random.uniform(0.0, 1.0), max_wait)
 
 
 def _error_kind(exc: Exception) -> str | None:
@@ -395,7 +487,7 @@ def _cool_down(api_key: str, model_name: str, exc: Exception) -> None:
     """429 = quota của riêng key đó. 503/504/timeout = model quá tải, key nào cũng
     như nhau (đo 2026-09-23) → cooldown cả model, khỏi chờ timeout lần lượt 3 key.
     Không gia hạn cặp đang cooldown — traffic liên tục sẽ giữ nó down mãi."""
-    keys = _gemini_keys() if _error_kind(exc) == "model" else [api_key]
+    keys = _gemini_keys() if api_key != _FPT_KEY and _error_kind(exc) == "model" else [api_key]
     until = time.monotonic() + _PAIR_COOLDOWN_S
     for k in keys:
         if not _is_down(k, model_name):
@@ -403,30 +495,50 @@ def _cool_down(api_key: str, model_name: str, exc: Exception) -> None:
 
 
 def gemini_call(api_key: str, model_name: str, prompt: str,
-                timeout: float = _GEMINI_TIMEOUT_S, **kwargs):
+                timeout: float = _GEMINI_TIMEOUT_S, max_429_retries: int = 0, **kwargs):
     """Lời gọi generate_content DUY NHẤT tới Gemini: timeout cứng, không retry
     ngầm, lỗi tạm thời thì cho cặp vào cooldown rồi ném lại cho caller xoay tiếp.
-    (Lỗi xảy ra lúc lặp stream nằm ngoài hàm này — stream_answer tự _cool_down.)"""
+    (Lỗi xảy ra lúc lặp stream nằm ngoài hàm này — stream_answer tự _cool_down.)
+    Khi max_429_retries > 0: áp dụng Exponential Backoff with Jitter khi gặp mã 429."""
     import google.generativeai as genai
 
     from src.rag.embedder import genai_client
 
     if _is_down(api_key, model_name):
         raise RuntimeError(f"Gemini {model_name}: unavailable (cooldown)")
-    try:
-        model = genai.GenerativeModel(model_name)
-        # Gắn client của đúng key thay cho genai.configure() (global, race giữa các
-        # thread — xem genai_client). ponytail: _client là thuộc tính riêng của
-        # google-generativeai 0.7.2 (đã pin); lên SDK google-genai thì thay bằng
-        # genai.Client(api_key=...).models.generate_content.
-        model._client = genai_client(api_key)
-        return model.generate_content(
-            prompt, request_options={"retry": None, "timeout": timeout}, **kwargs
-        )
-    except Exception as exc:
-        if _is_transient(exc):
+
+    if api_key == _FPT_KEY:
+        try:
+            return _fpt_call(model_name, prompt, timeout, stream=kwargs.get("stream", False))
+        except Exception as exc:
+            # ponytail: mọi lỗi FPT (cả 401/400) đều cooldown — Gemini gánh thay, khỏi
+            # gọi lại một key/model hỏng ở mỗi câu hỏi. Không retry 429 riêng cho FPT.
             _cool_down(api_key, model_name, exc)
-        raise
+            raise
+
+    for attempt in range(max_429_retries + 1):
+        try:
+            model = genai.GenerativeModel(model_name)
+            # Gắn client của đúng key thay cho genai.configure() (global, race giữa các
+            # thread — xem genai_client). ponytail: _client là thuộc tính riêng của
+            # google-generativeai 0.7.2 (đã pin); lên SDK google-genai thì thay bằng
+            # genai.Client(api_key=...).models.generate_content.
+            model._client = genai_client(api_key)
+            return model.generate_content(
+                prompt, request_options={"retry": None, "timeout": timeout}, **kwargs
+            )
+        except Exception as exc:
+            if _is_429(exc) and attempt < max_429_retries:
+                wait_time = _backoff_jitter_wait(attempt)
+                logger.warning(
+                    "Gemini 429 trên {} (key…{}), áp dụng exponential backoff {:.2f}s (lần {}/{})",
+                    model_name, api_key[-4:], wait_time, attempt + 1, max_429_retries,
+                )
+                time.sleep(wait_time)
+                continue
+            if _is_transient(exc):
+                _cool_down(api_key, model_name, exc)
+            raise
 
 
 # Round-robin cursor so consecutive generations start at DIFFERENT (key, model)
@@ -439,18 +551,27 @@ _GEMINI_PAIR_CURSOR = 0
 def gemini_generate(
     prompt: str, models: list[str] | None = None, log_input: str | None = None,
     timeout: float = _GEMINI_TIMEOUT_S, name: str = "gemini-generate",
+    max_429_backoff_retries: int = 0, info: dict | None = None,
 ) -> str:
-    """Sinh văn bản qua Gemini, xoay vòng (key, model) cho tới khi một cặp trả lời.
+    """Sinh văn bản: thử các model FPT trước, rồi xoay vòng (key, model) Gemini cho
+    tới khi một cặp trả lời.
 
     Điểm vào DUY NHẤT cho mọi nơi cần LLM (generator, grader, compliance, agent)
     kể từ khi Gemini là nhà cung cấp duy nhất — một cursor chung giữ cho các lần
     gọi liên tiếp không dồn hết vào cặp đầu tiên.
+
+    Theo gemini.md:
+    - Khi gặp mã 429: Áp dụng Exponential Backoff with Jitter (max_429_backoff_retries).
+    - Khi 3.5-flash gặp mã 503: Tự động fallback sang gemini-3.8-flash.
 
     `log_input`: phần được GHI LÊN LANGFUSE thay cho `prompt` đầy đủ, khi caller
     có prompt template tĩnh (rules, hướng dẫn định dạng...) ghép với phần biến
     đổi thực sự (câu hỏi, lịch sử). Không có nó, mọi lần gọi đều lộ nguyên văn
     template tĩnh trong "input" — làm trace không đọc được (phần thay đổi chìm
     giữa hàng chục dòng rules không đổi). `prompt` gửi cho Gemini KHÔNG đổi.
+
+    `info`: nếu truyền dict, ghi `info["provider"]` = "fpt"/"gemini" — nhà cung cấp
+    đã trả lời (nhãn used_llm trên UI), không đổi kiểu trả về của hàm.
 
     `name`: tên observation trên Langfuse theo MỤC ĐÍCH (route-intent, grade-chunks,
     generate-answer...). Langfuse xếp mọi generation phẳng dưới trace gốc, nên tên là
@@ -464,12 +585,19 @@ def gemini_generate(
         raise exc
 
     global _GEMINI_PAIR_CURSOR
+    # FPT luôn thử trước theo thứ tự cấu hình; round-robin chỉ xoay phần Gemini.
+    n_fpt = sum(1 for k, _ in pairs if k == _FPT_KEY)
+    gem = pairs[n_fpt:]
+    start = _GEMINI_PAIR_CURSOR % len(gem) if gem else 0
+    pairs = pairs[:n_fpt] + gem[start:] + gem[:start]
     n = len(pairs)
-    start = _GEMINI_PAIR_CURSOR
     last_exc: Exception | None = None
     t_first = datetime.now(timezone.utc)
-    for offset in range(n):
-        api_key, model_name = pairs[(start + offset) % n]
+    offset = 0
+    while offset < len(pairs):  # pairs có thể dài thêm (fallback 503 bên dưới)
+        n = len(pairs)
+        api_key, model_name = pairs[offset]
+        offset += 1
         t0 = datetime.now(timezone.utc)
         try:
             response = gemini_call(api_key, model_name, prompt, timeout=timeout)
@@ -488,7 +616,10 @@ def gemini_generate(
                 )
                 # Advance cursor so the NEXT call starts at the following pair —
                 # round-robin keeps any single (key, model) under its RPM limit.
-                _GEMINI_PAIR_CURSOR = (start + offset + 1) % n
+                if api_key != _FPT_KEY:
+                    _GEMINI_PAIR_CURSOR = (start + offset - n_fpt) % max(len(gem), 1)
+                if info is not None:
+                    info["provider"] = "fpt" if api_key == _FPT_KEY else "gemini"
                 return response.text
         except Exception as exc:
             transient = _is_transient(exc)
@@ -497,12 +628,59 @@ def gemini_generate(
                 t0, datetime.now(timezone.utc), error=f"{type(exc).__name__}: {exc}",
                 level="WARNING" if transient else "ERROR",
             )
-            if transient:
+            # Lỗi FPT nào cũng rơi về Gemini (key FPT sai không được làm hỏng câu hỏi).
+            if transient or api_key == _FPT_KEY:
                 logger.debug("Gemini {} (key…{}) unavailable, rotating: {}",
                              model_name, api_key[-4:], str(exc)[:100])
                 last_exc = exc
+                # Rule 5: Fallback sang gemini-3.8-flash nếu gemini-3.5-flash gặp 503
+                if _is_503(exc) and (model_name.startswith("gemini-3.5-flash") or "3.5-flash" in model_name):
+                    fallback_model = "gemini-3.8-flash"
+                    if not any(m == fallback_model for _, m in pairs):
+                        fallback_pairs = [(k, fallback_model) for k in _gemini_keys() if not _is_down(k, fallback_model)]
+                        if fallback_pairs:
+                            logger.info(
+                                "Gemini 3.5-flash dính 503. Tự động fallback sang {}: thêm {} cặp",
+                                fallback_model, len(fallback_pairs),
+                            )
+                            pairs.extend(fallback_pairs)
                 continue
             raise  # non-quota error — propagate immediately
+
+    # Exponential Backoff with Jitter khi mọi cặp đều dính 429
+    if max_429_backoff_retries > 0 and last_exc is not None and _is_429(last_exc):
+        for backoff_attempt in range(max_429_backoff_retries):
+            wait_time = _backoff_jitter_wait(backoff_attempt)
+            logger.warning(
+                "Mọi cặp Gemini dính 429. Áp dụng exponential backoff with jitter: chờ {:.2f}s (lần {}/{})",
+                wait_time, backoff_attempt + 1, max_429_backoff_retries,
+            )
+            time.sleep(wait_time)
+            retry_pairs = _gemini_pairs(models)
+            if not retry_pairs:
+                keys = _gemini_keys()
+                m_list = models or [m.strip() for m in get_settings().gemini_generation_models.split(",") if m.strip()]
+                retry_pairs = [(k, m) for m in m_list for k in keys]
+            for k, m in retry_pairs:
+                t_retry = datetime.now(timezone.utc)
+                try:
+                    res = gemini_call(k, m, prompt, timeout=timeout)
+                    if res.text:
+                        usage = getattr(res, "usage_metadata", None)
+                        record_generation(
+                            name, m, logged, res.text, t_retry, datetime.now(timezone.utc),
+                            prompt_tokens=getattr(usage, "prompt_token_count", 0) if usage else 0,
+                            completion_tokens=getattr(usage, "candidates_token_count", 0) if usage else 0,
+                        )
+                        if info is not None:
+                            info["provider"] = "fpt" if k == _FPT_KEY else "gemini"
+                        return res.text
+                except Exception as retry_exc:
+                    if _is_transient(retry_exc):
+                        last_exc = retry_exc
+                        continue
+                    raise
+
     # Mọi cặp im lặng (response.text rỗng) thì last_exc vẫn None — `raise None`
     # sẽ ném TypeError che mất nguyên nhân thật.
     exhausted = last_exc or RuntimeError(
@@ -521,6 +699,7 @@ def _call_gemini(
     context: str,
     history: list[dict] | None = None,
     models: list[str] | None = None,
+    info: dict | None = None,
 ) -> str | None:
     """Câu trả lời có trích dẫn cho một câu hỏi, qua vòng xoay của gemini_generate."""
     history_block = ""
@@ -537,6 +716,8 @@ def _call_gemini(
         log_input=variable_part,
         timeout=_GEMINI_ANSWER_TIMEOUT_S,
         name="generate-answer",
+        max_429_backoff_retries=2,
+        info=info,
     )
 
 
@@ -618,13 +799,13 @@ def generate_answer(
     context, citation_list = _build_context(chunks)
     context = _as_of_block(as_of_date) + context
 
-    # Gemini là nhà cung cấp DUY NHẤT (2026-09-19). Chịu lỗi nằm ở vòng xoay
-    # (key × model) bên trong _call_gemini; hết mọi cặp thì rơi về trích dẫn
-    # nguyên văn, không gọi nhà cung cấp nào khác.
+    # FPT trước, Gemini dự phòng — chịu lỗi nằm ở vòng xoay bên trong _call_gemini;
+    # hết mọi cặp thì rơi về trích dẫn nguyên văn.
     try:
-        answer = _call_gemini(query, context, history=history, models=_select_models(complex_query))
-        used_llm = "gemini"
-        logger.info("Gemini answered query ({} chars)", len(answer or ""))
+        info: dict = {}
+        answer = _call_gemini(query, context, history=history, models=_select_models(complex_query), info=info)
+        used_llm = info.get("provider", "gemini")
+        logger.info("{} answered query ({} chars)", used_llm, len(answer or ""))
     except Exception as exc:
         logger.error("Gemini failed on every (key, model) pair: {}", exc)
         answer = _build_extractive_answer(query, chunks)
@@ -749,6 +930,14 @@ async def stream_answer(
             )
             if transient:
                 _cool_down(api_key, model_name, stream_exc)
+                # Rule 5: Fallback sang gemini-3.8-flash nếu gemini-3.5-flash gặp 503
+                if _is_503(stream_exc) and (model_name.startswith("gemini-3.5-flash") or "3.5-flash" in model_name):
+                    fallback_model = "gemini-3.8-flash"
+                    if not any(m == fallback_model for _, m in pairs):
+                        fallback_pairs = [(k, fallback_model) for k in _gemini_keys() if not _is_down(k, fallback_model)]
+                        if fallback_pairs:
+                            logger.info("Gemini stream 3.5-flash dính 503, fallback sang {}", fallback_model)
+                            pairs.extend(fallback_pairs)
             if streamed:
                 return  # nửa câu trả lời đã ra — không nối thêm từ cặp khác
             continue  # chưa có chữ nào ra — thử cặp (key, model) kế tiếp

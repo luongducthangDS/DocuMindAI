@@ -19,6 +19,10 @@ DOMAIN_TOPICS = (
     "bảo hiểm xã hội, bảo hiểm thất nghiệp, hưu trí"
 )
 
+# FPT AI (OpenAI-compatible) — LLM chính + reranker. Không phải mkp-api.fptcloud.com:
+# key token-api trả 401 ở đó (đo 2026-10-17).
+FPT_API_BASE = "https://token-api.fpt.ai/v1"
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -27,30 +31,23 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
-    # LLM — Gemini là nhà cung cấp DUY NHẤT (2026-09-19, quyết định của Ted).
-    # Không còn Groq / OpenAI-compatible / model local: mọi lời gọi LLM đi qua
-    # src.rag.generator.gemini_generate, xoay vòng (key x model).
+    # LLM — FPT AI Marketplace là nhà cung cấp CHÍNH (2026-10-17), Gemini dự phòng.
+    # Mọi lời gọi LLM vẫn đi qua src.rag.generator.gemini_generate / _gemini_pairs:
+    # các model FPT đứng đầu vòng xoay, hỏng hết mới tới (key x model) Gemini.
+    # FPT_API_KEY rỗng = bỏ qua FPT, chạy chỉ Gemini như trước.
+    fpt_api_key: str = ""
+    fpt_models: str = "Qwen3.8-27B,DeepSeek-V4-Flash"
     google_api_key: str = ""
     google_api_key_2: str = ""
     google_api_key_3: str = ""
-    gemini_judge_models: str = "gemini-3.1-flash-lite,gemini-3.5-flash-lite"
+    gemini_judge_models: str = "gemini-3.5-flash-lite"
     # gemini_generation_models: danh sach model Gemini cho generation, phan cach dau phay.
-    # Generation se xoay vong 3 key x cac model nay. Uu tien model RPD cao.
-    # Free tier RPD/RPM (Ted 2026-09-10): 3.1-flash-lite=500/15, 3.5-flash-lite=500/15,
-    # 2.5-flash-lite=20/10. Cac "flash" thuong (2.5/3/3.5/3.6/3.7/3.8) chi RPD 20.
-    # gemini-2.0-* / 1.5-* / 2.5-pro / 3.1-pro = KHONG co quota tren key nay.
-    gemini_generation_models: str = "gemini-3.1-flash-lite,gemini-3.5-flash-lite,gemini-2.5-flash-lite"
+    # Theo gemini.md: Default Model la gemini-3.8-flash; High-speed / Lightweight la gemini-3.5-flash-lite.
+    # Tuyet doi khong dung gemini-2.5-flash, gemini-2.5-pro, gemini-2.5-flash-lite (da deprecated HTTP 404).
+    gemini_generation_models: str = "gemini-3.8-flash,gemini-3.5-flash-lite"
     # Tier "khó": dùng khi generator._is_complex_query() đánh giá câu hỏi phức tạp
-    # (dài, so sánh nhiều văn bản, hội thoại nhiều lượt). "flash" thường RPD=20 —
-    # thấp hơn flash-lite (RPD=500) nhưng vẫn free tier, chấp nhận được vì số câu
-    # "khó" là thiểu số so với tổng truy vấn.
-    # Đã probe trực tiếp API (2026-09-22) để xác nhận tồn tại + có quota trên key
-    # hiện tại — KHÔNG suy đoán từ tên: gemini-2.5-flash bị retired ("no longer
-    # available to new users"), gemini-3-flash / gemini-3.1-flash 404 not found.
-    # 3.6/3.7/3.8-flash và 3-flash-preview đều OK. Nếu .env override
-    # GEMINI_GENERATION_MODELS (tier mặc định) bằng model nào trong danh sách
-    # dưới, đổi tier này để hai tier không trùng model.
-    gemini_generation_models_complex: str = "gemini-3.7-flash,gemini-3.8-flash,gemini-3.6-flash"
+    # (dài, so sánh nhiều văn bản, hội thoại nhiều lượt).
+    gemini_generation_models_complex: str = "gemini-3.8-flash,gemini-3.7-flash,gemini-3.6-flash"
 
     # Langfuse — LLM observability tùy chọn (trace/span cho toàn bộ agent run:
     # router, retrieve, grade, reformulate, answer — xem src/langfuse_otel.py).
@@ -75,10 +72,10 @@ class Settings(BaseSettings):
         default="https://cloud.langfuse.com",
         validation_alias=AliasChoices("LANGFUSE_HOST", "LANGFUSE_BASE_URL"),
     )
-    # Embedding chạy qua Gemini Embedding API — không nạp model nào vào RAM.
+    # Embedding chạy qua Gemini Embedding API — gemini.md quy định luôn dùng gemini-embedding-2.
     # Collection mang nhãn model đã index; lệch nhãn ⇒ EmbeddingModelMismatch lúc mở
     # store, nên đổi giá trị này BẮT BUỘC chạy: python scripts/reembed_corpus.py --yes
-    embedding_model: str = "gemini-embedding-001"
+    embedding_model: str = "gemini-embedding-2"
 
     # LangSmith
     langchain_tracing_v2: bool = False
@@ -127,8 +124,8 @@ class Settings(BaseSettings):
     # initialize_rag_on_startup=True: pre-warms embedder + ChromaDB during lifespan startup,
     # avoiding cold-start on first user query (~8-12s penalty). Set False for dev/local.
     initialize_rag_on_startup: bool = True
-    # enable_reranker=True: cross-encoder reranker runs locally (no API), adds ~150ms,
-    # improves context_precision measurably. Set False to reduce memory on constrained hosts.
+    # enable_reranker=True: có FPT_API_KEY thì rerank qua FPT /v1/rerank (không nạp model,
+    # ~0.8s/câu); không có key thì cross-encoder local (~2.2GB RAM, cần requirements-rerank.txt).
     enable_reranker: bool = True
     # reranker_model: cross-encoder for reranking. Default is the multilingual
     # BGE reranker (handles Vietnamese natively). For low-RAM hosts you can fall

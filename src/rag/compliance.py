@@ -159,7 +159,7 @@ def _extract_value_via_llm(situation: str, condition: dict) -> float | None:
             "không giải thích, không kèm chữ nào khác. Nếu không có số nào liên quan, "
             f"trả về đúng chữ 'none'.\n\nCâu: {situation}"
         )
-        raw = (gemini_generate(prompt, name="extract-compliance-value") or "").strip()
+        raw = (gemini_generate(prompt, models=["gemini-3.5-flash-lite"], name="extract-compliance-value") or "").strip()
         if raw.lower() == "none":
             return None
         match = _ANY_NUMBER_RE.search(raw)

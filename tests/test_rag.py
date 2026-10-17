@@ -291,6 +291,88 @@ class TestGeminiOverload:
         assert calls == [("k1", "m1"), ("k1", "m2"), ("k2", "m2"), ("k2", "m2")]
 
 
+class TestFptPrimary:
+    """FPT AI là nhà cung cấp chính (2026-10-17): thử trước Gemini, mọi lỗi FPT —
+    kể cả key sai — rơi về vòng xoay Gemini thay vì làm hỏng câu hỏi."""
+
+    @staticmethod
+    def _resp(status, payload=None):
+        return MagicMock(status_code=status, text="err", json=lambda: payload)
+
+    def test_fpt_answers_first_without_reasoning(self, monkeypatch):
+        import src.rag.generator as gen
+
+        monkeypatch.setenv("FPT_API_KEY", "fpt-test")
+        monkeypatch.setattr(gen, "_PAIR_DOWN_UNTIL", {})
+        gen.get_settings.cache_clear()
+        body = {"choices": [{"message": {"content": "\n\nTrả lời [1]", "reasoning_content": "nháp"}}],
+                "usage": {"prompt_tokens": 5, "completion_tokens": 3}}
+        with patch("requests.post", return_value=self._resp(200, body)) as post, \
+             patch("google.generativeai.GenerativeModel") as gemini, \
+             patch("src.rag.generator.record_generation"):
+            info = {}
+            assert gen.gemini_generate("q", info=info) == "Trả lời [1]"
+        assert info == {"provider": "fpt"}  # nhãn used_llm trên UI phải là FPT, không phải Gemini
+        assert post.call_args.kwargs["json"]["model"] == "Qwen3.8-27B"
+        gemini.assert_not_called()
+
+    def test_fpt_auth_error_falls_back_to_gemini(self, monkeypatch):
+        import src.rag.generator as gen
+
+        monkeypatch.setenv("FPT_API_KEY", "fpt-wrong")
+        monkeypatch.setattr(gen, "_PAIR_DOWN_UNTIL", {})
+        gen.get_settings.cache_clear()
+        with patch("requests.post", return_value=self._resp(401)), \
+             patch("src.rag.embedder.genai_client", lambda k: MagicMock()), \
+             patch("google.generativeai.GenerativeModel") as gemini, \
+             patch("src.rag.generator.record_generation"):
+            gemini.return_value.generate_content.return_value = MagicMock(text="gemini ok", usage_metadata=None)
+            assert gen.gemini_generate("q") == "gemini ok"
+        # 401 đẩy model FPT vào cooldown: câu sau đi thẳng Gemini, không gọi lại key hỏng.
+        assert all(k != gen._FPT_KEY for k, _ in gen._gemini_pairs())
+
+
+class TestFptRerank:
+    """Reranker qua FPT /v1/rerank: sắp theo relevance_score; API lỗi thì giữ thứ tự
+    RRF VÀ tắt ngưỡng 0.05 cho lượt đó — không thì mọi đoạn (điểm RRF ~0.016) bị
+    loại và câu trả lời thành "không tìm thấy" mà không báo lỗi."""
+
+    @staticmethod
+    def _nodes():
+        from llama_index.core.schema import NodeWithScore, TextNode
+        return [NodeWithScore(node=TextNode(text=t, id_=t), score=0.016) for t in ("a", "b", "c")]
+
+    def test_sorts_by_fpt_score_and_keeps_top_n(self):
+        from llama_index.core.schema import QueryBundle
+        from src.rag.retriever import _FptRerank
+
+        body = {"results": [{"index": 0, "relevance_score": 0.1}, {"index": 2, "relevance_score": 0.9},
+                            {"index": 1, "relevance_score": 0.5}]}
+        with patch("requests.post", return_value=MagicMock(json=lambda: body)) as post:
+            out = _FptRerank("bge-reranker-v2-m3", top_n=2).postprocess_nodes(self._nodes(), QueryBundle("q"))
+        assert [(n.node.id_, n.score) for n in out] == [("c", 0.9), ("b", 0.5)]
+        assert post.call_args.kwargs["json"]["model"] == "bge-reranker-v2-m3"
+
+    def test_api_failure_keeps_rrf_order_and_disables_score_gate(self, monkeypatch):
+        from llama_index.core.schema import QueryBundle
+        import src.rag.generator as gen
+        import src.rag.retriever as r_module
+        from src.rag.context import reset_degraded, start_degraded
+
+        monkeypatch.setenv("ENABLE_RERANKER", "true")
+        gen.get_settings.cache_clear()
+        monkeypatch.setattr(r_module, "_reranker_active", True)
+        token = start_degraded()
+        try:
+            assert gen._effective_min_score() == 0.05
+            with patch("requests.post", side_effect=ConnectionError("down")):
+                out = r_module._FptRerank("m", top_n=2).postprocess_nodes(self._nodes(), QueryBundle("q"))
+            assert [n.node.id_ for n in out] == ["a", "b"]
+            assert gen._effective_min_score() == 0.0
+        finally:
+            reset_degraded(token)
+
+
 class TestQueryComplexityRouting:
     """Heuristic routing model + kích thước context theo độ khó câu hỏi
     (generator._is_complex_query / _select_models)."""

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import threading
 import time
+import uuid
 from collections.abc import Callable, Iterator
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -95,8 +96,11 @@ class TestUploadDoesNotBlock:
 
 
 def _ws_turn(client: TestClient, payload: dict) -> Callable[[], None]:
+    # Session riêng mỗi lượt: ShortTermMemory sống qua các test, chung id thì lượt sau
+    # có lịch sử → _contextualize_query gọi Gemini THẬT bằng key giả (2-5s mạng) và
+    # vượt started.wait(5) — test hỏng theo độ trễ mạng, không theo code (2026-10-17).
     def fire() -> None:
-        with client.websocket_connect("/api/v1/ws/loop-test") as ws:
+        with client.websocket_connect(f"/api/v1/ws/loop-{uuid.uuid4().hex[:8]}") as ws:
             ws.send_json(payload)
             while '"done"' not in (ws.receive().get("text") or ""):
                 pass

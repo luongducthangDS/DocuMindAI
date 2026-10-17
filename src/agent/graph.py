@@ -112,7 +112,7 @@ def _get_llm():
         from langchain_google_genai import ChatGoogleGenerativeAI
 
         llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash-lite",
+            model="gemini-3.8-flash",
             google_api_key=settings.google_api_key,
             temperature=0.1,
         )
@@ -402,8 +402,10 @@ def router_node(state: AgentState) -> dict:
             if settings.google_api_key:
                 from src.rag.generator import gemini_generate
 
+                judge_models = [m.strip() for m in settings.gemini_judge_models.split(",") if m.strip()]
                 intent_raw = gemini_generate(
                     f"{_ROUTER_PROMPT}\n\nCâu hỏi: {query}",
+                    models=judge_models or None,
                     log_input=query,
                     name="route-intent",
                 ).strip().lower()
@@ -728,7 +730,7 @@ def answer_node(state: AgentState) -> dict:
     )
     latency = int((time.time() - t0) * 1000)
 
-    llm_label = {"gemini": "Gemini", "extractive_fallback": "Trích nguyên văn (không LLM)",
+    llm_label = {"gemini": "Gemini", "fpt": "FPT AI", "extractive_fallback": "Trích nguyên văn (không LLM)",
                  "none": "Không cần LLM"}.get(
         result["used_llm"], result["used_llm"]
     )
