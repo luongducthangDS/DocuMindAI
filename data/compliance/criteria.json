@@ -2,6 +2,10 @@
   {
     "id": "lam_them_gio_trong_nam",
     "topic": "Trần số giờ làm thêm trong 01 năm",
+    "anchors": [
+      "làm thêm",
+      "tăng ca"
+    ],
     "keywords": [
       "làm thêm",
       "tăng ca",
@@ -31,6 +35,10 @@
   {
     "id": "lam_them_gio_trong_thang",
     "topic": "Trần số giờ làm thêm trong 01 tháng",
+    "anchors": [
+      "làm thêm",
+      "tăng ca"
+    ],
     "keywords": [
       "làm thêm",
       "tăng ca",
@@ -58,6 +66,9 @@
   {
     "id": "thoi_gian_thu_viec",
     "topic": "Thời gian thử việc tối đa với công việc cần trình độ từ cao đẳng trở lên",
+    "anchors": [
+      "thử việc"
+    ],
     "keywords": [
       "thử việc",
       "ngày",
@@ -84,6 +95,9 @@
   {
     "id": "tien_luong_thu_viec",
     "topic": "Tỷ lệ tiền lương tối thiểu trong thời gian thử việc",
+    "anchors": [
+      "thử việc"
+    ],
     "keywords": [
       "thử việc",
       "lương thử việc",
@@ -109,6 +123,12 @@
   {
     "id": "nghi_hang_nam_dieu_kien_binh_thuong",
     "topic": "Số ngày nghỉ hằng năm hưởng nguyên lương trong điều kiện làm việc bình thường",
+    "anchors": [
+      "nghỉ hằng năm",
+      "nghỉ phép",
+      "ngày phép",
+      "phép năm"
+    ],
     "keywords": [
       "nghỉ hằng năm",
       "nghỉ phép",
@@ -133,6 +153,11 @@
   {
     "id": "luong_toi_thieu_thang_vung_1",
     "topic": "Mức lương tối thiểu tháng vùng I",
+    "anchors": [
+      "lương tối thiểu",
+      "vùng i",
+      "vùng 1"
+    ],
     "keywords": [
       "lương tối thiểu",
       "vùng i",

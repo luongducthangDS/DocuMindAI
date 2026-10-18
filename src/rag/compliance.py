@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import calendar
 import json
-import math
 import re
 from functools import lru_cache
 
@@ -35,8 +34,9 @@ _OPERATORS = {
 # thập phân. Đọc "1.200 giờ" thành 1.2 từng cho ✅ một vụ làm thêm 1200 giờ/năm.
 _NUM = r"\d{1,3}(?:\.\d{3})+(?![\d,])|\d+(?:[.,]\d+)?"
 _THOUSANDS_RE = re.compile(r"\d{1,3}(?:\.\d{3})+")
-# Ngày tháng ("30/4", "01/01/2026") không phải số liệu của tình huống.
-_DATE_RE = re.compile(r"\b\d{1,2}/\d{1,2}(?:/\d{2,4})?\b")
+# Ngày tháng ("30/4", "01/01/2026") và số hiệu văn bản ("74/2024/NĐ-CP" — từng thành
+# "lương 74 triệu ✅") không phải số liệu của tình huống.
+_DATE_RE = re.compile(r"\b\d{1,2}/\d{1,2}(?:/\d{2,4})?\b|\b\d+/\d{4}\b")
 
 
 def _parse_number(raw: str) -> float:
@@ -45,29 +45,20 @@ def _parse_number(raw: str) -> float:
     return float(raw.replace(",", "."))
 
 
-# Tried in order: number carrying the criterion's own unit ("320 giờ" for a
-# giờ/năm criterion), number near a known label keyword, number followed by any
-# unit marker (%/triệu/đồng), then any number at all.
-# Labels mirror `condition.field` in data/compliance/criteria.json (labour /
-# social-insurance domain). Adding a criterion with a new field means adding
-# its label here, otherwise extraction falls through to the generic patterns.
+# Nhãn dùng khi gọi extract_situation_value không kèm anchors của tiêu chí (test, công
+# cụ); check_compliance luôn truyền anchors, nên nhãn khi đó là chính chủ đề tiêu chí.
 _NUMBER_NEAR_LABEL_RE = re.compile(
     r"(?:giờ làm thêm|làm thêm|tăng ca|thử việc|mức lương|tiền lương|lương|"
     r"ngày nghỉ|nghỉ hằng năm|nghỉ phép|thời gian đóng|tỷ lệ đóng|tuổi nghỉ hưu)"
     rf"\D{{0,20}}?({_NUM})",
     re.IGNORECASE,
 )
-_TRAILING_UNIT_NUMBER_RE = re.compile(rf"({_NUM})\s*(?:%|giờ|ngày|tháng|năm|triệu|đồng)")
-_ANY_NUMBER_RE = re.compile(rf"({_NUM})")
-
-# Below this cosine similarity, an embedding match is considered noise rather
-# than a real match — situation is unrelated to any known criterion.
-_EMBEDDING_MATCH_THRESHOLD = 0.45
+_UNIT_AFTER_RE = re.compile(r"\s*(năm|tháng|tuần|ngày|giờ|%|triệu|đồng)(?![a-zà-ỹ])", re.IGNORECASE)
 
 # Minimum _keyword_score (total matched keyword length) to decide on keywords
 # alone. A single generic word — "%", "ngày", "tháng" — is not evidence that the
 # situation is about a given criterion, and this engine emits a ✅/❌ verdict with
-# a citation, so a weak match must fall through to embeddings rather than guess.
+# a citation, so a weak match must fall through to RAG rather than guess.
 _MIN_KEYWORD_SCORE = 6
 
 
@@ -86,52 +77,42 @@ def _keyword_score(situation: str, criterion: dict) -> int:
 
     Criteria in the same family share short keywords ("thử việc", "làm thêm")
     and are told apart by a longer, more specific one ("lương thử việc",
-    "trong 01 năm"). Counting matches ties those pairs and drops the decision on
-    the embedding fallback; weighting by length lets the specific phrase win.
+    "trong 01 năm"). Counting matches ties those pairs (→ no match); weighting by
+    length lets the specific phrase win.
     """
     situation_lower = situation.lower()
-    return sum(len(kw) for kw in criterion.get("keywords", []) if kw.lower() in situation_lower)
+    # Không có cụm chủ đề (anchors) thì cụm phụ ("trong năm", "bao lâu", "phần trăm") cộng
+    # lại vẫn vượt ngưỡng — đo 2026-10-18: câu lương hưu "16 năm … trong năm nay" thành
+    # "✅ đạt" theo trần làm thêm giờ/năm. Cụm phụ chỉ để phân xử giữa tiêu chí cùng họ.
+    if not any(_has_phrase(situation_lower, a) for a in criterion.get("anchors", [])):
+        return 0
+    return sum(len(kw) for kw in criterion.get("keywords", []) if _has_phrase(situation_lower, kw))
 
 
-def _cosine_similarity(a: list[float], b: list[float]) -> float:
-    dot = sum(x * y for x, y in zip(a, b))
-    norm_a = math.sqrt(sum(x * x for x in a))
-    norm_b = math.sqrt(sum(y * y for y in b))
-    if norm_a == 0 or norm_b == 0:
-        return 0.0
-    return dot / (norm_a * norm_b)
+def _phrase_re(phrase: str) -> re.Pattern:
+    """Nguyên cụm theo ranh giới từ: "vùng i" không được khớp "vùng iii"/"vùng iv".
+    Ranh giới chỉ đặt ở đầu/cuối là chữ — "%", "/năm" khớp liền sau số như cũ."""
+    p = phrase.lower()
+    head = r"(?<!\w)" if p[:1].isalnum() else ""
+    tail = r"(?!\w)" if p[-1:].isalnum() else ""
+    return re.compile(head + re.escape(p) + tail)
 
 
-def _match_by_embedding(situation: str, criteria: list[dict]) -> dict | None:
-    try:
-        from src.rag.embedder import get_embedder
-
-        embedder = get_embedder()
-        situation_vec = embedder.get_query_embedding(situation)
-        best_criterion = None
-        best_sim = -1.0
-        for c in criteria:
-            topic_vec = embedder.get_query_embedding(c["topic"])
-            sim = _cosine_similarity(situation_vec, topic_vec)
-            if sim > best_sim:
-                best_sim = sim
-                best_criterion = c
-        return best_criterion if best_sim >= _EMBEDDING_MATCH_THRESHOLD else None
-    except Exception as exc:
-        logger.warning("Embedding-based compliance match failed: {}", exc)
-        return None
+def _has_phrase(text_lower: str, phrase: str) -> bool:
+    return _phrase_re(phrase).search(text_lower) is not None
 
 
 def match_criteria(situation: str, criteria: list[dict]) -> dict | None:
-    """Keyword overlap first (cheap, deterministic); falls back to embedding
-    similarity against each criterion's `topic` when keywords are ambiguous
-    or absent."""
+    """Keyword overlap only. Ambiguous or absent → None, and the graph falls back to
+    RAG (cited answer, no ✅/❌). The old embedding fallback (cosine vs `topic`, one
+    threshold for every embedding model) matched 0/5 correctly on legal_qa_200 and put
+    pension questions under the annual-leave criterion (2026-10-18)."""
     return _match(situation, criteria)[0]
 
 
 def _match(situation: str, criteria: list[dict]) -> tuple[dict | None, dict]:
     """(tiêu chí, cách khớp). Cách khớp đi vào trace: engine này phát ✅/❌, nên khớp
-    nhầm tiêu chí phải thấy được là do từ khoá (điểm bao nhiêu) hay do embedding."""
+    nhầm tiêu chí phải thấy được là do từ khoá nào, điểm bao nhiêu."""
     if not criteria:
         return None, {"by": "none"}
 
@@ -146,27 +127,7 @@ def _match(situation: str, criteria: list[dict]) -> tuple[dict | None, dict]:
     if best_score >= _MIN_KEYWORD_SCORE and best_score > second_score:
         return best, {"by": "keyword", "score": best_score, "runner_up": second_score}
 
-    return _match_by_embedding(situation, criteria), {"by": "embedding", "keyword_best": best_score}
-
-
-def _extract_value_via_llm(situation: str, condition: dict) -> float | None:
-    try:
-        from src.rag.generator import gemini_generate
-
-        prompt = (
-            f"Trích xuất giá trị số liên quan đến '{condition.get('field')}' "
-            f"({condition.get('unit', '')}) từ câu sau. Chỉ trả về một số duy nhất, "
-            "không giải thích, không kèm chữ nào khác. Nếu không có số nào liên quan, "
-            f"trả về đúng chữ 'none'.\n\nCâu: {situation}"
-        )
-        raw = (gemini_generate(prompt, models=["gemini-3.5-flash-lite"], name="extract-compliance-value") or "").strip()
-        if raw.lower() == "none":
-            return None
-        match = _ANY_NUMBER_RE.search(raw)
-        return _parse_number(match.group(1)) if match else None
-    except Exception as exc:
-        logger.warning("LLM value extraction failed: {}", exc)
-        return None
+    return None, {"by": "none", "keyword_best": best_score}
 
 
 def _to_millions(raw: str) -> float:
@@ -174,10 +135,33 @@ def _to_millions(raw: str) -> float:
     return float(re.sub(r"[.,]", "", raw)) / 1_000_000
 
 
-def extract_situation_value(situation: str, condition: dict) -> float | None:
+# Một con số chỉ là giá trị của tiêu chí khi đứng gần chủ đề của nó (anchors) — "hợp đồng
+# thời vụ 3 tuần …, có được yêu cầu thử việc không?" không phải "thử việc 21 ngày".
+_ANCHOR_WINDOW = 30
+
+
+def _near_anchor(situation: str, anchors):
+    if not anchors:
+        return lambda m: True
+    low = situation.lower()
+    spans = [(a.start(), a.end()) for p in anchors for a in _phrase_re(p).finditer(low)]
+    return lambda m: any(m.start() - e <= _ANCHOR_WINDOW and s - m.end() <= _ANCHOR_WINDOW for s, e in spans)
+
+
+def _other_period(situation: str, m, unit: str) -> bool:
+    """"300 giờ/năm" không phải giá trị của tiêu chí giờ/tháng."""
+    period = unit.split("/", 1)[1].strip() if "/" in unit else ""
+    after = re.match(r"\s*/\s*(\w+)", situation[m.end():])
+    return bool(period and after and not period.endswith(after.group(1).lower()))
+
+
+def extract_situation_value(situation: str, condition: dict, anchors=()) -> float | None:
     """Pull the numeric value relevant to `condition['field']` out of
-    free-form Vietnamese phrasing. Regex first (deterministic, cheapest);
-    escalates to one LLM extraction call only if regex finds nothing.
+    free-form Vietnamese phrasing — regex only. None when no number is tied to
+    the criterion: the caller answers insufficient_info and the graph falls back
+    to RAG. (An LLM extraction fallback used to guess here — "10 tháng lương tối
+    thiểu" came back as a 10-triệu wage → ✅. A verdict must rest on a number the
+    user can see in their own question.)
 
     Money criteria are stored in "triệu đồng" but people write the amount both
     ways ("4,5 triệu" and "4.500.000 đồng"), so a full amount is matched first
@@ -185,17 +169,19 @@ def extract_situation_value(situation: str, condition: dict) -> float | None:
     trailing group "000".
     """
     situation = _DATE_RE.sub(" ", situation)
-    money = "đồng" in condition.get("unit", "")
+    near = _near_anchor(situation, anchors)
+    unit = condition.get("unit", "")
+    money = "đồng" in unit
     if money:
         # "5.310.000" / "5310000" — a raw amount in đồng, converted to triệu.
         # Tried before the label patterns, which would otherwise read the "1"
         # out of "lương tối thiểu vùng 1" as the amount.
-        full_amount = re.search(r"(\d{1,3}(?:[.,]\d{3}){2,})|(\d{7,})", situation)
+        full_amount = next((m for m in re.finditer(r"(\d{1,3}(?:[.,]\d{3}){2,})|(\d{7,})", situation)
+                            if near(m)), None)
         if full_amount:
             return _to_millions(full_amount.group(0))
-        in_millions = re.search(
-            r"(\d+(?:[.,]\d+)?)\s*(?:triệu|tr(?![a-zà-ỹ]))", situation, re.IGNORECASE
-        )
+        in_millions = next((m for m in re.finditer(
+            r"(\d+(?:[.,]\d+)?)\s*(?:triệu|tr(?![a-zà-ỹ]))", situation, re.IGNORECASE) if near(m)), None)
         if in_millions:
             return float(in_millions.group(1).replace(",", "."))
 
@@ -210,24 +196,32 @@ def extract_situation_value(situation: str, condition: dict) -> float | None:
                 "(hoặc tỷ lệ %) mới so được với ngưỡng."
             )
     if condition.get("unit") == "ngày":
-        days = _days_from_other_units(situation, condition)
+        days = _days_from_other_units(situation, condition, near)
         if days is not None:
             return days
 
-    unit_word = re.split(r"[\s/]", condition.get("unit", ""), maxsplit=1)[0]
+    unit_word = re.split(r"[\s/]", unit, maxsplit=1)[0]
     own_unit_re = re.compile(rf"({_NUM})\s*{re.escape(unit_word)}", re.IGNORECASE) if unit_word else None
-    for pattern in (own_unit_re, _NUMBER_NEAR_LABEL_RE, _TRAILING_UNIT_NUMBER_RE, _ANY_NUMBER_RE):
-        match = pattern.search(situation) if pattern else None
-        if match:
-            try:
-                value = _parse_number(match.group(1))
-            except ValueError:
-                continue
-            # "lương 4500000" written without separators — still đồng, not triệu.
-            if money and value >= 1000:
-                value /= 1_000_000
-            return value
-    return _extract_value_via_llm(situation, condition)
+    label_re = (re.compile(rf"(?:{'|'.join(map(re.escape, anchors))})\D{{0,20}}?({_NUM})", re.IGNORECASE)
+                if anchors else _NUMBER_NEAR_LABEL_RE)
+    # Chỉ số đi với đơn vị của tiêu chí hoặc đứng ngay sau nhãn của nó. Bản cũ còn thử "số
+    # bất kỳ + đơn vị bất kỳ" rồi "số bất kỳ": "phải làm đủ 24 tháng mới được nghỉ hằng năm"
+    # thành "24 ngày phép ✅".
+    candidates = [m for m in (own_unit_re.finditer(situation) if own_unit_re else ())
+                  if near(m) and not _other_period(situation, m, unit)]
+    # Số ngay sau nhãn nhưng mang đơn vị khác ("làm thêm tối đa trong 1 năm") là kỳ hạn, không phải giá trị.
+    candidates += [m for m in label_re.finditer(situation)
+                   if (u := _UNIT_AFTER_RE.match(situation, m.end())) is None or u.group(1).lower() == unit_word.lower()][:1]
+    for match in candidates:
+        try:
+            value = _parse_number(match.group(1))
+        except ValueError:
+            continue
+        # "lương 4500000" written without separators — still đồng, not triệu.
+        if money and value >= 1000:
+            value /= 1_000_000
+        return value
+    return None
 
 
 class AmbiguousValue(ValueError):
@@ -269,9 +263,9 @@ def _calendar_span(value: float, unit: str) -> tuple[float, float]:
     return min(spans), max(spans)
 
 
-def _days_from_other_units(situation: str, condition: dict) -> float | None:
+def _days_from_other_units(situation: str, condition: dict, near=lambda m: True) -> float | None:
     """Số ngày khi câu ghi bằng tháng/tuần/năm; None khi câu ghi thẳng bằng ngày."""
-    match = _TIME_SPAN_RE.search(situation)
+    match = next((m for m in _TIME_SPAN_RE.finditer(situation) if near(m)), None)
     if not match:
         return None
     value, unit = _parse_number(match.group(1)), match.group(2)
@@ -382,7 +376,7 @@ def check_compliance(situation: str, as_of_date: str | None = None) -> dict:
     criterion, how = _match(situation, load_criteria())
     if criterion is not None:
         situation_lower = situation.lower()
-        how["keywords"] = [kw for kw in criterion.get("keywords", []) if kw.lower() in situation_lower]
+        how["keywords"] = [kw for kw in criterion.get("keywords", []) if _has_phrase(situation_lower, kw)]
     return {**_verdict(situation, criterion, as_of), "match": how}
 
 
@@ -414,7 +408,7 @@ def _verdict(situation: str, criterion: dict | None, as_of: str) -> dict:
 
     condition = criterion["condition"]
     try:
-        value = extract_situation_value(situation, condition)
+        value = extract_situation_value(situation, condition, criterion.get("anchors", ()))
     except AmbiguousValue as exc:
         return {
             "matched": True,

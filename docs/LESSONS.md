@@ -20,6 +20,26 @@ chọn sai lần hai.
 
 ## Chọn công nghệ / kiến trúc
 
+### Engine tuân thủ phát ✅/❌ dựa trên khớp mềm và số đoán (→ 2026-10-18)
+- **Đã quyết:** `compliance_check` chọn tiêu chí bằng tổng độ dài cụm từ khoá (cụm phụ như "trong
+  năm", "bao lâu", "phần trăm" cũng tính), không đủ thì khớp embedding với một ngưỡng cosine chung
+  0.45; lấy giá trị bằng "số theo đơn vị → số gần nhãn → số + đơn vị bất kỳ → số bất kỳ → LLM".
+  Mỗi tầng thêm vào để "bắt được nhiều câu hơn".
+- **Sai ở đâu:** mỗi tầng dự phòng là một cách mới để phán sai, và không ai đo tỉ lệ phán sai trên
+  câu KHÔNG phải câu tuân thủ. Đo 2026-10-18 (legal_qa_200): engine phát ✅/❌ cho 42/83 câu có chữ
+  số; router đưa 21 câu vào node → 13 phán quyết, 10 sai — lương hưu "16 năm … trong năm nay" thành
+  "✅ đạt trần làm thêm giờ", embedding (cosine 0.48) đưa câu lương hưu vào "nghỉ hằng năm", "vùng i"
+  khớp chuỗi con "vùng iii", "74/2024" thành mức lương 74 triệu, LLM đọc "10 tháng lương tối thiểu"
+  thành lương 10 triệu. Live production (embedding Gemini) trả đúng kiểu đó cho câu lương hưu.
+- **Cái giá:** ~5% câu gold nhận phán quyết sai *kèm trích dẫn điều luật* — dạng sai nguy hiểm
+  nhất của sản phẩm. Không eval nào thấy: eval đầu cuối gọi thẳng `generate_answer`, bỏ qua router.
+- **Bài học:** với đầu ra có thẩm quyền (✅/❌), mặc định phải là KHÔNG phán; mỗi đường dự phòng
+  cần bằng chứng rằng nó đúng, không chỉ rằng nó "bắt thêm được". Và eval phải chạy đúng đường
+  người dùng đi (router → node), không phải hàm con dễ gọi nhất.
+- **Giờ làm thế nào:** tiêu chí có `anchors` bắt buộc; khớp theo ranh giới từ; bỏ embedding và LLM
+  trích số; số phải ở gần anchor và đúng đơn vị/kỳ hạn; còn lại rơi về RAG. Test chạy engine trên
+  cả gold set: chỉ lh_c01/lh_c02a/lh_c02b được phán (đều đúng).
+
 ### Đặt LLM judge làm cổng cho mọi câu hỏi mà không đo chính judge (→ 2026-09-27)
 - **Đã quyết:** graph self-correcting: `grade_node` hỏi LLM "các đoạn có liên quan không",
   "không" thì reformulate + truy hồi + grade lại. Khi tắt reranker, ngưỡng tắt nhánh nhanh

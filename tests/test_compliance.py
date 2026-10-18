@@ -130,21 +130,39 @@ class TestMatchCriteria:
     def test_generic_word_alone_is_not_a_match(self):
         """"ngày"/"tháng"/"%" on their own are below _MIN_KEYWORD_SCORE — the
         engine emits a ✅/❌ verdict with a citation, so a weak match must fall
-        through to embeddings instead of guessing a criterion."""
+        through to RAG instead of guessing a criterion."""
         from src.rag.compliance import load_criteria, match_criteria
 
-        with patch("src.rag.compliance._match_by_embedding", return_value=None) as mock_embed:
-            result = match_criteria("Hợp đồng này ký được mấy tháng?", load_criteria())
-        assert result is None
-        mock_embed.assert_called_once()
+        assert match_criteria("Hợp đồng này ký được mấy tháng?", load_criteria()) is None
 
-    def test_no_keyword_match_falls_back_to_embedding_and_returns_none_below_threshold(self):
+    def test_unrelated_question_is_not_a_match(self):
         from src.rag.compliance import load_criteria, match_criteria
 
-        with patch("src.rag.compliance._match_by_embedding", return_value=None) as mock_embed:
-            result = match_criteria("Giá vàng SJC hôm nay bao nhiêu?", load_criteria())
-        assert result is None
-        mock_embed.assert_called_once()
+        assert match_criteria("Giá vàng SJC hôm nay bao nhiêu?", load_criteria()) is None
+
+    @pytest.mark.parametrize("situation", [
+        # Đo 2026-10-18 trên legal_qa_200: router đưa các câu này vào compliance_check, và
+        # cụm phụ không kèm chủ đề ("trong năm", "phần trăm") hoặc embedding (cosine 0.48 với
+        # "nghỉ hằng năm") phát ✅/❌ theo một tiêu chí không liên quan.
+        "Lao động nam làm việc trong điều kiện bình thường, đã đóng bảo hiểm xã hội bắt buộc "
+        "16 năm. Nếu nghỉ việc trong năm nay thì phải đủ bao nhiêu tuổi mới được nghỉ hưu?",
+        "Tôi đã đủ tuổi nghỉ hưu và nghỉ việc hôm nay, đã đóng bảo hiểm xã hội bắt buộc được "
+        "17 năm. Tôi có được hưởng lương hưu hằng tháng không?",
+        "Lao động nam đủ tuổi nghỉ hưu, đã đóng bảo hiểm xã hội bắt buộc đủ 20 năm. Mức lương "
+        "hưu hằng tháng bằng bao nhiêu phần trăm mức bình quân tiền lương?",
+    ])
+    def test_supporting_phrases_without_a_topic_anchor_do_not_match(self, situation):
+        from src.rag.compliance import load_criteria, match_criteria
+
+        assert match_criteria(situation, load_criteria()) is None
+
+    def test_region_one_does_not_match_region_three(self):
+        from src.rag.compliance import _has_phrase
+
+        assert _has_phrase("doanh nghiệp ở vùng i trả", "vùng i")
+        assert not _has_phrase("doanh nghiệp ở vùng iii trả", "vùng i")
+        assert not _has_phrase("doanh nghiệp ở vùng iv trả", "vùng i")
+        assert _has_phrase("bằng 80% lương", "%")
 
     def test_empty_criteria_returns_none(self):
         from src.rag.compliance import match_criteria
@@ -193,10 +211,47 @@ class TestCheckCompliance:
     def test_no_match_when_unrelated(self):
         from src.rag.compliance import check_compliance
 
-        with patch("src.rag.compliance._match_by_embedding", return_value=None):
-            result = check_compliance("Hôm nay trời mưa có nên đi làm không?")
+        result = check_compliance("Hôm nay trời mưa có nên đi làm không?")
         assert result["matched"] is False
         assert result["verdict"] == "no_match"
+
+    def test_number_not_tied_to_the_criterion_is_not_its_value(self):
+        """"24 tháng" thâm niên không phải số ngày phép; "74/2024" là số hiệu văn bản. Bản cũ
+        lấy số bất kỳ → "✅ đạt" cho câu tiền đề sai. Không có số đúng nghĩa thì không phán."""
+        from src.rag.compliance import check_compliance
+
+        leave = check_compliance("Người lao động phải làm đủ 24 tháng mới được nghỉ hằng năm "
+                                 "hưởng lương, đúng không?")
+        wage = check_compliance("Doanh nghiệp ở vùng I phải trả mức lương tối thiểu tháng thấp "
+                                "nhất là bao nhiêu theo Nghị định 74/2024/NĐ-CP?")
+        probation = check_compliance("Công ty ký hợp đồng lao động thời vụ 3 tuần với một lao động, "
+                                     "công ty có được yêu cầu người này thử việc trước không?")
+        assert leave["verdict"] not in ("pass", "fail")
+        assert wage["verdict"] not in ("pass", "fail")
+        assert probation["verdict"] not in ("pass", "fail")   # 3 tuần là thời hạn hợp đồng
+
+    def test_gold_set_gets_verdicts_only_on_compliance_questions(self):
+        """Đo 2026-10-18: bản cũ phát ✅/❌ cho 42/83 câu gold có chữ số, router đưa 21 câu vào
+        node này → 10 phán quyết sai kèm trích dẫn (lương hưu chấm theo làm thêm giờ…).
+        Engine giờ chỉ dùng từ khoá + regex nên tất định — chặn được bằng test."""
+        import json
+
+        from src.rag.compliance import check_compliance
+
+        gold = json.loads((Path(__file__).resolve().parents[1] / "data/eval/legal_qa_200.json")
+                          .read_text(encoding="utf-8"))
+        judged = {g["id"]: check_compliance(g["question"], as_of_date=g["as_of_date"])["verdict"]
+                  for g in gold}
+        judged = {k: v for k, v in judged.items() if v in ("pass", "fail")}
+        assert judged == {"lh_c01": "fail", "lh_c02a": "pass", "lh_c02b": "fail"}
+
+    def test_value_from_another_period_is_skipped(self):
+        """"300 giờ/năm" trong ngoặc là trần của ngành khác; giá trị của câu là 45 giờ/tháng."""
+        from src.rag.compliance import check_compliance
+
+        r = check_compliance("Một xưởng cơ khí (không thuộc ngành được làm thêm 300 giờ/năm) yêu cầu "
+                             "công nhân làm thêm 45 giờ trong tháng này. Như vậy có đúng luật không?")
+        assert (r["criterion_id"], r["extracted_value"], r["verdict"]) == ("lam_them_gio_trong_thang", 45.0, "fail")
 
     def test_insufficient_info_when_no_number(self, monkeypatch):
         from src.config import get_settings
@@ -239,6 +294,12 @@ class TestCriteriaDataIntegrity:
             assert doc_id in indexed, (
                 f"{c['id']} trích dẫn '{so_hieu}' — không có trong data/raw/lao_dong/"
             )
+
+    def test_every_criterion_has_topic_anchors(self):
+        # Thiếu anchors = tiêu chí 0 điểm với mọi câu — im lặng không bao giờ khớp.
+        from src.rag.compliance import load_criteria
+
+        assert all(c.get("anchors") for c in load_criteria())
 
     def test_no_banking_vocabulary_left(self):
         from src.rag.compliance import load_criteria

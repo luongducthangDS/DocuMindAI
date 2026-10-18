@@ -142,16 +142,15 @@ def test_router_records_why_it_chose_the_intent(monkeypatch, query, llm, intent,
 
 
 @pytest.mark.usefixtures("real_criteria", "no_network")
-def test_compliance_result_says_how_the_criterion_was_matched(monkeypatch):
+def test_compliance_result_says_how_the_criterion_was_matched():
     from src.rag import compliance
 
     r = compliance.check_compliance("Công ty cho nhân viên làm thêm 1.200 giờ trong năm có đúng luật không?")
     assert r["criterion_id"] == "lam_them_gio_trong_nam"
     assert r["match"]["by"] == "keyword" and r["match"]["keywords"]
 
-    monkeypatch.setattr(compliance, "_match_by_embedding", lambda *_a: None)
     r = compliance.check_compliance("Giá vàng SJC hôm nay bao nhiêu?")
-    assert r["verdict"] == "no_match" and r["match"]["by"] == "embedding"
+    assert r["verdict"] == "no_match" and r["match"]["by"] == "none"
 
 
 def test_rotated_429_is_warning_only_exhaustion_is_error(monkeypatch):
