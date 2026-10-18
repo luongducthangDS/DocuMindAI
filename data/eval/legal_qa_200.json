@@ -165,7 +165,11 @@
     ],
     "distractor_docs": [
       "41-2024-QH15"
-    ]
+    ],
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "ld_t04b",
@@ -189,7 +193,11 @@
     ],
     "distractor_docs": [
       "58-2014-QH13"
-    ]
+    ],
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "ld_t05a",
@@ -299,7 +307,11 @@
     ],
     "distractor_docs": [
       "58-2014-QH13"
-    ]
+    ],
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "ld_t07a",
@@ -326,7 +338,11 @@
     ],
     "distractor_docs": [
       "41-2024-QH15"
-    ]
+    ],
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "ld_t07b",
@@ -416,7 +432,14 @@
     ],
     "distractor_docs": [
       "38-2013-QH13"
-    ]
+    ],
+    "acceptable_clauses": [
+      "374-2025-ND-CP__d15"
+    ],
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "nhieu_dieu_dung"
+    }
   },
   {
     "id": "ld_t09a",
@@ -440,7 +463,11 @@
     ],
     "distractor_docs": [
       "74-2025-QH15"
-    ]
+    ],
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "ld_t09b",
@@ -488,7 +515,11 @@
     ],
     "distractor_docs": [
       "74-2025-QH15"
-    ]
+    ],
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "ld_t10b",
@@ -512,7 +543,11 @@
     ],
     "distractor_docs": [
       "38-2013-QH13"
-    ]
+    ],
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "ld_t11a",
@@ -1045,7 +1080,11 @@
       "41-2024-QH15"
     ],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "dien_dat_xa"
+    }
   },
   {
     "id": "lh_b02b",
@@ -1071,7 +1110,11 @@
     ],
     "drafted_by": "claude",
     "reviewed": false,
-    "scoring_note": "Sửa công cụ chấm ngày 2026-09-23 SAU khi xem output lần chạy đầu: chỉ thêm cách viết tương đương / thu hẹp chuỗi cấm cho đúng lỗi cần bắt. Đáp án không đổi."
+    "scoring_note": "Sửa công cụ chấm ngày 2026-09-23 SAU khi xem output lần chạy đầu: chỉ thêm cách viết tương đương / thu hẹp chuỗi cấm cho đúng lỗi cần bắt. Đáp án không đổi.",
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "dien_dat_xa"
+    }
   },
   {
     "id": "lh_o01",
@@ -1176,7 +1219,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "dien_dat_xa"
+    }
   },
   {
     "id": "lh_f02",
@@ -1329,7 +1376,8 @@
     "source_clauses": [],
     "expect_contains": [
       [
-        "thời hạn trả lương"
+        "thời hạn trả lương",
+        "kỳ hạn trả lương"
       ],
       [
         "phụ cấp lương"
@@ -1338,7 +1386,14 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "acceptable_clauses": [
+      "10-2020-TT-BLDTBXH__d3_s1"
+    ],
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "nhieu_dieu_dung"
+    }
   },
   {
     "id": "g2_a003",
@@ -1360,7 +1415,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "g2_a004",
@@ -1523,7 +1582,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "g2_a011",
@@ -1687,7 +1750,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "g2_a018",
@@ -1920,7 +1987,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "g2_a028",
@@ -2086,7 +2157,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "g2_a035",
@@ -2158,7 +2233,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "g2_a038",
@@ -2436,7 +2515,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "g2_a049",
@@ -2563,7 +2646,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "g2_b005",
@@ -2754,7 +2841,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "g2_b013",
@@ -2820,7 +2911,14 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "acceptable_clauses": [
+      "12-2025-TT-BNV__d8"
+    ],
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "nhieu_dieu_dung"
+    }
   },
   {
     "id": "g2_b016",
@@ -2917,7 +3015,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "g2_b020",
@@ -3195,7 +3297,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "g2_b032",
@@ -3217,7 +3323,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "g2_b033",
@@ -3227,11 +3337,11 @@
     "category": "bhxh_mot_lan",
     "temporal_kind": "multi_clause",
     "expected_behavior": "answer",
-    "ground_truth": "Người lao động có thể lựa chọn hưởng trợ cấp hằng tháng thay vì bảo hiểm xã hội một lần (điểm a khoản 1 Điều 70 Luật Bảo hiểm xã hội 2024). Theo Điều 22 Nghị định 158/2025/NĐ-CP, điều kiện là không hưởng bảo hiểm xã hội một lần, không bảo lưu thời gian đóng bảo hiểm xã hội và có đề nghị hưởng trợ cấp hằng tháng, áp dụng cho người đủ tuổi nghỉ hưu nhưng chưa đủ điều kiện hưởng lương hưu và chưa đủ tuổi hưởng trợ cấp hưu trí xã hội.",
+    "ground_truth": "Người lao động có thể lựa chọn hưởng trợ cấp hằng tháng thay vì bảo hiểm xã hội một lần (Điều 23 Luật Bảo hiểm xã hội 2024). Theo Điều 22 Nghị định 158/2025/NĐ-CP, điều kiện là không hưởng bảo hiểm xã hội một lần, không bảo lưu thời gian đóng bảo hiểm xã hội và có đề nghị hưởng trợ cấp hằng tháng, áp dụng cho người đủ tuổi nghỉ hưu nhưng chưa đủ điều kiện hưởng lương hưu và chưa đủ tuổi hưởng trợ cấp hưu trí xã hội.",
     "source_doc": "41-2024-QH15",
     "source_clause": "",
     "source_clauses": [
-      "41-2024-QH15__d70",
+      "41-2024-QH15__d23",
       "158-2025-ND-CP__d22"
     ],
     "expect_contains": [
@@ -3245,7 +3355,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "gold_sai"
+    }
   },
   {
     "id": "g2_b034",
@@ -3273,7 +3387,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "g2_b035",
@@ -3309,15 +3427,12 @@
     "question": "Người lao động đã đóng bảo hiểm xã hội bắt buộc được 14 năm 8 tháng, đủ tuổi nghỉ hưu theo diện thông thường (Điều 64 Luật Bảo hiểm xã hội). Người này có được đóng một lần cho số tháng còn thiếu để đủ điều kiện hưởng lương hưu không?",
     "as_of_date": "2025-10-01",
     "category": "huu_tri",
-    "temporal_kind": "multi_clause",
+    "temporal_kind": "single_clause",
     "expected_behavior": "answer",
-    "ground_truth": "Có. Theo khoản 7 Điều 33 Luật Bảo hiểm xã hội 2024, người lao động còn thiếu tối đa 06 tháng đóng bảo hiểm xã hội để đủ điều kiện hưởng lương hưu được đóng tiếp một lần cho số tháng còn thiếu. Theo điểm a khoản 2 Điều 12 Thông tư 12/2025/TT-BNV, đối với trường hợp đủ tuổi theo diện thông thường (Điều 64), điều kiện áp dụng là đã có thời gian đóng bảo hiểm xã hội bắt buộc từ đủ 14 năm 6 tháng đến dưới 15 năm — 14 năm 8 tháng thỏa mãn điều kiện này.",
-    "source_doc": "41-2024-QH15",
-    "source_clause": "",
-    "source_clauses": [
-      "41-2024-QH15__d33_s1",
-      "12-2025-TT-BNV__d12"
-    ],
+    "ground_truth": "Có. Theo điểm a khoản 2 Điều 12 Thông tư 12/2025/TT-BNV (hướng dẫn khoản 7 Điều 33 Luật Bảo hiểm xã hội 2024: còn thiếu tối đa 06 tháng đóng bảo hiểm xã hội để đủ điều kiện hưởng lương hưu thì được đóng tiếp một lần), trường hợp đủ tuổi theo diện thông thường (Điều 64) áp dụng khi đã có thời gian đóng bảo hiểm xã hội bắt buộc từ đủ 14 năm 6 tháng đến dưới 15 năm — 14 năm 8 tháng thỏa mãn điều kiện này.",
+    "source_doc": "12-2025-TT-BNV",
+    "source_clause": "12-2025-TT-BNV__d12",
+    "source_clauses": [],
     "expect_contains": [
       [
         "tối đa 06 tháng"
@@ -3329,7 +3444,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "gold_sai"
+    }
   },
   {
     "id": "g2_b037",
@@ -3351,7 +3470,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "g2_b038",
@@ -3543,7 +3666,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "g2_c007",
@@ -3746,7 +3873,14 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "acceptable_clauses": [
+      "134-2015-ND-CP__d10"
+    ],
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "nhieu_dieu_dung"
+    }
   },
   {
     "id": "g2_c016",
@@ -3966,7 +4100,11 @@
       "41-2024-QH15"
     ],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "g2_c026",
@@ -4016,7 +4154,11 @@
       "41-2024-QH15"
     ],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "g2_c028",
@@ -4041,7 +4183,11 @@
       "41-2024-QH15"
     ],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "g2_c029",
@@ -4132,7 +4278,14 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "acceptable_clauses": [
+      "374-2025-ND-CP__d4"
+    ],
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "nhieu_dieu_dung"
+    }
   },
   {
     "id": "g2_d003",
@@ -4387,7 +4540,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "clause_review": {
+      "date": "2026-10-18",
+      "label": "truy_hoi_khac"
+    }
   },
   {
     "id": "g2_d015",
