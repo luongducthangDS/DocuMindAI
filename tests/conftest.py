@@ -31,6 +31,11 @@ def patch_settings(tmp_path, monkeypatch):
     for var in ("LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY", "LANGCHAIN_API_KEY", "FPT_API_KEY"):
         monkeypatch.setenv(var, "")
     monkeypatch.setenv("LANGCHAIN_TRACING_V2", "false")
+    # Danh sách model Gemini lấy theo default của code, không theo .env máy dev: .env để
+    # trống (tắt Gemini, chỉ chạy FPT — 2026-10-17) từng làm 3 test mock Gemini không còn cặp nào.
+    from src.config import Settings
+    for field in ("gemini_generation_models", "gemini_generation_models_complex", "gemini_judge_models"):
+        monkeypatch.setenv(field.upper(), Settings.model_fields[field].default)
 
     # Clear lru_cache so settings reload with test env
     from src.config import get_settings

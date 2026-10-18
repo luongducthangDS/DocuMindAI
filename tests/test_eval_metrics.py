@@ -58,6 +58,26 @@ def test_ci_gate_fails_only_beyond_tolerance():
     assert "❌" in table
 
 
+def test_ci_gate_fails_a_report_measured_without_the_dense_leg(tmp_path, monkeypatch):
+    """Số đủ ngưỡng nhưng có câu đo bằng BM25 (embedding 429) vẫn phải FAIL."""
+    import json
+    import sys
+
+    import pytest
+
+    from eval import ci_gate
+
+    summary = {"overall": {"pre_filter": {"recall_at_1": 0.8, "mrr": 0.8}}}
+    meta = {"gold_set": "g.json", "n_questions": 2}
+    (tmp_path / "base.json").write_text(json.dumps({"meta": meta, "summary": summary}))
+    (tmp_path / "new.json").write_text(json.dumps({"meta": {**meta, "n_degraded": 3}, "summary": summary}))
+    monkeypatch.delenv("GITHUB_STEP_SUMMARY", raising=False)
+    monkeypatch.setattr(sys, "argv", ["ci_gate", str(tmp_path / "new.json"), "--baseline", str(tmp_path / "base.json")])
+    with pytest.raises(SystemExit) as exc:
+        ci_gate.main()
+    assert exc.value.code == 1
+
+
 def test_legal_qa_200_schema():
     """DB-free guard; eval/validate_gold.py checks the same set against the live index."""
     import json
@@ -110,3 +130,25 @@ def test_readme_eval_table_quotes_the_report_verbatim():
     for arm in ("no_temporal", "pre_filter"):
         m = summary["by_kind"]["doc_version"][arm]
         assert f"{m['answer_accuracy']:.2f}" in doc_version and f"n={m['n']}" in doc_version
+
+
+def test_summarise_recall_at_1_single_drops_multi_clause_questions():
+    """Câu nhiều điều khoản xếp theo điều khoản kém nhất nên không bao giờ hạng 1 —
+    recall_at_1 chung bị kéo xuống bởi một trần cấu trúc, recall_at_1_single thì không."""
+    def row(rank, multi):
+        ctx = {"gold": True, "distractor": False, "clean": True, "n_chunks": 8, "gold_rank": rank}
+        return {"temporal_kind": "x", "has_gold": True, "multi_clause": multi, "retrieve_ms": 1,
+                "arms": {"a": {"context": ctx}}}
+
+    agg = summarise([row(1, False), row(2, False), row(2, True)], ("a",), retrieval_only=True)["overall"]["a"]
+    assert agg["recall_at_1"] == 1 / 3
+    assert agg["recall_at_1_single"] == 1 / 2 and agg["n_single"] == 2
+
+
+def test_gold_rank_accepts_alternate_clause_for_single_clause_question():
+    chunks = [_chunk("nd__d15", "nd__d15__v1"), _chunk("luat__d39", "luat__d39__v1")]
+    q = {"source_clause": "luat__d39", "acceptable_clauses": ["nd__d15"]}
+    assert gold_rank(chunks, q) == 1
+    # Câu nhiều điều khoản: điều khoản thay thế không được dùng để "lấp" điều khoản thiếu
+    q_multi = {"source_clause": "", "source_clauses": ["luat__d39", "x__d1"], "acceptable_clauses": ["nd__d15"]}
+    assert gold_rank(chunks, q_multi) is None

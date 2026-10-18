@@ -52,6 +52,9 @@ def main() -> None:
     if new["meta"]["gold_set"] != base["meta"]["gold_set"] or new["meta"]["n_questions"] != base["meta"]["n_questions"]:
         sys.exit("Gold set khác baseline — cập nhật reports/eval_baseline.json cùng PR đổi gold set.")
     failures, table = gate(new["summary"]["overall"][args.arm], base["summary"]["overall"][args.arm])
+    # Câu chạy thiếu nhánh dense (embedding 429) là số đo BM25 — PASS trên đó là PASS giả.
+    if degraded := new["meta"].get("n_degraded"):
+        failures.append(f"{degraded} câu đo thiếu nhánh dense (embedding lỗi/quota) — chạy lại, đừng so")
 
     md = f"### Retrieval eval — arm `{args.arm}`, {new['meta']['n_questions']} câu\n\n{table}\n"
     md += "\n" + ("**FAIL**\n- " + "\n- ".join(failures) if failures else "**PASS** — không metric nào tụt quá ngưỡng.") + "\n"

@@ -5,6 +5,8 @@ A drafted question is only ground truth if the index can back it. For every item
   • source_clause / source_clauses exist as clause_uid in the vector store
   • as_of_date falls inside [effective_from, effective_to) of some version of each clause
   • every expect_contains group appears verbatim in that text (except derived answers)
+  • each acceptable_clauses entry is live at as_of_date and ON ITS OWN contains every
+    expect_contains group — an alternate gold must answer the question by itself
   • ids are unique; refusals carry no gold clause
 
 Checks against the LIVE index (Chroma or Qdrant via vector_backend), so it also catches
@@ -78,6 +80,12 @@ def check(q: dict, catalog: dict[str, list[dict]]) -> list[str]:
     for group in q["expect_contains"]:
         if not any(_norm(alt) in blob for alt in group):
             errors.append(f"expect_contains không có nguyên văn trong chunk nguồn: {group}")
+    for uid in q.get("acceptable_clauses") or []:
+        live = [v for v in catalog.get(uid, [])
+                if v.get("effective_from_i", 0) <= as_of < v.get("effective_to_i", 99991231)]
+        alt_blob = "\n".join(_norm(v["text"]) for v in live)
+        if not live or not all(any(_norm(a) in alt_blob for a in g) for g in q["expect_contains"]):
+            errors.append(f"acceptable_clauses {uid}: không hiệu lực tại as_of hoặc thiếu expect_contains")
     return errors
 
 

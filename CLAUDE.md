@@ -23,11 +23,15 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
 - Corpus lao động/BHXH: 20 văn bản tại `data/raw/lao_dong/` (+ `_versions/` cho bản sửa đổi
   cấp khoản). Index có **19** `doc_id`: `18-VBHN-VPQH` là bản hợp nhất, nạp làm nội dung của `45-2019-QH14`
   (`consolidated_from`) — `/documents` hiện 19 là đúng. Corpus ngân hàng cũ đã bỏ — `data/raw/banking_docs/` không còn tồn tại.
-- ChromaDB `data/chroma_db/` (collection `documind_legal`): **1151 chunks**, 3072-dim.
-  Qdrant Cloud (production đọc từ đây) **vẫn giữ vector `gemini-embedding-001`** — đo 2026-10-17,
-  production + CI pin `EMBEDDING_MODEL=gemini-embedding-001` cho khớp. Chroma local đã là
-  `gemini-embedding-2`, nên `scripts/restore_chroma_from_qdrant.py` lúc này sẽ ghi vector SAI
-  model vào local. Chuyển production sang 2: migrate Chroma → Qdrant rồi đổi env Render + bỏ pin CI cùng lúc.
+- ChromaDB `data/chroma_db/`: local dùng **`documind_legal_fpt`** (FPT `Vietnamese_Embedding`, 1024-dim,
+  **1247 chunks**, từ 2026-10-17 — `.env` CHROMA_COLLECTION/EMBEDDING_MODEL); `documind_legal` (gemini-embedding-2,
+  1247) và `documind_legal__backup_gemini-embedding-001` (1151, corpus cũ) còn giữ. Ingest lại 2026-10-17 sau
+  khi bù 145/2020 Điều 102–115 + phụ lục, sửa bảng/công thức; Qdrant vẫn là bản 1151 chunk cũ.
+  Qdrant Cloud (production đọc từ đây): collection **`documind_legal_fpt`** (1247 point, FPT
+  `Vietnamese_Embedding` 1024-dim, migrate + verify 2026-10-18); env Render + CI đặt
+  `QDRANT_COLLECTION=documind_legal_fpt`, `EMBEDDING_MODEL=Vietnamese_Embedding`. Collection cũ
+  `documind_legal` (gemini-embedding-001, 1151, corpus cũ) giữ nguyên làm đường quay lui — đổi lại
+  2 biến env là về bản cũ. `scripts/restore_chroma_from_qdrant.py` phải chạy với cùng cặp env đó.
 - `data/compliance/criteria.json`: 6 tiêu chí định lượng lao động (trần làm thêm giờ
   năm/tháng, thời gian thử việc, lương thử việc 85%, nghỉ hằng năm, lương tối thiểu vùng I).
   Mọi tiêu chí phải trích dẫn văn bản CÓ trong `data/raw/lao_dong/` — có test chặn
@@ -46,9 +50,10 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   `--embed-cache` chỉ dùng cho CI (latency khi đó không phải số thật). Kết quả: README mục Đánh giá —
   chỉ trích nguyên `summary` của report, không tính tay trên tập con (test chặn); report ghi
   `meta.index` (provider/collection/model/số chunk) + `meta.git_sha`.
-- CI: `.github/workflows/ci.yml` — pytest + retrieval eval trên Qdrant (reranker tắt như Render),
-  gate bằng `eval/ci_gate.py` so với `reports/eval_baseline.json`. Cần secrets `GOOGLE_API_KEY*`,
-  `QDRANT_URL`, `QDRANT_API_KEY`.
+- CI: `.github/workflows/ci.yml` — pytest + retrieval eval trên Qdrant `documind_legal_fpt`, gate bằng
+  `eval/ci_gate.py` so với `reports/eval_baseline.json` (FAIL cả khi report có câu đo thiếu nhánh dense —
+  `meta.n_degraded`). Reranker TẮT trong CI dù production bật (199 lời gọi rerank dồn dập dính 429 FPT).
+  Cần secrets `FPT_API_KEY`, `QDRANT_URL`, `QDRANT_API_KEY`.
 - **Chroma Cloud** (database `DocuMind`, biến `CHROMA_CLOUD_*`): chỉ là bản sao để xem dashboard
   và so provider — app KHÔNG đọc từ đó. Đồng bộ: `python scripts/copy_chroma_to_cloud.py`; so
   sánh: `python eval/provider_bench.py` (kết quả README mục Đánh giá). Gọi qua REST
@@ -58,18 +63,28 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   Report nào ghi rerank phải xem `meta.reranker_active`, không tin `ENABLE_RERANKER`.
   torch/sentence-transformers/transformers **không** còn trong `requirements.txt` (2026-09-27,
   image production không cài ~1.3GB này) — muốn chạy reranker: `pip install -r requirements-rerank.txt`.
-- Test suite: 635 passed, 3 skipped khi không có Chroma local (đo 2026-10-17). Test không gửi trace ra Langfuse/LangSmith
+- Test suite: 646 passed (đo 2026-10-17). Test không gửi trace ra Langfuse/LangSmith
   (`conftest.py::patch_settings` xoá key).
 
 **Stack:**
 - Backend: FastAPI + LangGraph agent + vector store qua `VECTOR_STORE_PROVIDER`
   (`chroma` mặc định local, hoặc `qdrant` cho Qdrant Cloud — xem `src/rag/vector_backend.py`)
-- Embedding: `gemini-embedding-2` (3072-dim) qua Gemini Embedding API — **không nạp
-  model nào vào RAM**. Model đọc từ `EMBEDDING_MODEL`, không hard-code. Lịch sử: chạy
+- Embedding: local `Vietnamese_Embedding` (1024-dim) qua FPT `/v1/embeddings` (từ 2026-10-17; production còn
+  ghim `gemini-embedding-001`) — **không nạp model nào vào RAM**. Ngưỡng cosine grader theo model
+  (`grader._COSINE_GATES`): model chưa đo thì luôn hỏi judge. Model đọc từ `EMBEDDING_MODEL`, không hard-code. Lịch sử: chạy
   model local `AITeamVN/Vietnamese_Embedding` (1024-dim) tới 2026-09-19; `gemini-embedding-001` tới 2026-10.
 - Retriever: Hybrid BM25 + dense vector + RRF fusion + cross-encoder reranker
-  (reranker `BAAI/bge-reranker-v2-m3` vẫn chạy LOCAL — ngoại lệ duy nhất)
-- LLM: **FPT AI Marketplace chính, Gemini dự phòng** (2026-10-17). `_gemini_pairs` đặt các
+  (`bge-reranker-v2-m3` qua FPT `/v1/rerank` khi có FPT_API_KEY, 10 ứng viên — `_RERANK_POOL`; không key thì
+  local). Sau fusion,
+  `_apply_query_priors` (retriever.py) hạ 3 bậc đoạn thuộc chương/văn bản BHXH tự nguyện khi câu
+  hỏi không nói "tự nguyện", và đoạn phụ lục khi câu hỏi không hỏi danh mục/biểu mẫu/năm sinh/địa
+  bàn — chỉ đổi thứ tự, không đổi điểm. Đo 2026-10-17 (legal_qa_200, recall@1 câu một điều):
+  FPT embedding 0.828 → luật 0.834 → + rerank pool 10 **0.882** (`reports/temporal_eval_vnembed_rerank10.json`,
+  rerank API p50 250ms); Gemini-2 0.72 → 0.78 với luật.
+- LLM: **chỉ FPT AI Marketplace** (2026-10-18): `GEMINI_GENERATION_MODELS`, `GEMINI_GENERATION_MODELS_COMPLEX`,
+  `GEMINI_JUDGE_MODELS` để TRỐNG ở `.env` và Render ⇒ không còn cặp Gemini; FPT hỏng cả hai model thì trích
+  nguyên văn nguồn (`used_llm=extractive_fallback`). Bật lại Gemini = điền lại 3 biến (code giữ nguyên;
+  test ép default qua `conftest.py`). Mô tả cơ chế khi còn Gemini (2026-10-17): `_gemini_pairs` đặt các
   cặp `("fpt", model)` từ `FPT_MODELS` lên đầu vòng xoay, nên mọi call site (`gemini_generate`,
   `stream_answer`, contextualize/restore-diacritics trong graph) thử FPT trước; lỗi FPT nào
   (kể cả 401) cũng cooldown model đó rồi rơi về Gemini (`gemini-3.8-flash`, phân loại
@@ -111,7 +126,7 @@ Lệnh ingest tài liệu:
 ```powershell
 # Ingest corpus lao động vào ChromaDB.
 # BẮT BUỘC có --manifest: thiếu cờ này script rơi về chế độ quét thư mục, nuốt luôn
-# _versions/ thành tài liệu độc lập (chunk rác thay vì 1151).
+# _versions/ thành tài liệu độc lập (chunk rác thay vì 1247).
 python scripts/ingest_documents.py --source-dir data/raw/lao_dong `
   --manifest docs/corpus/corpus_manifest.yaml --reset
 
@@ -207,6 +222,9 @@ eval/
   rag_comparison.py  Benchmark pipeline (RAGAS + local metrics)
   run_evals.py       Entry point eval
   metrics.py         Local metrics: hit_rate, MRR, citation_rate, ooc_refusal_rate
+  corpus_llm_audit.py  Model FPT đọc từng đoạn corpus: loại đoạn + lỗi trích xuất (bảng vỡ, câu đứt,
+                       lẫn nội dung). Cache theo hash đoạn; mặc định 80 RPM (FPT 100 RPM/model, chung
+                       key với production). Kiểm toàn văn với nguồn: `python scripts/acquire_corpus.py`
 
 logs/
   chat_history.jsonl   Log mỗi query/response (append, structured JSON; tự tạo lại khi chạy)
@@ -219,7 +237,7 @@ logs/
 - `GOOGLE_API_KEY`, `GOOGLE_API_KEY_2`, `GOOGLE_API_KEY_3` — 3 Gemini keys
 - `GEMINI_JUDGE_MODELS` — danh sách model cho RAGAS eval & classification (mặc định `gemini-3.5-flash-lite`)
 - `GEMINI_GENERATION_MODELS` — danh sách model Gemini cho generation (mặc định `gemini-3.8-flash,gemini-3.5-flash-lite`)
-- `EMBEDDING_MODEL=gemini-embedding-2` — nguồn sự thật duy nhất cho model
+- `EMBEDDING_MODEL=Vietnamese_Embedding` (local; tên không bắt đầu bằng `gemini` = đi FPT) — nguồn sự thật duy nhất cho model
   embedding. Đổi giá trị này **bắt buộc** chạy `python scripts/reembed_corpus.py --yes`;
   collection mang nhãn model đã index, lệch nhãn là `EmbeddingModelMismatch` lúc mở store.
 - `API_PORT=8081`
@@ -266,7 +284,7 @@ for k in ("HF_HOME", "HF_HUB_CACHE", "TRANSFORMERS_CACHE", "SENTENCE_TRANSFORMER
 
 **LLM temperature:** `0.0` (không phải 0.1) để citation ổn định giữa các lần chạy.
 
-**ChromaDB:** Dùng local `PersistentClient` (không cần server). HTTP server ở `localhost:8000` thường không chạy — `get_chroma_collection()` probe TCP 0.5s rồi đi thẳng xuống local, thay vì chờ `heartbeat()` hết 4.2s. Collection `documind_legal` đang có 1151 chunks (3072-dim, `gemini-embedding-2`), kèm metadata `embedding_model`/`embedding_dim` để phát hiện lệch model.
+**ChromaDB:** Dùng local `PersistentClient` (không cần server). HTTP server ở `localhost:8000` thường không chạy — `get_chroma_collection()` probe TCP 0.5s rồi đi thẳng xuống local, thay vì chờ `heartbeat()` hết 4.2s. Collection `documind_legal` đang có 1247 chunks (3072-dim, `gemini-embedding-2`), kèm metadata `embedding_model`/`embedding_dim` để phát hiện lệch model.
 
 **Pin chromadb là 0.6.3 — chạy đúng `.venv` của repo:** Python global của máy có chromadb 1.5.9; chỉ cần mở `data/chroma_db/` một lần bằng bản đó là store bị migrate tại chỗ (thêm cột `schema_str`, `config_json_str` về `{}`, `index_metadata.pickle` của HNSW thành dict) và 0.6.3 hết mở nổi — mọi truy vấn trả 0 chunk. Khôi phục: `python scripts/repair_chroma_config.py` để vá config, `python scripts/restore_chroma_from_qdrant.py --yes` để dựng lại chunk+vector từ Qdrant (không re-embed, ~15 phút vì Qdrant free tier ở sa-east-1).
 

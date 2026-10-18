@@ -29,6 +29,8 @@ Metrics per arm:
   • context_clean     — gold present AND no distractor (retrieval-level, no LLM)
   • recall_at_k / mrr — rank of the (complete) gold evidence, over questions that
                         have a gold clause
+  • recall_at_1_single— recall@1 over single-clause questions only (multi-clause
+                        ones rank by their worst clause, so can never be rank 1)
   • faithfulness      — LLM judge: share of answer claims backed by context (--judge)
   • *_ms_p50 / p95    — retrieval and end-to-end latency
 
@@ -136,12 +138,15 @@ def gold_rank(chunks: list, question: dict) -> int | None:
     if not required:
         return None
     bad_versions = set(question.get("distractor_versions") or [])
+    # Một câu một điều khoản có thể đúng ở nhiều nơi (luật và nghị định hướng dẫn cùng
+    # quy định) — acceptable_clauses liệt kê các nơi đó, validate_gold kiểm từng cái.
+    alternates = set(question.get("acceptable_clauses") or []) if len(required) == 1 else set()
     worst = 0
     for uid in required:
         rank = next(
             (
                 i for i, c in enumerate(chunks, 1)
-                if str(c.metadata.get("clause_uid", "")) == uid
+                if str(c.metadata.get("clause_uid", "")) in {uid} | alternates
                 and str(c.metadata.get("version_id", "")) not in bad_versions
             ),
             None,
@@ -187,6 +192,8 @@ def score_context(chunks: list, question: dict) -> dict:
         )
     elif gold_hit and gold_clause:
         gold_hit = gold_clause in clauses
+    if not gold_hit and set(question.get("acceptable_clauses") or []) & clauses:
+        gold_hit = True
 
     # Multi-clause questions (data/eval/hard_questions.json) name every clause the
     # answer has to combine. All of them must be in context: a context holding the
@@ -331,7 +338,7 @@ def run(
     retrieval_only: bool,
     judge_arms: tuple[str, ...] = (),
 ) -> dict[str, Any]:
-    from src.rag.context import RetrievalContext
+    from src.rag.context import RetrievalContext, degraded_flags, reset_degraded, start_degraded
     from src.rag.generator import generate_answer
     from src.rag.retriever import nodes_to_chunks, retrieve_with_context
 
@@ -343,9 +350,13 @@ def run(
     if questions:
         retriever.retrieve(questions[0]["question"])
 
+    # pre_filter tự truy hồi (retrieve_with_context); lượt chung chỉ phục vụ các arm còn
+    # lại — chạy riêng pre_filter mà vẫn gọi nó là gấp đôi embed + rerank vô ích.
+    needs_shared = any(a != "pre_filter" for a in arms)
     for i, q in enumerate(questions, 1):
+        degraded = start_degraded()
         t0 = time.time()
-        chunks = nodes_to_chunks(retriever.retrieve(q["question"]))
+        chunks = nodes_to_chunks(retriever.retrieve(q["question"])) if needs_shared else []
         retrieve_ms = int((time.time() - t0) * 1000)
         logger.info(
             "[{}/{}] {} @{} — {} chunks",
@@ -360,6 +371,7 @@ def run(
             "temporal_kind": q["temporal_kind"],
             "expected_behavior": q["expected_behavior"],
             "has_gold": has_gold_clause(q),
+            "multi_clause": len(q.get("source_clauses") or []) > 1,
             "retrieve_ms": retrieve_ms,
             "arms": {},
         }
@@ -401,6 +413,10 @@ def run(
 
             row["arms"][arm] = entry
 
+        # Nhánh dense bị bỏ (embedding 429/quota) = câu này đo trên BM25 thôi. Đo 2026-10-17:
+        # 26/199 câu như vậy làm A/B "dao động" 1–4 câu giữa hai lượt cùng cấu hình.
+        row["degraded"] = sorted(set(degraded_flags()))
+        reset_degraded(degraded)
         rows.append(row)
 
     return {
@@ -419,6 +435,7 @@ def run(
             # hay Qdrant" và README phải suy luận.
             "index": langfuse_otel._index_version,
             "git_sha": _git("rev-parse", "--short", "HEAD"),
+            "n_degraded": sum(1 for r in rows if r.get("degraded")),
         },
         "rows": rows,
         "summary": summarise(rows, arms, retrieval_only),
@@ -450,6 +467,13 @@ def summarise(rows: list[dict], arms: tuple[str, ...], retrieval_only: bool) -> 
             for k in RECALL_KS:
                 agg[f"recall_at_{k}"] = sum(1 for x in ranked if x and x <= k) / len(ranked)
             agg["mrr"] = sum(1 / x for x in ranked if x) / len(ranked)
+        # Câu nhiều điều khoản lấy hạng của điều khoản KÉM nhất, nên không bao giờ đạt
+        # hạng 1 — recall@1 chung có trần < 1 (0.909 trên legal_qa_200). Số này bỏ chúng ra.
+        single = [r["arms"][arm]["context"].get("gold_rank") for r in subset
+                  if r.get("has_gold") and not r.get("multi_clause")]
+        if single:
+            agg["recall_at_1_single"] = sum(1 for x in single if x == 1) / len(single)
+            agg["n_single"] = len(single)
         retrieve = [r["arms"][arm].get("retrieve_ms", r["retrieve_ms"]) for r in subset]
         agg["retrieve_ms_p50"] = _percentile(retrieve, 50)
         agg["retrieve_ms_p95"] = _percentile(retrieve, 95)
@@ -490,7 +514,7 @@ def print_report(report: dict) -> None:
     arms = report["meta"]["arms"]
     retrieval_only = report["meta"]["retrieval_only"]
     metrics = ["context_gold", "context_distractor", "context_clean"]
-    metrics += [f"recall_at_{k}" for k in RECALL_KS] + ["mrr"]
+    metrics += [f"recall_at_{k}" for k in RECALL_KS] + ["recall_at_1_single", "mrr"]
     if not retrieval_only:
         metrics += ["answer_accuracy", "faithfulness"]
 
@@ -672,6 +696,9 @@ def main() -> None:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"Đã ghi báo cáo: {args.output}")
+    if report["meta"].get("n_degraded"):
+        logger.warning("{} câu chạy thiếu nhánh dense (quota embedding?) — số đo của chúng là BM25, "
+                       "đừng so A/B trước khi chạy lại", report["meta"]["n_degraded"])
     if args.mlflow is not None:
         log_to_mlflow(report, args.output, args.mlflow or None)
 

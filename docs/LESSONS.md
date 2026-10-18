@@ -176,6 +176,33 @@ chọn sai lần hai.
 
 ## Dữ liệu & đánh giá
 
+### Ngưỡng cosine của grader là hằng số chung cho mọi model embedding (09-27 → 2026-10-17)
+- **Đã quyết:** `CONFIDENT_COSINE = 0.75` / `HOPELESS_COSINE = 0.60` đo trên gemini-embedding-001,
+  đặt thành hằng số module; comment ghi "đổi EMBEDDING_MODEL là phải đo lại" nhưng code không
+  buộc điều đó.
+- **Sai ở đâu:** cosine không cùng thang giữa các model. Vietnamese_Embedding (FPT): câu có gold
+  top-8 p50 0.625, min 0.442 — dưới HOPELESS 0.60 tới ~40% câu có đáp án. Chuyển sang FPT mà quên
+  đo lại thì grader trả "không liên quan" cho chúng (reformulate rồi từ chối), không lỗi nào hiện ra.
+  gemini-embedding-2 (chạy local từ 10-03) cũng chưa từng được đo.
+- **Cái giá:** chưa lên production (production ghim 001) — bắt được lúc đổi embedding sang FPT.
+- **Bài học:** ngưỡng đo trên một thang phải gắn với thang đó trong code, không chỉ trong comment.
+- **Giờ làm thế nào:** `grader._COSINE_GATES` theo model (001: 0.75/0.60, Vietnamese_Embedding:
+  0.54/0.42); model chưa đo thì không đi tắt bằng cosine, luôn hỏi judge — chậm hơn, không sai.
+
+### Eval lặng lẽ đo trên BM25 khi embedding hết quota (→ 2026-10-17)
+- **Đã làm:** A/B luật ưu tiên (hạ chương BHXH tự nguyện / đoạn phụ lục) bằng `temporal_eval.py
+  --embed-cache`, so các lượt với nhau.
+- **Sai ở đâu:** Gemini embedding dính 429 trên cả 3 key; `_DenseOrSkip` bỏ nhánh dense và chạy
+  tiếp bằng BM25 — đúng cho production, nhưng eval không ghi lại. 26/199 câu đo thiếu dense,
+  khác nhau giữa các lượt, nên cùng một cấu hình lệch 1–4 câu; hai câu tưởng "luật làm tốt/tệ
+  đi" hoá ra giống hệt nhau khi chạy lại trực tiếp.
+- **Cái giá:** suýt chọn mức hạ và báo mức tăng dựa trên nhiễu (bảng A/B đầu tiên lẫn baseline
+  của lượt đang điền cache).
+- **Bài học:** một phép đo có đường "suy giảm êm" phải tự khai nó đã suy giảm; trước khi tin
+  chênh lệch A/B, chạy lặp cùng cấu hình để biết biên nhiễu.
+- **Giờ làm thế nào:** mỗi dòng report có `degraded` (cờ `mark_degraded` của retriever), meta có
+  `n_degraded`, và eval cảnh báo khi > 0. So A/B trên lượt đã đủ cache, lặp ≥ 2 lần.
+
 ### Coi "VERIFIED" + validator PASS là corpus đủ chữ (09-12 → 2026-10-17)
 - **Đã quyết:** corpus nạp khi `verify_status: VERIFIED` và `validate_corpus.py` PASS. Cả hai
   chỉ kiểm metadata (số hiệu, ngày, id/version); `acquire_corpus.py` lấy `pdfs[0]` trên trang

@@ -633,7 +633,11 @@
       ]
     ],
     "expect_absent": [],
-    "distractor_docs": []
+    "distractor_docs": [],
+    "acceptable_clauses": [
+      "145-2020-ND-CP__d55"
+    ],
+    "acceptable_clauses_note": "Claude thêm 2026-10-17: văn bản hướng dẫn quy định cùng nội dung, đọc tay + validate_gold kiểm nguyên văn — CHƯA có người duyệt"
   },
   {
     "id": "ld_t13b",
@@ -652,7 +656,11 @@
       ]
     ],
     "expect_absent": [],
-    "distractor_docs": []
+    "distractor_docs": [],
+    "acceptable_clauses": [
+      "145-2020-ND-CP__d55"
+    ],
+    "acceptable_clauses_note": "Claude thêm 2026-10-17: văn bản hướng dẫn quy định cùng nội dung, đọc tay + validate_gold kiểm nguyên văn — CHƯA có người duyệt"
   },
   {
     "id": "ld_t14a",
@@ -1653,7 +1661,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "acceptable_clauses": [
+      "145-2020-ND-CP__d89_s1"
+    ],
+    "acceptable_clauses_note": "Claude thêm 2026-10-17: văn bản hướng dẫn quy định cùng nội dung, đọc tay + validate_gold kiểm nguyên văn — CHƯA có người duyệt"
   },
   {
     "id": "g2_a017",
@@ -1741,7 +1753,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "acceptable_clauses": [
+      "145-2020-ND-CP__d56"
+    ],
+    "acceptable_clauses_note": "Claude thêm 2026-10-17: văn bản hướng dẫn quy định cùng nội dung, đọc tay + validate_gold kiểm nguyên văn — CHƯA có người duyệt"
   },
   {
     "id": "g2_a021",
@@ -2948,7 +2964,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "acceptable_clauses": [
+      "12-2025-TT-BNV__d14"
+    ],
+    "acceptable_clauses_note": "Claude thêm 2026-10-17: văn bản hướng dẫn quy định cùng nội dung, đọc tay + validate_gold kiểm nguyên văn — CHƯA có người duyệt"
   },
   {
     "id": "g2_b022",
@@ -3036,7 +3056,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "acceptable_clauses": [
+      "41-2024-QH15__d101"
+    ],
+    "acceptable_clauses_note": "Claude thêm 2026-10-17: văn bản hướng dẫn quy định cùng nội dung, đọc tay + validate_gold kiểm nguyên văn — CHƯA có người duyệt"
   },
   {
     "id": "g2_b026",
@@ -3406,7 +3430,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "acceptable_clauses": [
+      "59-2015-TT-BLDTBXH__d3"
+    ],
+    "acceptable_clauses_note": "Claude thêm 2026-10-17: văn bản hướng dẫn quy định cùng nội dung, đọc tay + validate_gold kiểm nguyên văn — CHƯA có người duyệt"
   },
   {
     "id": "g2_c002",
@@ -3448,7 +3476,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "acceptable_clauses": [
+      "59-2015-TT-BLDTBXH__d6"
+    ],
+    "acceptable_clauses_note": "Claude thêm 2026-10-17: văn bản hướng dẫn quy định cùng nội dung, đọc tay + validate_gold kiểm nguyên văn — CHƯA có người duyệt"
   },
   {
     "id": "g2_c004",
@@ -3553,7 +3585,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "acceptable_clauses": [
+      "115-2015-ND-CP__d7"
+    ],
+    "acceptable_clauses_note": "Claude thêm 2026-10-17: văn bản hướng dẫn quy định cùng nội dung, đọc tay + validate_gold kiểm nguyên văn — CHƯA có người duyệt"
   },
   {
     "id": "g2_c009",
@@ -3619,7 +3655,11 @@
     "expect_absent": [],
     "distractor_docs": [],
     "drafted_by": "claude",
-    "reviewed": false
+    "reviewed": false,
+    "acceptable_clauses": [
+      "115-2015-ND-CP__d8"
+    ],
+    "acceptable_clauses_note": "Claude thêm 2026-10-17: văn bản hướng dẫn quy định cùng nội dung, đọc tay + validate_gold kiểm nguyên văn — CHƯA có người duyệt"
   },
   {
     "id": "g2_c012",
