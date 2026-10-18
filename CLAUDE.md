@@ -97,7 +97,11 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   dao động 2–3 câu giữa hai lượt cùng cấu hình (FPT temperature 0 vẫn không tất định) — mà p95 +0.7s và
   /v1/rerank 429 khi tải (chung hạn mức key với LLM). k mới là đòn bẩy: k=8 so k=3 thắng 9/thua 2.
   Faithfulness judge ≈0.99 ở cả 6 cấu hình và cho 1.0 cả câu sai bám đúng một đoạn đã hết hiệu lực →
-  chưa dùng làm thước đo an toàn được; chấm chuỗi cũng báo sai câu đúng. Hiệu chỉnh cả hai bằng người
+  chưa dùng làm thước đo an toàn được; chấm chuỗi cũng báo sai câu đúng. Đo lại sau chunk H1 + gold đã duyệt
+  (`reports/retrieval_experiments_2026-10-18.json`): rerank r@1 câu một điều 0.860 → 0.899 nhưng r@8 câu một điều 0.989 → 0.983,
+  +0.76 s, 29/199 câu vẫn 429 ở 50 lượt/phút — vẫn TẮT (LLM nhận đủ 8 đoạn nên thứ tự trong top-8 ít đổi câu trả
+  lời). doc2query (FPT sinh 4 câu hỏi/đoạn, nhánh RRF thứ ba) đã thử và LOẠI: cứu 4–7/29 câu người duyệt xác nhận
+  truy hồi sai nhưng r@1 0.860 → 0.788, độ phủ câu nhiều điều 0.969 → 0.938. Hiệu chỉnh cả hai bằng người
   chấm: bảng duyệt https://claude.ai/artifact/GwULtyAAPsxS5LewLzjcdn (36 câu trượt hạng 1 + 30 câu trả
   lời k=8; nhãn ở collection `reviews` của artifact, Claude đọc bằng ArtifactData). Lượt đầu (32/36 `gold_sai`)
   chấm trên văn bản bị trang cắt ở 700–900 ký tự → bỏ. Lượt duyệt lại trên toàn văn (2026-10-18, 36/36): truy hồi
