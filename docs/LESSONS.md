@@ -176,6 +176,114 @@ chọn sai lần hai.
 
 ## Dữ liệu & đánh giá
 
+### Hiệu lực gán theo văn bản, không theo khoản đi sửa luật khác (2021 → 2026-10-18)
+- **Đã quyết:** mỗi đoạn mang hiệu lực của văn bản chứa nó; chỉ khoản bị *chính văn bản khác sửa*
+  (`sua_doi_in_place`) mới có cửa sổ riêng. BLLĐ 2019 còn hiệu lực → mọi đoạn BLLĐ mở tới 9999.
+- **Sai ở đâu:** Điều 219 khoản 1 BLLĐ không phải quy định lao động mà là văn bản sửa Luật BHXH
+  58/2014 (điều kiện lương hưu "đủ 20 năm"). Luật đó bị 41/2024 thay từ 01/7/2025, nên khoản này hết
+  áp dụng theo — nhưng index vẫn mở. Bộ tách khoản cũng không phân biệt được "2.", "3." *trong* phần
+  trích “…” với khoản thật, nên kể cả khai báo cũng sẽ cắt sai. Cùng loại: 41/2024 Điều 139 khoản 2
+  sửa Luật Việc làm 38/2013.
+- **Cái giá:** đo 2026-10-18 (eval đầu cuối k=8): lh_m05b trả lời "không đủ điều kiện vì chưa đủ 20
+  năm", g2_b037 xác nhận tiền đề sai "phải đủ 20 năm" — câu lương hưu sai kiểu có thẩm quyền. Không
+  metric truy hồi nào báo: gold vẫn trong top-8, `context_distractor` = 0% vì chỉ đếm văn bản liệt
+  kê sẵn trong `distractor_docs`; judge faithfulness chấm cả hai 1.0 (câu trả lời *bám đúng* đoạn đó).
+- **Bài học:** điều "Sửa đổi, bổ sung … của luật X" sống theo luật X, không theo văn bản chứa nó.
+  Và lỗi hiệu lực chỉ lộ khi đọc câu trả lời, không lộ ở recall — phải đọc câu sai, không chỉ đếm.
+- **Giờ làm thế nào:** `loai_sua: het_hieu_luc` trong manifest (khoản đóng tại ngày luật X bị thay,
+  không có bản mới); bộ tách khoản bỏ qua đầu khoản trong “…” (`chunker._split_amended_dieu`).
+  Rà mọi điều tên "Sửa đổi, bổ sung" khi thêm văn bản (grep `^Điều .*Sửa đổi, bổ sung`).
+  Sau sửa: gold trong ngữ cảnh 0.970 → 0.980, độ phủ câu nhiều điều 0.912 → 0.941.
+
+### Coi faithfulness judge là thước đo an toàn câu trả lời (09-23 → 2026-10-18)
+- **Đã quyết:** README/eval báo faithfulness (LLM judge) bên cạnh answer accuracy chấm chuỗi, như
+  hai chỉ số đủ để nói câu trả lời có đáng tin.
+- **Sai ở đâu:** chưa ai so judge với người chấm. Eval 6 cấu hình (2026-10-18): faithfulness 0.988–0.996
+  ở mọi cấu hình — không phân biệt được gì; cho 1.0 hai câu sai nêu trên. Chấm chuỗi thì báo sai ít nhất
+  3/10 câu đúng (diễn đạt khác chuỗi kỳ vọng) và cho qua lh_m05b sai.
+- **Cái giá:** số "0.99 faithfulness" trông như bảo chứng an toàn trong khi nó chỉ đo "có trích từ
+  ngữ cảnh"; chọn cấu hình theo hai số này là chọn theo nhiễu.
+- **Bài học:** faithfulness đo bám nguồn, không đo đúng luật — nguồn hết hiệu lực vẫn "faithful".
+  Một bộ chấm tự động chưa hiệu chỉnh với người là ước lượng chưa biết sai số.
+- **Giờ làm thế nào:** 30 câu trả lời k=8 + 36 câu trượt ở bảng duyệt (artifact, xem CLAUDE.md) cho
+  người chấm; tính độ khớp judge/chuỗi với người trước khi dùng chúng để chọn cấu hình.
+
+### Ngưỡng cosine của grader là hằng số chung cho mọi model embedding (09-27 → 2026-10-17)
+- **Đã quyết:** `CONFIDENT_COSINE = 0.75` / `HOPELESS_COSINE = 0.60` đo trên gemini-embedding-001,
+  đặt thành hằng số module; comment ghi "đổi EMBEDDING_MODEL là phải đo lại" nhưng code không
+  buộc điều đó.
+- **Sai ở đâu:** cosine không cùng thang giữa các model. Vietnamese_Embedding (FPT): câu có gold
+  top-8 p50 0.625, min 0.442 — dưới HOPELESS 0.60 tới ~40% câu có đáp án. Chuyển sang FPT mà quên
+  đo lại thì grader trả "không liên quan" cho chúng (reformulate rồi từ chối), không lỗi nào hiện ra.
+  gemini-embedding-2 (chạy local từ 10-03) cũng chưa từng được đo.
+- **Cái giá:** chưa lên production (production ghim 001) — bắt được lúc đổi embedding sang FPT.
+- **Bài học:** ngưỡng đo trên một thang phải gắn với thang đó trong code, không chỉ trong comment.
+- **Giờ làm thế nào:** `grader._COSINE_GATES` theo model (001: 0.75/0.60, Vietnamese_Embedding:
+  0.54/0.42); model chưa đo thì không đi tắt bằng cosine, luôn hỏi judge — chậm hơn, không sai.
+
+### Eval lặng lẽ đo trên BM25 khi embedding hết quota (→ 2026-10-17)
+- **Đã làm:** A/B luật ưu tiên (hạ chương BHXH tự nguyện / đoạn phụ lục) bằng `temporal_eval.py
+  --embed-cache`, so các lượt với nhau.
+- **Sai ở đâu:** Gemini embedding dính 429 trên cả 3 key; `_DenseOrSkip` bỏ nhánh dense và chạy
+  tiếp bằng BM25 — đúng cho production, nhưng eval không ghi lại. 26/199 câu đo thiếu dense,
+  khác nhau giữa các lượt, nên cùng một cấu hình lệch 1–4 câu; hai câu tưởng "luật làm tốt/tệ
+  đi" hoá ra giống hệt nhau khi chạy lại trực tiếp.
+- **Cái giá:** suýt chọn mức hạ và báo mức tăng dựa trên nhiễu (bảng A/B đầu tiên lẫn baseline
+  của lượt đang điền cache).
+- **Bài học:** một phép đo có đường "suy giảm êm" phải tự khai nó đã suy giảm; trước khi tin
+  chênh lệch A/B, chạy lặp cùng cấu hình để biết biên nhiễu.
+- **Giờ làm thế nào:** mỗi dòng report có `degraded` (cờ `mark_degraded` của retriever), meta có
+  `n_degraded`, và eval cảnh báo khi > 0. So A/B trên lượt đã đủ cache, lặp ≥ 2 lần.
+
+### Coi "VERIFIED" + validator PASS là corpus đủ chữ (09-12 → 2026-10-17)
+- **Đã quyết:** corpus nạp khi `verify_status: VERIFIED` và `validate_corpus.py` PASS. Cả hai
+  chỉ kiểm metadata (số hiệu, ngày, id/version); `acquire_corpus.py` lấy `pdfs[0]` trên trang
+  Công báo và "kiểm" bằng đếm số Điều của chính file vừa tải.
+- **Sai ở đâu:** văn bản dài in qua nhiều số Công báo. 145/2020 có hai PDF (số 1203+1204 và
+  1205+1206) — chỉ phần 1 được tải, file dừng ở Điều 101 bằng dòng "(Xem tiếp theo Công báo
+  số 1205 + 1206)", bước kiểm vẫn báo khớp vì nó đếm đúng phần đã tải. Cùng lớp lỗi "không ai
+  đọc chữ": bảng tuổi nghỉ hưu 135/2020 dính vào Điều 9 (regex phụ lục chỉ nhận "PHỤ LỤC" hoa)
+  rồi bị `[:4000]` cắt mất 1639 ký tự không một dòng log; dấu chữ ký số chen giữa điểm/khoản ở
+  13 văn bản; 74/2024 và 374/2025 có chữ dạng tổ hợp (NFD) mà BM25 không khớp; 2 khoản BLLĐ
+  sửa từ 2026-01-01 không có bản cũ nên hỏi `as_of` 2025 nhận lời văn 2026. Công thức in dạng
+  phân số/ngoặc lớn (lương hưu, BHXH tự nguyện, ốm đau, lương làm đêm) ra text thành chuỗi phẳng
+  mất vạch phân số, bị dời sang Điều khác (158 Điều 17→19, 134 Điều 5→6, 115, 59/2015), hoặc
+  mất hẳn vì là ảnh (159 Điều 6–8); `clean_text` coi "dòng chỉ có số" là số trang kể cả với
+  HTML, nên mẫu số "/ 60", "/ 24 ngày" của 12/2025 biến mất.
+- **Cái giá:** 5 tuần index thiếu Điều 102–115 + 6 phụ lục của NĐ hướng dẫn chính của BLLĐ
+  (trọng tài, đình công, hiệu lực/thay thế, danh mục công việc cho thuê lại, nơi không được
+  đình công); câu tra bảng tuổi nghỉ hưu chỉ có số dàn phẳng không đọc được hàng nào.
+  Manifest còn ghi sai "3 phụ lục" và "05/2015 (một phần)" vì không ai mở được Điều 114.
+- **Bài học:** "đã xác minh" phải nói rõ xác minh CÁI GÌ — metadata đúng không nói gì về toàn
+  văn. Kiểm nguồn phải so nội dung (theo từ) với nguồn, không đếm cấu trúc của chính nó; và
+  không được có đường nào trong pipeline bỏ dữ liệu mà không log.
+- **Giờ làm thế nào:** `acquire_corpus.py` lấy mọi PDF của văn bản và so theo từ
+  (`word_match`); chunker nhận "Phụ lục I"/"Phụ lục: …", tách khối quá dài theo đoạn thay vì
+  cắt; `clean_md` chuẩn hoá NFC + xoá dấu chữ ký số; `TestCorpusTextIntegrity` đối chiếu số Điều
+  với `cau_truc` của manifest; `eval/corpus_llm_audit.py` cho model FPT đọc từng đoạn (bảng vỡ,
+  câu đứt, lẫn nội dung). 3 văn bản lấy từ mirror đối chiếu nguồn thứ hai: khớp 1.000. Công thức
+  sửa theo ẢNH trang Công báo (render PDF, không đoán), viết `(tử) / (mẫu)`; file sửa tay ghi
+  "sửa tay" trong `cach_lay` vì `acquire_corpus.py --force` sẽ ghi đè.
+
+### Chunk theo Điều mà bỏ mất Chương — và dán tiêu đề Chương vào điều đứng trước (→ 2026-10-17)
+- **Đã quyết:** `chunk_by_dieu` cắt từ "Điều N." tới "Điều" kế tiếp, coi mỗi Điều là đơn vị
+  tự đủ nghĩa; tiêu đề Chương/Mục không đi vào text lẫn metadata.
+- **Sai ở đâu:** luật BHXH có hai chương song song — Chương III bắt buộc, Chương IV tự nguyện —
+  với các Điều trùng tên ("Điều 54. Điều kiện hưởng lương hưu" / "Điều 73. Điều kiện hưởng
+  lương hưu") mà thân bài không có chữ "bắt buộc"/"tự nguyện". Bỏ Chương thì hai đoạn không
+  phân biệt được. Tệ hơn: tiêu đề nằm giữa hai Điều bị regex nuốt vào CUỐI điều trước — 168/1151
+  đoạn mang tiêu đề của phần sau (điều cuối Chương III chứa "BẢO HIỂM XÃ HỘI TỰ NGUYỆN").
+- **Cái giá:** soi 76 câu trượt hạng 1 (legal_qa_200): ~18 câu hỏi về BHXH bắt buộc nhận điều
+  của BHXH tự nguyện, 8/12 câu gold không lọt top-8 là loại này — LLM trả lời câu bắt buộc
+  bằng quy định tự nguyện, kèm trích dẫn trông hợp lệ.
+- **Bài học:** đơn vị chunk đúng ngữ nghĩa vẫn cần ngữ cảnh cấu trúc bao ngoài nó; và "recall@1
+  thấp" phải được mổ từng câu trượt trước khi đoán nguyên nhân (dữ liệu, gold set hay metric —
+  ở đây là cả ba: 17 câu nhiều điều khoản không bao giờ đạt hạng 1 theo cách tính).
+- **Giờ làm thế nào:** chunker gắn "Chương … — Mục …" vào đầu mọi đoạn (kể cả `_versions/`) +
+  metadata `chuong`/`muc`, cắt tiêu đề khỏi điều trước; tiêu đề phải VIẾT HOA để không nhầm câu
+  dẫn chiếu. Không rerank: context_gold 0.940 → 0.990, recall@1 0.591 → 0.683, recall@8 0.935 →
+  0.989. Eval thêm `recall_at_1_single`; gold set có `acceptable_clauses` (validate_gold kiểm).
+
 ### Tính lại số trên tập con ngoài harness, report không ghi đo trên index nào (09-23 → 10-03)
 - **Đã làm:** report `eval_e2e.json` có accuracy 0.739 → 0.910 (199 câu). README lại ghi
   0.763 → 0.935, tính tay trên 169 câu cả hai arm đều gọi được Gemini; faithfulness cũng

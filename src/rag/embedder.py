@@ -226,6 +226,60 @@ class _GeminiAPIEmbedding(BaseEmbedding):
         return await asyncio.to_thread(self._get_text_embeddings, texts)
 
 
+class _FptEmbedding(BaseEmbedding):
+    """Embedding qua FPT /v1/embeddings (OpenAI-compatible) — vd. Vietnamese_Embedding
+    (1024 chiều). Không phân biệt query/document như Gemini: model không có task_type."""
+
+    fail_fast_queries: bool = False  # cùng nghĩa với _GeminiAPIEmbedding
+
+    def __init__(self, model_name: str, **kwargs):
+        kwargs.setdefault("embed_batch_size", 32)
+        super().__init__(model_name=model_name, **kwargs)
+
+    def _call(self, texts: List[str]) -> List[List[float]]:
+        import requests
+
+        from src.config import FPT_API_BASE
+
+        r = requests.post(
+            f"{FPT_API_BASE}/embeddings",
+            headers={"Authorization": f"Bearer {get_settings().fpt_api_key}"},
+            # API từ chối chuỗi rỗng; get_embedding_dim() dò chiều bằng đúng chuỗi đó.
+            json={"model": self.model_name, "input": [t if t.strip() else " " for t in texts]},
+            timeout=60,
+        )
+        r.raise_for_status()
+        return [d["embedding"] for d in sorted(r.json()["data"], key=lambda d: d["index"])]
+
+    # ponytail: retry mù cho 429/5xx khi ingest; FPT không trả header rate-limit để chờ chính xác.
+    @retry(stop=stop_after_attempt(6), wait=wait_exponential(multiplier=2, min=5, max=60))
+    def _embed(self, texts: List[str]) -> List[List[float]]:
+        return self._call(texts)
+
+    def _get_query_embedding(self, query: str) -> List[float]:
+        if self.fail_fast_queries:
+            try:
+                return self._call([query])[0]
+            except Exception as exc:  # noqa: BLE001 — retriever bỏ nhánh dense, chạy BM25
+                raise EmbeddingUnavailable(str(exc)[:200]) from exc
+        return self._embed([query])[0]
+
+    def _get_text_embedding(self, text: str) -> List[float]:
+        return self._embed([text])[0]
+
+    def _get_text_embeddings(self, texts: List[str]) -> List[List[float]]:
+        return self._embed(texts)
+
+    async def _aget_query_embedding(self, query: str) -> List[float]:
+        return await asyncio.to_thread(self._get_query_embedding, query)
+
+    async def _aget_text_embedding(self, text: str) -> List[float]:
+        return await asyncio.to_thread(self._get_text_embedding, text)
+
+    async def _aget_text_embeddings(self, texts: List[str]) -> List[List[float]]:
+        return await asyncio.to_thread(self._get_text_embeddings, texts)
+
+
 @lru_cache(maxsize=None)
 def genai_client(api_key: str):
     """GenerativeServiceClient riêng cho từng API key, dùng chung giữa các thread.
@@ -250,6 +304,9 @@ def get_embedder() -> "BaseEmbedding":
     """
     settings = get_settings()
     model_name = settings.embedding_model
+    if not model_name.startswith(("gemini", "models/")):
+        logger.info("Using FPT Embedding API (no local model load): {}", model_name)
+        return _FptEmbedding(model_name=model_name)
     logger.info("Using Gemini Embedding API (no local model load): {}", model_name)
     keys = [settings.google_api_key, settings.google_api_key_2, settings.google_api_key_3]
     return _GeminiAPIEmbedding(model_name=model_name, api_keys=keys)

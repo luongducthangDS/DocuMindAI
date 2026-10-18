@@ -47,8 +47,9 @@ class InPlaceAmendment:
 
     @property
     def has_old_version(self) -> bool:
-        """False for clauses that were newly inserted (no superseded text)."""
-        return self.loai_sua != "bo_sung_khoan_moi"
+        """False for clauses that were newly inserted (no superseded text), and for
+        clauses that lapsed (`het_hieu_luc`): the corpus text is the only version."""
+        return self.loai_sua not in ("bo_sung_khoan_moi", "het_hieu_luc")
 
     @property
     def corpus_text_is_superseded(self) -> bool:
@@ -59,8 +60,12 @@ class InPlaceAmendment:
         with no VBHN (Luật BHXH 2024, amended by Luật Dân số 113/2025/QH15) is
         the mirror image: the corpus file is the pre-amendment text and the new
         wording lives in `version_moi`.
+
+        `het_hieu_luc` is the same minus the new wording: the clause amended a law
+        that was later replaced (BLLĐ Điều 219 khoản 1 sửa Luật BHXH 58/2014, hết
+        áp dụng khi 41/2024/QH15 thay luật đó) — it ends and nothing follows it.
         """
-        return self.loai_sua == "sua_doi_khong_co_vbhn"
+        return self.loai_sua in ("sua_doi_khong_co_vbhn", "het_hieu_luc")
 
 
 @dataclass(frozen=True)

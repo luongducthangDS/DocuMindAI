@@ -6,6 +6,8 @@ BM25, fused via RRF. Optional cross-encoder reranker for precision.
 from __future__ import annotations
 
 import math
+import re
+import unicodedata
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -418,6 +420,42 @@ class _ScreenedRetriever:
         return self._screen(await self._base.aretrieve(query))
 
 
+# ── Ưu tiên theo câu hỏi: chỉ đổi THỨ TỰ, không đổi điểm (ngưỡng generator đọc điểm) ──
+# Đo 2026-10-17, 45 câu một điều khoản trượt hạng 1 (legal_qa_200): 11 câu hỏi BHXH bắt buộc
+# nhận điều BHXH tự nguyện (41/2024 Điều 64↔98, 58↔95; 58/2014 Điều 54↔73…), 6 câu nhận
+# đoạn phụ lục thay cho Điều quy định. Người lao động theo hợp đồng mặc định thuộc BHXH bắt
+# buộc; phụ lục (bảng theo năm sinh, danh mục địa bàn, biểu mẫu) chỉ là đáp án khi câu hỏi
+# hỏi đúng thứ đó.
+# ponytail: luật theo từ khoá, đủ cho hai nhóm lỗi đã đo; thêm nhóm mới thì đo trước khi thêm luật.
+_DEMOTE_RANKS = 3
+# Số ứng viên (sau ưu tiên) gửi reranker FPT. Đo 2026-10-17 (Vietnamese_Embedding, legal_qa_200,
+# 50 RPM): pool 20 dính 429 ở 34/199 câu (payload 20 đoạn × tới 4000 ký tự — key dùng chung với
+# production), pool 10 không câu nào; recall@1 câu một điều 0.882 (pool 10) vs 0.834 không rerank,
+# rerank API p50 250ms / p95 296ms.
+_RERANK_POOL = 10
+# Không dùng "xã"/"tỉnh" làm dấu hiệu: "bảo hiểm xã hội", "cấp tỉnh" có mặt ở khắp nơi.
+_APPENDIX_CUE_RE = re.compile(
+    r"phụ lục|danh mục|biểu mẫu|mẫu số|mẫu đơn|theo mẫu|năm sinh|tháng sinh|sinh (?:năm|tháng|ngày)"
+    r"|địa bàn|thuộc vùng|vùng nào|vùng mấy"
+)
+
+
+def _demoted(query_l: str, meta: dict) -> bool:
+    if "tự nguyện" not in query_l:
+        chuong = str(meta.get("chuong", "")).upper()
+        # Chương gộp "…BẮT BUỘC VÀ BẢO HIỂM XÃ HỘI TỰ NGUYỆN" là của cả hai — không hạ.
+        if ("TỰ NGUYỆN" in chuong and "BẮT BUỘC" not in chuong) or "tự nguyện" in str(meta.get("title", "")).lower():
+            return True
+    return meta.get("chunk_strategy") == "appendix" and not _APPENDIX_CUE_RE.search(query_l)
+
+
+def _apply_query_priors(query: str, nodes: list) -> list:
+    """Dời đoạn bị hạ xuống `_DEMOTE_RANKS` bậc (ổn định: thứ tự giữa các đoạn khác giữ nguyên)."""
+    q = unicodedata.normalize("NFC", query).lower()
+    keyed = [(i + (_DEMOTE_RANKS + 0.5 if _demoted(q, n.node.metadata or {}) else 0), n) for i, n in enumerate(nodes)]
+    return [n for _, n in sorted(keyed, key=lambda kn: kn[0])]
+
+
 def retrieve_with_context(query: str, ctx, top_k: int = 20, top_n: int = 8) -> list[RetrievedChunk]:
     """Access-controlled, tenant-scoped, point-in-time retrieval.
 
@@ -472,9 +510,12 @@ def retrieve_with_context(query: str, ctx, top_k: int = 20, top_n: int = 8) -> l
                      len(nodes) - len(visible))
 
     if _reranker_instance is not None and visible:
-        visible = _reranker_instance.postprocess_nodes(visible, QueryBundle(query_str=query))
+        pool = _apply_query_priors(query, visible)[:_RERANK_POOL]
+        # [:top_n]: reranker trả top_n lúc dựng (8) — không cắt thì tham số top_n của hàm bị bỏ qua.
+        visible = _apply_query_priors(query, _reranker_instance.postprocess_nodes(pool, QueryBundle(query_str=query)))[:top_n]
     else:
-        visible = visible[:top_n]
+        # Trước khi cắt top_n: đoạn bị hạ có thể rơi khỏi top, đoạn khác vào thay.
+        visible = _apply_query_priors(query, visible)[:top_n]
 
     chunks = nodes_to_chunks(visible)
     from src.config import get_settings

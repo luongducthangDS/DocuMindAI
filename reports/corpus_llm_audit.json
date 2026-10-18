@@ -1,0 +1,1032 @@
+{
+ "summary": {
+  "doan": 1247,
+  "loi_goi_model": 0,
+  "loai": {
+   "quy_pham": 1088,
+   "bang_tra_cuu": 69,
+   "bieu_mau": 89,
+   "?": 1
+  },
+  "loi": {
+   "thieu_noi_dung": 12,
+   "cau_dut": 11,
+   "lan_noi_dung": 28,
+   "bang_vo": 17,
+   "ky_tu_loi": 9,
+   "trung_lap": 3
+  },
+  "doan_co_loi": 77,
+  "theo_van_ban": {
+   "45-2019-QH14": {
+    "doan": 229,
+    "co_loi": 5
+   },
+   "145-2020-ND-CP": {
+    "doan": 161,
+    "co_loi": 11
+   },
+   "135-2020-ND-CP": {
+    "doan": 38,
+    "co_loi": 3
+   },
+   "10-2020-TT-BLDTBXH": {
+    "doan": 22,
+    "co_loi": 1
+   },
+   "293-2025-ND-CP": {
+    "doan": 22,
+    "co_loi": 1
+   },
+   "41-2024-QH15": {
+    "doan": 149,
+    "co_loi": 0
+   },
+   "158-2025-ND-CP": {
+    "doan": 60,
+    "co_loi": 7
+   },
+   "159-2025-ND-CP": {
+    "doan": 20,
+    "co_loi": 0
+   },
+   "12-2025-TT-BNV": {
+    "doan": 24,
+    "co_loi": 2
+   },
+   "11-2025-TT-BNV": {
+    "doan": 7,
+    "co_loi": 0
+   },
+   "74-2025-QH15": {
+    "doan": 55,
+    "co_loi": 1
+   },
+   "374-2025-ND-CP": {
+    "doan": 103,
+    "co_loi": 33
+   },
+   "74-2024-ND-CP": {
+    "doan": 10,
+    "co_loi": 0
+   },
+   "58-2014-QH13": {
+    "doan": 127,
+    "co_loi": 0
+   },
+   "115-2015-ND-CP": {
+    "doan": 37,
+    "co_loi": 3
+   },
+   "59-2015-TT-BLDTBXH": {
+    "doan": 59,
+    "co_loi": 10
+   },
+   "134-2015-ND-CP": {
+    "doan": 18,
+    "co_loi": 0
+   },
+   "38-2013-QH13": {
+    "doan": 62,
+    "co_loi": 0
+   },
+   "28-2015-ND-CP": {
+    "doan": 44,
+    "co_loi": 0
+   }
+  },
+  "model": {
+   "Qwen3.8-27B": 690,
+   "DeepSeek-V4-Flash": 557
+  }
+ },
+ "flagged": [
+  {
+   "key": "2ba90a2b1a3ddfc104815655bb929afaa58d186d",
+   "doc_id": "45-2019-QH14",
+   "dieu": 61,
+   "clause_uid": "45-2019-QH14__d61_k3",
+   "loai": "quy_pham",
+   "loi": [
+    "thieu_noi_dung"
+   ],
+   "ghi_chu": "Thiếu nội dung khoản 1 và 2, chỉ còn khoản 3",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "9c5a6a604fb85b6ccee38d10d87914c2387dd552",
+   "doc_id": "45-2019-QH14",
+   "dieu": 139,
+   "clause_uid": "45-2019-QH14__d139",
+   "loai": "quy_pham",
+   "loi": [
+    "thieu_noi_dung"
+   ],
+   "ghi_chu": "Đoạn bắt đầu bằng tiêu đề Chương X nhưng thiếu khoản 1 của Điều 139, chỉ có các khoản 2-5.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "729dcc4751687cd255054e22bcdd17a6e32c378e",
+   "doc_id": "45-2019-QH14",
+   "dieu": 154,
+   "clause_uid": "45-2019-QH14__d154_k8a",
+   "loai": "quy_pham",
+   "loi": [
+    "cau_dut"
+   ],
+   "ghi_chu": "Đoạn trích thiếu ngữ cảnh khoản, câu 8a bị cắt cụt không rõ thuộc khoản nào",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "d0ada1550069a44bd7c85c2ed25172d7bdf4a66e",
+   "doc_id": "45-2019-QH14",
+   "dieu": 219,
+   "clause_uid": "45-2019-QH14__d219_s1",
+   "loai": "quy_pham",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Lẫn nội dung sửa đổi Bộ luật Tố tụng dân sự (Điều 32) vào văn bản Lao động",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "3d422dc2929ab969d4202c64e1c0e66f7e8fec43",
+   "doc_id": "45-2019-QH14",
+   "dieu": 59,
+   "clause_uid": "45-2019-QH14__d59_k2_pa",
+   "loai": "quy_pham",
+   "loi": [
+    "thieu_noi_dung"
+   ],
+   "ghi_chu": "Đoạn thiếu cụm 'Người sử dụng lao động có trách nhiệm' trước nội dung, câu bị cắt cụt.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "f08a64735f68973a8fd375fefe81d48c86d9e60f",
+   "doc_id": "145-2020-ND-CP",
+   "dieu": 26,
+   "clause_uid": "145-2020-ND-CP__d26",
+   "loai": "quy_pham",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Dòng đầu tiên là tiêu đề Chương/Mục do hệ thống gắn, không thuộc nội dung Điều 26.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "938b96ea8e2eeed88098d8255a79da16b8668bfa",
+   "doc_id": "145-2020-ND-CP",
+   "dieu": "",
+   "clause_uid": "145-2020-ND-CP__pl1",
+   "loai": "bang_tra_cuu",
+   "loi": [
+    "bang_vo"
+   ],
+   "ghi_chu": "Danh mục công việc Phụ lục II bị dàn phẳng, mất cấu trúc bảng STT/Công việc",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "f773cdb86ffbdc999bf52cbf45ade384df2aecf9",
+   "doc_id": "145-2020-ND-CP",
+   "dieu": "",
+   "clause_uid": "145-2020-ND-CP__pl17",
+   "loai": "bieu_mau",
+   "loi": [
+    "bang_vo"
+   ],
+   "ghi_chu": "Bảng số liệu bị dàn phẳng, các cột 'Đầu kỳ/Tăng/Giảm/Cuối kỳ' và dữ liệu không phân tách rõ ràng.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "58c79bbd97d082cca4d68be78092b0710845cf5c",
+   "doc_id": "145-2020-ND-CP",
+   "dieu": "",
+   "clause_uid": "145-2020-ND-CP__pl18",
+   "loai": "bieu_mau",
+   "loi": [
+    "bang_vo"
+   ],
+   "ghi_chu": "Bảng số liệu bị dàn phẳng, mất cấu trúc hàng cột",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "4754832d3aa9dcdc3dbf6582fac45f007bd3b791",
+   "doc_id": "145-2020-ND-CP",
+   "dieu": "",
+   "clause_uid": "145-2020-ND-CP__pl20",
+   "loai": "bieu_mau",
+   "loi": [
+    "bang_vo",
+    "ky_tu_loi"
+   ],
+   "ghi_chu": "Bảng bị dàn phẳng, dính chữ 'Chếđộphúc lợi', 'Từ6'.",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "cb038c4c30d5f479150ed9293467b75daf009672",
+   "doc_id": "145-2020-ND-CP",
+   "dieu": "",
+   "clause_uid": "145-2020-ND-CP__pl21",
+   "loai": "bieu_mau",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Đoạn gồm hai mẫu riêng biệt (Mẫu 11 và 12); phần đầu mẫu 12 bị cắt, thiếu nội dung bảng.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "13a387446280ea26df59598c80a849abbc5d877e",
+   "doc_id": "145-2020-ND-CP",
+   "dieu": "",
+   "clause_uid": "145-2020-ND-CP__pl22",
+   "loai": "bang_tra_cuu",
+   "loi": [
+    "bang_vo",
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Bảng mã tỉnh bị dàn phẳng, tiêu đề cột lẫn vào dòng 30",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "5bd374dbd32d566ad3afa2c844f1060ff7a9fd5d",
+   "doc_id": "145-2020-ND-CP",
+   "dieu": "",
+   "clause_uid": "145-2020-ND-CP__pl23",
+   "loai": "bieu_mau",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Đoạn gồm hai mẫu biểu khác nhau: mẫu thỏa thuận làm thêm giờ và công văn đề nghị, bị ghép liền.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "8959a0afab55a4d4711df2949779e44d230faa8e",
+   "doc_id": "145-2020-ND-CP",
+   "dieu": "",
+   "clause_uid": "145-2020-ND-CP__pl24",
+   "loai": "bieu_mau",
+   "loi": [
+    "bang_vo"
+   ],
+   "ghi_chu": "Bảng danh sách trường hợp làm thêm bị dàn phẳng, mất cấu trúc cột",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "0f9e67f6f3ed2a0e172428689e8e22bf1021368c",
+   "doc_id": "145-2020-ND-CP",
+   "dieu": "",
+   "clause_uid": "145-2020-ND-CP__pl35",
+   "loai": "bang_tra_cuu",
+   "loi": [
+    "cau_dut"
+   ],
+   "ghi_chu": "Đoạn kết thúc đột ngột tại tiêu đề mục III, thiếu danh sách đơn vị bên dưới.",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "085a15513a5e9cb663264dc416880e2afdd54309",
+   "doc_id": "145-2020-ND-CP",
+   "dieu": "",
+   "clause_uid": "145-2020-ND-CP__pl36",
+   "loai": "bang_tra_cuu",
+   "loi": [
+    "thieu_noi_dung"
+   ],
+   "ghi_chu": "Mục V có tiêu đề nhưng không có nội dung danh sách doanh nghiệp; mục VI bị dính với tiêu đề.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "fbb6863284593b3fce1a897fd220a4444d1aa181",
+   "doc_id": "135-2020-ND-CP",
+   "dieu": 5,
+   "clause_uid": "135-2020-ND-CP__d5",
+   "loai": "quy_pham",
+   "loi": [
+    "bang_vo"
+   ],
+   "ghi_chu": "Bảng tuổi nghỉ hưu tại khoản 2 bị dàn phẳng, mất cấu trúc hàng cột",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "d6ea24612183653bb865d7efcd82365eb1a6a837",
+   "doc_id": "135-2020-ND-CP",
+   "dieu": 7,
+   "clause_uid": "135-2020-ND-CP__d7",
+   "loai": "quy_pham",
+   "loi": [
+    "cau_dut"
+   ],
+   "ghi_chu": "Câu cuối điểm a) bị cắt cụt, thiếu phần kết thúc.",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "c9e770241a58772bc936413c702ddf4ff57c88ac",
+   "doc_id": "135-2020-ND-CP",
+   "dieu": "",
+   "clause_uid": "135-2020-ND-CP__pl28",
+   "loai": "bang_tra_cuu",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Đoạn cuối 'Phụ lục III...' và '1. Khai thác mỏ hầm lò.' là nội dung của phụ lục khác, không thuộc bảng tra cứu tuổi nghỉ hưu.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "42bb4d2028c247c23b2a0d64036773f093299150",
+   "doc_id": "10-2020-TT-BLDTBXH",
+   "dieu": "",
+   "clause_uid": "10-2020-TT-BLDTBXH__pl1",
+   "loai": "bang_tra_cuu",
+   "loi": [
+    "ky_tu_loi"
+   ],
+   "ghi_chu": "Lỗi chính tả 'Thông tư tư' và 'bắn mìn' thừa chữ",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "7d217e3a8d5aadb9a6b19cbcf6e174796eae3865",
+   "doc_id": "293-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "293-2025-ND-CP__pl12",
+   "loai": "bang_tra_cuu",
+   "loi": [
+    "ky_tu_loi"
+   ],
+   "ghi_chu": "Lỗi tách danh sách: '1 Bảo Lộc, 2 Bảo Lộc' và 'Đinh Văn Lâm Hà'",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "5eb5e7d37071a99278743f982ad6dfefd0fd71a2",
+   "doc_id": "158-2025-ND-CP",
+   "dieu": 8,
+   "clause_uid": "158-2025-ND-CP__d8",
+   "loai": "quy_pham",
+   "loi": [
+    "ky_tu_loi"
+   ],
+   "ghi_chu": "Lỗi chính tả 'ngưởi' tại khoản 2a, cần sửa thành 'người'.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "2079df97994c3fd913e0900cea19d87595e2cdc5",
+   "doc_id": "158-2025-ND-CP",
+   "dieu": 32,
+   "clause_uid": "158-2025-ND-CP__d32_s1",
+   "loai": "quy_pham",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Dòng đầu 'Chương VI. QUY ĐỊNH CHUYỂN TIẾP' không thuộc Điều 32, có thể do hệ thống gắn nhầm.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "d50b2329f151768e61de9500387cf1c1343e8e6c",
+   "doc_id": "158-2025-ND-CP",
+   "dieu": 34,
+   "clause_uid": "158-2025-ND-CP__d34_s2",
+   "loai": "quy_pham",
+   "loi": [
+    "ky_tu_loi"
+   ],
+   "ghi_chu": "Lỗi lặp từ 'hội hội' ở câu đầu; câu a bị xuống dòng giữa chừng nhưng không sai.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "caa883a499fc7a07b7bdb60ef7ea06259a744731",
+   "doc_id": "158-2025-ND-CP",
+   "dieu": 35,
+   "clause_uid": "158-2025-ND-CP__d35_s1",
+   "loai": "quy_pham",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Dòng đầu 'Chương VI...' là tiêu đề chương, không thuộc Điều 35; có thể do hệ thống gắn.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "830edfc6df41f5a0290ad0f8b5b6976e023ad476",
+   "doc_id": "158-2025-ND-CP",
+   "dieu": 36,
+   "clause_uid": "158-2025-ND-CP__d36_s1",
+   "loai": "quy_pham",
+   "loi": [
+    "thieu_noi_dung"
+   ],
+   "ghi_chu": "Đoạn bắt đầu bằng '3. Hồ sơ...' nhưng thiếu phần dẫn trước đó; có thể do tách khoản.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "1279b08774bb50560d111d5d9b2959fc471fbce9",
+   "doc_id": "158-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "158-2025-ND-CP__pl1",
+   "loai": "bang_tra_cuu",
+   "loi": [
+    "bang_vo"
+   ],
+   "ghi_chu": "Bảng Phụ lục II bị dàn phẳng, mất cấu trúc cột",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "6cf391dd85e34e3fca0c2b5a3abd37db7e266a66",
+   "doc_id": "158-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "158-2025-ND-CP__pl3",
+   "loai": "bieu_mau",
+   "loi": [
+    "cau_dut"
+   ],
+   "ghi_chu": "Đoạn bị cắt cụt ở cuối dòng 'Ông (bà):...'",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "3e2312a14f9c0292280e6f0c2cbba543458fc01c",
+   "doc_id": "12-2025-TT-BNV",
+   "dieu": 2,
+   "clause_uid": "12-2025-TT-BNV__d2",
+   "loai": "quy_pham",
+   "loi": [
+    "thieu_noi_dung"
+   ],
+   "ghi_chu": "Khoản 1 của Điều 2 bị thiếu, đoạn bắt đầu từ khoản 2; cần kiểm tra phần trích xuất.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "e9f61e8fa10c66a6efb3097a940815bbfe788f7f",
+   "doc_id": "12-2025-TT-BNV",
+   "dieu": 16,
+   "clause_uid": "12-2025-TT-BNV__d16_s1",
+   "loai": "quy_pham",
+   "loi": [
+    "thieu_noi_dung"
+   ],
+   "ghi_chu": "Sau 'như sau:' có công thức và nội dung, nhưng thiếu phần giải thích cho công thức Mbqtl? Thực tế có đủ.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "ede831e639de7332ce1f91a5a8d7d0c4e2d2b8e7",
+   "doc_id": "74-2025-QH15",
+   "dieu": 53,
+   "clause_uid": "74-2025-QH15__d53",
+   "loai": "bang_tra_cuu",
+   "loi": [
+    "bang_vo"
+   ],
+   "ghi_chu": "Bảng danh mục phí bị dàn phẳng, mất cấu trúc cột",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "f4463f14f8827ce994425b2c90179031a33be2e8",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": 13,
+   "clause_uid": "374-2025-ND-CP__d13_s2",
+   "loai": "quy_pham",
+   "loi": [
+    "thieu_noi_dung"
+   ],
+   "ghi_chu": "Khoản 5 thiếu nội dung khoản 4 trước đó, nhưng đoạn bắt đầu bằng '5.' không có dấu hiệu cắt câu.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "3e75b4c20fdd00a732cc9e6c5d1c761586aafeca",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": 14,
+   "clause_uid": "374-2025-ND-CP__d14",
+   "loai": "quy_pham",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Dòng 'Chương V. TRỢ CẤP THẤT NGHIỆP' có thể là tiêu đề chương do hệ thống gắn, không thuộc Điều 14.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "9366b463df06925db8866effd5b77d64e12f75e7",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": 18,
+   "clause_uid": "374-2025-ND-CP__d18",
+   "loai": "quy_pham",
+   "loi": [
+    "thieu_noi_dung"
+   ],
+   "ghi_chu": "Khoản 3 dẫn 'theo Mẫu số 16' nhưng không kèm biểu mẫu; câu cuối thiếu nội dung.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "f795bf7dadbb85d4f58a2b9d805425d2f84d5356",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": 19,
+   "clause_uid": "374-2025-ND-CP__d19_s1",
+   "loai": "quy_pham",
+   "loi": [
+    "cau_dut"
+   ],
+   "ghi_chu": "Đoạn bắt đầu bằng 'h)' thiếu phần đầu của điểm h, có thể bị cắt từ trước.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "21bb846166cff278b99684b1debaccd04f83f8a5",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": 30,
+   "clause_uid": "374-2025-ND-CP__d30",
+   "loai": "quy_pham",
+   "loi": [
+    "ky_tu_loi"
+   ],
+   "ghi_chu": "Khoản 6: 'viẹc' thiếu dấu nặng; khoản 7: dấu '/' thay cho 'và'.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "6a78a52c37b8212c136dbca8b74ec8afabba2800",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl2",
+   "loai": "bieu_mau",
+   "loi": [
+    "cau_dut"
+   ],
+   "ghi_chu": "Danh sách mẫu bị cắt cụt ở cuối đoạn tại 'Mẫu số 30'.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "0ec76bb57374c50595b694912c7b4bd18c66dbdd",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl3",
+   "loai": "bieu_mau",
+   "loi": [
+    "trung_lap"
+   ],
+   "ghi_chu": "Lặp lại tiêu đề cơ quan và quốc hiệu hai lần liên tiếp",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "caba78e1719428e98dd1f43a9cf07ebd381442d7",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl4",
+   "loai": "bieu_mau",
+   "loi": [
+    "lan_noi_dung",
+    "trung_lap"
+   ],
+   "ghi_chu": "Lẫn mẫu số 02 vào sau phiếu giới thiệu; phần ghi chú bị lặp lại.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "ef9df5e8d0678da0d4b34739f79360544560fa1b",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl6",
+   "loai": "bieu_mau",
+   "loi": [
+    "trung_lap"
+   ],
+   "ghi_chu": "Phần đầu Mẫu số 04 bị lặp lại 2 lần liên tiếp",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "4bac08c8159d9a9e890351dc0b6e8da9b43393c9",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl10",
+   "loai": "bieu_mau",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Lẫn hai mẫu riêng biệt (Mẫu 07 và Mẫu 08) trong cùng một đoạn; có thể do trích xuất ghép nhiều trang.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "3f660cee3087fc29f0f6c3fcb59f3ad6bf37e9aa",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl14",
+   "loai": "bieu_mau",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Lẫn hai mẫu: mẫu đề nghị bảo lưu và mẫu quyết định hưởng trợ cấp; thiếu dòng 'Tôi cam đoan...'.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "3f54f81235c66e83f18497585385c8b302d282b5",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl16",
+   "loai": "bieu_mau",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Lẫn nội dung của hai mẫu khác nhau: Mẫu số 12 (thông báo tìm kiếm việc làm) và Mẫu số 13 (về việc không nhận trợ cấp).",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "f42354b1c7096fd047924ad90b2b1ff6ae242936",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl20",
+   "loai": "bieu_mau",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Đoạn gồm hai mẫu: Quyết định và Thông báo; phần Thông báo bị cắt ngang sau 'Kính gửi'.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "638a2da6f50dd51999bb4555cd57af9e863619ca",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl21",
+   "loai": "bieu_mau",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Đoạn gồm hai mẫu liền nhau: Mẫu số 18 (thông báo) và Quyết định chấm dứt hưởng, thiếu ranh giới rõ.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "a9c8c32d20eb4b41254897c9739d1d5455e95382",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl25",
+   "loai": "bieu_mau",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Đoạn bắt đầu bằng 'Bản chụp...' và 'Giấy tờ khác:' là phần cuối của mẫu trước, sau đó mới đến Mẫu số 22.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "27588ae245caf31f9b8e0f8d60683f9e3543779e",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl26",
+   "loai": "bieu_mau",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Đoạn bắt đầu bằng phần cuối của mẫu 22 (Nơi đăng ký...), sau đó mới đến Mẫu số 23; lẫn hai mẫu.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "004c49081777a2f6e8bc5e35f4e6d343e2ede827",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl28",
+   "loai": "bieu_mau",
+   "loi": [
+    "cau_dut"
+   ],
+   "ghi_chu": "",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "f6b7ec8cc380b3749efa243355eca3d85a9bbd9c",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl29",
+   "loai": "bieu_mau",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Đoạn chứa mẫu biểu và phụ lục, nhưng có lẫn 'Phụ lục I' và 'Phụ lục II' không thuộc nội dung mẫu.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "b7bcf0725bd7658af4855cad56c52684fd98717c",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl30",
+   "loai": "bieu_mau",
+   "loi": [
+    "cau_dut"
+   ],
+   "ghi_chu": "Đoạn bị cắt cụt ở cuối tại dòng '1. Giá trị hợp đồng:'",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "85c3c8312292511119bdc1a572059793f284c16b",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl31",
+   "loai": "bieu_mau",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Phần đầu đoạn là hợp đồng (Điều 3, 4) lẫn với mẫu đơn đề nghị; ranh giới không rõ.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "72d37058dcac04c14aca114596b5bb307065cbc8",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl32",
+   "loai": "bieu_mau",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Lẫn nội dung hai mẫu: Mẫu số 27 (đơn đề nghị) và Quyết định của Sở Nội vụ; thiếu dấu phân tách rõ ràng.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "8021eb9872202b5a6f4cdbf534bfedb822b41b0f",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl34",
+   "loai": "bieu_mau",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Đoạn chứa hai mẫu riêng biệt (Thông báo và Quyết định) bị ghép lại; phần cuối Quyết định bị cắt.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "199fb139e35d1528f6fdfa53a5519e3d4e595e23",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl36",
+   "loai": "bieu_mau",
+   "loi": [
+    "cau_dut"
+   ],
+   "ghi_chu": "Đoạn kết thúc đột ngột tại dòng 'Tên viết tắt:'",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "bed9f201651eff8efe5b7b697472bb6fa7c1ab0e",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl37",
+   "loai": "bieu_mau",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Đoạn gồm hai mẫu riêng biệt: Thông báo và Quyết định, bị ghép liền không phân tách.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "40c4588619223cece4af0e233b52a64863b985d7",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl38",
+   "loai": "bieu_mau",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Đoạn chứa hai mẫu riêng biệt: Quyết định hủy và Thông báo hoàn trả, bị ghép liền nhau.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "b88ac5bf142e5adbd1935f1b9bdd3d945fc40a8d",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl39",
+   "loai": "bieu_mau",
+   "loi": [
+    "bang_vo"
+   ],
+   "ghi_chu": "Bảng thông tin lao động bị dàn phẳng, mất cấu trúc hàng cột",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "bd2247d632f884d59e8f80944ca73b35741b9059",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl40",
+   "loai": "bieu_mau",
+   "loi": [
+    "bang_vo"
+   ],
+   "ghi_chu": "Bảng thống kê đầu đoạn bị dàn phẳng, không xác định được giá trị thuộc hàng/cột; các cột trong danh sách lao động cũng bị phá vỡ.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "66aae86698c7e3a80624906a404792c905ccaf96",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl41",
+   "loai": "bieu_mau",
+   "loi": [
+    "bang_vo"
+   ],
+   "ghi_chu": "Bảng số liệu cuối đoạn bị dàn phẳng, mất cấu trúc hàng cột",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "c309741743901b81750af3f7818e70e4fdecd1b1",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl42",
+   "loai": "bang_tra_cuu",
+   "loi": [
+    "bang_vo"
+   ],
+   "ghi_chu": "Bảng số liệu bị dàn phẳng, mất cấu trúc hàng cột",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "cef94540ae320b2072d3d1ce0e8640e728d8a677",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl43",
+   "loai": "bieu_mau",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Đoạn trích là biểu mẫu thống kê, có lẫn cụm 'theo quyết định hỗ trợ của Giám đốc Sở Nội vụ' lặp lại không thuộc nội dung biểu.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "843d0e15adf7dc345948baacd6690bfcf1aa3f16",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl44",
+   "loai": "bieu_mau",
+   "loi": [
+    "bang_vo"
+   ],
+   "ghi_chu": "Bảng số liệu doanh nghiệp bị dàn phẳng, mất cấu trúc hàng cột",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "c0bad790a03b6a90c8026f06204bb5ce9254e40a",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl45",
+   "loai": "bieu_mau",
+   "loi": [
+    "cau_dut"
+   ],
+   "ghi_chu": "Mục III thiếu xuống dòng sau 'THỰC HIỆN CHÍNH SÁCH...', mục 5 thiếu dấu chấm cuối câu.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "2354b643da94898a2ee51c6d534349fe77692ab5",
+   "doc_id": "374-2025-ND-CP",
+   "dieu": "",
+   "clause_uid": "374-2025-ND-CP__pl46",
+   "loai": "bieu_mau",
+   "loi": [
+    "ky_tu_loi"
+   ],
+   "ghi_chu": "Lỗi chính tả lặp từ 'hỗ trợ hỗ trợ' và 'đào đào tạo'.",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "c0731dedf9f445c652cdf6ba8bf1b8435f71e2de",
+   "doc_id": "115-2015-ND-CP",
+   "dieu": 7,
+   "clause_uid": "115-2015-ND-CP__d7",
+   "loai": "quy_pham",
+   "loi": [
+    "bang_vo"
+   ],
+   "ghi_chu": "Bảng số năm đóng BHXH tại điểm c khoản 2 bị dàn phẳng",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "51ad3d636e82e6c50682b604480ad0bbb8fde793",
+   "doc_id": "115-2015-ND-CP",
+   "dieu": 11,
+   "clause_uid": "115-2015-ND-CP__d11",
+   "loai": "quy_pham",
+   "loi": [
+    "bang_vo"
+   ],
+   "ghi_chu": "Dòng 'Mức bình quân tiền lương...' bị dàn phẳng, thiếu cấu trúc bảng.",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "7186486d2a49afe43caa38aead93196b5fb1e8d5",
+   "doc_id": "115-2015-ND-CP",
+   "dieu": 23,
+   "clause_uid": "115-2015-ND-CP__d23_s1",
+   "loai": "quy_pham",
+   "loi": [
+    "thieu_noi_dung"
+   ],
+   "ghi_chu": "Đoạn bắt đầu bằng 'Chương IV...' nhưng thiếu tiêu đề Điều 23 và phần mở đầu khoản 1, chỉ có khoản 2, 3.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "15d3455cfc49418ecce1313144bbb06cb02f2a0c",
+   "doc_id": "59-2015-TT-BLDTBXH",
+   "dieu": 4,
+   "clause_uid": "59-2015-TT-BLDTBXH__d4_s1",
+   "loai": "quy_pham",
+   "loi": [
+    "cau_dut"
+   ],
+   "ghi_chu": "Đoạn bắt đầu bằng '3.' giữa khoản, thiếu phần đầu của khoản 3; có thể do tách từ giữa.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "a7d8bb0fbeec42fe80e2f2d3a225f093b6a7a08e",
+   "doc_id": "59-2015-TT-BLDTBXH",
+   "dieu": 14,
+   "clause_uid": "59-2015-TT-BLDTBXH__d14",
+   "loai": "quy_pham",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Khoản 1 ghi 'chế độ ốm đau' nhưng tiêu đề là 'chế độ thai sản'",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "69967bf318022b2c916b16a160cac24e4f8b5130",
+   "doc_id": "59-2015-TT-BLDTBXH",
+   "dieu": 20,
+   "clause_uid": "59-2015-TT-BLDTBXH__d20",
+   "loai": "quy_pham",
+   "loi": [
+    "thieu_noi_dung"
+   ],
+   "ghi_chu": "Khoản 3 kết thúc bằng 'Trong đó:' nhưng thiếu phần giải thích Mbqtl và tiền lương.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "6626ce30fbab38d823e6266ed4eea26690765a35",
+   "doc_id": "59-2015-TT-BLDTBXH",
+   "dieu": 31,
+   "clause_uid": "59-2015-TT-BLDTBXH__d31",
+   "loai": "quy_pham",
+   "loi": [
+    "bang_vo"
+   ],
+   "ghi_chu": "Bảng ví dụ 52 bị dàn phẳng, mất cấu trúc cột",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "649a668acb4fb121d25f6288fdd0ba927175b658",
+   "doc_id": "59-2015-TT-BLDTBXH",
+   "dieu": 33,
+   "clause_uid": "59-2015-TT-BLDTBXH__d33",
+   "loai": "quy_pham",
+   "loi": [
+    "ky_tu_loi"
+   ],
+   "ghi_chu": "Lỗi chính tả 'công an nhân nhân dân' tại đoạn 1a",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "f893d0e86cd5abbc1052e2d10bba11612336c645",
+   "doc_id": "59-2015-TT-BLDTBXH",
+   "dieu": 37,
+   "clause_uid": "59-2015-TT-BLDTBXH__d37",
+   "loai": "quy_pham",
+   "loi": [
+    "ky_tu_loi"
+   ],
+   "ghi_chu": "Lỗi chính tả 'hàng háng' tại khoản 2",
+   "model": "Qwen3.8-27B"
+  },
+  {
+   "key": "0e3175a8f8f9db8c582ddbe476606a452a23432d",
+   "doc_id": "59-2015-TT-BLDTBXH",
+   "dieu": 39,
+   "clause_uid": "59-2015-TT-BLDTBXH__d39_s1",
+   "loai": "quy_pham",
+   "loi": [
+    "thieu_noi_dung"
+   ],
+   "ghi_chu": "Khoản 3 có câu 'cụ thể như sau:' nhưng sau đó chỉ có các điểm a, b, không có nội dung chi tiết.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "d1e7e57e8ac7dc0ed521319987ac8bfd15adbf0d",
+   "doc_id": "59-2015-TT-BLDTBXH",
+   "dieu": "",
+   "clause_uid": "59-2015-TT-BLDTBXH__pl1",
+   "loai": "bang_tra_cuu",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Cuối đoạn lẫn nội dung 'Mẫu số 1...' và quốc hiệu, không thuộc danh mục công việc.",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "40a4041e8d1c8fc7fdcbbca8169c4084a96a9a2f",
+   "doc_id": "59-2015-TT-BLDTBXH",
+   "dieu": "",
+   "clause_uid": "59-2015-TT-BLDTBXH__pl3",
+   "loai": "bieu_mau",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Đoạn gồm hai mẫu đơn khác nhau: cuối mẫu 1 lẫn vào đầu mẫu 2 (Giấy xác nhận).",
+   "model": "DeepSeek-V4-Flash"
+  },
+  {
+   "key": "d3e6a67edf6f95258ee5013de2a7e7d64000cd93",
+   "doc_id": "59-2015-TT-BLDTBXH",
+   "dieu": "",
+   "clause_uid": "59-2015-TT-BLDTBXH__pl4",
+   "loai": "bieu_mau",
+   "loi": [
+    "lan_noi_dung"
+   ],
+   "ghi_chu": "Đoạn bắt đầu bằng nội dung của mẫu trước (Xác nhận), sau đó chuyển sang Mẫu số 3 (Đơn đề nghị) mà không có ranh giới rõ ràng.",
+   "model": "DeepSeek-V4-Flash"
+  }
+ ]
+}

@@ -96,33 +96,50 @@ def no_reranker(monkeypatch):
     monkeypatch.setattr("src.rag.retriever._reranker_active", False)
 
 
+CONFIDENT, HOPELESS = grader._COSINE_GATES["Vietnamese_Embedding"]
+
+
+@pytest.fixture
+def fpt_embedding(monkeypatch):
+    monkeypatch.setattr(grader, "cosine_gates", lambda: (CONFIDENT, HOPELESS))
+
+
 class TestConditionalGrade:
-    def test_confident_dense_score_skips_llm(self, monkeypatch, no_reranker):
+    def test_confident_dense_score_skips_llm(self, monkeypatch, no_reranker, fpt_embedding):
         calls = _forbid_llm(monkeypatch)
-        out = grader.grade_chunks("q", _chunks(grader.CONFIDENT_COSINE + 0.01))
+        out = grader.grade_chunks("q", _chunks(CONFIDENT + 0.01))
         assert out["relevant"] is True
         assert calls == []
 
-    def test_hopeless_dense_score_skips_llm(self, monkeypatch, no_reranker):
+    def test_hopeless_dense_score_skips_llm(self, monkeypatch, no_reranker, fpt_embedding):
         calls = _forbid_llm(monkeypatch)
-        out = grader.grade_chunks("q", _chunks(grader.HOPELESS_COSINE - 0.01))
+        out = grader.grade_chunks("q", _chunks(HOPELESS - 0.01))
         assert out["relevant"] is False
         assert calls == []
 
-    def test_ambiguous_dense_score_asks_llm(self, monkeypatch, no_reranker):
+    def test_ambiguous_dense_score_asks_llm(self, monkeypatch, no_reranker, fpt_embedding):
         calls = _forbid_llm(monkeypatch)
-        mid = (grader.CONFIDENT_COSINE + grader.HOPELESS_COSINE) / 2
+        mid = (CONFIDENT + HOPELESS) / 2
         grader.grade_chunks("q", _chunks(mid))
         assert len(calls) == 1
 
-    def test_unknown_dense_score_asks_llm(self, monkeypatch, no_reranker):
+    def test_unknown_dense_score_asks_llm(self, monkeypatch, no_reranker, fpt_embedding):
         """Chunk không có điểm dense (vd. chỉ BM25 tìm ra) → không đoán, hỏi LLM."""
         calls = _forbid_llm(monkeypatch)
         grader.grade_chunks("q", _chunks(None))
         assert len(calls) == 1
 
     def test_thresholds_are_ordered(self):
-        assert -1.0 < grader.HOPELESS_COSINE < grader.CONFIDENT_COSINE < 1.0
+        for model, (confident, hopeless) in grader._COSINE_GATES.items():
+            assert -1.0 < hopeless < confident < 1.0, model
+
+    def test_unmeasured_embedding_model_never_shortcuts_on_cosine(self, monkeypatch, no_reranker):
+        """Mỗi model một thang cosine: model chưa đo thì 0.99 hay 0.01 cũng phải hỏi judge."""
+        monkeypatch.setattr(grader, "cosine_gates", lambda: None)
+        calls = _forbid_llm(monkeypatch)
+        grader.grade_chunks("q", _chunks(0.99))
+        grader.grade_chunks("q", _chunks(0.01))
+        assert len(calls) == 2
 
 
 # ── 4. Điểm dense quy về cosine, cùng thang cho Chroma lẫn Qdrant ─────────────

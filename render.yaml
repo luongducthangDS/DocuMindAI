@@ -35,23 +35,29 @@ services:
         generateValue: true
       - key: ENVIRONMENT
         value: production
-      # Phải khớp model đã tạo vector trên Qdrant. Qdrant vẫn là gemini-embedding-001
-      # (đo 2026-10-17); check lúc mở collection chỉ so số chiều — 001 và 2 đều 3072 —
-      # nên đổi sang 2 trước khi migrate Qdrant = tìm kiếm rác, không có lỗi nào báo.
+      # Phải khớp model đã tạo vector trong QDRANT_COLLECTION. Từ 2026-10-18: FPT
+      # Vietnamese_Embedding (1024-dim) ở collection documind_legal_fpt; collection cũ
+      # documind_legal (gemini-embedding-001, 3072) giữ nguyên để quay lại được.
       - key: EMBEDDING_MODEL
-        value: gemini-embedding-001
+        value: Vietnamese_Embedding
+      - key: QDRANT_COLLECTION
+        value: documind_legal_fpt
       - key: INITIALIZE_RAG_ON_STARTUP
         value: "true"
-      # Free tier = 512MB RAM. Reranker mặc định (BAAI/bge-reranker-v2-m3) nặng
-      # ~2.2GB — bắt buộc phải tắt trên free tier; bật lại nếu nâng plan có nhiều RAM hơn.
+      # Reranker qua FPT /v1/rerank chạy được trên free tier (không nạp model), nhưng TẮT cho tới
+      # khi eval đầu cuối cho thấy nó làm câu trả lời tốt hơn: đo 2026-10-18 nó chỉ đổi thứ tự —
+      # hạng 1 thắng 13/thua 5 câu (sign test p≈0.10), top-8 1/1 — mà thêm ~250ms p50.
       - key: ENABLE_RERANKER
         value: "false"
-      # Embedding đi qua Gemini Embedding API nên không model nào nạp vào RAM;
-      # dùng chung GOOGLE_API_KEY với phần generation, không cần HF_TOKEN.
-      # Theo gemini.md: Default Model la gemini-3.8-flash, Lightweight la gemini-3.5-flash-lite.
+      # LLM chỉ FPT (2026-10-18): danh sách model Gemini để trống = không có cặp Gemini dự
+      # phòng; FPT hỏng thì trích nguyên văn nguồn. Bật lại: điền tên model vào 3 biến này.
       - key: GEMINI_GENERATION_MODELS
-        value: gemini-3.8-flash,gemini-3.5-flash-lite
-      # Corpus nằm ở Qdrant Cloud (migrate 2026-09-19: 1149 chunks, 3072-dim,
+        value: ""
+      - key: GEMINI_GENERATION_MODELS_COMPLEX
+        value: ""
+      - key: GEMINI_JUDGE_MODELS
+        value: ""
+      # Corpus nằm ở Qdrant Cloud (documind_legal_fpt: 1249 chunks, 1024-dim, migrate 2026-10-18,
       # verify top-1 khớp ChromaDB nguồn). Disk Render ephemeral nên ChromaDB local
       # trong container luôn rỗng — đừng quay lại provider chroma ở production.
       # QDRANT_URL/QDRANT_API_KEY sync:false => điền tay ở dashboard.

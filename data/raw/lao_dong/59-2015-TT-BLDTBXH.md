@@ -8,7 +8,7 @@ ngay_hieu_luc: "2016-02-15"
 trang_thai: "het_hieu_luc"
 nguon: "https://congbao.chinhphu.vn/van-ban/thong-tu-so-59-2015-tt-bldtbxh-18869.htm"
 nguon_file: "(Công báo, tải qua trang nguồn)"
-cach_lay: "pdf_text_layer (PyMuPDF)"
+cach_lay: "pdf_text_layer (PyMuPDF); sửa tay 2026-10-17: công thức Điều 6, 12 (ví dụ 16–17), 20 (Mbqtl a–g, khoản 2–3, ví dụ 36–37) dựng lại theo ảnh trang Công báo 139+140 — tải lại --force sẽ mất"
 ngay_lay: "2026-09-12"
 ---
 PHẦN VĂN BẢN QUY PHẠM PHÁP LUẬT
@@ -153,11 +153,15 @@ Trong trường hợp này, cả hai vợ chồng chị T đều được giải
 
 1. Mức hưởng chế độ ốm đau theo quy định tại khoản 1 Điều 26 và Điều 27 của Luật bảo hiểm xã hội được tính như sau:
 
+Mức hưởng chế độ ốm đau = (Tiền lương tháng đóng bảo hiểm xã hội của tháng liền kề trước khi nghỉ việc / 24 ngày) x 75 (%) x Số ngày nghỉ việc được hưởng chế độ ốm đau
+
 - Số ngày nghỉ việc được hưởng chế độ ốm đau được tính theo ngày làm việc không kể ngày nghỉ lễ, nghỉ Tết, ngày nghỉ hàng tuần.
 
 2. Mức hưởng chế độ ốm đau đối với người lao động nghỉ việc do mắc bệnh thuộc danh mục bệnh cần chữa trị dài ngày theo quy định tại khoản 2 Điều 26 của Luật bảo hiểm xã hội được tính như sau:
 
-Mức hưởng chế độ ốm đau đối với bệnh cần chữa trị dài ngày = Tiền lương đóng bảo hiểm xã hội của tháng liền kề trước khi nghỉ việc x Tỷ lệ hưởng chế độ ốm đau (%) x Số tháng nghỉ việc hưởng chế độ ốm đau Trong đó:
+Mức hưởng chế độ ốm đau đối với bệnh cần chữa trị dài ngày = Tiền lương đóng bảo hiểm xã hội của tháng liền kề trước khi nghỉ việc x Tỷ lệ hưởng chế độ ốm đau (%) x Số tháng nghỉ việc hưởng chế độ ốm đau
+
+Trong đó:
 
 a) Tỷ lệ hưởng chế độ ốm đau được tính bằng 75% đối với thời gian hưởng chế độ ốm đau của người lao động trong 180 ngày đầu. Sau khi hưởng hết thời gian 180 ngày mà vẫn tiếp tục điều trị thì tỷ lệ hưởng chế độ ốm đau cho thời gian tiếp theo được tính như sau:
 
@@ -167,13 +171,11 @@ a) Tỷ lệ hưởng chế độ ốm đau được tính bằng 75% đối v�
 
 - Bằng 50% nếu người lao động đã đóng bảo hiểm xã hội dưới 15 năm.
 
-Mức hưởng chế độ ốm đau Tiền lương tháng đóng bảo hiểm xã hội của tháng liền kề trước khi nghỉ việc = 24 ngày Số ngày nghỉ việc được hưởng chế độ ốm đau 75 (%) x
-
-x
-
 b) Tháng nghỉ việc hưởng chế độ ốm đau được tính từ ngày bắt đầu nghỉ việc hưởng chế độ ốm đau của tháng đó đến ngày trước liền kề của tháng sau liền kề.
 
 Trường hợp có ngày lẻ không trọn tháng thì cách tính mức hưởng chế độ ốm đau cho những ngày này như sau:
+
+Mức hưởng chế độ ốm đau đối với bệnh cần chữa trị dài ngày = (Tiền lương đóng bảo hiểm xã hội của tháng liền kề trước khi nghỉ việc / 24 ngày) x Tỷ lệ hưởng chế độ ốm đau (%) x Số ngày nghỉ việc hưởng chế độ ốm đau
 
 Trong đó:
 
@@ -196,10 +198,6 @@ Ngày 06/6/2016 bà Ch bị tai nạn rủi ro phải nghỉ việc để điề
 Trường hợp bà Ch được giải quyết hưởng chế độ ốm đau, mức hưởng chế độ ốm đau được tính trên mức tiền lương tháng là 5 triệu đồng.
 
 4. Người lao động nghỉ việc hưởng trợ cấp ốm đau từ 14 ngày làm việc trở lên trong tháng thì người lao động và người sử dụng lao động không phải đóng bảo hiểm xã hội tháng đó. Thời gian này không được tính để hưởng bảo hiểm xã hội.
-
-Mức hưởng chế độ ốm đau đối với bệnh cần chữa trị dài ngày Tiền lương đóng bảo hiểm xã hội của tháng liền kề trước khi nghỉ việc = 24 ngày Số ngày nghỉ việc hưởng chế độ ốm đau Tỷ lệ hưởng chế độ ốm đau (%) x
-
-x
 
 5. Trong thời gian người lao động nghỉ việc hưởng trợ cấp ốm đau do bị mắc bệnh thuộc Danh mục bệnh cần chữa trị dài ngày, người lao động được hưởng bảo hiểm y tế do quỹ bảo hiểm xã hội đóng cho người lao động.
 
@@ -309,9 +307,9 @@ Ví dụ 16: Chị C sinh con vào ngày 16/3/2016, có quá trình đóng bảo
 
 Mức bình quân tiền lương tháng đóng bảo hiểm xã hội của 6 tháng liền kề trước khi nghỉ việc của chị C được tính như sau:
 
-= 5.500.000 (đồng/tháng) Như vậy, mức bình quân tiền lương tháng đóng bảo hiểm xã hội của 6 tháng liền kề trước khi nghỉ việc để làm cơ sở tính hưởng chế độ thai sản của chị C là 5.500.000 đồng/tháng.
+Mức bình quân tiền lương tháng đóng bảo hiểm xã hội của 6 tháng liền kề trước khi nghỉ việc = [(5.000.000 x 4) + (6.500.000 x 2)] / 6 = 5.500.000 (đồng/tháng)
 
-Mức bình quân tiền lương tháng đóng bảo hiểm xã hội của 6 tháng liền kề trước khi nghỉ việc (5.000.000 x 4) + (6.500.000 x 2) =
+Như vậy, mức bình quân tiền lương tháng đóng bảo hiểm xã hội của 6 tháng liền kề trước khi nghỉ việc để làm cơ sở tính hưởng chế độ thai sản của chị C là 5.500.000 đồng/tháng.
 
 Ví dụ 17: Chị D sinh con ngày 13/5/2017 (thuộc trường hợp khi mang thai phải nghỉ việc để dưỡng thai theo chỉ định của cơ sở khám bệnh, chữa bệnh có thẩm quyền), có quá trình đóng bảo hiểm xã hội như sau:
 
@@ -323,7 +321,9 @@ Ví dụ 17: Chị D sinh con ngày 13/5/2017 (thuộc trường hợp khi mang 
 
 Mức bình quân tiền lương tháng đóng bảo hiểm xã hội của 6 tháng liền kề trước khi nghỉ việc của chị D được tính như sau:
 
-= 7.500.000 (đồng/tháng) Như vậy, mức bình quân tiền lương tháng đóng bảo hiểm xã hội của 6 tháng liền kề trước khi nghỉ việc để làm cơ sở tính hưởng chế độ thai sản của chị D là 7.500.000 đồng/tháng.
+Mức bình quân tiền lương tháng đóng bảo hiểm xã hội của 6 tháng liền kề trước khi nghỉ việc = [(7.000.000 x 4) + (8.500.000 x 2)] / 6 = 7.500.000 (đồng/tháng)
+
+Như vậy, mức bình quân tiền lương tháng đóng bảo hiểm xã hội của 6 tháng liền kề trước khi nghỉ việc để làm cơ sở tính hưởng chế độ thai sản của chị D là 7.500.000 đồng/tháng.
 
 b) Đối với trường hợp người lao động hưởng chế độ thai sản theo quy định tại Điều 32, Điều 33, các khoản 2, 4, 5 và 6 Điều 34, Điều 37 của Luật bảo hiểm xã hội ngay trong tháng đầu thuộc diện tham gia bảo hiểm xã hội thì mức hưởng chế độ thai sản được tính trên tiền lương tháng làm căn cứ đóng bảo hiểm xã hội của chính tháng đó.
 
@@ -332,8 +332,6 @@ b) Đối với trường hợp người lao động hưởng chế độ thai s
 a) Trường hợp hợp đồng lao động hết thời hạn trong thời gian người lao động nghỉ việc hưởng chế độ thai sản thì thời gian hưởng chế độ thai sản từ khi nghỉ việc đến khi hợp đồng lao động hết thời hạn được tính là thời gian đóng bảo hiểm xã hội, thời gian hưởng chế độ thai sản sau khi hợp đồng lao động hết thời hạn không được tính là thời gian đã đóng bảo hiểm xã hội;
 
 b) Thời gian hưởng chế độ thai sản của người lao động chấm dứt hợp đồng lao động, hợp đồng làm việc hoặc thôi việc trước thời điểm sinh con hoặc nhận con nuôi dưới 06 tháng tuổi quy định tại khoản 4 Điều 31 của Luật bảo hiểm xã hội không được tính là thời gian đã đóng bảo hiểm xã hội;
-
-= Mức bình quân tiền lương tháng đóng bảo hiểm xã hội của 6 tháng liền kề trước khi nghỉ việc (7.000.000 x 4) + (8.500.000 x 2)
 
 c) Trường hợp lao động nữ đi làm trước khi hết thời hạn nghỉ sinh con theo quy định thì thời gian hưởng chế độ thai sản từ khi nghỉ việc đến khi đi làm trước khi hết thời hạn nghỉ sinh được tính là thời gian đóng bảo hiểm xã hội, kể từ thời điểm đi làm trước khi hết thời hạn nghỉ sinh con thì lao động nữ vẫn được hưởng chế độ thai sản cho đến khi hết thời hạn quy định tại khoản 1 hoặc khoản 3 Điều 34 của Luật bảo hiểm xã hội nhưng người lao động và người sử dụng lao động phải đóng bảo hiểm xã hội, bảo hiểm y tế;
 
@@ -409,7 +407,9 @@ Người lao động khi nghỉ việc có đủ 20 năm đóng bảo hiểm xã
 
 1. Bị suy giảm khả năng lao động từ 61% đến 80% và đảm bảo điều kiện về tuổi đời theo bảng dưới đây:
 
-Năm nghỉ hưởng lương hưu Điều kiện về tuổi đời đối với nam Điều kiện về tuổi đời đối với nữ 2016 Đủ 51 tuổi Đủ 46 tuổi 2017 Đủ 52 tuổi Đủ 47 tuổi 2018 Đủ 53 tuổi Đủ 48 tuổi 2019 Đủ 54 tuổi Đủ 49 tuổi Từ 2020 trở đi Đủ 55 tuổi Đủ 50 tuổi 2. Bị suy giảm khả năng lao động từ 81% trở lên và nam đủ 50 tuổi, nữ đủ 45 tuổi.
+Năm nghỉ hưởng lương hưu và điều kiện về tuổi đời: 2016: nam đủ 51 tuổi, nữ đủ 46 tuổi; 2017: nam đủ 52 tuổi, nữ đủ 47 tuổi; 2018: nam đủ 53 tuổi, nữ đủ 48 tuổi; 2019: nam đủ 54 tuổi, nữ đủ 49 tuổi; Từ 2020 trở đi: nam đủ 55 tuổi, nữ đủ 50 tuổi.
+
+2. Bị suy giảm khả năng lao động từ 81% trở lên và nam đủ 50 tuổi, nữ đủ 45 tuổi.
 
 3. Bị suy giảm khả năng lao động từ 61% trở lên và có đủ 15 năm trở lên làm nghề hoặc công việc đặc biệt nặng nhọc, độc hại, nguy hiểm thuộc danh mục do Bộ Lao động - Thương binh và Xã hội, Bộ Y tế ban hành.
 
@@ -545,7 +545,9 @@ Mức bình quân tiền lương tháng đóng bảo hiểm xã hội để làm
 
 Số tiền Nhà nước hỗ trợ đóng bảo hiểm xã hội tự nguyện được tính bằng tổng số tiền Nhà nước hỗ trợ của từng tháng đã đóng bảo hiểm xã hội tự nguyện. Mức hỗ trợ của từng tháng được tính theo công thức sau:
 
-Số tiền Nhà nước hỗ trợ tháng i = 0,22 x Chuẩn nghèo khu vực nông thôn tại tháng i x Tỷ lệ hỗ trợ của Nhà nước tại tháng i 4. Khi tính mức hưởng bảo hiểm xã hội một lần trong trường hợp thời gian đóng bảo hiểm xã hội có tháng lẻ thì từ 01 tháng đến 06 tháng được tính là nửa năm, từ 07 tháng đến 11 tháng được tính là một năm.
+Số tiền Nhà nước hỗ trợ tháng i = 0,22 x Chuẩn nghèo khu vực nông thôn tại tháng i x Tỷ lệ hỗ trợ của Nhà nước tại tháng i
+
+4. Khi tính mức hưởng bảo hiểm xã hội một lần trong trường hợp thời gian đóng bảo hiểm xã hội có tháng lẻ thì từ 01 tháng đến 06 tháng được tính là nửa năm, từ 07 tháng đến 11 tháng được tính là một năm.
 
 Trường hợp tính đến trước ngày 01 tháng 01 năm 2014 nếu thời gian đóng bảo hiểm xã hội có tháng lẻ thì những tháng lẻ đó được chuyển sang giai đoạn đóng bảo hiểm xã hội từ ngày 01 tháng 01 năm 2014 trở đi để làm căn cứ tính hưởng bảo hiểm xã hội một lần.
 
@@ -575,19 +577,31 @@ Như vậy, bảo hiểm xã hội một lần của ông V được tính trên
 
 a) Đối với người lao động bắt đầu tham gia bảo hiểm xã hội trước ngày 01 tháng 01 năm 1995:
 
+Mbqtl = Tổng số tiền lương tháng đóng bảo hiểm xã hội của 5 năm (60 tháng) cuối trước khi nghỉ việc / 60 tháng
+
 b) Đối với người lao động bắt đầu tham gia bảo hiểm xã hội trong khoảng thời gian từ ngày 01 tháng 01 năm 1995 đến ngày 31 tháng 12 năm 2000:
+
+Mbqtl = Tổng số tiền lương tháng đóng bảo hiểm xã hội của 6 năm (72 tháng) cuối trước khi nghỉ việc / 72 tháng
 
 c) Đối với người lao động bắt đầu tham gia bảo hiểm xã hội trong khoảng thời gian từ ngày 01 tháng 01 năm 2001 đến ngày 31 tháng 12 năm 2006:
 
-= Mbqtl Tổng số tiền lương tháng đóng bảo hiểm xã hội của 5 năm (60 tháng) cuối trước khi nghỉ việc 60 tháng = Mbqtl Tổng số tiền lương tháng đóng bảo hiểm xã hội của 6 năm (72 tháng) cuối trước khi nghỉ việc 72 tháng Mbqtl Tổng số tiền lương tháng đóng bảo hiểm xã hội của 8 năm (96 tháng) cuối trước khi nghỉ việc = 96 tháng
+Mbqtl = Tổng số tiền lương tháng đóng bảo hiểm xã hội của 8 năm (96 tháng) cuối trước khi nghỉ việc / 96 tháng
 
 d) Đối với người lao động bắt đầu tham gia bảo hiểm xã hội trong khoảng thời gian từ ngày 01 tháng 01 năm 2007 đến ngày 31 tháng 12 năm 2015:
 
+Mbqtl = Tổng số tiền lương tháng đóng bảo hiểm xã hội của 10 năm (120 tháng) cuối trước khi nghỉ việc / 120 tháng
+
 đ) Đối với người lao động bắt đầu tham gia bảo hiểm xã hội từ ngày 01 tháng 01 năm 2016 đến ngày 31 tháng 12 năm 2019:
+
+Mbqtl = Tổng số tiền lương tháng đóng bảo hiểm xã hội của 15 năm (180 tháng) cuối trước khi nghỉ việc / 180 tháng
 
 e) Đối với người lao động bắt đầu tham gia bảo hiểm xã hội từ ngày 01 tháng 01 năm 2020 đến ngày 31 tháng 12 năm 2024:
 
+Mbqtl = Tổng số tiền lương tháng đóng bảo hiểm xã hội của 20 năm (240 tháng) cuối trước khi nghỉ việc / 240 tháng
+
 g) Đối với người lao động bắt đầu tham gia bảo hiểm xã hội từ ngày 01 tháng 01 năm 2025 trở đi:
+
+Mbqtl = Tổng số tiền lương tháng đóng bảo hiểm xã hội của toàn bộ thời gian đóng / Tổng số tháng đóng bảo hiểm xã hội
 
 Trong đó:
 
@@ -597,7 +611,7 @@ Tiền lương tháng đóng bảo hiểm xã hội là tiền lương theo ng�
 
 2. Mức bình quân tiền lương tháng đóng bảo hiểm xã hội đối với người lao động có toàn bộ thời gian đóng bảo hiểm xã hội theo chế độ tiền lương do người sử dụng lao động quyết định quy định tại khoản 2 Điều 62 của Luật bảo hiểm xã hội và khoản 2 Điều 9 Nghị định số 115/2015/NĐ-CP được hướng dẫn như sau:
 
-= Mbqtl Tổng số tiền lương tháng đóng bảo hiểm xã hội của 10 năm (120 tháng) cuối trước khi nghỉ việc 120 tháng = Mbqtl Tổng số tiền lương tháng đóng bảo hiểm xã hội của 15 năm (180 tháng) cuối trước khi nghỉ việc 180 tháng = Mbqtl Tổng số tiền lương tháng đóng bảo hiểm xã hội của 20 năm (240 tháng) cuối trước khi nghỉ việc 240 tháng Mbqtl Tổng số tiền lương tháng đóng bảo hiểm xã hội của các tháng đóng bảo hiểm xã hội = Tổng số tháng đóng bảo hiểm xã hội = Mbqtl Tổng số tiền lương tháng đóng bảo hiểm xã hội của toàn bộ thời gian đóng Tổng số tháng đóng bảo hiểm xã hội
+Mbqtl = Tổng số tiền lương tháng đóng bảo hiểm xã hội của các tháng đóng bảo hiểm xã hội / Tổng số tháng đóng bảo hiểm xã hội
 
 Trong đó:
 
@@ -606,6 +620,8 @@ Mbqtl: mức bình quân tiền lương tháng đóng bảo hiểm xã hội.
 Tiền lương tháng đóng bảo hiểm xã hội là tiền lương tháng đã đóng bảo hiểm xã hội được điều chỉnh theo quy định tại khoản 2 Điều 63 của Luật bảo hiểm xã hội và khoản 2 Điều 10 Nghị định số 115/2015/NĐ-CP.
 
 3. Mức bình quân tiền lương tháng đóng bảo hiểm xã hội đối với người lao động vừa có thời gian đóng bảo hiểm xã hội thuộc đối tượng thực hiện chế độ tiền lương do Nhà nước quy định, vừa có thời gian đóng bảo hiểm xã hội theo chế độ tiền lương do người sử dụng lao động quyết định theo khoản 3 Điều 62 của Luật bảo hiểm xã hội và khoản 3 Điều 9 Nghị định số 115/2015/NĐ-CP được hướng dẫn như sau:
+
+Mbqtl = (Tổng số tiền lương tháng đóng bảo hiểm xã hội theo chế độ tiền lương do Nhà nước quy định + Tổng số tiền lương tháng đóng bảo hiểm xã hội của các tháng đóng bảo hiểm xã hội theo chế độ tiền lương do người sử dụng lao động quyết định) / Tổng số tháng đóng bảo hiểm xã hội
 
 Trong đó:
 
@@ -623,8 +639,6 @@ Ví dụ 36: Ông Q nghỉ việc hưởng lương hưu khi đủ 60 tuổi, có
 
 - Từ tháng 10/2009 đến tháng 9/2016 (7 năm) đóng bảo hiểm xã hội theo chế độ tiền lương do Nhà nước quy định.
 
-Tổng số tiền lương tháng đóng bảo hiểm xã hội của các tháng đóng bảo hiểm xã hội theo chế độ tiền lương do người sử dụng lao động quyết định = Tổng số tiền lương tháng đóng bảo hiểm xã hội theo chế độ tiền lương do Nhà nước quy định + Tổng số tháng đóng bảo hiểm xã hội Mbqtl
-
 Ông Q hưởng lương hưu từ tháng 10/2016.
 
 Tổng số tiền lương tháng đóng bảo hiểm xã hội theo chế độ tiền lương do Nhà nước quy định của ông Q được tính theo điểm b nêu trên như sau:
@@ -633,7 +647,11 @@ Tổng số tiền lương tháng đóng bảo hiểm xã hội theo chế độ
 
 - Mức bình quân tiền lương tháng đóng bảo hiểm xã hội theo chế độ tiền lương do Nhà nước quy định của ông Q được tính như sau:
 
-- Vậy, tổng số tiền lương tháng đóng bảo hiểm xã hội theo chế độ tiền lương do Nhà nước quy định của ông Q được tính là: 168 tháng x Mbqtl Ví dụ 37: Ông T nghỉ việc hưởng lương hưu khi đủ 60 tuổi, có 22 năm đóng bảo hiểm xã hội. Diễn biến thời gian đóng bảo hiểm xã hội của ông T như sau:
+Mbqtl = Tổng số tiền lương tháng đóng bảo hiểm xã hội của 5 năm cuối đóng bảo hiểm xã hội theo chế độ tiền lương do Nhà nước quy định (tính từ tháng 10/2011 đến tháng 9/2016) / 60 tháng
+
+- Vậy, tổng số tiền lương tháng đóng bảo hiểm xã hội theo chế độ tiền lương do Nhà nước quy định của ông Q được tính là: 168 tháng x Mbqtl.
+
+Ví dụ 37: Ông T nghỉ việc hưởng lương hưu khi đủ 60 tuổi, có 22 năm đóng bảo hiểm xã hội. Diễn biến thời gian đóng bảo hiểm xã hội của ông T như sau:
 
 - Từ tháng 01/1996 đến tháng 12/2002 (7 năm) đóng bảo hiểm xã hội theo chế độ tiền lương do Nhà nước quy định.
 
@@ -649,11 +667,9 @@ Tổng số tiền lương tháng đóng bảo hiểm xã hội theo chế độ
 
 - Mức bình quân tiền lương tháng đóng bảo hiểm xã hội theo chế độ tiền lương do Nhà nước quy định của ông T được tính như sau:
 
+Mbqtl = Tổng số tiền lương tháng đóng bảo hiểm xã hội của 6 năm cuối đóng bảo hiểm xã hội theo chế độ tiền lương do Nhà nước quy định (24 tháng tính từ tháng 01/2001 đến tháng 12/2002 cộng 48 tháng tính từ tháng 01/2014 đến tháng 12/2017) / 72 tháng
+
 - Vậy, tổng số tiền lương tháng đóng bảo hiểm xã hội theo chế độ tiền lương do Nhà nước quy định của ông T được tính là: 132 tháng x Mbqtl.
-
-Mbqtl = Tổng số tiền lương tháng đóng bảo hiểm xã hội của 5 năm cuối đóng bảo hiểm xã hội theo chế độ tiền lương do Nhà nước quy định (tính từ tháng 10/2011 đến tháng 9/2016) 60 tháng
-
-Mbqtl  = Tổng số tiền lương tháng đóng bảo hiểm xã hội của 6 năm cuối đóng bảo hiểm xã hội theo chế độ tiền lương do Nhà nước quy định (24 tháng tính từ tháng 01/2001 đến tháng 12/2002 cộng 48 tháng tính từ tháng 01/2014 đến tháng 12/2017) 72 tháng
 
 4. Lương hưu của người lao động thuộc đối tượng thực hiện chế độ tiền lương do Nhà nước quy định đã đóng bảo hiểm xã hội bao gồm phụ cấp thâm niên nghề sau đó chuyển sang ngành nghề có hoặc không có phụ cấp thâm niên nghề rồi mới nghỉ hưu, được thực hiện theo quy định tại khoản 6 Điều 9 của Nghị định số 115/2015/NĐ-CP và được hướng dẫn cụ thể như sau:
 

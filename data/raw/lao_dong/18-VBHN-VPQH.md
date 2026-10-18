@@ -9,7 +9,7 @@ hop_nhat_cua: "45-2019-QH14"
 trang_thai: "hop_nhat"
 nguon: "https://congbao.chinhphu.vn/van-ban/van-ban-hop-nhat-so-18-vbhn-vpqh-468971.htm"
 nguon_file: "(Công báo, tải qua trang nguồn)"
-cach_lay: "pdf_text_layer (PyMuPDF)"
+cach_lay: "pdf_text_layer (PyMuPDF); sửa tay 2026-10-17: bỏ khối xác thực VBHN dính cuối Điều 220 — tải lại --force sẽ mất"
 ngay_lay: "2026-09-12"
 ---
 CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM Độc lập - Tự do - Hạnh phúc BỘ LUẬT LAO ĐỘNG Bộ luật Lao động số 45/2019/QH14 ngày 20 tháng 11 năm 2019 của Quốc hội, có hiệu lực kể từ ngày 01 tháng 01 năm 2021, được sửa đổi, bổ sung bởi:
@@ -1914,9 +1914,9 @@ Người lao động Việt Nam đi làm việc ở nước ngoài phải tuân 
 
 3. Chính phủ quy định chi tiết việc tuyển dụng, quản lý lao động Việt Nam làm việc cho các tổ chức, cá nhân nước ngoài tại Việt Nam.
 
-Điều 151. Điều kiện người lao động nước ngoài làm việc tại Việt
+Điều 151. Điều kiện người lao động nước ngoài làm việc tại Việt Nam
 
-Nam 1. Người lao động nước ngoài làm việc tại Việt Nam là người có quốc tịch nước ngoài và phải đáp ứng các điều kiện sau đây:
+1. Người lao động nước ngoài làm việc tại Việt Nam là người có quốc tịch nước ngoài và phải đáp ứng các điều kiện sau đây:
 
 a) Đủ 18 tuổi trở lên và có năng lực hành vi dân sự đầy đủ;
 
@@ -2128,9 +2128,9 @@ TỔ CHỨC ĐẠI DIỆN NGƯỜI LAO ĐỘNG TẠI CƠ SỞ
 
 3. Các tổ chức đại diện người lao động quy định tại khoản 1 và khoản 2 Điều này bình đẳng về quyền và nghĩa vụ trong việc đại diện bảo vệ quyền và lợi ích hợp pháp, chính đáng của người lao động trong quan hệ lao động.
 
-Điều 171. Công đoàn cơ sở thuộc hệ thống tổ chức Công đoàn Việt
+Điều 171. Công đoàn cơ sở thuộc hệ thống tổ chức Công đoàn Việt Nam
 
-Nam 1. Công đoàn cơ sở thuộc hệ thống tổ chức Công đoàn Việt Nam được thành lập ở các cơ quan, tổ chức, đơn vị, doanh nghiệp.
+1. Công đoàn cơ sở thuộc hệ thống tổ chức Công đoàn Việt Nam được thành lập ở các cơ quan, tổ chức, đơn vị, doanh nghiệp.
 
 2. Việc thành lập, giải thể, tổ chức và hoạt động của Công đoàn cơ sở được thực hiện theo quy định của Luật Công đoàn.
 
@@ -2544,9 +2544,9 @@ a) Yêu cầu Hội đồng trọng tài lao động giải quyết theo quy đ�
 
 b) Tổ chức đại diện người lao động có quyền tiến hành thủ tục quy định tại các điều 200, 201 và 202 của Bộ luật này để đình công.
 
-Điều 197. Giải quyết tranh chấp lao động tập thể về lợi ích của
+Điều 197. Giải quyết tranh chấp lao động tập thể về lợi ích của Hội đồng trọng tài lao động
 
-Hội đồng trọng tài lao động 1. Trên cơ sở đồng thuận, các bên tranh chấp có quyền yêu cầu Hội đồng trọng tài lao động giải quyết tranh chấp trong trường hợp hòa giải không thành hoặc hết thời hạn hòa giải quy định tại khoản 2 Điều 188 của Bộ luật này mà hòa giải viên lao động không tiến hành hòa giải hoặc một trong các bên không thực hiện thỏa thuận trong biên bản hòa giải thành.
+1. Trên cơ sở đồng thuận, các bên tranh chấp có quyền yêu cầu Hội đồng trọng tài lao động giải quyết tranh chấp trong trường hợp hòa giải không thành hoặc hết thời hạn hòa giải quy định tại khoản 2 Điều 188 của Bộ luật này mà hòa giải viên lao động không tiến hành hòa giải hoặc một trong các bên không thực hiện thỏa thuận trong biên bản hòa giải thành.
 
 2. Trong thời hạn 07 ngày làm việc kể từ ngày nhận được yêu cầu
 
@@ -2889,5 +2889,3 @@ Bộ luật Lao động số 10/2012/QH13 hết hiệu lực thi hành kể từ
 đổi, bổ sung để phù hợp và để áp dụng quy định của Bộ luật này.
 
 3. Chế độ lao động đối với cán bộ, công chức, viên chức, người thuộc lực lượng Quân đội nhân dân, Công an nhân dân, tổ chức xã hội, xã viên hợp tác xã, người làm việc không có quan hệ lao động do các văn bản pháp luật khác quy định nhưng tùy từng đối tượng mà được áp dụng một số quy định trong Bộ luật này.
-
-VĂN PHÒNG QUỐC HỘI Số: 18 /VBHN-VPQH XÁC THỰC VĂN BẢN HỢP NHẤT Hà Nội, ngày 12 tháng 02 năm 2026 CHỦ NHIỆM Lê Quang Mạnh

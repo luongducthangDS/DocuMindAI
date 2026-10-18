@@ -355,6 +355,11 @@ _FPT_KEY = "fpt"
 # (quá timeout 20s của router/thêm dấu), tắt thì 1.3s/36 token. Suy luận nếu có nằm ở
 # `reasoning_content` riêng, nên chỉ đọc `content`.
 _FPT_URL = f"{FPT_API_BASE}/chat/completions"
+# Qwen thỉnh thoảng trả đúng token gọi tool dù request không khai tool (đo 2026-10-18: 1/~1000
+# câu, nội dung cả câu trả lời là "<tool_call>"). Coi là lỗi để vòng xoay sang model kế tiếp —
+# trước token đầu tiên, nên đường stream cũng đổi được model mà người dùng không thấy rác.
+# ponytail: chỉ bắt mẫu đã gặp; câu trả lời rác dạng khác (vd. toàn chữ số) chưa bắt.
+_FPT_JUNK = "<tool_call>"
 
 
 def _fpt_call(model_name: str, prompt: str, timeout: float, stream: bool = False):
@@ -378,8 +383,11 @@ def _fpt_call(model_name: str, prompt: str, timeout: float, stream: bool = False
         return _fpt_stream(r)
     data = r.json()
     usage = data.get("usage") or {}
+    text = (data["choices"][0]["message"].get("content") or "").strip()
+    if text.startswith(_FPT_JUNK):
+        raise RuntimeError(f"FPT {model_name}: trả về token rác {text[:40]!r}")
     return SimpleNamespace(
-        text=(data["choices"][0]["message"].get("content") or "").strip(),
+        text=text,
         usage_metadata=SimpleNamespace(
             prompt_token_count=usage.get("prompt_tokens", 0),
             candidates_token_count=usage.get("completion_tokens", 0),
@@ -390,6 +398,7 @@ def _fpt_call(model_name: str, prompt: str, timeout: float, stream: bool = False
 def _fpt_stream(r):
     # Đọc bytes rồi tự decode UTF-8: SSE thường không khai charset, requests sẽ đoán
     # ISO-8859-1 và làm vỡ tiếng Việt nếu dùng decode_unicode.
+    first = True
     for raw in r.iter_lines():
         line = raw.decode("utf-8").strip()
         if not line.startswith("data:"):
@@ -399,6 +408,10 @@ def _fpt_stream(r):
             break
         choices = json.loads(payload).get("choices") or []
         text = (choices[0].get("delta") or {}).get("content") if choices else None
+        if first and text and text.strip():
+            if text.lstrip().startswith(_FPT_JUNK):
+                raise RuntimeError(f"FPT stream: trả về token rác {text[:40]!r}")
+            first = False
         if text:
             yield SimpleNamespace(text=text)
 

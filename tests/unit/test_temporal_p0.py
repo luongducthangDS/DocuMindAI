@@ -42,8 +42,12 @@ def wage_index(wage_chunks, mem_retriever):
     return mem_retriever(TextNode(id_=i, text=t, metadata=m) for i, t, m in wage_chunks)
 
 
+# Hàng vùng I của bảng lương (Điều 3) — không phải danh mục địa bàn "Vùng I, gồm ..." ở phụ lục.
+REGION_ONE_ROW = "Vùng I: mức lương tối thiểu tháng"
+
+
 def _region_one_chunks(chunks):
-    return [c for c in chunks if "Vùng I " in c.text]
+    return [c for c in chunks if REGION_ONE_ROW in c.text]
 
 
 @pytest.mark.parametrize("as_of,expected,other,so_hieu", [
@@ -68,7 +72,7 @@ def test_changeover_day_is_exclusive(wage_chunks):
 
     def visible(as_of):
         return {m["so_hieu"] for _, t, m in wage_chunks
-                if "Vùng I " in t and RetrievalContext(as_of_date=as_of).allows(m)}
+                if REGION_ONE_ROW in t and RetrievalContext(as_of_date=as_of).allows(m)}
 
     assert visible("2025-12-31") == {"74/2024/NĐ-CP"}
     assert visible("2026-01-01") == {"293/2025/NĐ-CP"}

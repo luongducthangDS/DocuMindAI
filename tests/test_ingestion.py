@@ -202,8 +202,9 @@ class TestManifest:
             assert isinstance(entry.effective_to, str)
 
     def test_in_place_amendments_parsed_for_bo_luat_lao_dong(self, manifest):
-        amendments = manifest["45-2019-QH14"].in_place_amended_clauses
-        # T4: đúng 4 khoản/điểm bị sửa in-place
+        amendments = [a for a in manifest["45-2019-QH14"].in_place_amended_clauses
+                      if a.loai_sua != "het_hieu_luc"]
+        # T4: đúng 4 khoản/điểm bị sửa in-place (Điều 219 khoản 1 là hết hiệu lực, không phải sửa)
         assert len(amendments) == 4
         by_uid = {a.clause_uid: a for a in amendments}
         d139 = by_uid["45-2019-QH14__d139_k1"]
@@ -321,6 +322,35 @@ class TestClauseChunking:
         assert "Khoản này được sửa đổi, bổ sung theo quy định tại" not in joined
 
 
+class TestLapsedClause:
+    """Điều 219 khoản 1 BLLĐ sửa điều kiện lương hưu "đủ 20 năm" của Luật BHXH 58/2014 —
+    hết áp dụng khi 41/2024/QH15 thay luật đó (01/7/2025). Đo 2026-10-18: để mở tới 9999
+    thì đoạn này làm câu trả lời lương hưu sau 7/2025 nói "chưa đủ 20 năm"."""
+
+    @staticmethod
+    def _by_uid(chunks):
+        return {c.metadata["clause_uid"]: c for c in chunks if c.metadata["dieu"] == 219}
+
+    def test_khoan_1_ends_when_the_amended_law_was_replaced(self, bo_luat_chunks):
+        k1 = self._by_uid(bo_luat_chunks)["45-2019-QH14__d219_k1"]
+        assert k1.metadata["effective_to"] == "2025-07-01"
+        assert not k1.metadata.get("superseded_by")   # không có bản nào thay nó
+
+    def test_quoted_khoan_stay_inside_khoan_1(self, bo_luat_chunks):
+        # "2.", "3.", "4." trong “Điều 54 …” là khoản của luật được sửa — tách ở đó thì quy
+        # tắc 20 năm rơi sang đoạn còn hiệu lực.
+        by_uid = self._by_uid(bo_luat_chunks)
+        assert "b) Đủ 20 năm đóng bảo hiểm xã hội trở lên" in by_uid["45-2019-QH14__d219_k1"].text
+        rest = [c for u, c in by_uid.items() if u != "45-2019-QH14__d219_k1"]
+        assert rest and all("20 năm" not in c.text for c in rest)
+        assert all(c.metadata["effective_to"] == "9999-12-31" for c in rest)
+
+    def test_no_chunk_is_only_the_article_title(self, bo_luat_chunks):
+        titles = [c for c in bo_luat_chunks if c.text.splitlines()[-1].startswith("Điều ")
+                  and len(c.text.splitlines()) <= 2]
+        assert titles == []
+
+
 @pytest.fixture(scope="module")
 def luat_bhxh_chunks(manifest):
     """Chunks of Luật BHXH 2024 — amended in place but with no VBHN to index from."""
@@ -436,3 +466,88 @@ class TestVerifyGate:
             "---\ndoc_id: \"fake-doc\"\n---\nĐiều 1. Thử\n\n" + "x" * 600, encoding="utf-8"
         )
         assert discover_lao_dong(manifest, tmp_path, "2026-09-12") == []
+
+
+class TestHeadingContext:
+    """Chương/Mục đi theo từng đoạn: thiếu nó thì "Điều kiện hưởng lương hưu" của BHXH
+    bắt buộc và tự nguyện giống hệt nhau (đo 2026-10-17, ~18/186 câu gold trượt vì thế)."""
+
+    TEXT = (
+        "Chương III\n\nBẢO HIỂM XÃ HỘI BẮT BUỘC\n\nMục 4\n\nCHẾ ĐỘ HƯU TRÍ\n\n"
+        "Điều 54. Điều kiện hưởng lương hưu\n\n1. Người lao động đủ 20 năm đóng bảo hiểm xã hội trở lên.\n\n"
+        "Chương IV\n\nBẢO HIỂM XÃ HỘI TỰ NGUYỆN\n\n"
+        "Điều 73. Điều kiện hưởng lương hưu\n\n1. Người lao động hưởng lương hưu khi đủ 20 năm đóng, theo\n"
+        "Mục 3 Chương III của Bộ luật Lao động.\n"
+    )
+
+    def test_chunk_carries_its_own_chapter_and_not_the_next_one(self):
+        d54, d73 = chunk_by_dieu(self.TEXT, {"doc_id": "x", "title": "t"})
+        assert d54.text.startswith("Chương III. BẢO HIỂM XÃ HỘI BẮT BUỘC — Mục 4. CHẾ ĐỘ HƯU TRÍ\nĐiều 54.")
+        assert "TỰ NGUYỆN" not in d54.text  # tiêu đề Chương IV từng dính vào cuối Điều 54
+        assert d73.metadata["chuong"] == "Chương IV. BẢO HIỂM XÃ HỘI TỰ NGUYỆN"
+        assert d73.metadata["muc"] == ""  # Mục reset khi sang Chương mới
+        # Dẫn chiếu "Mục 3 Chương III của Bộ luật" không phải tiêu đề: không bị cắt
+        assert d73.text.endswith("Chương III của Bộ luật Lao động.")
+        assert d54.metadata["dieu_header"] == "Điều 54. Điều kiện hưởng lương hưu"
+
+
+class TestCorpusTextIntegrity:
+    """Lỗi trích PDF mà validate_corpus.py (chỉ kiểm metadata) không thấy — đo 2026-10-17:
+    145/2020 dừng ở Điều 101/115, bảng tuổi nghỉ hưu 135/2020 bị cắt 1639 ký tự, dấu
+    chữ ký số chen giữa điểm/khoản ở 13 văn bản, chữ dạng tổ hợp (NFD) ở 74/2024."""
+
+    @pytest.fixture(scope="class")
+    def corpus_chunks(self):
+        from scripts.ingest_documents import discover_lao_dong
+
+        return dict(discover_lao_dong(MANIFEST_PATH, CORPUS_DIR, "2026-10-17"))
+
+    def test_article_count_matches_manifest_structure(self, corpus_chunks):
+        import re
+
+        import yaml
+
+        docs = yaml.safe_load(MANIFEST_PATH.read_text(encoding="utf-8"))["documents"]
+        expected = {d["doc_id"]: int(m.group(1)) for d in docs
+                    if (m := re.search(r"(\d+)\s*điều", str(d.get("cau_truc", ""))))}
+        for doc_id, n in expected.items():
+            if doc_id in corpus_chunks:
+                got = {c.metadata["dieu"] for c in corpus_chunks[doc_id] if isinstance(c.metadata["dieu"], int)}
+                assert got == set(range(1, n + 1)), f"{doc_id}: thiếu Điều {sorted(set(range(1, n + 1)) - got)}"
+
+    def test_no_pdf_artifacts_or_truncation(self, corpus_chunks):
+        import unicodedata
+
+        for doc_id, chunks in corpus_chunks.items():
+            for c in chunks:
+                assert "Thời gian ký:" not in c.text, f"{doc_id} Đ{c.metadata['dieu']}: dấu chữ ký số"
+                assert unicodedata.is_normalized("NFC", c.text), f"{doc_id} Đ{c.metadata['dieu']}: không phải NFC"
+                assert c.metadata.get("char_count", len(c.text)) <= len(c.text) + 1, f"{doc_id} Đ{c.metadata['dieu']}: bị cắt"
+
+    def test_title_case_appendix_heading_splits_but_reference_does_not(self):
+        from src.ingestion.chunker import split_appendix
+
+        body, appendix = split_appendix(
+            "Điều 4. Tuổi\n\nPhụ lục III ban hành kèm theo Nghị định này.\n\nPhụ lục I\n\nLỘ TRÌNH"
+        )
+        assert body.endswith("Nghị định này.\n\n") and appendix.startswith("Phụ lục I\n")
+
+    def test_oversized_block_without_khoan_is_split_not_cut(self):
+        from src.ingestion.chunker import _split_large_dieu
+
+        text = "Điều 9. Trách nhiệm\n\n" + "\n\n".join(f"Dòng bảng {i} " + "x" * 300 for i in range(30))
+        chunks = _split_large_dieu(text, {"doc_id": "x"}, 4000)
+        assert len(chunks) > 1 and all("Dòng bảng 29" in c.text for c in chunks[-1:])
+        assert sum(len(c.text) for c in chunks) >= len(text) - 2 * len(chunks)
+
+    def test_sentence_broken_across_paragraphs_is_rejoined_but_structure_is_not(self):
+        from scripts.ingest_documents import clean_md
+
+        out = clean_md(
+            "1. Người lao động bị xử lý theo quy định của pháp luật về lao\n\nđộng.\n\n"
+            "a) Điểm một,\n\nđiểm một tiếp;\n\nb) Điểm hai\n\nĐiều 2. Tiêu đề\n\nCHƯƠNG HOA\n\nthân bài\n\n"
+            "c) theo khoản 1 và khoản 2\n\nĐiều 27 của Luật này."
+        )
+        assert "pháp luật về lao động." in out and "Điểm một, điểm một tiếp;" in out
+        assert "khoản 2 Điều 27 của Luật này." in out  # dẫn chiếu, không phải tiêu đề Điều
+        assert "\n\nb) Điểm hai\n\nĐiều 2. Tiêu đề\n\nCHƯƠNG HOA\n\nthân bài" in out

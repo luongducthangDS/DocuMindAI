@@ -40,6 +40,23 @@ def gate(new: dict, base: dict) -> tuple[list[str], str]:
     return failures, "\n".join(lines)
 
 
+def paired(new_rows: list, base_rows: list, arm: str = "pre_filter") -> str:
+    """Câu thắng/thua so với baseline (cùng câu, cùng nhãn). Với n≈170 và kết quả đã cố định,
+    số câu đổi chiều nói nhiều hơn chênh lệch tỷ lệ (CI95 của recall@1 ≈ ±0.05)."""
+    base = {r["id"]: r["arms"][arm]["context"].get("gold_rank") for r in base_rows}
+    lines = ["| | thắng | thua |", "|---|---:|---:|"]
+    for label, k, single_only in (("hạng 1 (câu một điều)", 1, True), ("top-8", 8, False)):
+        win = loss = 0
+        for r in new_rows:
+            if r["id"] not in base or not r.get("has_gold") or (single_only and r.get("multi_clause")):
+                continue
+            was, now = (base[r["id"]] or 99) <= k, (r["arms"][arm]["context"].get("gold_rank") or 99) <= k
+            win += now and not was
+            loss += was and not now
+        lines.append(f"| {label} | {win} | {loss} |")
+    return "\n".join(lines)
+
+
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("report", type=Path)
@@ -52,8 +69,13 @@ def main() -> None:
     if new["meta"]["gold_set"] != base["meta"]["gold_set"] or new["meta"]["n_questions"] != base["meta"]["n_questions"]:
         sys.exit("Gold set khác baseline — cập nhật reports/eval_baseline.json cùng PR đổi gold set.")
     failures, table = gate(new["summary"]["overall"][args.arm], base["summary"]["overall"][args.arm])
+    # Câu chạy thiếu nhánh dense (embedding 429) là số đo BM25, rerank lỗi là thứ tự RRF — PASS trên đó là PASS giả.
+    if degraded := new["meta"].get("n_degraded"):
+        failures.append(f"{degraded} câu đo thiếu bước (embedding/rerank lỗi hoặc quota) — chạy lại, đừng so")
 
     md = f"### Retrieval eval — arm `{args.arm}`, {new['meta']['n_questions']} câu\n\n{table}\n"
+    if base.get("rows") and new.get("rows"):
+        md += f"\nSo theo từng câu với baseline:\n\n{paired(new['rows'], base['rows'], args.arm)}\n"
     md += "\n" + ("**FAIL**\n- " + "\n- ".join(failures) if failures else "**PASS** — không metric nào tụt quá ngưỡng.") + "\n"
     print(md)
     if summary := os.environ.get("GITHUB_STEP_SUMMARY"):

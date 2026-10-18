@@ -35,9 +35,19 @@ _CONFIDENT_SCORE_MULTIPLIER = 2.0
 # "irrelevant" 11/14 câu mà gold đứng top-8 (đa số hạng 1) — tức ở vùng cao nó chỉ
 # thêm reformulate + grade + embed, không cứu được câu nào.
 # HOPELESS = dưới mọi câu có gold; thực tế chỉ còn các lượt truy hồi rỗng/lệch hẳn.
-# Đổi EMBEDDING_MODEL là phải đo lại (eval/agent_budget_eval.py).
-CONFIDENT_COSINE = 0.75
-HOPELESS_COSINE = 0.60
+# Mỗi model một thang cosine, nên ngưỡng đi theo EMBEDDING_MODEL. Vietnamese_Embedding (FPT,
+# đo 2026-10-17 trên index 1247 đoạn): gold top-8 p10 0.535 / min 0.442, câu phải từ chối p50
+# 0.315 / max 0.530 — dùng 0.75/0.60 của Gemini cho model này là ~40% câu có đáp án bị coi
+# "không liên quan". CONFIDENT 0.54 nằm trên max câu từ chối, HOPELESS 0.42 dưới min câu có gold.
+# Model chưa đo (kể cả gemini-embedding-2): không đi tắt bằng cosine, luôn hỏi judge.
+_COSINE_GATES: dict[str, tuple[float, float]] = {   # model -> (CONFIDENT, HOPELESS)
+    "gemini-embedding-001": (0.75, 0.60),
+    "Vietnamese_Embedding": (0.54, 0.42),
+}
+
+
+def cosine_gates() -> tuple[float, float] | None:
+    return _COSINE_GATES.get(get_settings().embedding_model)
 
 _JUDGE_PROMPT = """Câu hỏi: {query}
 
@@ -125,12 +135,14 @@ def grade_chunks(query: str, chunks: list[RetrievedChunk]) -> dict:
     if threshold > 0 and best_score >= threshold * _CONFIDENT_SCORE_MULTIPLIER:
         return {"relevant": True, "reason": f"Điểm liên quan cao ({best_score:.3f})"}
 
-    if threshold == 0:
+    gates = cosine_gates()
+    if threshold == 0 and gates:
+        confident, hopeless = gates
         dense = [c.dense_score for c in chunks if c.dense_score is not None]
         best_cos = max(dense) if dense else None
-        if best_cos is not None and best_cos >= CONFIDENT_COSINE:
+        if best_cos is not None and best_cos >= confident:
             return {"relevant": True, "reason": f"Độ tương đồng cao (cos {best_cos:.3f})"}
-        if best_cos is not None and best_cos < HOPELESS_COSINE:
+        if best_cos is not None and best_cos < hopeless:
             return {"relevant": False, "reason": f"Độ tương đồng quá thấp (cos {best_cos:.3f})"}
 
     judged = _call_judge_llm(query, chunks)

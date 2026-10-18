@@ -93,37 +93,43 @@ def http_get(url: str, retries: int = 4) -> bytes:
 
 
 def resolve_source(url: str):
-    """Trả (url_tai, kind, cách_resolve); kind = 'pdf' | 'html'."""
+    """Trả (các_url_tải, kind, cách_resolve); kind = 'pdf' | 'html'.
+
+    Một văn bản dài in qua NHIỀU số Công báo (145/2020: số 1203+1204 rồi 1205+1206),
+    trang văn bản liệt kê một PDF cho mỗi số — phải lấy hết, theo thứ tự. Bản cũ chỉ lấy
+    `pdfs[0]` nên 145/2020 dừng ở Điều 101/115 mà bước kiểm vẫn báo khớp.
+    """
     if not url:
-        return None, None, "no-source"
+        return [], None, "no-source"
 
     if "xaydungchinhsach.chinhphu.vn" in url or "baochinhphu.vn" in url:
-        return url, "html", "chinhphu-html"
+        return [url], "html", "chinhphu-html"
 
     if url.lower().endswith(".pdf") or "format=pdf" in url.lower():
-        return url, "pdf", "direct-pdf"
+        return [url], "pdf", "direct-pdf"
 
     if "congbao.chinhphu.vn" in url:
         try:
             html = http_get(url).decode("utf-8", "ignore")
         except Exception as exc:  # noqa: BLE001
-            return None, None, "congbao-fetch-error: {}".format(exc)
-        pdfs = [l for l in PDF_LINK_RE.findall(html) if "pdf" in l.lower()]
+            return [], None, "congbao-fetch-error: {}".format(exc)
+        # Trang cũ (2013–2015) ghi link không có dấu chấm: ".../13409-1-592015tt-bldtbxh13458pdf"
+        pdfs = list(dict.fromkeys(l for l in PDF_LINK_RE.findall(html) if l.lower().endswith("pdf")))
         if pdfs:
-            return pdfs[0], "pdf", "congbao-html"
-        return None, None, "congbao-no-pdf-link"
+            return pdfs, "pdf", "congbao-html" + ("+{}-so".format(len(pdfs)) if len(pdfs) > 1 else "")
+        return [], None, "congbao-no-pdf-link"
 
     if "vanban.chinhphu.vn" in url or "chinhphu.vn/?pageid=" in url:
         try:
             html = http_get(url).decode("utf-8", "ignore")
         except Exception as exc:  # noqa: BLE001
-            return None, None, "vanban-fetch-error: {}".format(exc)
+            return [], None, "vanban-fetch-error: {}".format(exc)
         pdfs = VBPQ_LINK_RE.findall(html)
         if pdfs:
-            return pdfs[0], "pdf", "vanban-html"
-        return None, None, "vanban-no-pdf-link"
+            return pdfs[:1], "pdf", "vanban-html"
+        return [], None, "vanban-no-pdf-link"
 
-    return None, None, "unsupported-source"
+    return [], None, "unsupported-source"
 
 
 # ---------------------------------------------------------------- text
@@ -149,6 +155,34 @@ def pdf_to_text(data: bytes):
         return "\n".join(pages), len(pages)
 
 
+def fetch(url: str, kind: str) -> bytes:
+    data = http_get(url)
+    # Endpoint "…?format=pdf" của Công báo đôi khi trả trang xem trước thay
+    # vì file: lấy link PDF thật trong đó rồi tải lại.
+    if kind == "pdf" and not data[:5].startswith(b"%PDF"):
+        pdfs = [l for l in PDF_LINK_RE.findall(data.decode("utf-8", "ignore")) if l.lower().endswith("pdf")]
+        if pdfs:
+            data = http_get(pdfs[0])
+        if not data[:5].startswith(b"%PDF"):
+            raise ValueError("nguồn không trả PDF ({})".format(url))
+    return data
+
+
+# Từ của nguồn vắng mặt trong file được phép tới mức này: dấu chữ ký số, ô bảng dựng lại.
+MAX_MISSING_WORDS = 400
+
+
+def word_match(source: str, current: str) -> tuple[float, int]:
+    """(độ giống theo chuỗi từ, số từ của nguồn không có trong file)."""
+    import difflib
+
+    a = re.findall(r"\w+", unicodedata.normalize("NFC", source).lower())
+    b = re.findall(r"\w+", unicodedata.normalize("NFC", current).lower())
+    sm = difflib.SequenceMatcher(None, a, b, autojunk=False)
+    missing = sum(i2 - i1 for op, i1, i2, _, _ in sm.get_opcodes() if op in ("delete", "replace"))
+    return sm.ratio(), missing
+
+
 def html_to_text(data: bytes) -> str:
     """Trích thân bài toàn văn trên Cổng TTĐT Chính phủ."""
     from bs4 import BeautifulSoup
@@ -158,14 +192,16 @@ def html_to_text(data: bytes) -> str:
     return node.get_text("\n", strip=True) if node else ""
 
 
-def clean_text(text: str) -> str:
+def clean_text(text: str, kind: str = "pdf") -> str:
+    # "Dòng chỉ có số" là số trang ở PDF; ở HTML đó là ô bảng — mẫu số công thức (12/2025:
+    # Mbqtl = Tổng… / 60) bị xoá mất nếu lọc cả HTML.
     lines = []
     for raw in text.splitlines():
         line = raw.replace("\xa0", " ").rstrip()
         stripped = line.strip()
-        if re.fullmatch(r"\d{1,4}", stripped):          # số trang đứng một mình
+        if kind == "pdf" and re.fullmatch(r"\d{1,4}", stripped):  # số trang đứng một mình
             continue
-        if re.match(r"^CÔNG BÁO/Số \d+", stripped):     # header lặp mỗi trang
+        if re.match(r"^(?:\d{1,4}\s+)?CÔNG BÁO/Số \d+", stripped):  # header lặp mỗi trang (pdfplumber: số trang đứng trước)
             continue
         lines.append(line)
     return re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip() + "\n"
@@ -304,44 +340,29 @@ def main() -> int:
         # tra cứu (bản .signed.pdf là scan): ưu tiên nguồn còn trích được text.
         if "html_fulltext" in str(old_fm.get("cach_lay", "")) and "chinhphu.vn/?pageid" in str(page_url):
             page_url = str(old_fm.get("nguon_file") or page_url)
-        url, kind, how = resolve_source(page_url)
-        if not url:
+        urls, kind, how = resolve_source(page_url)
+        if not urls:
             print("[FAIL] {}: {} ({})".format(did, how, page_url))
             failed.append((did, how))
             continue
 
         try:
-            data = http_get(url)
+            parts = [fetch(u, kind) for u in urls]
         except Exception as exc:  # noqa: BLE001
-            print("[FAIL] {}: download error {}".format(did, exc))
-            failed.append((did, "download: {}".format(exc)))
+            print("[FAIL] {}: {}".format(did, exc))
+            failed.append((did, str(exc)[:80]))
             continue
-
-        # Endpoint "…?format=pdf" của Công báo đôi khi trả trang xem trước thay
-        # vì file: lấy link PDF thật trong đó rồi tải lại.
-        if kind == "pdf" and not data[:5].startswith(b"%PDF"):
-            pdfs = [l for l in PDF_LINK_RE.findall(data.decode("utf-8", "ignore")) if "pdf" in l.lower()]
-            if pdfs:
-                try:
-                    data = http_get(pdfs[0])
-                    url, how = pdfs[0], how + "+viewer-fallback"
-                except Exception as exc:  # noqa: BLE001
-                    print("[FAIL] {}: viewer fallback lỗi {}".format(did, exc))
-                    failed.append((did, "viewer-fallback"))
-                    continue
+        url = urls[0]
 
         if kind == "html":
-            text, pages = html_to_text(data), 0
+            text, pages = html_to_text(parts[0]), 0
             if len(text) < 2000:
                 print("[FAIL] {}: trang HTML không có phần toàn văn ({})".format(did, url))
                 failed.append((did, "html-no-fulltext"))
                 continue
         else:
-            if not data[:5].startswith(b"%PDF"):
-                print("[FAIL] {}: nguồn không trả PDF ({})".format(did, url))
-                failed.append((did, "not-pdf"))
-                continue
-            text, pages = pdf_to_text(data)
+            extracted = [pdf_to_text(d) for d in parts]
+            text, pages = "\n".join(t for t, _ in extracted), sum(n for _, n in extracted)
             if not has_text_layer(text, pages):
                 print("[FAIL] {}: PDF là bản scan (không có text layer) — cần nguồn khác".format(did))
                 failed.append((did, "scanned-pdf"))
@@ -352,18 +373,21 @@ def main() -> int:
             failed.append((did, "so-hieu-mismatch"))
             continue
 
-        body = clean_text(text)
+        body = clean_text(text, kind)
         n_dieu, max_dieu = count_dieu(body)
 
         if path.exists() and not args.force:
             cur = read_body(path)
             c_dieu, c_max = count_dieu(cur)
-            if (c_dieu, c_max) == (n_dieu, max_dieu):
-                print("[ok  ] {}: khớp file đang có ({} điều, tới Điều {})".format(did, n_dieu, max_dieu))
+            ratio, missing = word_match(body, cur)
+            # Đếm Điều thôi không đủ: lệch nội dung trong Điều (bảng, câu mất) không đổi số Điều.
+            if (c_dieu, c_max) == (n_dieu, max_dieu) and missing <= MAX_MISSING_WORDS:
+                print("[ok  ] {}: khớp file đang có ({} điều, tới Điều {}; {:.3f} theo từ, {} từ nguồn không có trong file)".format(
+                    did, n_dieu, max_dieu, ratio, missing))
                 ok += 1
             else:
-                print("[DIFF] {}: file có {} điều (tới {}), nguồn cho {} điều (tới {})".format(
-                    did, c_dieu, c_max, n_dieu, max_dieu))
+                print("[DIFF] {}: file có {} điều (tới {}), nguồn cho {} điều (tới {}); {:.3f} theo từ, {} từ nguồn không có trong file".format(
+                    did, c_dieu, c_max, n_dieu, max_dieu, ratio, missing))
                 diff += 1
             continue
 

@@ -118,6 +118,26 @@ class TestRetrieveWithContext:
         got = r_module.retrieve_with_context("q", RetrievalContext(), top_n=8)
         assert len(got) == 8
 
+    def test_with_reranker_top_n_is_still_honoured(self, singletons):
+        singletons(dense_nodes=[node(f"n{i}", score=1 - i / 100) for i in range(12)], reranker=RecordingReranker())
+        assert len(r_module.retrieve_with_context("q", RetrievalContext(), top_n=3)) == 3
+
+    def test_voluntary_chapter_and_appendix_yield_to_the_article_asked_about(self, singletons):
+        tn = node("d98", score=0.9, chuong="Chương VI. BẢO HIỂM XÃ HỘI TỰ NGUYỆN")
+        pl = node("pl1", score=0.8, chunk_strategy="appendix")
+        mixed = node("d23", score=0.7, chuong="Chương IV. ĐÓNG BẢO HIỂM XÃ HỘI BẮT BUỘC VÀ BẢO HIỂM XÃ HỘI TỰ NGUYỆN")
+        rest = [node(f"n{i}", score=0.6 - i / 100) for i in range(4)]
+        singletons(dense_nodes=[tn, pl, mixed, *rest])
+
+        def order(q):
+            return [c.metadata["clause_uid"] for c in r_module.retrieve_with_context(q, RetrievalContext())]
+
+        got = order("Phải đóng bảo hiểm xã hội bao nhiêu năm thì được hưởng lương hưu?")
+        assert got[:2] == ["d23", "n0"]              # chương gộp bắt buộc + tự nguyện không bị hạ
+        assert got.index("d98") < got.index("pl1")   # hai đoạn bị hạ giữ thứ tự với nhau
+        assert order("Người tham gia bảo hiểm xã hội tự nguyện được hưởng lương hưu khi nào?")[0] == "d98"
+        assert order("Phường Hoàn Kiếm thuộc vùng nào?")[:2] == ["pl1", "d23"]   # câu hỏi về địa bàn
+
     def test_embedding_quota_falls_back_to_bm25_without_sleeping(self, monkeypatch):
         """Hết quota embed: server không được ngủ chờ (từng làm 1 câu hỏi mất 231s),
         mà phải trả kết quả BM25 ngay. Dùng VectorStoreIndex thật để chắc chắn
