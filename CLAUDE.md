@@ -92,9 +92,11 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   Faithfulness judge ≈0.99 ở cả 6 cấu hình và cho 1.0 cả câu sai bám đúng một đoạn đã hết hiệu lực →
   chưa dùng làm thước đo an toàn được; chấm chuỗi cũng báo sai câu đúng. Hiệu chỉnh cả hai bằng người
   chấm: bảng duyệt https://claude.ai/artifact/GwULtyAAPsxS5LewLzjcdn (36 câu trượt hạng 1 + 30 câu trả
-  lời k=8; nhãn ở collection `reviews` của artifact, Claude đọc bằng ArtifactData). Lượt duyệt đầu (2026-10-18,
-  32/36 `gold_sai`) chấm trên văn bản bị trang cắt ở 700–900 ký tự → không dùng; trang đã nạp toàn văn,
-  nhãn cũ hiện "cần xem lại" (`text_full_since`). `ci_gate` in bảng thắng/thua theo câu;
+  lời k=8; nhãn ở collection `reviews` của artifact, Claude đọc bằng ArtifactData). Lượt đầu (32/36 `gold_sai`)
+  chấm trên văn bản bị trang cắt ở 700–900 ký tự → bỏ. Lượt duyệt lại trên toàn văn (2026-10-18, 36/36): truy hồi
+  sai 26, nhiều điều đều đúng 5, diễn đạt xa 3, gold sai 2 → đã áp vào `legal_qa_200.json` (`acceptable_clauses`,
+  sửa g2_b033/g2_b036, mỗi câu ghi `clause_review`; `reviewed` vẫn false — người duyệt chấm nhãn điều khoản, chưa
+  duyệt cả câu). Phần B (30 câu trả lời để hiệu chỉnh judge) chưa ai chấm. `ci_gate` in bảng thắng/thua theo câu;
   câu nhiều điều khoản đo bằng `multi_coverage_at_k` (recall@1 của chúng luôn = 0 theo định nghĩa).
 - LLM: **chỉ FPT AI Marketplace** (2026-10-18): `GEMINI_GENERATION_MODELS`, `GEMINI_GENERATION_MODELS_COMPLEX`,
   `GEMINI_JUDGE_MODELS` để TRỐNG ở `.env` và Render ⇒ không còn cặp Gemini; FPT hỏng cả hai model thì trích

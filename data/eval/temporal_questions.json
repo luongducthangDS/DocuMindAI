@@ -235,6 +235,7 @@
     "ground_truth": "Theo khoản 1 Điều 39 Luật Việc làm 2025 (74/2025/QH15), mức hưởng hằng tháng bằng 60% mức bình quân tiền lương tháng đóng bảo hiểm thất nghiệp của 06 tháng đã đóng gần nhất, tối đa không quá 05 lần mức lương tối thiểu tháng theo vùng do Chính phủ công bố áp dụng tại tháng cuối cùng đóng bảo hiểm thất nghiệp.",
     "source_doc": "74-2025-QH15",
     "source_clause": "74-2025-QH15__d39",
+    "acceptable_clauses": ["374-2025-ND-CP__d15"],
     "expect_contains": [["60%"], ["05 lần", "5 lần"], ["lương tối thiểu"]],
     "expect_absent": ["mức lương cơ sở", "38/2013"],
     "distractor_docs": ["38-2013-QH13"]
