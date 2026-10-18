@@ -9,8 +9,8 @@
     "corpus_earliest_point_in_time": "2015-01-01",
     "retriever": "hybrid BM25 + dense, RRF fusion → top-8",
     "reranker_active": false,
-    "index": "qdrant/documind_legal_fpt/Vietnamese_Embedding/1247",
-    "git_sha": "b96f2af",
+    "index": "qdrant/documind_legal_fpt/Vietnamese_Embedding/1249",
+    "git_sha": "065b5ad",
     "n_degraded": 0,
     "embed_cache": true
   },
@@ -29,13 +29,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -54,6 +55,7 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
@@ -79,13 +81,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -104,13 +107,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -129,13 +133,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -154,6 +159,7 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
@@ -179,13 +185,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 2,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -203,7 +210,8 @@
       "arms": {
         "pre_filter": {
           "context": {
-            "gold_rank": 6,
+            "gold_rank": 3,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
@@ -229,13 +237,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -254,13 +263,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 194
         }
       },
       "degraded": []
@@ -279,13 +289,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -304,13 +315,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 2,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -329,13 +341,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 208
+          "retrieve_ms": 194
         }
       },
       "degraded": []
@@ -354,13 +367,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -379,13 +393,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 201
         }
       },
       "degraded": []
@@ -404,13 +419,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 2,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 194
         }
       },
       "degraded": []
@@ -429,13 +445,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 2,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -454,13 +471,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -479,13 +497,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 2,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -504,13 +523,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 7,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -529,13 +549,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -554,13 +575,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 194
         }
       },
       "degraded": []
@@ -579,13 +601,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -604,13 +627,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -629,13 +653,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -654,13 +679,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -679,13 +705,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -704,13 +731,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -733,7 +761,7 @@
             "clean": true,
             "n_chunks": 0
           },
-          "retrieve_ms": 194
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -756,7 +784,7 @@
             "clean": true,
             "n_chunks": 0
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 188
         }
       },
       "degraded": []
@@ -775,13 +803,17 @@
         "pre_filter": {
           "context": {
             "gold_rank": 3,
+            "clause_ranks": [
+              1,
+              3
+            ],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -800,13 +832,17 @@
         "pre_filter": {
           "context": {
             "gold_rank": 3,
+            "clause_ranks": [
+              1,
+              3
+            ],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -825,13 +861,17 @@
         "pre_filter": {
           "context": {
             "gold_rank": 6,
+            "clause_ranks": [
+              1,
+              6
+            ],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -850,13 +890,17 @@
         "pre_filter": {
           "context": {
             "gold_rank": 3,
+            "clause_ranks": [
+              1,
+              3
+            ],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -875,13 +919,17 @@
         "pre_filter": {
           "context": {
             "gold_rank": 7,
+            "clause_ranks": [
+              5,
+              7
+            ],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 210
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -899,14 +947,18 @@
       "arms": {
         "pre_filter": {
           "context": {
-            "gold_rank": 5,
+            "gold_rank": 3,
+            "clause_ranks": [
+              3,
+              2
+            ],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -925,13 +977,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -950,13 +1003,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -975,13 +1029,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -1000,13 +1055,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": null,
+            "clause_ranks": [],
             "gold_coverage": 0.0,
             "gold": false,
             "distractor": false,
             "clean": false,
             "n_chunks": 8
           },
-          "retrieve_ms": 214
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -1025,13 +1081,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 3,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -1050,13 +1107,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": null,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 194
         }
       },
       "degraded": []
@@ -1075,13 +1133,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": null,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -1100,13 +1159,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": null,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -1125,13 +1185,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 6,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -1150,13 +1211,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -1175,13 +1237,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 194
         }
       },
       "degraded": []
@@ -1200,13 +1263,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 208
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -1225,13 +1289,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -1250,13 +1315,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 215
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -1275,13 +1341,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -1300,13 +1367,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 2,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -1325,13 +1393,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -1350,13 +1419,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -1375,13 +1445,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -1400,13 +1471,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 208
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -1425,13 +1497,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -1450,13 +1523,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -1475,13 +1549,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 3,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -1500,13 +1575,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -1525,13 +1601,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 203
         }
       },
       "degraded": []
@@ -1550,13 +1627,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -1575,13 +1653,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 200
         }
       },
       "degraded": []
@@ -1600,13 +1679,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 194
         }
       },
       "degraded": []
@@ -1625,13 +1705,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -1650,13 +1731,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 2,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -1675,13 +1757,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -1700,13 +1783,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -1725,13 +1809,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -1750,13 +1835,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -1775,13 +1861,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -1800,13 +1887,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -1825,13 +1913,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -1850,13 +1939,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -1875,13 +1965,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 200
         }
       },
       "degraded": []
@@ -1900,13 +1991,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 2,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -1925,13 +2017,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 208
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -1950,13 +2043,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 208
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -1975,13 +2069,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -2000,13 +2095,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -2025,13 +2121,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -2050,13 +2147,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -2075,13 +2173,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 4,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -2100,13 +2199,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -2125,13 +2225,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -2150,13 +2251,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 2,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -2175,13 +2277,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -2200,13 +2303,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -2225,13 +2329,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -2250,13 +2355,17 @@
         "pre_filter": {
           "context": {
             "gold_rank": 8,
+            "clause_ranks": [
+              1,
+              8
+            ],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -2275,13 +2384,17 @@
         "pre_filter": {
           "context": {
             "gold_rank": 3,
+            "clause_ranks": [
+              1,
+              3
+            ],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -2300,13 +2413,17 @@
         "pre_filter": {
           "context": {
             "gold_rank": 2,
+            "clause_ranks": [
+              2,
+              1
+            ],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -2325,13 +2442,17 @@
         "pre_filter": {
           "context": {
             "gold_rank": 8,
+            "clause_ranks": [
+              2,
+              8
+            ],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 210
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -2350,13 +2471,17 @@
         "pre_filter": {
           "context": {
             "gold_rank": 5,
+            "clause_ranks": [
+              5,
+              1
+            ],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -2375,13 +2500,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 200
         }
       },
       "degraded": []
@@ -2400,13 +2526,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 203
         }
       },
       "degraded": []
@@ -2425,13 +2552,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 2,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -2450,13 +2578,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": null,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -2475,13 +2604,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": null,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 210
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -2500,13 +2630,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -2525,13 +2656,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -2550,13 +2682,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -2575,13 +2708,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 2,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -2600,6 +2734,7 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
@@ -2625,13 +2760,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 210
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -2650,13 +2786,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -2675,13 +2812,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 209
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -2700,13 +2838,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -2725,13 +2864,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 208
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -2750,13 +2890,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -2775,13 +2916,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -2800,13 +2942,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 209
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -2825,13 +2968,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -2850,13 +2994,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 2,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -2875,13 +3020,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -2900,13 +3046,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -2925,13 +3072,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 202
         }
       },
       "degraded": []
@@ -2949,14 +3097,15 @@
       "arms": {
         "pre_filter": {
           "context": {
-            "gold_rank": 2,
+            "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -2975,13 +3124,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -3000,13 +3150,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -3025,13 +3176,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 208
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -3050,13 +3202,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -3075,13 +3228,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -3100,13 +3254,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -3125,6 +3280,7 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
@@ -3150,13 +3306,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -3175,13 +3332,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -3200,13 +3358,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -3225,13 +3384,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 211
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -3250,13 +3410,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": null,
+            "clause_ranks": [],
             "gold_coverage": 0.0,
             "gold": false,
             "distractor": false,
             "clean": false,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -3275,13 +3436,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 2,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 194
         }
       },
       "degraded": []
@@ -3300,13 +3462,17 @@
         "pre_filter": {
           "context": {
             "gold_rank": null,
+            "clause_ranks": [
+              1,
+              null
+            ],
             "gold_coverage": 0.5,
             "gold": false,
             "distractor": false,
             "clean": false,
             "n_chunks": 8
           },
-          "retrieve_ms": 212
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -3324,14 +3490,18 @@
       "arms": {
         "pre_filter": {
           "context": {
-            "gold_rank": null,
-            "gold_coverage": 0.5,
-            "gold": false,
+            "gold_rank": 8,
+            "clause_ranks": [
+              8,
+              1
+            ],
+            "gold_coverage": 1.0,
+            "gold": true,
             "distractor": false,
-            "clean": false,
+            "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 200
         }
       },
       "degraded": []
@@ -3350,13 +3520,17 @@
         "pre_filter": {
           "context": {
             "gold_rank": 3,
+            "clause_ranks": [
+              1,
+              3
+            ],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 212
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -3375,13 +3549,17 @@
         "pre_filter": {
           "context": {
             "gold_rank": null,
+            "clause_ranks": [
+              null,
+              1
+            ],
             "gold_coverage": 0.5,
             "gold": false,
             "distractor": false,
             "clean": false,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -3399,14 +3577,15 @@
       "arms": {
         "pre_filter": {
           "context": {
-            "gold_rank": null,
-            "gold_coverage": 0.0,
-            "gold": false,
+            "gold_rank": 8,
+            "clause_ranks": [],
+            "gold_coverage": 1.0,
+            "gold": true,
             "distractor": false,
-            "clean": false,
+            "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 222
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -3425,13 +3604,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -3450,13 +3630,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": null,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 264
+          "retrieve_ms": 200
         }
       },
       "degraded": []
@@ -3475,13 +3656,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": null,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -3500,13 +3682,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 255
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -3525,13 +3708,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -3550,13 +3734,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 230
+          "retrieve_ms": 201
         }
       },
       "degraded": []
@@ -3575,13 +3760,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 213
+          "retrieve_ms": 194
         }
       },
       "degraded": []
@@ -3600,13 +3786,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -3625,13 +3812,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 2,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -3650,13 +3838,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 211
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -3675,13 +3864,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 209
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -3700,13 +3890,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 213
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -3725,13 +3916,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 194
         }
       },
       "degraded": []
@@ -3750,13 +3942,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -3775,13 +3968,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -3800,13 +3994,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 206
         }
       },
       "degraded": []
@@ -3825,13 +4020,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -3850,13 +4046,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -3875,13 +4072,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -3900,13 +4098,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 208
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -3925,13 +4124,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -3950,13 +4150,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -3975,13 +4176,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -4000,13 +4202,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 200
         }
       },
       "degraded": []
@@ -4025,13 +4228,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -4050,13 +4254,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -4075,13 +4280,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 209
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -4100,13 +4306,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 3,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -4125,13 +4332,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 209
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -4150,13 +4358,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 2,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -4175,13 +4384,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 213
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -4204,7 +4414,7 @@
             "clean": true,
             "n_chunks": 0
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 188
         }
       },
       "degraded": []
@@ -4227,7 +4437,7 @@
             "clean": true,
             "n_chunks": 0
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -4246,13 +4456,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -4271,13 +4482,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 2,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 210
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -4296,13 +4508,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 200
         }
       },
       "degraded": []
@@ -4321,13 +4534,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 194
         }
       },
       "degraded": []
@@ -4346,13 +4560,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -4371,13 +4586,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 201
         }
       },
       "degraded": []
@@ -4396,13 +4612,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -4421,13 +4638,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -4446,13 +4664,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 208
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -4471,13 +4690,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 208
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -4496,13 +4716,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -4521,13 +4742,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 200
         }
       },
       "degraded": []
@@ -4546,13 +4768,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -4571,13 +4794,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 7,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -4596,13 +4820,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -4621,13 +4846,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -4646,13 +4872,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 194
         }
       },
       "degraded": []
@@ -4671,13 +4898,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -4696,13 +4924,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -4721,13 +4950,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -4746,13 +4976,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -4771,13 +5002,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 208
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -4796,13 +5028,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -4821,13 +5054,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 194
         }
       },
       "degraded": []
@@ -4846,13 +5080,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 215
+          "retrieve_ms": 201
         }
       },
       "degraded": []
@@ -4871,13 +5106,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": 1,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -4896,13 +5132,17 @@
         "pre_filter": {
           "context": {
             "gold_rank": 2,
+            "clause_ranks": [
+              1,
+              2
+            ],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -4921,13 +5161,17 @@
         "pre_filter": {
           "context": {
             "gold_rank": 5,
+            "clause_ranks": [
+              1,
+              5
+            ],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 194
         }
       },
       "degraded": []
@@ -4946,13 +5190,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": null,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 200
         }
       },
       "degraded": []
@@ -4971,13 +5216,14 @@
         "pre_filter": {
           "context": {
             "gold_rank": null,
+            "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
             "distractor": false,
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 199
         }
       },
       "degraded": []
@@ -4987,20 +5233,24 @@
     "overall": {
       "pre_filter": {
         "n": 199,
-        "context_gold": 0.9698492462311558,
-        "context_gold_coverage": 0.9773869346733668,
+        "context_gold": 0.9798994974874372,
+        "context_gold_coverage": 0.9849246231155779,
         "context_distractor": 0.0,
-        "context_clean": 0.9698492462311558,
+        "context_clean": 0.9798994974874372,
         "avg_chunks": 7.839195979899498,
-        "recall_at_1": 0.7580645161290323,
-        "recall_at_3": 0.9032258064516129,
-        "recall_at_5": 0.9247311827956989,
-        "recall_at_8": 0.967741935483871,
-        "mrr": 0.8343830005120326,
-        "recall_at_1_single": 0.834319526627219,
+        "recall_at_1": 0.7634408602150538,
+        "recall_at_3": 0.9139784946236559,
+        "recall_at_5": 0.9301075268817204,
+        "recall_at_8": 0.978494623655914,
+        "mrr": 0.8400281618023553,
+        "recall_at_1_single": 0.8402366863905325,
         "n_single": 169,
-        "retrieve_ms_p50": 204.0,
-        "retrieve_ms_p95": 213.0
+        "multi_coverage_at_3": 0.7058823529411765,
+        "multi_coverage_at_5": 0.7941176470588235,
+        "multi_coverage_at_8": 0.9411764705882353,
+        "n_multi": 17,
+        "retrieve_ms_p50": 197.0,
+        "retrieve_ms_p95": 200.0
       }
     },
     "by_kind": {
@@ -5019,8 +5269,8 @@
           "mrr": 0.5833333333333334,
           "recall_at_1_single": 0.5,
           "n_single": 4,
-          "retrieve_ms_p50": 205.0,
-          "retrieve_ms_p95": 214.0
+          "retrieve_ms_p50": 196.0,
+          "retrieve_ms_p95": 199.0
         }
       },
       "clause_version": {
@@ -5038,8 +5288,8 @@
           "mrr": 1.0,
           "recall_at_1_single": 1.0,
           "n_single": 4,
-          "retrieve_ms_p50": 204.0,
-          "retrieve_ms_p95": 205.0
+          "retrieve_ms_p50": 194.0,
+          "retrieve_ms_p95": 199.0
         }
       },
       "compliance": {
@@ -5057,8 +5307,8 @@
           "mrr": 1.0,
           "recall_at_1_single": 1.0,
           "n_single": 3,
-          "retrieve_ms_p50": 206.0,
-          "retrieve_ms_p95": 208.0
+          "retrieve_ms_p50": 194.0,
+          "retrieve_ms_p95": 198.0
         }
       },
       "control": {
@@ -5076,8 +5326,8 @@
           "mrr": 1.0,
           "recall_at_1_single": 1.0,
           "n_single": 4,
-          "retrieve_ms_p50": 203.0,
-          "retrieve_ms_p95": 204.0
+          "retrieve_ms_p50": 196.0,
+          "retrieve_ms_p95": 197.0
         }
       },
       "doc_version": {
@@ -5089,50 +5339,54 @@
           "context_clean": 1.0,
           "avg_chunks": 8.0,
           "recall_at_1": 0.6785714285714286,
-          "recall_at_3": 0.9285714285714286,
-          "recall_at_5": 0.9285714285714286,
+          "recall_at_3": 0.9642857142857143,
+          "recall_at_5": 0.9642857142857143,
           "recall_at_8": 1.0,
-          "mrr": 0.8086734693877551,
+          "mrr": 0.8146258503401359,
           "recall_at_1_single": 0.6785714285714286,
           "n_single": 28,
-          "retrieve_ms_p50": 202.0,
-          "retrieve_ms_p95": 213.0
+          "retrieve_ms_p50": 197.0,
+          "retrieve_ms_p95": 201.0
         }
       },
       "false_premise": {
         "pre_filter": {
           "n": 7,
-          "context_gold": 0.8571428571428571,
-          "context_gold_coverage": 0.8571428571428571,
+          "context_gold": 1.0,
+          "context_gold_coverage": 1.0,
           "context_distractor": 0.0,
-          "context_clean": 0.8571428571428571,
+          "context_clean": 1.0,
           "avg_chunks": 8.0,
           "recall_at_1": 0.5714285714285714,
           "recall_at_3": 0.7142857142857143,
           "recall_at_5": 0.7142857142857143,
-          "recall_at_8": 0.8571428571428571,
-          "mrr": 0.6666666666666667,
+          "recall_at_8": 1.0,
+          "mrr": 0.6845238095238095,
           "recall_at_1_single": 0.5714285714285714,
           "n_single": 7,
-          "retrieve_ms_p50": 203.0,
-          "retrieve_ms_p95": 222.0
+          "retrieve_ms_p50": 197.0,
+          "retrieve_ms_p95": 203.0
         }
       },
       "multi_clause": {
         "pre_filter": {
           "n": 17,
-          "context_gold": 0.8235294117647058,
-          "context_gold_coverage": 0.9117647058823529,
+          "context_gold": 0.8823529411764706,
+          "context_gold_coverage": 0.9411764705882353,
           "context_distractor": 0.0,
-          "context_clean": 0.8235294117647058,
+          "context_clean": 0.8823529411764706,
           "avg_chunks": 8.0,
           "recall_at_1": 0.0,
-          "recall_at_3": 0.4117647058823529,
+          "recall_at_3": 0.47058823529411764,
           "recall_at_5": 0.5882352941176471,
-          "recall_at_8": 0.8235294117647058,
-          "mrr": 0.2250700280112045,
-          "retrieve_ms_p50": 206.0,
-          "retrieve_ms_p95": 212.0
+          "recall_at_8": 0.8823529411764706,
+          "mrr": 0.24026610644257704,
+          "multi_coverage_at_3": 0.7058823529411765,
+          "multi_coverage_at_5": 0.7941176470588235,
+          "multi_coverage_at_8": 0.9411764705882353,
+          "n_multi": 17,
+          "retrieve_ms_p50": 196.0,
+          "retrieve_ms_p95": 200.0
         }
       },
       "out_of_range": {
@@ -5143,8 +5397,8 @@
           "context_distractor": 0.0,
           "context_clean": 1.0,
           "avg_chunks": 0.0,
-          "retrieve_ms_p50": 195.0,
-          "retrieve_ms_p95": 198.0
+          "retrieve_ms_p50": 188.0,
+          "retrieve_ms_p95": 190.0
         }
       },
       "out_of_scope": {
@@ -5155,8 +5409,8 @@
           "context_distractor": 0.0,
           "context_clean": 1.0,
           "avg_chunks": 8.0,
-          "retrieve_ms_p50": 205.0,
-          "retrieve_ms_p95": 264.0
+          "retrieve_ms_p50": 197.0,
+          "retrieve_ms_p95": 200.0
         }
       },
       "single_clause": {
@@ -5167,15 +5421,15 @@
           "context_distractor": 0.0,
           "context_clean": 0.9915254237288136,
           "avg_chunks": 8.0,
-          "recall_at_1": 0.8813559322033898,
+          "recall_at_1": 0.8898305084745762,
           "recall_at_3": 0.9745762711864406,
           "recall_at_5": 0.9830508474576272,
           "recall_at_8": 0.9915254237288136,
-          "mrr": 0.9298829701372074,
-          "recall_at_1_single": 0.8813559322033898,
+          "mrr": 0.9341202582728007,
+          "recall_at_1_single": 0.8898305084745762,
           "n_single": 118,
-          "retrieve_ms_p50": 205.0,
-          "retrieve_ms_p95": 211.0
+          "retrieve_ms_p50": 197.0,
+          "retrieve_ms_p95": 201.0
         }
       },
       "table_lookup": {
@@ -5193,8 +5447,8 @@
           "mrr": 1.0,
           "recall_at_1_single": 1.0,
           "n_single": 1,
-          "retrieve_ms_p50": 205.0,
-          "retrieve_ms_p95": 205.0
+          "retrieve_ms_p50": 197.0,
+          "retrieve_ms_p95": 197.0
         }
       }
     }
