@@ -76,7 +76,7 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   Report nào ghi rerank phải xem `meta.reranker_active`, không tin `ENABLE_RERANKER`.
   torch/sentence-transformers/transformers **không** còn trong `requirements.txt` (2026-09-27,
   image production không cài ~1.3GB này) — muốn chạy reranker: `pip install -r requirements-rerank.txt`.
-- Test suite: 672 passed (đo 2026-10-18). Test không gửi trace ra Langfuse/LangSmith
+- Test suite: 686 passed (đo 2026-10-18). Test không gửi trace ra Langfuse/LangSmith
   (`conftest.py::patch_settings` xoá key).
 
 **Stack:**
@@ -130,14 +130,16 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   UI web đi WebSocket → `stream_answer`, eval đi `generate_answer`: từ 2026-10-18 hai đường cùng gắn
   `_as_of_block` (trước đó đường stream không có ngày tra cứu). Sửa prompt thì sửa `_SYSTEM_PROMPT` —
   dùng chung cho cả hai.
-  **Lỗi đã biết — câu Có/Không "có đủ điều kiện":** Qwen chốt kết luận ở câu đầu (rule 8 BLUF) theo luật
-  cũ nó nhớ dù ngữ cảnh đúng — `lh_m05b` (16 năm đóng, luật 41/2024 chỉ cần 15) đúng 10/24 lần. Đã đo
-  2026-10-18, KHÔNG ship: thêm rule "trí nhớ có thể là luật cũ" 5/12; viết lại BLUF "điều kiện trước" 5/12,
-  4/12; bỏ BLUF 11/12 nhưng trên 208 câu thêm 2 lỗi thật (`lh_c02b`, `g2_d028`); DeepSeek trước Qwen
-  15/18 nhưng trên 208 câu thua 6 (`lh_o02` trả lời câu ngoài phạm vi); bật `enable_thinking` cho câu
-  `_is_complex_query` (61/208) 8/8 trên hai câu Có/Không nhưng p95 sinh 61s, max 83s (> timeout 45s). Còn
-  chưa thử: lượt LLM thứ hai kiểm kết luận Có/Không với đoạn nguồn. So phương án đổi prompt/model thì
-  đọc từng câu đổi kết quả — chấm chuỗi thiên vị cấu hình đang chạy (LESSONS).
+  **Câu Có/Không — phân tích trước, trả lời sau** (`_analysis_block`, 2026-10-18): câu khớp `_YES_NO_RE`
+  (30/208 câu gold) gọi thêm một lượt `analyze-conditions` (trích điều kiện kèm [N] → áp vào dữ kiện →
+  kết luận) rồi nối phân tích vào ngữ cảnh của lượt trả lời; cả `generate_answer` lẫn `stream_answer`
+  (stream vẫn stream — phân tích xong mới bắt đầu). Lỗi thì bỏ qua. Lý do: rule 8 BLUF + suy luận tắt ⇒
+  Qwen chốt Có/Không theo luật cũ nó nhớ — `lh_m05b` (16 năm đóng, Luật 41/2024 chỉ cần 15) đúng 10/24 →
+  12/12; `lh_c02b`, `g2_d028` 6/6; +2.0s p50, max 5.6s. Đã đo và loại: rule "trí nhớ có thể là luật cũ"
+  5/12; BLUF "điều kiện trước" 5/12, 4/12; bỏ BLUF 11/12 nhưng 208 câu thêm 2 lỗi thật; DeepSeek trước Qwen
+  thua 6 (`lh_o02` trả lời câu ngoài phạm vi); `enable_thinking` cho câu phức tạp p95 sinh 61s; kiểm SAU
+  bản nháp (verifier) 10/12 — model tự phân tích đúng nhưng so với bản nháp lại ghi "GIỮ". So phương án đổi
+  prompt/model thì đọc từng câu đổi kết quả — chấm chuỗi thiên vị cấu hình đang chạy (LESSONS).
 - Frontend: React + Vite (port 5174), proxies `/api` → backend port 8081
 
 **Deploy (2026-07, theo default-tech-stack skill):**

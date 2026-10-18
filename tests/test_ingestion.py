@@ -396,6 +396,29 @@ class TestLapsedClause:
         assert rest and all("20 năm" not in c.text for c in rest)
         assert all(c.metadata["effective_to"] == "9999-12-31" for c in rest)
 
+    def test_no_amendment_of_a_replaced_document_outlives_it(self, manifest):
+        """Bất biến cả corpus (người chấm 2026-10-18 đề xuất, mở rộng ra mọi văn bản bị thay):
+        đoạn "Sửa đổi, bổ sung … <văn bản X>" ngoài phần trích “…” phải hết hiệu lực không muộn
+        hơn X. Bản cũ để BLLĐ Điều 219 khoản 1 (sửa Luật BHXH 58/2014) mở tới 9999 → câu lương hưu
+        sau 01/7/2025 trả lời "chưa đủ 20 năm" kèm trích dẫn."""
+        import re
+
+        from scripts.ingest_documents import build_clause_chunks
+
+        replaced = {e.so_hieu: (e.doc_id, e.effective_to) for e in manifest.values()
+                    if e.effective_to != "9999-12-31"}
+        bad = []
+        for e in manifest.values():
+            for c in build_clause_chunks(e, CORPUS_DIR, "2026-10-18"):
+                outside = re.sub(r"“[^”]*”", " ", c.text)   # văn bản được trích lại không tính
+                for so_hieu, (doc_id, end) in replaced.items():
+                    if doc_id == e.doc_id:
+                        continue
+                    if re.search(r"Sửa đổi, bổ sung[^\n]{0,160}?" + re.escape(so_hieu), outside) \
+                            and c.metadata["effective_to"] > end:
+                        bad.append((c.metadata["version_id"], so_hieu, end, c.metadata["effective_to"]))
+        assert bad == []
+
     def test_no_chunk_is_only_the_article_title(self, bo_luat_chunks):
         titles = [c for c in bo_luat_chunks if c.text.splitlines()[-1].startswith("Điều ")
                   and len(c.text.splitlines()) <= 2]

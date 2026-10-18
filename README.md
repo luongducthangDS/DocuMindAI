@@ -207,35 +207,35 @@ Mọi số trong bảng lấy nguyên từ `summary.overall` / `summary.by_kind`
 
 | Chỉ số | Trước (`no_temporal`) | Sau (`pre_filter`) |
 |---|---:|---:|
-| Recall@1 | 0.579 | **0.779** |
-| Recall@5 | 0.913 | **0.938** |
-| MRR | 0.720 | **0.850** |
+| Recall@1 | 0.585 | **0.790** |
+| Recall@5 | 0.918 | **0.938** |
+| MRR | 0.725 | **0.857** |
 | Ngữ cảnh lẫn bản luật hết hiệu lực | 24.5% | **0.0%** |
-| Answer accuracy (208 câu) | 0.793 | **0.995** |
-| — riêng câu đổi phiên bản văn bản (n=28) | 0.43 | **1.00** |
-| — riêng câu đổi phiên bản khoản (n=13) | 0.38 | **1.00** |
-| Faithfulness (LLM judge; n=199 / 196 câu judge chấm được) | 0.983 | 0.979 |
-| Latency truy hồi p95 | 1909 ms | 1411 ms |
-| Latency end-to-end p50 / p95 | 2.3 s / 4.3 s | 2.1 s / 4.5 s |
+| Answer accuracy (208 câu) | 0.812 | **0.986** |
+| — riêng câu đổi phiên bản văn bản (n=28) | 0.46 | **1.00** |
+| — riêng câu đổi phiên bản khoản (n=13) | 0.38 | **0.92** |
+| Faithfulness (LLM judge; n=199 / 196 câu judge chấm được) | 0.985 | 0.989 |
+| Latency truy hồi p95 | 1069 ms | 1059 ms |
+| Latency end-to-end p50 / p95 | 2.0 s / 5.3 s | 1.9 s / 5.7 s |
 
 Đọc bảng cho đúng:
 - Chạy 2026-10-18, `meta.index` = `qdrant/documind_legal_fpt/Vietnamese_Embedding/1249/5ce81d96ccb9`
   — đuôi là hash nội dung, trùng Chroma local và `ingest_documents.py --dry-run` của code hiện tại,
-  tức đúng index production đang đọc. LLM FPT, không reranker, git `bed62de`.
-- 8/208 câu đo thiếu nhánh dense (embedding lỗi → chỉ BM25, `meta.n_degraded`); 4 câu ở arm "sau"
-  trích nguyên văn không qua LLM. Cả hai vẫn được chấm như mọi câu — đó là hệ thống như người dùng gặp.
-- Accuracy chấm bằng chuỗi. Lượt chạy đầu arm "sau" 0.981: đọc 4 câu bị chấm sai thì 3 câu trả lời
-  đúng mà lệch chuỗi gold (`ld_t07a` nhắc "thai sản" trong câu phủ định; `g2_b004`, `g2_b027` diễn đạt
-  khác). Đã sửa 3 câu gold đó rồi chấm lại **cả hai arm** trên câu trả lời đã lưu (`--rescore`, không
-  gọi lại LLM): "trước" 0.788 → 0.793, "sau" 0.981 → 0.995. Đây là sửa thước đo sau khi đọc đầu ra,
-  không phải hệ thống tốt lên.
-- Câu sai thật còn lại, `lh_m05b`: có Điều 64 Luật BHXH 2024 trong ngữ cảnh (hạng 2) mà vẫn kết luận
-  "phải đủ 20 năm" — model chốt Có/Không ở câu đầu (rule BLUF) theo luật cũ nó nhớ. Lặp lại đúng
-  10/24 lần; các cách sửa đã đo đều không qua (CLAUDE.md, mục LLM).
-- Faithfulness ≈0.98 ở cả hai arm dù accuracy lệch 19 điểm — judge không phân biệt được câu bám
+  tức đúng index production đang đọc. LLM FPT, không reranker, 0 câu thiếu nhánh dense. Report ghi git
+  `81997fb` nhưng chạy trên bản đó **cộng** lượt phân tích Có/Không chưa commit (harness giờ ghi `-dirty`).
+- Câu Có/Không (30/208) đi qua một lượt phân tích điều kiện trước khi trả lời (CLAUDE.md, mục LLM):
+  `lh_m05b` — có Điều 64 Luật BHXH 2024 trong ngữ cảnh mà trước đó kết luận "phải đủ 20 năm" — giờ đúng;
+  so lượt trước, 30 câu này ở arm "sau" thắng 1, thua 0. Câu Có/Không chậm hơn một lượt LLM — phần lớn
+  chênh lệch p95 đầu cuối so với lượt trước (4.5 s).
+- Accuracy chấm bằng chuỗi. 3 câu arm "sau" bị chấm sai đều không phải câu Có/Không (prompt của chúng
+  không đổi — chênh với lượt trước là dao động của FPT): `g2_b023`, `g3_cv08` trả lời đúng mà lệch chuỗi
+  gold; `lh_o02` sai thật — câu ngoài phạm vi (tỷ lệ đóng BHYT) mà vẫn trả lời "1,5%" theo trí nhớ, gặp ở
+  2/4 lượt chạy hôm đó. Trước lượt này đã sửa 3 câu gold lệch chuỗi (`ld_t07a`, `g2_b004`, `g2_b027`) sau
+  khi đọc đầu ra — sửa thước đo, áp cho cả hai arm.
+- Faithfulness ≈0.98–0.99 ở cả hai arm dù accuracy lệch 17 điểm — judge không phân biệt được câu bám
   đúng một đoạn đã hết hiệu lực, nên chưa dùng làm thước đo an toàn.
 - Câu đổi phiên bản khoản: corpus chỉ có 6 khoản nhiều phiên bản; 13 câu phủ đủ 12 phiên bản, đủ
-  để thấy hướng, chưa đủ cho một tỷ lệ chặt.
+  để thấy hướng, chưa đủ cho một tỷ lệ chặt (0.92 ở arm "sau" là `g3_cv08` lệch chuỗi).
 - Latency đo từ máy local tới Qdrant Cloud (australia-southeast1), không phải từ Render.
 - Câu do Claude soạn (`drafted_by: claude`, `reviewed: false`) **chưa được người duyệt**.
 
