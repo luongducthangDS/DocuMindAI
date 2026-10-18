@@ -107,7 +107,7 @@ def _ws_turn(client: TestClient, payload: dict) -> Callable[[], None]:
     return fire
 
 
-async def _fake_stream(_query, _chunks):
+async def _fake_stream(_query, _chunks, as_of_date=None):
     yield "ok"
 
 

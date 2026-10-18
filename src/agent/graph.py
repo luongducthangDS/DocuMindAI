@@ -759,7 +759,7 @@ async def answer_node_async(state: AgentState) -> dict:
     t0 = time.time()
     chunks = state.get("retrieved_chunks", [])
     parts = []
-    async for token in stream_answer(state["query"], chunks):
+    async for token in stream_answer(state["query"], chunks, as_of_date=state.get("as_of_date") or ""):
         parts.append(token)
     answer = "".join(parts)
     latency = int((time.time() - t0) * 1000)

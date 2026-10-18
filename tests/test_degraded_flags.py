@@ -131,7 +131,7 @@ def test_ws_done_frame_carries_flags():
         mark_degraded("dense_skipped")
         return [SimpleNamespace(score=1.0)]
 
-    async def fake_stream(_query, _chunks):
+    async def fake_stream(_query, _chunks, as_of_date=None):
         yield "ok"
 
     app = FastAPI()

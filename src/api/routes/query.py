@@ -506,7 +506,7 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
 
                 t_step = time.perf_counter()
                 answer_parts = []
-                async for token in stream_answer(query, chunks):
+                async for token in stream_answer(query, chunks, as_of_date=turn_ctx.effective_as_of):
                     await websocket.send_text(token)
                     answer_parts.append(token)
             finally:

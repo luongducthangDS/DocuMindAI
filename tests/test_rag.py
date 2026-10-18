@@ -126,6 +126,24 @@ class TestGenerator:
                 tokens.append(token)
             assert any("không" in t.lower() or "chưa" in t.lower() for t in tokens)
 
+    @pytest.mark.asyncio
+    async def test_stream_answer_prompt_states_as_of_date_like_generate_answer(self):
+        """Web UI streams; eval measures generate_answer. Same date preamble in both."""
+        from src.rag.generator import stream_answer
+
+        prompts = []
+
+        def fake_thread(model_name, api_key, prompt, q):
+            prompts.append(prompt)
+            q.put(("token", "Trả lời [1]"))
+            q.put(("end", None))
+
+        chunk = RetrievedChunk(text="Điều 64 ...", score=0.9, metadata={"title": "Luật BHXH"})
+        with patch("src.rag.generator._gemini_pairs", return_value=[("k", "m")]), \
+             patch("src.rag.generator._stream_chunks_in_thread", side_effect=fake_thread):
+            [t async for t in stream_answer("Nghỉ trong năm nay?", [chunk], as_of_date="2026-03-01")]
+        assert "**Thời điểm tra cứu:** 2026-03-01" in prompts[0]
+
 
 class _FakeChunk:
     def __init__(self, text: str):

@@ -859,10 +859,15 @@ def _stream_chunks_in_thread(model_name: str, api_key: str, prompt: str, q: queu
 async def stream_answer(
     query: str,
     chunks: list[RetrievedChunk],
+    as_of_date: str | None = None,
 ) -> AsyncIterator[str]:
     """
     Stream tokens from Gemini, rotating over (key, model) pairs like the
     non-streaming path. Yields text chunks for WebSocket/SSE streaming.
+
+    `as_of_date` gets the same preamble as generate_answer: without it the web UI
+    (WebSocket → here) answered "trong năm nay" by the model's own idea of the
+    year, while eval — which calls generate_answer — measured a prompt that has it.
     """
     if not chunks:
         yield "Tôi không tìm thấy văn bản pháp luật liên quan đến câu hỏi này."
@@ -887,6 +892,7 @@ async def stream_answer(
     complex_query = _is_complex_query(query)
 
     context, citation_list = _build_context(chunks)
+    context = _as_of_block(as_of_date) + context
 
     pairs = _gemini_pairs(_select_models(complex_query))
     if not pairs:

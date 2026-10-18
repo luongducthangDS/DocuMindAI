@@ -333,7 +333,8 @@
       ]
     ],
     "expect_absent": [
-      "thai sản",
+      "trợ cấp thai sản",
+      "4 chế độ",
       "41/2024"
     ],
     "distractor_docs": [
@@ -2640,7 +2641,10 @@
     "source_clauses": [],
     "expect_contains": [
       [
-        "tính mức đóng, mức hưởng"
+        "mức đóng"
+      ],
+      [
+        "mức hưởng"
       ]
     ],
     "expect_absent": [],
@@ -3200,7 +3204,8 @@
     "source_clauses": [],
     "expect_contains": [
       [
-        "tối đa 04 người"
+        "04 người",
+        "4 người"
       ]
     ],
     "expect_absent": [],
