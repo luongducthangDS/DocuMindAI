@@ -18,15 +18,6 @@ from src.rag import compliance
 pytestmark = pytest.mark.usefixtures("real_criteria", "no_network")
 
 
-@pytest.fixture(autouse=True)
-def _no_fallbacks(monkeypatch):
-    def boom(*_a, **_kw):
-        raise AssertionError("rơi xuống fallback LLM/embedding")
-
-    monkeypatch.setattr(compliance, "_extract_value_via_llm", boom)
-    monkeypatch.setattr(compliance, "_match_by_embedding", boom)
-
-
 @pytest.mark.parametrize("situation,criterion_id,value,verdict", [
     # 1. 3 tháng = 90 ngày > 60 → ❌
     ("Thử việc vị trí chuyên môn 3 tháng có đúng luật không?", "thoi_gian_thu_viec", 90.0, "fail"),

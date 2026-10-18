@@ -17,16 +17,6 @@ from src.rag import compliance
 pytestmark = pytest.mark.usefixtures("real_criteria", "no_network")
 
 
-@pytest.fixture(autouse=True)
-def _no_fallbacks(monkeypatch):
-    """Regex phải tự trích được — không cho rơi xuống LLM/embedding che lỗi parser."""
-    def boom(*_a, **_kw):
-        raise AssertionError("parser rơi xuống fallback LLM/embedding")
-
-    monkeypatch.setattr(compliance, "_extract_value_via_llm", boom)
-    monkeypatch.setattr(compliance, "_match_by_embedding", boom)
-
-
 CASES = [
     # (câu, criterion_id, giá trị trích, verdict)
     ("Công ty cho nhân viên làm thêm 1.200 giờ trong năm có đúng luật không?",

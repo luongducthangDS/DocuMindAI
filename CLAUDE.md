@@ -174,8 +174,15 @@ tenant nào. CORS phải giữ `X-API-Key` trong `allow_headers` (`src/api/main.
 đường đi thẳng tới "câu trả lời sai có thẩm quyền" — khi thêm tiêu chí:
 - Số liệu phải tra từ chính văn bản trong `data/raw/lao_dong/`, không lấy từ trí nhớ.
 - `so_hieu` phải trỏ tới văn bản CÓ trong corpus (test `TestCriteriaDataIntegrity` chặn).
-- `keywords` chấm theo tổng ĐỘ DÀI cụm khớp, ngưỡng `_MIN_KEYWORD_SCORE = 6`. Tránh cụm
-  quá rộng (`"trả lương"`, `"/tháng"`) — chúng kéo nhầm tiêu chí khác.
+- `anchors` (bắt buộc): cụm CHỦ ĐỀ — câu không chứa cụm nào thì tiêu chí được 0 điểm.
+  `keywords` chấm theo tổng ĐỘ DÀI cụm khớp, ngưỡng `_MIN_KEYWORD_SCORE = 6`, chỉ để phân xử
+  giữa tiêu chí cùng họ. Khớp theo ranh giới từ ("vùng i" ≠ "vùng iii"). Tránh cụm quá rộng.
+- Chỉ khớp bằng từ khoá, trích số chỉ bằng regex, số phải nằm trong 30 ký tự quanh một anchor
+  và mang đúng đơn vị/kỳ hạn của tiêu chí; không chắc thì `no_match`/`insufficient_info` → RAG.
+  Đã gỡ (2026-10-18) đường khớp embedding (0/5 đúng) và LLM trích số (đoán "10 tháng lương" thành
+  10 triệu): bản cũ phát ✅/❌ cho 42/83 câu gold có chữ số, 10 phán quyết sai tới tay người dùng.
+  `test_gold_set_gets_verdicts_only_on_compliance_questions` chạy engine trên cả gold set (tất định).
+  Eval đầu cuối (`temporal_eval.py`) gọi thẳng `generate_answer`, KHÔNG qua router/node này.
 Đánh giá retrieval benchmark:
 ```powershell
 python eval/run_evals.py --strategies dense rerank --retrieval-only --limit 5
@@ -267,7 +274,7 @@ logs/
   `abstained`/`uncited`/`invalid_citation`; span `retrieve-documents` (từng chunk: văn bản, điều,
   khoản, hiệu lực, điểm RRF/rerank + `cosine` dense + `bm25` thô — không kèm nội dung),
   `temporal-filter` (đoạn bị loại + lý do),
-  `compliance-check` (tiêu chí, khớp bằng từ khoá hay embedding, số trích được), `post-process`
+  `compliance-check` (tiêu chí, cụm từ khoá khớp + điểm, số trích được), `post-process`
   (`[n]` → điều nào). Lượt thử Gemini lỗi mà vòng xoay còn đi tiếp = WARNING, hết vòng = ERROR.
   Dựng payload trace không bao giờ được làm hỏng câu trả lời (`langfuse_otel.non_fatal`).
   Gửi: thread daemon, gửi lại 429/5xx/lỗi mạng, 4xx thì bỏ — mọi batch bị bỏ đều log WARNING
@@ -281,7 +288,7 @@ logs/
   Trên LangSmith mọi lời gọi LLM là run `gemini-generate` (`@traceable` trên `gemini_generate`),
   mục đích thấy qua node cha. Langfuse xếp generation phẳng nên đặt tên theo mục đích:
   `route-intent`, `contextualize-query`, `restore-diacritics`, `grade-chunks`, `reformulate-query`,
-  `generate-answer`(`-stream`), `extract-compliance-value`, `summarize-document`,
+  `generate-answer`(`-stream`), `summarize-document`,
   `compare-documents`, `eval-judge-faithfulness` — lời gọi mới phải truyền `name=`
   (`test_every_llm_call_site_names_its_purpose` chặn).
 
