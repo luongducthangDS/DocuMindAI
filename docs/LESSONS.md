@@ -20,6 +20,22 @@ chọn sai lần hai.
 
 ## Chọn công nghệ / kiến trúc
 
+### Hai đường sinh câu trả lời tự dựng prompt, eval đo đường UI không đi (→ 2026-10-18)
+- **Đã quyết:** `generate_answer` (REST/agent — và mọi eval đầu cuối) và `stream_answer` (WebSocket —
+  UI web) mỗi hàm tự dựng prompt. Khối "Thời điểm tra cứu" (`_as_of_block`) chỉ được thêm vào
+  `generate_answer`.
+- **Sai ở đâu:** UI web đi `stream_answer`, nơi LLM không được biết ngày tra cứu — "nghỉ việc trong
+  năm nay" được hiểu theo năm model tự giả định, câu trả lời không nêu mốc. Eval gọi `generate_answer`
+  nên accuracy 0.98–0.995 là của một prompt người dùng web không nhận. Không test nào so prompt hai đường.
+- **Cái giá:** con số đầu cuối trong README không phải của đường production chính; lệch không ai thấy
+  cho tới khi lần theo `lh_m05b` (câu hỏi có "trong năm nay").
+- **Bài học:** như mục engine tuân thủ bên dưới — eval phải chạy đúng đường người dùng đi; hai hàm
+  làm cùng một việc thì phần dựng prompt phải là một chỗ, không phải hai bản sao trôi dần.
+- **Giờ làm thế nào:** `stream_answer(..., as_of_date)` gắn cùng `_as_of_block`; WS truyền
+  `turn_ctx.effective_as_of`, node agent truyền `as_of_date` của state;
+  `test_stream_answer_prompt_states_as_of_date_like_generate_answer` chặn. Còn lệch: `stream_answer`
+  không nhận lịch sử hội thoại — chưa hợp nhất hẳn hai hàm.
+
 ### Engine tuân thủ phát ✅/❌ dựa trên khớp mềm và số đoán (→ 2026-10-18)
 - **Đã quyết:** `compliance_check` chọn tiêu chí bằng tổng độ dài cụm từ khoá (cụm phụ như "trong
   năm", "bao lâu", "phần trăm" cũng tính), không đủ thì khớp embedding với một ngưỡng cosine chung
@@ -195,6 +211,20 @@ chọn sai lần hai.
 - **Giờ làm thế nào:** `use_local_hf_cache()` trong `src/hf_env.py`; `EMBEDDING_MODEL` trong `.env`.
 
 ## Dữ liệu & đánh giá
+
+### So phương án bằng accuracy chấm chuỗi — thước đo thiên vị cấu hình đang chạy (Claude, 2026-10-18)
+- **Đã làm:** thử 3 cách sửa `lh_m05b` trên 208 câu (bỏ rule BLUF; DeepSeek trước Qwen; bật suy luận
+  cho câu phức tạp), so accuracy chấm chuỗi với lượt đang chạy (0.995): cả ba "tệ hơn" (0.966–0.976).
+- **Sai ở đâu:** chuỗi gold được viết và sửa theo cách diễn đạt của chính cấu hình đang chạy (vừa sửa 3
+  câu sau khi đọc đầu ra của nó). Đổi prompt/model là đổi cách viết — "0,5 tháng" thay "một nửa tháng",
+  "Nam phải đủ **50 tuổi**" thay "nam đủ 50 tuổi", "12 tháng" và "24 tháng" tách hai dòng. Đọc từng câu
+  đổi kết quả: phương án bỏ BLUF thua 5 câu thì 3 câu trả lời đúng; bật suy luận thua 6 thì ≥5 câu đúng.
+- **Cái giá:** kết luận "không ship" vẫn đúng (bỏ BLUF thêm 2 lỗi thật; suy luận làm p95 sinh 61s) nhưng
+  số tổng đã nói sai mức độ — một cải tiến thật đổi cách diễn đạt cũng sẽ bị loại y như vậy.
+- **Bài học:** accuracy chấm chuỗi chỉ so được các lượt cùng prompt và model. So phương án khác cách
+  diễn đạt phải đọc từng câu đổi kết quả, hoặc dùng judge đã hiệu chỉnh bằng người (Phần B bảng duyệt —
+  chưa ai chấm).
+- **Giờ làm thế nào:** báo phương án bằng bảng thắng/thua theo câu, tách "thua thật" khỏi "thua do chấm".
 
 ### Nhận dạng index bằng số chunk (10-03 → 2026-10-18)
 - **Đã quyết:** sau mục "report không ghi đo trên index nào" (bên dưới), `meta.index` và trace

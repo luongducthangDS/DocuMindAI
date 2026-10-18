@@ -12,7 +12,7 @@ def _run_turn(payload: dict) -> list:
     async def noop():
         return None
 
-    async def fake_stream(query, chunks):
+    async def fake_stream(query, chunks, as_of_date=None):
         for tok in ("Mức lương ", "5.310.000 đồng [1]"):
             yield tok
 

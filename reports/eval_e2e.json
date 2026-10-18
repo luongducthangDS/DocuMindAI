@@ -13,7 +13,8 @@
     "index": "qdrant/documind_legal_fpt/Vietnamese_Embedding/1249/5ce81d96ccb9",
     "git_sha": "bed62de",
     "n_degraded": 8,
-    "embed_cache": false
+    "embed_cache": false,
+    "rescored": true
   },
   "rows": [
     {
@@ -729,7 +730,8 @@
             "correct": false,
             "missing": [],
             "forbidden_present": [
-              "thai sản"
+              "trợ cấp thai sản",
+              "4 chế độ"
             ]
           },
           "faithfulness": 1.0
@@ -749,11 +751,9 @@
           "used_llm": "fpt",
           "generate_ms": 2108,
           "score": {
-            "correct": false,
+            "correct": true,
             "missing": [],
-            "forbidden_present": [
-              "thai sản"
-            ]
+            "forbidden_present": []
           },
           "faithfulness": 1.0
         }
@@ -5793,10 +5793,8 @@
           "used_llm": "fpt",
           "generate_ms": 3410,
           "score": {
-            "correct": false,
-            "missing": [
-              "tính mức đóng, mức hưởng"
-            ],
+            "correct": true,
+            "missing": [],
             "forbidden_present": []
           },
           "faithfulness": 1.0
@@ -5816,10 +5814,8 @@
           "used_llm": "fpt",
           "generate_ms": 2864,
           "score": {
-            "correct": false,
-            "missing": [
-              "tính mức đóng, mức hưởng"
-            ],
+            "correct": true,
+            "missing": [],
             "forbidden_present": []
           },
           "faithfulness": 1.0
@@ -7083,10 +7079,8 @@
           "used_llm": "fpt",
           "generate_ms": 1412,
           "score": {
-            "correct": false,
-            "missing": [
-              "tối đa 04 người"
-            ],
+            "correct": true,
+            "missing": [],
             "forbidden_present": []
           },
           "faithfulness": 1.0
@@ -11690,7 +11684,7 @@
         "n_multi": 16,
         "retrieve_ms_p50": 529.0,
         "retrieve_ms_p95": 1909.0,
-        "answer_accuracy": 0.7884615384615384,
+        "answer_accuracy": 0.7932692307692307,
         "e2e_ms_p50": 2284.0,
         "e2e_ms_p95": 4308.0,
         "faithfulness": 0.9832077051926298,
@@ -11716,7 +11710,7 @@
         "n_multi": 16,
         "retrieve_ms_p50": 527.0,
         "retrieve_ms_p95": 1411.0,
-        "answer_accuracy": 0.9807692307692307,
+        "answer_accuracy": 0.9951923076923077,
         "e2e_ms_p50": 2090.0,
         "e2e_ms_p95": 4528.0,
         "faithfulness": 0.979421768707483,
@@ -11947,7 +11941,7 @@
           "n_single": 28,
           "retrieve_ms_p50": 519.0,
           "retrieve_ms_p95": 610.0,
-          "answer_accuracy": 0.9642857142857143,
+          "answer_accuracy": 1.0,
           "e2e_ms_p50": 1898.0,
           "e2e_ms_p95": 2943.0,
           "faithfulness": 0.9761904761904762,
@@ -12127,7 +12121,7 @@
           "n_single": 119,
           "retrieve_ms_p50": 533.0,
           "retrieve_ms_p95": 1940.0,
-          "answer_accuracy": 0.9411764705882353,
+          "answer_accuracy": 0.9495798319327731,
           "e2e_ms_p50": 2229.0,
           "e2e_ms_p95": 4921.0,
           "faithfulness": 0.9974789915966387,
@@ -12149,7 +12143,7 @@
           "n_single": 119,
           "retrieve_ms_p50": 526.0,
           "retrieve_ms_p95": 1952.0,
-          "answer_accuracy": 0.9831932773109243,
+          "answer_accuracy": 1.0,
           "e2e_ms_p50": 2095.0,
           "e2e_ms_p95": 4713.0,
           "faithfulness": 0.9908963585434173,

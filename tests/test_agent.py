@@ -414,7 +414,7 @@ class TestFallbackToRetrievalAnswer:
         }
         seen_chunks = []
 
-        async def fake_stream_answer(query, chunks):
+        async def fake_stream_answer(query, chunks, as_of_date=None):
             seen_chunks.append(chunks)
             yield "Trả lời [1]"
 
@@ -442,7 +442,7 @@ class TestFallbackToRetrievalAnswer:
         state = {"messages": [], "query": "câu hỏi", "retrieved_chunks": [], "steps": []}
         seen_chunks = []
 
-        async def fake_stream_answer(query, chunks):
+        async def fake_stream_answer(query, chunks, as_of_date=None):
             seen_chunks.append(chunks)
             yield "Trả lời [1]"
 

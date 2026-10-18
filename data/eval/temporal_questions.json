@@ -191,7 +191,7 @@
     "source_doc": "58-2014-QH13",
     "source_clause": "58-2014-QH13__d4",
     "expect_contains": [["hưu trí"], ["tử tuất"]],
-    "expect_absent": ["thai sản", "41/2024"],
+    "expect_absent": ["trợ cấp thai sản", "4 chế độ", "41/2024"],
     "distractor_docs": ["41-2024-QH15"]
   },
   {

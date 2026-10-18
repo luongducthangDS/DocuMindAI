@@ -211,8 +211,8 @@ Mọi số trong bảng lấy nguyên từ `summary.overall` / `summary.by_kind`
 | Recall@5 | 0.913 | **0.938** |
 | MRR | 0.720 | **0.850** |
 | Ngữ cảnh lẫn bản luật hết hiệu lực | 24.5% | **0.0%** |
-| Answer accuracy (208 câu) | 0.788 | **0.981** |
-| — riêng câu đổi phiên bản văn bản (n=28) | 0.43 | **0.96** |
+| Answer accuracy (208 câu) | 0.793 | **0.995** |
+| — riêng câu đổi phiên bản văn bản (n=28) | 0.43 | **1.00** |
 | — riêng câu đổi phiên bản khoản (n=13) | 0.38 | **1.00** |
 | Faithfulness (LLM judge; n=199 / 196 câu judge chấm được) | 0.983 | 0.979 |
 | Latency truy hồi p95 | 1909 ms | 1411 ms |
@@ -224,10 +224,14 @@ Mọi số trong bảng lấy nguyên từ `summary.overall` / `summary.by_kind`
   tức đúng index production đang đọc. LLM FPT, không reranker, git `bed62de`.
 - 8/208 câu đo thiếu nhánh dense (embedding lỗi → chỉ BM25, `meta.n_degraded`); 4 câu ở arm "sau"
   trích nguyên văn không qua LLM. Cả hai vẫn được chấm như mọi câu — đó là hệ thống như người dùng gặp.
-- Accuracy chấm bằng chuỗi. Đọc 4 câu arm "sau" bị chấm sai: 3 câu trả lời đúng mà lệch chuỗi gold
-  (`ld_t07a` nhắc "thai sản" trong câu phủ định; `g2_b004`, `g2_b027` diễn đạt khác). Câu sai thật,
-  `lh_m05b`: có Điều 64 Luật BHXH 2024 trong ngữ cảnh (hạng 2) mà vẫn kết luận "phải đủ 20 năm" —
-  lỗi suy luận, không phải lẫn phiên bản.
+- Accuracy chấm bằng chuỗi. Lượt chạy đầu arm "sau" 0.981: đọc 4 câu bị chấm sai thì 3 câu trả lời
+  đúng mà lệch chuỗi gold (`ld_t07a` nhắc "thai sản" trong câu phủ định; `g2_b004`, `g2_b027` diễn đạt
+  khác). Đã sửa 3 câu gold đó rồi chấm lại **cả hai arm** trên câu trả lời đã lưu (`--rescore`, không
+  gọi lại LLM): "trước" 0.788 → 0.793, "sau" 0.981 → 0.995. Đây là sửa thước đo sau khi đọc đầu ra,
+  không phải hệ thống tốt lên.
+- Câu sai thật còn lại, `lh_m05b`: có Điều 64 Luật BHXH 2024 trong ngữ cảnh (hạng 2) mà vẫn kết luận
+  "phải đủ 20 năm" — model chốt Có/Không ở câu đầu (rule BLUF) theo luật cũ nó nhớ. Lặp lại đúng
+  10/24 lần; các cách sửa đã đo đều không qua (CLAUDE.md, mục LLM).
 - Faithfulness ≈0.98 ở cả hai arm dù accuracy lệch 19 điểm — judge không phân biệt được câu bám
   đúng một đoạn đã hết hiệu lực, nên chưa dùng làm thước đo an toàn.
 - Câu đổi phiên bản khoản: corpus chỉ có 6 khoản nhiều phiên bản; 13 câu phủ đủ 12 phiên bản, đủ
