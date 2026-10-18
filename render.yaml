@@ -44,10 +44,11 @@ services:
         value: documind_legal_fpt
       - key: INITIALIZE_RAG_ON_STARTUP
         value: "true"
-      # Reranker qua FPT /v1/rerank (có FPT_API_KEY) — không nạp model vào RAM, chạy được
-      # trên free tier. 10 ứng viên/câu (retriever._RERANK_POOL), API p50 250ms.
+      # Reranker qua FPT /v1/rerank chạy được trên free tier (không nạp model), nhưng TẮT cho tới
+      # khi eval đầu cuối cho thấy nó làm câu trả lời tốt hơn: đo 2026-10-18 nó chỉ đổi thứ tự —
+      # hạng 1 thắng 13/thua 5 câu (sign test p≈0.10), top-8 1/1 — mà thêm ~250ms p50.
       - key: ENABLE_RERANKER
-        value: "true"
+        value: "false"
       # LLM chỉ FPT (2026-10-18): danh sách model Gemini để trống = không có cặp Gemini dự
       # phòng; FPT hỏng thì trích nguyên văn nguồn. Bật lại: điền tên model vào 3 biến này.
       - key: GEMINI_GENERATION_MODELS

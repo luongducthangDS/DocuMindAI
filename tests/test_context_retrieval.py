@@ -118,6 +118,10 @@ class TestRetrieveWithContext:
         got = r_module.retrieve_with_context("q", RetrievalContext(), top_n=8)
         assert len(got) == 8
 
+    def test_with_reranker_top_n_is_still_honoured(self, singletons):
+        singletons(dense_nodes=[node(f"n{i}", score=1 - i / 100) for i in range(12)], reranker=RecordingReranker())
+        assert len(r_module.retrieve_with_context("q", RetrievalContext(), top_n=3)) == 3
+
     def test_voluntary_chapter_and_appendix_yield_to_the_article_asked_about(self, singletons):
         tn = node("d98", score=0.9, chuong="Chương VI. BẢO HIỂM XÃ HỘI TỰ NGUYỆN")
         pl = node("pl1", score=0.8, chunk_strategy="appendix")

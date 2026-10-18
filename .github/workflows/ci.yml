@@ -24,9 +24,8 @@ jobs:
       - run: pytest -q --no-cov
 
   # Retrieval-only eval against the production vector store (Qdrant Cloud) — FPT embedding,
-  # collection documind_legal_fpt. Reranker TẮT dù production bật: 199 lời gọi /v1/rerank dồn
-  # dập dính 429 (FPT giới hạn theo phút, key dùng chung production) và làm cổng chập chờn;
-  # CI gác phần truy hồi + luật ưu tiên, số có rerank ở reports/temporal_eval_vnembed_rerank10.json.
+  # collection documind_legal_fpt. Reranker TẮT như production (chưa chứng minh được lợi ích; bật
+  # lại trong CI thì 199 lời gọi /v1/rerank dồn dập dính 429 — cần giới hạn tốc độ trước).
   # No LLM calls.
   # Fails the PR if recall/MRR drops beyond eval/ci_gate.py tolerances vs the
   # committed baseline.

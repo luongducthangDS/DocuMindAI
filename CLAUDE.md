@@ -52,7 +52,7 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   `meta.index` (provider/collection/model/số chunk) + `meta.git_sha`.
 - CI: `.github/workflows/ci.yml` — pytest + retrieval eval trên Qdrant `documind_legal_fpt`, gate bằng
   `eval/ci_gate.py` so với `reports/eval_baseline.json` (FAIL cả khi report có câu đo thiếu nhánh dense —
-  `meta.n_degraded`). Reranker TẮT trong CI dù production bật (199 lời gọi rerank dồn dập dính 429 FPT).
+  `meta.n_degraded`). Reranker TẮT trong CI như production.
   Cần secrets `FPT_API_KEY`, `QDRANT_URL`, `QDRANT_API_KEY`.
 - **Chroma Cloud** (database `DocuMind`, biến `CHROMA_CLOUD_*`): chỉ là bản sao để xem dashboard
   và so provider — app KHÔNG đọc từ đó. Đồng bộ: `python scripts/copy_chroma_to_cloud.py`; so
@@ -80,7 +80,10 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   hỏi không nói "tự nguyện", và đoạn phụ lục khi câu hỏi không hỏi danh mục/biểu mẫu/năm sinh/địa
   bàn — chỉ đổi thứ tự, không đổi điểm. Đo 2026-10-17 (legal_qa_200, recall@1 câu một điều):
   FPT embedding 0.828 → luật 0.834 → + rerank pool 10 **0.882** (`reports/temporal_eval_vnembed_rerank10.json`,
-  rerank API p50 250ms); Gemini-2 0.72 → 0.78 với luật.
+  rerank API p50 250ms); Gemini-2 0.72 → 0.78 với luật. Đọc theo cặp, không theo tỷ lệ (n=169, CI95 ±0.05):
+  rerank thắng 13/thua 5 ở hạng 1 (p≈0.10), không tăng top-8 → production TẮT rerank cho tới khi eval đầu
+  cuối (k × rerank, answer accuracy + faithfulness) cho thấy lợi ích. `ci_gate` in bảng thắng/thua theo câu;
+  câu nhiều điều khoản đo bằng `multi_coverage_at_k` (recall@1 của chúng luôn = 0 theo định nghĩa).
 - LLM: **chỉ FPT AI Marketplace** (2026-10-18): `GEMINI_GENERATION_MODELS`, `GEMINI_GENERATION_MODELS_COMPLEX`,
   `GEMINI_JUDGE_MODELS` để TRỐNG ở `.env` và Render ⇒ không còn cặp Gemini; FPT hỏng cả hai model thì trích
   nguyên văn nguồn (`used_llm=extractive_fallback`). Bật lại Gemini = điền lại 3 biến (code giữ nguyên;

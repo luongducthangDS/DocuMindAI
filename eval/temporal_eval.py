@@ -211,6 +211,9 @@ def score_context(chunks: list, question: dict) -> dict:
     distractor_hit = bool(docs & bad_docs) or bool(versions & bad_versions)
     return {
         "gold_rank": gold_rank(chunks, question),
+        # Hạng của TỪNG điều gold (câu nhiều điều khoản) — cơ sở của coverage@k.
+        "clause_ranks": [gold_rank(chunks, {**question, "source_clauses": [u], "source_clause": u})
+                         for u in required] if len(required) > 1 else [],
         "gold_coverage": coverage,
         "gold": gold_hit,
         "distractor": distractor_hit,
@@ -474,6 +477,14 @@ def summarise(rows: list[dict], arms: tuple[str, ...], retrieval_only: bool) -> 
         if single:
             agg["recall_at_1_single"] = sum(1 for x in single if x == 1) / len(single)
             agg["n_single"] = len(single)
+        # Câu nhiều điều khoản: tỷ lệ điều gold lọt top-k (trung bình theo câu), thay cho
+        # recall@1 — thước đo này mới phân biệt "có 1/2 điều" với "không có điều nào".
+        multi = [r["arms"][arm]["context"].get("clause_ranks") for r in subset
+                 if r.get("has_gold") and r.get("multi_clause") and r["arms"][arm]["context"].get("clause_ranks")]
+        if multi:
+            for k in (3, 5, 8):
+                agg[f"multi_coverage_at_{k}"] = sum(sum(1 for x in cr if x and x <= k) / len(cr) for cr in multi) / len(multi)
+            agg["n_multi"] = len(multi)
         retrieve = [r["arms"][arm].get("retrieve_ms", r["retrieve_ms"]) for r in subset]
         agg["retrieve_ms_p50"] = _percentile(retrieve, 50)
         agg["retrieve_ms_p95"] = _percentile(retrieve, 95)

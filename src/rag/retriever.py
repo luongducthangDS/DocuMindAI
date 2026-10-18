@@ -511,7 +511,8 @@ def retrieve_with_context(query: str, ctx, top_k: int = 20, top_n: int = 8) -> l
 
     if _reranker_instance is not None and visible:
         pool = _apply_query_priors(query, visible)[:_RERANK_POOL]
-        visible = _apply_query_priors(query, _reranker_instance.postprocess_nodes(pool, QueryBundle(query_str=query)))
+        # [:top_n]: reranker trả top_n lúc dựng (8) — không cắt thì tham số top_n của hàm bị bỏ qua.
+        visible = _apply_query_priors(query, _reranker_instance.postprocess_nodes(pool, QueryBundle(query_str=query)))[:top_n]
     else:
         # Trước khi cắt top_n: đoạn bị hạ có thể rơi khỏi top, đoạn khác vào thay.
         visible = _apply_query_priors(query, visible)[:top_n]
