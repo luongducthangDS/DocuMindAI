@@ -35,6 +35,11 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   `QDRANT_COLLECTION=documind_legal_fpt`, `EMBEDDING_MODEL=Vietnamese_Embedding`. Collection cũ
   `documind_legal` (gemini-embedding-001, 1151, corpus cũ) giữ nguyên làm đường quay lui — đổi lại
   2 biến env là về bản cũ. `scripts/restore_chroma_from_qdrant.py` phải chạy với cùng cặp env đó.
+  **Danh tính index = hash nội dung, không phải số chunk** (`vector_backend.corpus_fingerprint`):
+  app log `Index fingerprint …`, `meta.index`/trace có đuôi hash. 2026-10-18 Qdrant = Chroma =
+  `ingest_documents.py --dry-run` = `5ce81d96ccb9`. Index có khớp code không → so hash dry-run với hash
+  app log, đừng suy từ git log. `.env` local KHÔNG đặt `QDRANT_COLLECTION` — chạy gì trên Qdrant từ
+  máy local phải truyền `QDRANT_COLLECTION=documind_legal_fpt`, không thì rơi về `documind_legal` (3072-dim).
 - `data/compliance/criteria.json`: 6 tiêu chí định lượng lao động (trần làm thêm giờ
   năm/tháng, thời gian thử việc, lương thử việc 85%, nghỉ hằng năm, lương tối thiểu vùng I).
   Mọi tiêu chí phải trích dẫn văn bản CÓ trong `data/raw/lao_dong/` — có test chặn
@@ -46,13 +51,15 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   nguyên văn corpus, `reviewed: false` — **cần người duyệt**. Bộ 30 câu temporal đã bão hoà
   (1.000), dùng bộ này để đo cải tiến:
   `python eval/temporal_eval.py --gold data/eval/hard_questions.json --output reports/hard_eval.json`
-- **Gold set chính: `data/eval/legal_qa_200.json` (199 câu)** = 30 temporal + 19 hard + 150 câu
-  Claude soạn (`g2_*`, `reviewed: false`). Kiểm tra với index thật:
+- **Gold set chính: `data/eval/legal_qa_200.json` (208 câu)** = 30 temporal + 19 hard + 150 câu
+  Claude soạn (`g2_*`, `reviewed: false`) + 9 câu `g3_cv*` (2026-10-18, `clause_version`, `reviewed: false`):
+  corpus chỉ có 6 khoản nhiều phiên bản (12 phiên bản) mà gold cũ phủ 4 — giờ phủ đủ 12, có cặp cùng câu
+  hỏi ở hai thời điểm. Phiên bản theo văn bản (357 chunk, 9 văn bản bị thay) là phần dày của corpus. Kiểm tra với index thật:
   `python eval/validate_gold.py data/eval/legal_qa_200.json`. Metric: recall@1/3/5/8, MRR,
   faithfulness (`--judge <arms>`), p50/p95; `--mlflow <run>` log vào MLflow (`mlflow.db`, gitignored);
   `--embed-cache` chỉ dùng cho CI (latency khi đó không phải số thật). Kết quả: README mục Đánh giá —
   chỉ trích nguyên `summary` của report, không tính tay trên tập con (test chặn); report ghi
-  `meta.index` (provider/collection/model/số chunk) + `meta.git_sha`.
+  `meta.index` (provider/collection/model/số chunk/hash nội dung) + `meta.git_sha`.
 - CI: `.github/workflows/ci.yml` — pytest + retrieval eval trên Qdrant `documind_legal_fpt`, gate bằng
   `eval/ci_gate.py` so với `reports/eval_baseline.json` (FAIL cả khi report có câu đo thiếu nhánh dense —
   `meta.n_degraded`). Reranker TẮT trong CI như production.
@@ -66,7 +73,7 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   Report nào ghi rerank phải xem `meta.reranker_active`, không tin `ENABLE_RERANKER`.
   torch/sentence-transformers/transformers **không** còn trong `requirements.txt` (2026-09-27,
   image production không cài ~1.3GB này) — muốn chạy reranker: `pip install -r requirements-rerank.txt`.
-- Test suite: 655 passed (đo 2026-10-18). Test không gửi trace ra Langfuse/LangSmith
+- Test suite: 671 passed (đo 2026-10-18). Test không gửi trace ra Langfuse/LangSmith
   (`conftest.py::patch_settings` xoá key).
 
 **Stack:**
@@ -320,7 +327,7 @@ mất đoạn gold; bỏ cắt + header: accuracy 0.950 → 0.975, p50 đầu cu
 
 **ChromaDB:** Dùng local `PersistentClient` (không cần server). HTTP server ở `localhost:8000` thường không chạy — `get_chroma_collection()` probe TCP 0.5s rồi đi thẳng xuống local, thay vì chờ `heartbeat()` hết 4.2s. Collection `documind_legal` đang có 1247 chunks (3072-dim, `gemini-embedding-2`), kèm metadata `embedding_model`/`embedding_dim` để phát hiện lệch model.
 
-**Pin chromadb là 0.6.3 — chạy đúng `.venv` của repo:** Python global của máy có chromadb 1.5.9; chỉ cần mở `data/chroma_db/` một lần bằng bản đó là store bị migrate tại chỗ (thêm cột `schema_str`, `config_json_str` về `{}`, `index_metadata.pickle` của HNSW thành dict) và 0.6.3 hết mở nổi — mọi truy vấn trả 0 chunk. Khôi phục: `python scripts/repair_chroma_config.py` để vá config, `python scripts/restore_chroma_from_qdrant.py --yes` để dựng lại chunk+vector từ Qdrant (không re-embed, ~15 phút vì Qdrant free tier ở sa-east-1).
+**Pin chromadb là 0.6.3 — chạy đúng `.venv` của repo:** Python global của máy có chromadb 1.5.9; chỉ cần mở `data/chroma_db/` một lần bằng bản đó là store bị migrate tại chỗ (thêm cột `schema_str`, `config_json_str` về `{}`, `index_metadata.pickle` của HNSW thành dict) và 0.6.3 hết mở nổi — mọi truy vấn trả 0 chunk. Khôi phục: `python scripts/repair_chroma_config.py` để vá config, `python scripts/restore_chroma_from_qdrant.py --yes` để dựng lại chunk+vector từ Qdrant (không re-embed, ~15 phút vì Qdrant free tier ở xa — cluster `australia-southeast1` GCP, theo URL trong log 2026-10-18).
 
 **Đổi model embedding:** sửa `EMBEDDING_MODEL` trong `.env` → `python scripts/reembed_corpus.py --yes` (re-embed tại chỗ, giữ nguyên chunk + metadata temporal, tự sao lưu collection cũ sang `documind_legal__backup_<model cũ>`) → `pytest -q` + `python eval/temporal_eval.py`. So sánh ứng viên trước khi đổi: `python eval/embedding_ab.py --models current <model-moi>`.
 

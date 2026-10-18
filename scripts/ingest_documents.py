@@ -42,6 +42,7 @@ _repo_root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_repo_root))
 
 from src.rag.context import stamp_access_meta
+from src.rag.vector_backend import corpus_fingerprint
 from src.hf_env import use_local_hf_cache
 
 # Trước mọi import HuggingFace. offline=False: ingest là lúc hợp lệ để tải model
@@ -258,16 +259,19 @@ def main() -> None:
         return
 
     if args.dry_run:
-        total = 0
+        stored = []
         for doc_id, chunks in per_doc:
             logger.info("{} → {} chunks", doc_id, len(chunks))
-            total += len(chunks)
+            stored += chunks
         for md_path, doc_meta in documents:
             text = clean_md(md_path.read_text(encoding="utf-8"))
             chunks = [c for c in chunk_by_dieu(text, doc_meta) if c.is_valid]
             logger.info("{} → {} chunks", doc_meta.get("so_hieu", md_path.name), len(chunks))
-            total += len(chunks)
-        logger.info("Total chunks (dry-run): {}", total)
+            stored += chunks
+        # Same (text, metadata) that flush() writes, so this equals the fingerprint the
+        # app logs at startup ("Index fingerprint …") iff the index matches this code.
+        fingerprint = corpus_fingerprint((c.text, stamp_access_meta(_chroma_safe(c.metadata))) for c in stored)
+        logger.info("Total chunks (dry-run): {} · fingerprint {}", len(stored), fingerprint)
         return
 
     chroma_path = str((_repo_root / "data" / "chroma_db").resolve())

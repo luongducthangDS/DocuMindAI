@@ -14,8 +14,10 @@ direct_query() below parse that shape.
 
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import dataclass
+from typing import Iterable
 
 from loguru import logger
 
@@ -184,6 +186,29 @@ def fetch_all_chunks(backend: Backend, limit: int = 10_000) -> list[tuple[str, s
     docs = result.get("documents") or []
     metas = result.get("metadatas") or []
     return [(i, d, m or {}) for i, d, m in zip(ids, docs, metas) if d]
+
+
+# `status` is derived from the date ingest ran (clause_status(as_of=today)), not from
+# the content — the same corpus ingested a day apart may differ only there.
+_FINGERPRINT_SKIP = frozenset({"status"})
+
+
+def corpus_fingerprint(chunks: Iterable[tuple[str, dict]]) -> str:
+    """12-hex hash of every chunk's (text, metadata) — which index a run actually used.
+
+    The chunk count cannot tell two indexes apart: 719f1f2 rewrote the text of 193
+    pieces and the index stayed at 1249. Store ids are left out because Chroma
+    (version_id) and Qdrant (uuid) name the same chunk differently, so an index and
+    its migrated copy hash the same. Values go through str() for the same reason.
+    """
+    digests = sorted(
+        hashlib.sha256(json.dumps(
+            [text, {k: str(v) for k, v in meta.items() if k not in _FINGERPRINT_SKIP}],
+            ensure_ascii=False, sort_keys=True,
+        ).encode("utf-8")).hexdigest()
+        for text, meta in chunks
+    )
+    return hashlib.sha256("".join(digests).encode()).hexdigest()[:12]
 
 
 def direct_query(

@@ -4903,5 +4903,252 @@
     "distractor_docs": [],
     "drafted_by": "claude",
     "reviewed": false
+  },
+  {
+    "id": "g3_cv01",
+    "pair_id": "dao_tao_nghe_phoi_hop_co_so_gdnn",
+    "question": "Nhà nước khuyến khích người sử dụng lao động phối hợp với cơ sở giáo dục nghề nghiệp để đào tạo những chương trình, trình độ nào cho người lao động?",
+    "as_of_date": "2024-06-01",
+    "category": "ky_nang_nghe",
+    "temporal_kind": "clause_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 2 Điều 59 Bộ luật Lao động 2019 (bản trước 01/01/2026), người sử dụng lao động phối hợp với cơ sở giáo dục nghề nghiệp đào tạo các trình độ sơ cấp, trung cấp, cao đẳng và các chương trình đào tạo nghề nghiệp khác theo quy định.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d59_k2_pa",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "các chương trình đào tạo nghề nghiệp khác"
+      ]
+    ],
+    "expect_absent": [
+      "trung học nghề"
+    ],
+    "distractor_docs": [],
+    "distractor_versions": [
+      "45-2019-QH14__d59_k2_pa__v2026-01-01"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g3_cv02",
+    "pair_id": "dao_tao_nghe_phoi_hop_co_so_gdnn",
+    "question": "Nhà nước khuyến khích người sử dụng lao động phối hợp với cơ sở giáo dục nghề nghiệp để đào tạo những chương trình, trình độ nào cho người lao động?",
+    "as_of_date": "2026-03-01",
+    "category": "ky_nang_nghe",
+    "temporal_kind": "clause_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 2 Điều 59 Bộ luật Lao động 2019 được sửa đổi bởi Luật 124/2025/QH15 (hiệu lực 01/01/2026), người sử dụng lao động phối hợp với cơ sở giáo dục nghề nghiệp đào tạo chương trình giáo dục trung học nghề và các chương trình đào tạo trình độ sơ cấp, trung cấp, cao đẳng theo quy định.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d59_k2_pa",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "trung học nghề"
+      ]
+    ],
+    "expect_absent": [
+      "các chương trình đào tạo nghề nghiệp khác"
+    ],
+    "distractor_docs": [],
+    "distractor_versions": [
+      "45-2019-QH14__d59_k2_pa__v2021-01-01"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g3_cv03",
+    "pair_id": "hoc_nghe_tap_nghe_nghia_vu_nsdld",
+    "question": "Người sử dụng lao động tuyển người vào học nghề, tập nghề để làm việc cho mình thì phải tuân thủ những quy định gì?",
+    "as_of_date": "2025-05-01",
+    "category": "ky_nang_nghe",
+    "temporal_kind": "clause_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 3 Điều 61 Bộ luật Lao động 2019 (bản trước 01/01/2026), người sử dụng lao động tuyển người vào học nghề, tập nghề để làm việc cho mình thì không phải đăng ký hoạt động giáo dục nghề nghiệp; không được thu học phí; phải ký hợp đồng đào tạo theo quy định của Luật Giáo dục nghề nghiệp.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d61_k3",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "hợp đồng đào tạo"
+      ],
+      [
+        "không được thu học phí"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "distractor_versions": [
+      "45-2019-QH14__d61_k3__v2026-01-01"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g3_cv04",
+    "pair_id": "hoc_nghe_tap_nghe_nghia_vu_nsdld",
+    "question": "Người sử dụng lao động tuyển người vào học nghề, tập nghề để làm việc cho mình thì phải tuân thủ những quy định gì?",
+    "as_of_date": "2026-02-01",
+    "category": "ky_nang_nghe",
+    "temporal_kind": "clause_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo khoản 3 Điều 61 Bộ luật Lao động 2019 được sửa đổi bởi Luật 124/2025/QH15 (hiệu lực 01/01/2026), người sử dụng lao động tuyển người vào học nghề, tập nghề để làm việc cho mình thì không được thu học phí.",
+    "source_doc": "45-2019-QH14",
+    "source_clause": "45-2019-QH14__d61_k3",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "không được thu học phí"
+      ]
+    ],
+    "expect_absent": [
+      "không phải đăng ký hoạt động giáo dục nghề nghiệp"
+    ],
+    "distractor_docs": [],
+    "distractor_versions": [
+      "45-2019-QH14__d61_k3__v2021-01-01"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g3_cv05",
+    "pair_id": "lao_dong_nam_vo_sinh_con_thu_hai",
+    "question": "Lao động nam đang tham gia bảo hiểm xã hội bắt buộc có vợ sinh con thứ hai (sinh một con, sinh thường, không phải phẫu thuật, đủ tuần tuổi) thì được nghỉ việc hưởng chế độ thai sản bao nhiêu ngày làm việc?",
+    "as_of_date": "2026-03-01",
+    "category": "thai_san",
+    "temporal_kind": "clause_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 2 Điều 53 Luật Bảo hiểm xã hội 2024 (bản trước 01/7/2026), lao động nam có vợ sinh con (sinh thường, một con) được nghỉ 05 ngày làm việc; quy định riêng 10 ngày cho trường hợp vợ sinh con thứ hai chỉ có từ 01/7/2026.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d53_k2_pc",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "05 ngày làm việc",
+        "5 ngày làm việc"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "distractor_versions": [
+      "41-2024-QH15__d53_k2_pc__v2026-07-01"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g3_cv06",
+    "pair_id": "lao_dong_nam_vo_sinh_con_thu_hai",
+    "question": "Lao động nam đang tham gia bảo hiểm xã hội bắt buộc có vợ sinh con thứ hai (sinh một con, sinh thường, không phải phẫu thuật, đủ tuần tuổi) thì được nghỉ việc hưởng chế độ thai sản bao nhiêu ngày làm việc?",
+    "as_of_date": "2026-09-01",
+    "category": "thai_san",
+    "temporal_kind": "clause_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm c khoản 2 Điều 53 Luật Bảo hiểm xã hội 2024 được sửa đổi bởi Luật Dân số 113/2025/QH15 (hiệu lực 01/7/2026), lao động nam có vợ sinh con thứ hai được nghỉ 10 ngày làm việc.",
+    "source_doc": "41-2024-QH15",
+    "source_clause": "41-2024-QH15__d53_k2_pc",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "10 ngày làm việc"
+      ]
+    ],
+    "expect_absent": [],
+    "distractor_docs": [],
+    "distractor_versions": [
+      "41-2024-QH15__d53_k2_pc__v2025-07-01"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g3_cv07",
+    "pair_id": "tuoi_huong_luong_huu_dieu_kien_binh_thuong",
+    "question": "Người lao động tham gia bảo hiểm xã hội bắt buộc, làm việc trong điều kiện bình thường, khi nghỉ việc có đủ 20 năm đóng bảo hiểm xã hội thì được hưởng lương hưu khi đủ bao nhiêu tuổi?",
+    "as_of_date": "2019-06-01",
+    "category": "huu_tri",
+    "temporal_kind": "clause_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm a khoản 1 Điều 54 Luật Bảo hiểm xã hội 2014 (bản trước 01/01/2021), người lao động có đủ 20 năm đóng bảo hiểm xã hội được hưởng lương hưu khi nam đủ 60 tuổi, nữ đủ 55 tuổi.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d54",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "nam đủ 60 tuổi"
+      ],
+      [
+        "nữ đủ 55 tuổi"
+      ]
+    ],
+    "expect_absent": [
+      "Điều 169"
+    ],
+    "distractor_docs": [],
+    "distractor_versions": [
+      "58-2014-QH13__d54__v2021-01-01"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g3_cv08",
+    "pair_id": "luong_huu_suy_giam_kha_nang_lao_dong_81",
+    "question": "Người lao động có đủ 20 năm đóng bảo hiểm xã hội bắt buộc, bị suy giảm khả năng lao động từ 81% trở lên thì phải đủ bao nhiêu tuổi để được hưởng lương hưu với mức thấp hơn?",
+    "as_of_date": "2018-03-01",
+    "category": "huu_tri",
+    "temporal_kind": "clause_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm b khoản 1 Điều 55 Luật Bảo hiểm xã hội 2014 (bản trước 01/01/2021), người lao động bị suy giảm khả năng lao động từ 81% trở lên được hưởng lương hưu với mức thấp hơn khi nam đủ 50 tuổi, nữ đủ 45 tuổi.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d55",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "nam đủ 50 tuổi"
+      ],
+      [
+        "nữ đủ 45 tuổi"
+      ]
+    ],
+    "expect_absent": [
+      "Điều 169"
+    ],
+    "distractor_docs": [],
+    "distractor_versions": [
+      "58-2014-QH13__d55__v2021-01-01"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
+  },
+  {
+    "id": "g3_cv09",
+    "pair_id": "luong_huu_suy_giam_kha_nang_lao_dong_81",
+    "question": "Người lao động có đủ 20 năm đóng bảo hiểm xã hội bắt buộc, bị suy giảm khả năng lao động từ 81% trở lên thì phải đủ bao nhiêu tuổi để được hưởng lương hưu với mức thấp hơn?",
+    "as_of_date": "2023-03-01",
+    "category": "huu_tri",
+    "temporal_kind": "clause_version",
+    "expected_behavior": "answer",
+    "ground_truth": "Theo điểm b khoản 1 Điều 55 Luật Bảo hiểm xã hội 2014 được sửa đổi bởi Bộ luật Lao động 2019 (Điều 219 khoản 1 điểm b, hiệu lực 01/01/2021), người lao động bị suy giảm khả năng lao động từ 81% trở lên được hưởng lương hưu với mức thấp hơn khi có tuổi thấp hơn tối đa 10 tuổi so với tuổi nghỉ hưu quy định tại khoản 2 Điều 169 Bộ luật Lao động.",
+    "source_doc": "58-2014-QH13",
+    "source_clause": "58-2014-QH13__d55",
+    "source_clauses": [],
+    "expect_contains": [
+      [
+        "thấp hơn tối đa 10 tuổi"
+      ]
+    ],
+    "expect_absent": [
+      "nữ đủ 45 tuổi"
+    ],
+    "distractor_docs": [],
+    "distractor_versions": [
+      "58-2014-QH13__d55__v2016-01-01"
+    ],
+    "drafted_by": "claude",
+    "reviewed": false
   }
 ]

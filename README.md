@@ -193,11 +193,11 @@ với bộ câu hỏi tự xây có sẵn đáp án chuẩn và id chunk nguồn
 
 ### Kết quả trên kho lao động/BHXH hiện tại (đo 2026-09-23)
 
-Gold set [`data/eval/legal_qa_200.json`](data/eval/legal_qa_200.json): **199 câu**, 11 loại
+Gold set [`data/eval/legal_qa_200.json`](data/eval/legal_qa_200.json): **208 câu**, 11 loại
 (tra một điều khoản, đổi phiên bản văn bản, ghép nhiều điều khoản, tiền đề sai, ngoài phạm
 vi, trước mốc phủ corpus…). Mỗi câu trỏ tới `clause_uid` nguồn;
 [`eval/validate_gold.py`](eval/validate_gold.py) kiểm tra trên index thật rằng đáp án có
-**nguyên văn** trong chunk nguồn và `as_of_date` nằm trong hiệu lực của chunk đó (199/199 đạt).
+**nguyên văn** trong chunk nguồn và `as_of_date` nằm trong hiệu lực của chunk đó (208/208 đạt).
 
 Cấu hình đo = cấu hình production (Render: hybrid BM25 + dense, RRF, **không reranker**).
 Mọi số trong bảng lấy nguyên từ `summary.overall` / `summary.by_kind` của
@@ -207,26 +207,33 @@ Mọi số trong bảng lấy nguyên từ `summary.overall` / `summary.by_kind`
 
 | Chỉ số | Trước (`no_temporal`) | Sau (`pre_filter`) |
 |---|---:|---:|
-| Recall@1 | 0.500 | **0.667** |
-| Recall@5 | 0.903 | **0.935** |
-| MRR | 0.671 | **0.779** |
-| Ngữ cảnh lẫn bản luật hết hiệu lực | 21.6% | **0.0%** |
-| Answer accuracy (199 câu) | 0.739 | **0.910** |
-| — riêng câu đổi phiên bản văn bản (n=28) | 0.36 | **1.00** |
-| Faithfulness (LLM judge; n=170 / 163 câu judge chấm được) | 0.976 | 0.958 |
-| Latency truy hồi p95 | 555 ms | 672 ms |
-| Latency end-to-end p50 / p95 | 4.6 s / 22.8 s | 4.6 s / 19.0 s |
+| Recall@1 | 0.579 | **0.779** |
+| Recall@5 | 0.913 | **0.938** |
+| MRR | 0.720 | **0.850** |
+| Ngữ cảnh lẫn bản luật hết hiệu lực | 24.5% | **0.0%** |
+| Answer accuracy (208 câu) | 0.788 | **0.981** |
+| — riêng câu đổi phiên bản văn bản (n=28) | 0.43 | **0.96** |
+| — riêng câu đổi phiên bản khoản (n=13) | 0.38 | **1.00** |
+| Faithfulness (LLM judge; n=199 / 196 câu judge chấm được) | 0.983 | 0.979 |
+| Latency truy hồi p95 | 1909 ms | 1411 ms |
+| Latency end-to-end p50 / p95 | 2.3 s / 4.3 s | 2.1 s / 4.5 s |
 
 Đọc bảng cho đúng:
-- **p95 end-to-end bị chi phối bởi quota free tier Gemini**, không phải thời gian sinh: lượt
-  đo gặp hàng trăm lần 429, xoay key/model rồi chờ; 25 câu (trước) / 30 câu (sau) rơi xuống chế
-  độ trích nguyên văn (không LLM) và vẫn được chấm như mọi câu khác — accuracy là của hệ thống
-  đúng như người dùng gặp lúc đó, kể cả khi hết quota.
-- Faithfulness giảm nhẹ ở arm "sau" — chưa đủ mẫu để kết luận khác biệt; ghi đúng như đo.
+- Chạy 2026-10-18, `meta.index` = `qdrant/documind_legal_fpt/Vietnamese_Embedding/1249/5ce81d96ccb9`
+  — đuôi là hash nội dung, trùng Chroma local và `ingest_documents.py --dry-run` của code hiện tại,
+  tức đúng index production đang đọc. LLM FPT, không reranker, git `bed62de`.
+- 8/208 câu đo thiếu nhánh dense (embedding lỗi → chỉ BM25, `meta.n_degraded`); 4 câu ở arm "sau"
+  trích nguyên văn không qua LLM. Cả hai vẫn được chấm như mọi câu — đó là hệ thống như người dùng gặp.
+- Accuracy chấm bằng chuỗi. Đọc 4 câu arm "sau" bị chấm sai: 3 câu trả lời đúng mà lệch chuỗi gold
+  (`ld_t07a` nhắc "thai sản" trong câu phủ định; `g2_b004`, `g2_b027` diễn đạt khác). Câu sai thật,
+  `lh_m05b`: có Điều 64 Luật BHXH 2024 trong ngữ cảnh (hạng 2) mà vẫn kết luận "phải đủ 20 năm" —
+  lỗi suy luận, không phải lẫn phiên bản.
+- Faithfulness ≈0.98 ở cả hai arm dù accuracy lệch 19 điểm — judge không phân biệt được câu bám
+  đúng một đoạn đã hết hiệu lực, nên chưa dùng làm thước đo an toàn.
+- Câu đổi phiên bản khoản: corpus chỉ có 6 khoản nhiều phiên bản; 13 câu phủ đủ 12 phiên bản, đủ
+  để thấy hướng, chưa đủ cho một tỷ lệ chặt.
+- Latency đo từ máy local tới Qdrant Cloud (australia-southeast1), không phải từ Render.
 - Câu do Claude soạn (`drafted_by: claude`, `reviewed: false`) **chưa được người duyệt**.
-- Report này chạy trước khi harness ghi `meta.index`, nên không lưu provider/số chunk. Chạy
-  ngày 2026-09-23, sau khi đổi sang `gemini-embedding-001` (2026-09-19) → index 1.151 chunk;
-  provider không được ghi lại. Report từ nay mang `meta.index` + `meta.git_sha`.
 
 Tái lập (mỗi lần chạy là một run trong MLflow, experiment `documind-eval`, kèm git sha + cấu hình):
 

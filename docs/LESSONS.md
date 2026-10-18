@@ -196,6 +196,23 @@ chọn sai lần hai.
 
 ## Dữ liệu & đánh giá
 
+### Nhận dạng index bằng số chunk (10-03 → 2026-10-18)
+- **Đã quyết:** sau mục "report không ghi đo trên index nào" (bên dưới), `meta.index` và trace
+  mang `provider/collection/model/số chunk` — coi như đủ để biết một lần đo chạy trên index nào.
+- **Sai ở đâu:** số chunk đứng yên khi nội dung đổi: 719f1f2 viết lại text của 193 mảnh, các lần
+  vá hiệu lực tại chỗ đổi metadata — index vẫn 1249. Hai report "cùng index" có thể đo trên hai
+  nội dung khác nhau, và không có cách nào trả lời "index đang chạy có khớp code không" ngoài đọc
+  chunk bằng mắt. Claude (2026-10-18) trả lời câu đó bằng `git status` chụp lúc đầu phiên — đã cũ,
+  diff đã được commit và ingest — tức đoán thay vì đo.
+- **Cái giá:** không đối chiếu được eval trước/sau một thay đổi chunker; baseline CI, README và
+  production không chứng minh được là cùng một nội dung.
+- **Bài học:** danh tính của dữ liệu lấy từ chính nội dung, không từ một con số đếm hay từ việc
+  "đã chạy script". Trạng thái repo đọc lại lúc trả lời, không dùng ảnh chụp đầu phiên.
+- **Giờ làm thế nào:** `vector_backend.corpus_fingerprint` (hash text + metadata; bỏ id của store vì
+  Chroma/Qdrant đặt khác nhau, bỏ `status` vì nó theo ngày ingest) nối vào `meta.index`/trace:
+  `…/1249/5ce81d96ccb9`. `ingest_documents.py --dry-run` in hash của code hiện tại. Đo 2026-10-18:
+  Qdrant production = Chroma local = dry-run = `5ce81d96ccb9`.
+
 ### Trang duyệt gold cắt văn bản mà không báo (Claude, 2026-10-18)
 - **Đã làm:** dựng bảng duyệt cho người chấm 36 câu trượt; để trang nhẹ, cắt đoạn gold ở 900 và
   đoạn hạng 1 ở 700 ký tự, không có "…", không ghi số ký tự.
