@@ -60,6 +60,9 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   `--embed-cache` chỉ dùng cho CI (latency khi đó không phải số thật). Kết quả: README mục Đánh giá —
   chỉ trích nguyên `summary` của report, không tính tay trên tập con (test chặn); report ghi
   `meta.index` (provider/collection/model/số chunk/hash nội dung) + `meta.git_sha`.
+- Nguyên liệu câu hỏi tổng hợp (CHƯA DUYỆT, không phải gold): `data/eval/synthetic/doc2query_questions.jsonl` —
+  4.992 câu đời thường FPT sinh cho 1.249 đoạn (2026-10-18), mỗi dòng mang `text_sha1` của đoạn để biết dòng nào cũ.
+  Sinh tiếp cho đoạn mới/đổi: `python scripts/generate_doc2query.py`. Xem README trong thư mục trước khi dùng.
 - CI: `.github/workflows/ci.yml` — pytest + retrieval eval trên Qdrant `documind_legal_fpt`, gate bằng
   `eval/ci_gate.py` so với `reports/eval_baseline.json` (FAIL cả khi report có câu đo thiếu nhánh dense —
   `meta.n_degraded`). Reranker TẮT trong CI như production.
