@@ -116,10 +116,16 @@ def score_answer(answer: str, question: dict) -> dict:
         if not any(_norm(alt) in norm for alt in group)
     ]
     forbidden_hits = [bad for bad in question["expect_absent"] if _norm(bad) in norm]
+    # Câu Có/Không: con số có mặt cả trong câu sai — "**Có**, bạn được hưởng … phải đủ 20 năm"
+    # (lh_b02a, 3–5/6 lượt trước khi có _analysis_block) vẫn chứa "20 năm". Kết luận phải kiểm
+    # riêng, ở đầu câu trả lời — rule 8 (BLUF) đặt nó ở đó.
+    verdict = question.get("expect_verdict")
+    wrong_verdict = bool(verdict) and not re.match(rf"\W*{verdict}\b", norm)
     return {
-        "correct": not missing_groups and not forbidden_hits,
+        "correct": not missing_groups and not forbidden_hits and not wrong_verdict,
         "missing": [g[0] for g in missing_groups],
         "forbidden_present": forbidden_hits,
+        "wrong_verdict": wrong_verdict,
     }
 
 
@@ -410,6 +416,7 @@ def run(
                 )
                 entry["answer"] = result["answer"]
                 entry["used_llm"] = result["used_llm"]
+                entry["model"] = result.get("model", "")
                 entry["generate_ms"] = int((time.time() - t1) * 1000)
                 entry["score"] = score_answer(result["answer"], q)
                 if arm in judge_arms and result["used_llm"]:

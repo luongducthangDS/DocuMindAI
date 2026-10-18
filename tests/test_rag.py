@@ -330,7 +330,8 @@ class TestFptPrimary:
              patch("src.rag.generator.record_generation"):
             info = {}
             assert gen.gemini_generate("q", info=info) == "Trả lời [1]"
-        assert info == {"provider": "fpt"}  # nhãn used_llm trên UI phải là FPT, không phải Gemini
+        # nhãn used_llm trên UI phải là FPT, không phải Gemini; model cụ thể để biết Qwen hay model dự phòng
+        assert info == {"provider": "fpt", "model": "Qwen3.8-27B"}
         assert post.call_args.kwargs["json"]["model"] == "Qwen3.8-27B"
         gemini.assert_not_called()
 

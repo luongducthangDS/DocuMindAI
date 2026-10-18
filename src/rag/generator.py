@@ -56,7 +56,9 @@ Quy tắc bắt buộc:
 5. KHÔNG bịa đặt số liệu, điều kiện hay quy định không có trong các đoạn được cung cấp.
 6. Ngôn ngữ: tiếng Việt, rõ ràng, chính xác.
 7. KHÔNG liệt kê lại danh sách nguồn ở cuối — hệ thống sẽ tự động thêm.
-8. BLUF (Bottom Line Up Front): câu ĐẦU TIÊN phải là câu trả lời trực tiếp (con số, Có/Không, điều kiện cốt lõi) —
+8. BLUF (Bottom Line Up Front): khi các đoạn được cung cấp CÓ nội dung được hỏi, câu ĐẦU TIÊN phải là câu trả lời
+   trực tiếp lấy từ các đoạn đó (con số, Có/Không, điều kiện cốt lõi). Các đoạn KHÔNG có con số/quy định được hỏi
+   thì KHÔNG nêu con số đó dù bạn nhớ — dùng khuôn hỏi lại ở rule 4.
    KHÔNG mở đầu bằng "Dựa trên tài liệu...", "Theo quy định...", "Dưới đây là..." hay các câu dẫn dắt không mang thông tin.
    Giải thích/điều kiện chi tiết đưa vào SAU câu trả lời trực tiếp.
 9. Định dạng để dễ đọc quét (scannable):
@@ -627,7 +629,7 @@ def gemini_generate(
     template tĩnh trong "input" — làm trace không đọc được (phần thay đổi chìm
     giữa hàng chục dòng rules không đổi). `prompt` gửi cho Gemini KHÔNG đổi.
 
-    `info`: nếu truyền dict, ghi `info["provider"]` = "fpt"/"gemini" — nhà cung cấp
+    `info`: nếu truyền dict, ghi `info["provider"]` = "fpt"/"gemini" và `info["model"]` — nhà cung cấp
     đã trả lời (nhãn used_llm trên UI), không đổi kiểu trả về của hàm.
 
     `name`: tên observation trên Langfuse theo MỤC ĐÍCH (route-intent, grade-chunks,
@@ -677,6 +679,7 @@ def gemini_generate(
                     _GEMINI_PAIR_CURSOR = (start + offset - n_fpt) % max(len(gem), 1)
                 if info is not None:
                     info["provider"] = "fpt" if api_key == _FPT_KEY else "gemini"
+                    info["model"] = model_name
                 return response.text
         except Exception as exc:
             transient = _is_transient(exc)
@@ -731,6 +734,7 @@ def gemini_generate(
                         )
                         if info is not None:
                             info["provider"] = "fpt" if k == _FPT_KEY else "gemini"
+                            info["model"] = m
                         return res.text
                 except Exception as retry_exc:
                     if _is_transient(retry_exc):
@@ -857,8 +861,8 @@ def generate_answer(
 
     # FPT trước, Gemini dự phòng — chịu lỗi nằm ở vòng xoay bên trong _call_gemini;
     # hết mọi cặp thì rơi về trích dẫn nguyên văn.
+    info: dict = {}
     try:
-        info: dict = {}
         answer = _drop_empty_followup(
             _call_gemini(query, context, history=history, models=_select_models(complex_query), info=info))
         used_llm = info.get("provider", "gemini")
@@ -872,6 +876,9 @@ def generate_answer(
         "answer": answer,
         "sources": _cited_sources(answer, chunks),
         "used_llm": used_llm,
+        # Model cụ thể đã trả lời: Qwen hỏng/cooldown thì DeepSeek gánh, và hai model không ngang
+        # nhau (lh_o02: DeepSeek nêu "1,5%" BHYT theo trí nhớ 4/12, Qwen 0/12) — "fpt" không đủ.
+        "model": info.get("model", ""),
         "chunk_count": len(chunks),
     }
 
