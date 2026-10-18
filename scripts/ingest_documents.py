@@ -34,6 +34,7 @@ import json
 import os
 import re
 import sys
+import unicodedata
 from datetime import date
 from pathlib import Path
 
@@ -52,7 +53,7 @@ from loguru import logger
 
 from src.config import get_settings
 from src.rag.embedder import STORE_META_DIM, STORE_META_MODEL, get_embedder, get_embedding_dim
-from src.ingestion.chunker import LegalChunk, chunk_by_dieu
+from src.ingestion.chunker import LegalChunk, _with_heading, chunk_by_dieu
 from src.ingestion.cleaner import strip_consolidated_footnotes, strip_consolidated_quotations
 from src.ingestion.manifest import DocEntry, load_manifest
 from src.ingestion.versions import build_version_chunks
@@ -61,12 +62,46 @@ from src.ingestion.versions import build_version_chunks
 # một bản sao lệch nghĩa là corpus được index bằng model khác model lúc truy vấn.
 
 _HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
+# Dấu chữ ký số của Cổng TTĐT Chính phủ mà PDF Công báo in đè lên trang 1 — lọt vào text
+# layer giữa hai điểm/khoản (41/2024 Điều 2, 293/2025 Điều 3 ngay trước bảng lương vùng).
+_SIGNATURE_STAMP_RE = re.compile(
+    r"(?:Người ký|Ký bởi):[^\n]*?Thời gian ký:\s*[\d.]+\s+[\d:]+\s*[+-]\d{2}:\d{2}[ \t]*"
+)
 _MAX_LINE_CHARS = 2_000  # truncate scan-bloated table cells
+
+# Câu bị ngắt đoạn giữa chừng (thường tại chỗ sang trang PDF): "…theo quy định của pháp luật về lao"
+# ‖ "động." — 209 chỗ trên 14 văn bản, đo 2026-10-17. Chỉ nối khi đoạn sau KHÔNG mở một đơn vị cấu
+# trúc và (đoạn trước kết thúc bằng dấu phẩy, hoặc bằng chữ mà đoạn sau mở bằng chữ thường).
+_PARA_STRUCT_RE = re.compile(
+    r"^(?:Điều\s+\d+[a-z]?[.:]|Chương\s|Mục\s+\d|Phụ lục|PHỤ LỤC|Mẫu số|\d+[a-z]?\.|[a-zđ]\d?\)|[-+•(]|Trong đó|Nơi nhận)"
+)
+# "…theo quy định tại khoản 1 và khoản 2" ‖ "Điều 27 của Luật này…": dẫn chiếu, không phải tiêu đề Điều.
+_PARA_REF_RE = re.compile(r"^Điều\s+\d+[a-z]?\s+(?:của|này|và|Luật|Bộ luật|Nghị định)\b")
+_PARA_LOWER_RE = re.compile(r"^[a-zàáảãạăằắẳẵặâầấẩẫậđèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵ]")
+
+
+def _join_broken_paragraphs(text: str) -> str:
+    paras = text.split("\n\n")
+    out = [paras[0]]
+    for b in paras[1:]:
+        a = out[-1].rstrip()
+        bs = b.lstrip()
+        heading = a == a.upper() and any(c.isalpha() for c in a)
+        if a and bs and not heading and not _PARA_STRUCT_RE.match(bs) and (
+            a.endswith(",") or (re.search(r"[\w)]$", a) and (_PARA_LOWER_RE.match(bs) or _PARA_REF_RE.match(bs)))
+        ):
+            out[-1] = f"{a} {bs}"
+        else:
+            out.append(b)
+    return "\n\n".join(out)
 
 
 def clean_md(text: str) -> str:
-    """Remove HTML comments and truncate scan-bloated lines (e.g. 429KB table row)."""
-    text = _HTML_COMMENT_RE.sub("", text)
+    """NFC, drop HTML comments + signature stamps, truncate scan-bloated lines (e.g. 429KB table row)."""
+    # NFC: vài văn bản (74/2024 Điều 3, 374/2025) có chữ dạng tổ hợp — BM25 không khớp
+    # với "địa bàn" người dùng gõ.
+    text = unicodedata.normalize("NFC", text)
+    text = _SIGNATURE_STAMP_RE.sub("", _HTML_COMMENT_RE.sub("", text))
     lines = []
     for line in text.split("\n"):
         if len(line) > _MAX_LINE_CHARS:
@@ -74,7 +109,7 @@ def clean_md(text: str) -> str:
         lines.append(line)
     # Collapse 3+ blank lines into 2
     text = re.sub(r"\n{3,}", "\n\n", "\n".join(lines))
-    return text.strip()
+    return _join_broken_paragraphs(text).strip()
 
 
 def _default_meta(md_path: Path, institution: str) -> dict:
@@ -143,7 +178,13 @@ def build_clause_chunks(entry: DocEntry, corpus_dir: Path, as_of: str) -> list[L
     }
 
     chunks = chunk_by_dieu(body, doc_meta, entry.in_place_amended_clauses)
-    chunks += build_version_chunks(entry, corpus_dir, doc_meta, as_of=as_of)
+    # Bản cũ/mới của một khoản ở _versions/ nằm cùng Chương với Điều chứa nó.
+    heading = {c.metadata.get("dieu"): c.metadata for c in chunks if c.metadata.get("chuong")}
+    for v in build_version_chunks(entry, corpus_dir, doc_meta, as_of=as_of):
+        if not v.is_valid:  # đo trên thân, trước khi gắn tiền tố Chương
+            continue
+        h = heading.get(v.metadata.get("dieu"), {})
+        chunks.append(_with_heading(v, h.get("chuong", ""), h.get("muc", "")))
     return [c for c in chunks if c.is_valid]
 
 

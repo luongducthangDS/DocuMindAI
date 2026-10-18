@@ -95,12 +95,14 @@ documents:
         dieu_tieu_de: "Đào tạo nghề nghiệp và phát triển kỹ năng nghề"
         effective_from: "2026-01-01"
         amended_by_doc: "124/2025/QH15"
+        version_cu: "_versions/45-2019-QH14__d59_k2_pa__2021.md"
       - clause_uid: "45-2019-QH14__d61_k3"
         dieu: 61
         khoan: 3
         dieu_tieu_de: "Học nghề, tập nghề để làm việc cho người sử dụng lao động"
         effective_from: "2026-01-01"
         amended_by_doc: "124/2025/QH15"
+        version_cu: "_versions/45-2019-QH14__d61_k3__2021.md"
     cau_truc: "17 chương / 220 điều"
     nguon: "https://vanban.chinhphu.vn/?pageid=27160&docid=198540"
     verify_status: "VERIFIED"
@@ -114,10 +116,14 @@ documents:
     ngay_ban_hanh: "2020-12-14"
     ngay_hieu_luc: "2021-02-01"
     trang_thai: "con_hieu_luc"
-    thay_the: ["44/2013/NĐ-CP", "05/2015/NĐ-CP (một phần)", "148/2018/NĐ-CP", "149/2018/NĐ-CP"]  # PARTIAL — xác minh
+    # VERIFIED 2026-10-17 — nguyên văn Điều 114 khoản 2 (Công báo số 1205 + 1206); bản cũ ghi
+    # "05/2015 (một phần)" là sai: Điều 114 bãi bỏ toàn bộ, không có ngoại lệ.
+    thay_the: ["03/2014/NĐ-CP", "44/2013/NĐ-CP", "05/2015/NĐ-CP", "148/2018/NĐ-CP", "29/2019/NĐ-CP",
+               "149/2018/NĐ-CP", "49/2013/NĐ-CP", "121/2018/NĐ-CP", "45/2013/NĐ-CP", "85/2015/NĐ-CP",
+               "27/2014/NĐ-CP", "46/2013/NĐ-CP", "41/2013/NĐ-CP"]
     bi_thay_the_boi: []
     sua_doi_boi: []                        # chưa phát hiện; PHẢI đối chiếu lược đồ vbpl.vn
-    cau_truc: "11 chương / 115 điều / 3 phụ lục"
+    cau_truc: "11 chương / 115 điều / 6 phụ lục"   # Công báo in "Chương XI" hai lần (tranh chấp + điều khoản thi hành) — giữ nguyên văn
     nguon: "https://congbao.chinhphu.vn/van-ban/nghi-dinh-so-145-2020-nd-cp-32732.htm"
     verify_status: "VERIFIED"
     ghi_chu: "Nội dung then chốt: trợ cấp thôi việc/mất việc, thời giờ làm việc–nghỉ ngơi, làm thêm giờ, lương ngừng việc, quy chế dân chủ cơ sở."
@@ -273,6 +279,9 @@ documents:
     huong_dan_cho: ["158/2025/NĐ-CP"]
     nguon: "https://xaydungchinhsach.chinhphu.vn/toan-van-thong-tu-12-2025-tt-bnv-quy-dinh-chi-tiet-mot-so-dieu-cua-luat-bhxh-ve-bhxh-bat-buoc-11925070415595016.htm"
     verify_status: "VERIFIED (T2, 2026-09-11 — xaydungchinhsach.chinhphu.vn + english.luatvietnam.vn + snv.dongnai.gov.vn khớp ngày; thêm vào nhóm C theo dự kiến ở SPEC-corpus-acquisition.md)"
+    # THIẾU đã biết (2026-10-17): Điều 2 không có khoản 1 — trang xaydungchinhsach (nguồn duy nhất
+    # tải được) bỏ mất; bản .doc trên vbpl.vn chặn truy cập tự động (403). Cần bổ sung tay từ bản chính thức.
+    thieu_noi_dung: ["Điều 2 khoản 1"]
 
   # 25/2025/TT-BYT, 18/2021 + 19/2021/TT-BLĐTBXH, 24/2022/TT-BLĐTBXH: KHÔNG tra vòng này —
   # thuộc nhóm F (TNLĐ-BNN) đã HOÃN sang vòng sau (xem memory documind-labor-pivot).

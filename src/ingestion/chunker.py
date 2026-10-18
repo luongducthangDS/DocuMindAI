@@ -45,8 +45,69 @@ _MAX_DIEU_CHARS = 4_000  # articles longer than this are split further
 # Appendices and form templates ("Mẫu số 12", "PHỤ LỤC II") sit at the end of a
 # decree and contain their own "Điều 1. ..." lines — those belong to a sample
 # decision, not to the decree, so they must not be numbered as articles.
-_APPENDIX_RE = re.compile(r"^(?:PHỤ LỤC|Mẫu số\s+\d+)\b", re.MULTILINE)
+# Title-case headings too ("Phụ lục I", "Phụ lục I (Kèm theo ...", "Phụ lục: CÔNG VIỆC ...",
+# "Phụ lục THÔNG TIN ..."): missed, 135/2020's retirement-age tables were glued to its
+# last article and cut at 4000 chars. A body line "Phụ lục III ban hành kèm theo ..." is
+# a reference, not a heading.
+_APPENDIX_RE = re.compile(
+    r"^(?:PHỤ LỤC\b|Mẫu số\s+\d+\b"
+    r"|Phụ lục(?:[ \t]+[IVXLC]+)?[ \t]*(?:$|[(:])"
+    r"|Phụ lục[ \t]+(?![IVXLC]+\b)[A-ZĐ]{2,})",
+    re.MULTILINE,
+)
 _APPENDIX_CHUNK_CHARS = 1_500
+
+
+# "Chương IV" / "Mục 2" heading, title on the same line or on the following lines.
+_HEADING_RE = re.compile(r"^(Chương|Mục)\s+([IVXLC]+|\d+)\b\.?\s*(.*)$")
+
+
+def _heading_blocks(text: str) -> list[tuple[int, int, str, str]]:
+    """`(start, end, kind, label)` of every Chương/Mục heading block in `text`.
+
+    The title must be UPPERCASE: "Mục 3 Chương III của Bộ luật Lao động" inside an
+    article is a cross-reference, not a heading. Multi-line titles ("HỖ TRỢ ... ĐÀO TẠO,"
+    / "NÂNG CAO ...") are joined.
+    """
+    blocks: list[tuple[int, int, str, str]] = []
+    lines = text.split("\n")
+    offsets = [0]
+    for line in lines:
+        offsets.append(offsets[-1] + len(line) + 1)
+    i = 0
+    while i < len(lines):
+        m = _HEADING_RE.match(lines[i].strip())
+        if not m:
+            i += 1
+            continue
+        title, j = [m.group(3).strip()] if m.group(3).strip() else [], i + 1
+        while j < len(lines):
+            s = lines[j].strip()
+            if s and (s != s.upper() or _DIEU_HEAD_RE.match(s) or _HEADING_RE.match(s)):
+                break
+            if s:
+                title.append(s)
+            j += 1
+        label = " ".join(title)
+        if label and label == label.upper() and any(c.isalpha() for c in label):
+            blocks.append((offsets[i], offsets[j], m.group(1), f"{m.group(1)} {m.group(2)}. {label}"))
+            i = j
+        else:
+            i += 1
+    return blocks
+
+
+def _with_heading(chunk: "LegalChunk", chuong: str, muc: str) -> "LegalChunk":
+    """Prefix the chapter/section a chunk sits in. Without it "Điều 54. Điều kiện hưởng
+    lương hưu" (Chương III, BHXH bắt buộc) and "Điều 73. Điều kiện hưởng lương hưu"
+    (Chương IV, tự nguyện) are indistinguishable — measured 2026-10-17: ~18/186 gold
+    questions got the voluntary article for a mandatory question."""
+    if not chuong:
+        return chunk
+    context = f"{chuong} — {muc}" if muc else chuong
+    chunk.text = f"{context}\n{chunk.text}"
+    chunk.metadata.update(chuong=chuong, muc=muc, char_count=len(chunk.text))
+    return chunk
 
 
 def split_appendix(text: str) -> tuple[str, str]:
@@ -238,10 +299,24 @@ def chunk_by_dieu(
     for amendment in amendments:
         by_dieu.setdefault(amendment.dieu, []).append(amendment)
 
+    headings = _heading_blocks(text)
     for match in matches:
-        chunk_text = match.group(1).strip()
+        # A heading between two articles is matched as the TAIL of the earlier one
+        # (_DIEU_RE runs to the next "Điều") — it belongs to the articles after it.
+        inside = [h for h in headings if match.start() < h[0] < match.end()]
+        end = inside[0][0] if inside else match.end()
+        chunk_text = text[match.start():end].strip()
         if len(chunk_text) < 50:
             continue
+        chuong = muc = ""
+        for h_start, _end, kind, label in headings:
+            if h_start > match.start():
+                break
+            if kind == "Chương":
+                chuong, muc = label, ""
+            else:
+                muc = label
+        first = len(chunks)
 
         dieu, _suffix, dieu_tieu_de = parse_dieu_header(chunk_text)
 
@@ -250,25 +325,14 @@ def chunk_by_dieu(
             chunks.extend(
                 _split_amended_dieu(chunk_text, doc_meta, dieu, dieu_tieu_de, by_dieu[dieu])
             )
-            continue
-
         # Split oversized articles by khoản boundary
-        if len(chunk_text) > _MAX_DIEU_CHARS:
+        elif len(chunk_text) > _MAX_DIEU_CHARS:
             chunks.extend(_split_large_dieu(chunk_text, doc_meta, _MAX_DIEU_CHARS))
-            continue
-
-        version = _version_meta(
-            doc_meta,
-            clause_uid=f"{doc_meta['doc_id']}__d{dieu}" if doc_meta.get("doc_id") and dieu else "",
-            dieu=dieu,
-            dieu_tieu_de=dieu_tieu_de,
-        )
-        chunks.append(
-            LegalChunk(
-                text=chunk_text,
-                metadata={**_legacy_meta(doc_meta, chunk_text), **version},
-            )
-        )
+        else:
+            chunks.append(_article_chunk(chunk_text, doc_meta, dieu, dieu_tieu_de))
+        # Validity on the body, before the prefix: a heading-only stub ("Điều 19. Chấm
+        # dứt ...", 43 chars) must stay out of the index as it always has.
+        chunks[first:] = [_with_heading(c, chuong, muc) for c in chunks[first:] if c.is_valid]
 
     chunks.extend(_appendix_chunks(appendix, doc_meta))
 
@@ -278,6 +342,16 @@ def chunk_by_dieu(
         len(chunks),
     )
     return chunks
+
+
+def _article_chunk(chunk_text: str, doc_meta: dict, dieu: int | None, dieu_tieu_de: str) -> LegalChunk:
+    version = _version_meta(
+        doc_meta,
+        clause_uid=f"{doc_meta['doc_id']}__d{dieu}" if doc_meta.get("doc_id") and dieu else "",
+        dieu=dieu,
+        dieu_tieu_de=dieu_tieu_de,
+    )
+    return LegalChunk(text=chunk_text, metadata={**_legacy_meta(doc_meta, chunk_text), **version})
 
 
 def _appendix_chunks(appendix: str, doc_meta: dict) -> list[LegalChunk]:
@@ -387,7 +461,12 @@ def _split_large_dieu(
             dieu_tieu_de=dieu_tieu_de,
         ),
     }
-    parts = re.split(r"(?=\n\d+\.\s)", dieu_text)
+    parts = []
+    for part in re.split(r"(?=\n\d+\.\s)", dieu_text):
+        # A block with no khoản boundary (a table, an appendix glued to the last article)
+        # is split at paragraphs; the old `[:max_chars]` silently dropped its tail —
+        # 1639 chars of 135/2020's retirement table, measured 2026-10-17.
+        parts.extend(re.split(r"(?=\n\n)", part) if len(part) > max_chars else [part])
     chunks: list[LegalChunk] = []
     buffer = ""
 
@@ -412,14 +491,14 @@ def _split_large_dieu(
         else:
             if buffer.strip():
                 chunks.append(LegalChunk(
-                    text=buffer.strip()[:max_chars],
+                    text=buffer.strip(),
                     metadata=_segment_meta(len(buffer)),
                 ))
             buffer = part
 
     if buffer.strip():
         chunks.append(LegalChunk(
-            text=buffer.strip()[:max_chars],
+            text=buffer.strip(),
             metadata=_segment_meta(len(buffer)),
         ))
 
