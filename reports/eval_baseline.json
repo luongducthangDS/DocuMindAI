@@ -1,7 +1,7 @@
 {
   "meta": {
     "gold_set": "data/eval/legal_qa_200.json",
-    "n_questions": 199,
+    "n_questions": 208,
     "arms": [
       "pre_filter"
     ],
@@ -9,8 +9,8 @@
     "corpus_earliest_point_in_time": "2015-01-01",
     "retriever": "hybrid BM25 + dense, RRF fusion → top-8",
     "reranker_active": false,
-    "index": "qdrant/documind_legal_fpt/Vietnamese_Embedding/1249",
-    "git_sha": "96f9ecf",
+    "index": "qdrant/documind_legal_fpt/Vietnamese_Embedding/1249/5ce81d96ccb9",
+    "git_sha": "bed62de",
     "n_degraded": 0,
     "embed_cache": true
   },
@@ -36,7 +36,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -62,7 +62,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -88,7 +88,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 336
         }
       },
       "degraded": []
@@ -114,7 +114,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -140,7 +140,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 323
         }
       },
       "degraded": []
@@ -166,7 +166,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 185
         }
       },
       "degraded": []
@@ -192,7 +192,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 355
         }
       },
       "degraded": []
@@ -218,7 +218,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -244,7 +244,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 339
         }
       },
       "degraded": []
@@ -270,7 +270,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -296,7 +296,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 356
         }
       },
       "degraded": []
@@ -322,7 +322,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -348,7 +348,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 349
         }
       },
       "degraded": []
@@ -374,7 +374,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 188
         }
       },
       "degraded": []
@@ -400,7 +400,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 349
         }
       },
       "degraded": []
@@ -426,7 +426,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -452,7 +452,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 560
         }
       },
       "degraded": []
@@ -478,7 +478,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -504,7 +504,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 367
         }
       },
       "degraded": []
@@ -530,7 +530,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -556,7 +556,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 383
         }
       },
       "degraded": []
@@ -582,7 +582,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -608,7 +608,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 357
         }
       },
       "degraded": []
@@ -634,7 +634,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -660,7 +660,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 381
         }
       },
       "degraded": []
@@ -686,7 +686,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -712,7 +712,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 375
         }
       },
       "degraded": []
@@ -738,7 +738,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -761,7 +761,7 @@
             "clean": true,
             "n_chunks": 0
           },
-          "retrieve_ms": 191
+          "retrieve_ms": 339
         }
       },
       "degraded": []
@@ -784,7 +784,7 @@
             "clean": true,
             "n_chunks": 0
           },
-          "retrieve_ms": 192
+          "retrieve_ms": 345
         }
       },
       "degraded": []
@@ -813,7 +813,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 353
         }
       },
       "degraded": []
@@ -842,7 +842,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 354
         }
       },
       "degraded": []
@@ -871,7 +871,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 343
         }
       },
       "degraded": []
@@ -900,7 +900,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 346
         }
       },
       "degraded": []
@@ -929,7 +929,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 370
         }
       },
       "degraded": []
@@ -958,7 +958,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 194
         }
       },
       "degraded": []
@@ -984,7 +984,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 327
         }
       },
       "degraded": []
@@ -1010,7 +1010,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 341
         }
       },
       "degraded": []
@@ -1036,7 +1036,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -1062,7 +1062,7 @@
             "clean": false,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 346
         }
       },
       "degraded": []
@@ -1088,7 +1088,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -1114,7 +1114,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 357
         }
       },
       "degraded": []
@@ -1140,7 +1140,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 567
         }
       },
       "degraded": []
@@ -1166,7 +1166,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 346
         }
       },
       "degraded": []
@@ -1192,7 +1192,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 371
         }
       },
       "degraded": []
@@ -1218,7 +1218,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 361
         }
       },
       "degraded": []
@@ -1244,7 +1244,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 339
         }
       },
       "degraded": []
@@ -1270,7 +1270,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 351
         }
       },
       "degraded": []
@@ -1296,7 +1296,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -1322,7 +1322,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 543
         }
       },
       "degraded": []
@@ -1348,7 +1348,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 365
         }
       },
       "degraded": []
@@ -1374,7 +1374,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 194
+          "retrieve_ms": 350
         }
       },
       "degraded": []
@@ -1400,7 +1400,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 341
         }
       },
       "degraded": []
@@ -1426,7 +1426,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 368
         }
       },
       "degraded": []
@@ -1452,7 +1452,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 356
         }
       },
       "degraded": []
@@ -1478,7 +1478,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 383
         }
       },
       "degraded": []
@@ -1504,7 +1504,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 365
         }
       },
       "degraded": []
@@ -1530,7 +1530,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 376
         }
       },
       "degraded": []
@@ -1556,7 +1556,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 544
         }
       },
       "degraded": []
@@ -1582,7 +1582,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 369
         }
       },
       "degraded": []
@@ -1608,7 +1608,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 360
         }
       },
       "degraded": []
@@ -1634,7 +1634,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 380
         }
       },
       "degraded": []
@@ -1660,7 +1660,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 361
         }
       },
       "degraded": []
@@ -1686,7 +1686,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 355
         }
       },
       "degraded": []
@@ -1712,7 +1712,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 343
         }
       },
       "degraded": []
@@ -1738,7 +1738,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 556
         }
       },
       "degraded": []
@@ -1764,7 +1764,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 344
         }
       },
       "degraded": []
@@ -1790,7 +1790,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 334
         }
       },
       "degraded": []
@@ -1816,7 +1816,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 339
         }
       },
       "degraded": []
@@ -1842,7 +1842,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 361
         }
       },
       "degraded": []
@@ -1868,7 +1868,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 396
         }
       },
       "degraded": []
@@ -1894,7 +1894,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 355
         }
       },
       "degraded": []
@@ -1920,7 +1920,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 364
         }
       },
       "degraded": []
@@ -1946,7 +1946,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 337
         }
       },
       "degraded": []
@@ -1972,7 +1972,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 345
         }
       },
       "degraded": []
@@ -1998,7 +1998,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 345
         }
       },
       "degraded": []
@@ -2024,7 +2024,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 348
         }
       },
       "degraded": []
@@ -2050,7 +2050,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 360
         }
       },
       "degraded": []
@@ -2076,7 +2076,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 358
         }
       },
       "degraded": []
@@ -2102,7 +2102,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 336
         }
       },
       "degraded": []
@@ -2128,7 +2128,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 351
         }
       },
       "degraded": []
@@ -2154,7 +2154,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 369
         }
       },
       "degraded": []
@@ -2180,7 +2180,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 546
         }
       },
       "degraded": []
@@ -2206,7 +2206,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 341
         }
       },
       "degraded": []
@@ -2232,7 +2232,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 360
         }
       },
       "degraded": []
@@ -2258,7 +2258,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 347
         }
       },
       "degraded": []
@@ -2284,7 +2284,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 580
         }
       },
       "degraded": []
@@ -2310,7 +2310,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 387
         }
       },
       "degraded": []
@@ -2336,7 +2336,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 358
         }
       },
       "degraded": []
@@ -2365,7 +2365,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 354
         }
       },
       "degraded": []
@@ -2394,7 +2394,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 534
         }
       },
       "degraded": []
@@ -2423,7 +2423,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 191
+          "retrieve_ms": 359
         }
       },
       "degraded": []
@@ -2452,7 +2452,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 341
         }
       },
       "degraded": []
@@ -2481,7 +2481,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 345
         }
       },
       "degraded": []
@@ -2507,7 +2507,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 560
         }
       },
       "degraded": []
@@ -2533,7 +2533,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 334
         }
       },
       "degraded": []
@@ -2559,7 +2559,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 383
         }
       },
       "degraded": []
@@ -2585,7 +2585,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 371
         }
       },
       "degraded": []
@@ -2611,7 +2611,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 350
         }
       },
       "degraded": []
@@ -2637,7 +2637,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 396
         }
       },
       "degraded": []
@@ -2663,7 +2663,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 387
         }
       },
       "degraded": []
@@ -2689,7 +2689,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 547
         }
       },
       "degraded": []
@@ -2715,7 +2715,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 533
         }
       },
       "degraded": []
@@ -2741,7 +2741,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 360
         }
       },
       "degraded": []
@@ -2767,7 +2767,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 331
         }
       },
       "degraded": []
@@ -2793,7 +2793,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 351
         }
       },
       "degraded": []
@@ -2819,7 +2819,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 360
         }
       },
       "degraded": []
@@ -2845,7 +2845,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 352
         }
       },
       "degraded": []
@@ -2871,7 +2871,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 351
         }
       },
       "degraded": []
@@ -2897,7 +2897,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 340
         }
       },
       "degraded": []
@@ -2923,7 +2923,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 338
         }
       },
       "degraded": []
@@ -2949,7 +2949,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 353
         }
       },
       "degraded": []
@@ -2975,7 +2975,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 379
         }
       },
       "degraded": []
@@ -3001,7 +3001,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 346
         }
       },
       "degraded": []
@@ -3027,7 +3027,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 370
         }
       },
       "degraded": []
@@ -3053,7 +3053,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 345
         }
       },
       "degraded": []
@@ -3079,7 +3079,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 210
+          "retrieve_ms": 343
         }
       },
       "degraded": []
@@ -3105,7 +3105,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 362
         }
       },
       "degraded": []
@@ -3131,7 +3131,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 209
+          "retrieve_ms": 341
         }
       },
       "degraded": []
@@ -3157,7 +3157,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 361
         }
       },
       "degraded": []
@@ -3183,7 +3183,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 348
         }
       },
       "degraded": []
@@ -3209,7 +3209,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 345
         }
       },
       "degraded": []
@@ -3235,7 +3235,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 355
         }
       },
       "degraded": []
@@ -3261,7 +3261,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 209
+          "retrieve_ms": 351
         }
       },
       "degraded": []
@@ -3287,7 +3287,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 208
+          "retrieve_ms": 349
         }
       },
       "degraded": []
@@ -3313,7 +3313,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 359
         }
       },
       "degraded": []
@@ -3339,7 +3339,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 211
+          "retrieve_ms": 370
         }
       },
       "degraded": []
@@ -3365,7 +3365,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 211
+          "retrieve_ms": 357
         }
       },
       "degraded": []
@@ -3391,7 +3391,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 208
+          "retrieve_ms": 541
         }
       },
       "degraded": []
@@ -3417,7 +3417,7 @@
             "clean": false,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 330
         }
       },
       "degraded": []
@@ -3443,7 +3443,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 354
         }
       },
       "degraded": []
@@ -3472,7 +3472,7 @@
             "clean": false,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 536
         }
       },
       "degraded": []
@@ -3501,7 +3501,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 209
+          "retrieve_ms": 354
         }
       },
       "degraded": []
@@ -3530,7 +3530,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 363
         }
       },
       "degraded": []
@@ -3556,7 +3556,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 347
         }
       },
       "degraded": []
@@ -3582,7 +3582,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 378
         }
       },
       "degraded": []
@@ -3608,7 +3608,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 214
+          "retrieve_ms": 366
         }
       },
       "degraded": []
@@ -3634,7 +3634,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 337
         }
       },
       "degraded": []
@@ -3660,7 +3660,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 216
+          "retrieve_ms": 335
         }
       },
       "degraded": []
@@ -3686,7 +3686,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 209
+          "retrieve_ms": 352
         }
       },
       "degraded": []
@@ -3712,7 +3712,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 349
         }
       },
       "degraded": []
@@ -3738,7 +3738,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 340
         }
       },
       "degraded": []
@@ -3764,7 +3764,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 348
         }
       },
       "degraded": []
@@ -3790,7 +3790,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 327
         }
       },
       "degraded": []
@@ -3816,7 +3816,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 210
+          "retrieve_ms": 332
         }
       },
       "degraded": []
@@ -3842,7 +3842,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 208
+          "retrieve_ms": 358
         }
       },
       "degraded": []
@@ -3868,7 +3868,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 212
+          "retrieve_ms": 345
         }
       },
       "degraded": []
@@ -3894,7 +3894,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 209
+          "retrieve_ms": 375
         }
       },
       "degraded": []
@@ -3920,7 +3920,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 212
+          "retrieve_ms": 347
         }
       },
       "degraded": []
@@ -3946,7 +3946,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 349
         }
       },
       "degraded": []
@@ -3972,7 +3972,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 368
         }
       },
       "degraded": []
@@ -3998,7 +3998,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 350
         }
       },
       "degraded": []
@@ -4024,7 +4024,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 350
         }
       },
       "degraded": []
@@ -4050,7 +4050,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 568
         }
       },
       "degraded": []
@@ -4076,7 +4076,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 1008
         }
       },
       "degraded": []
@@ -4102,7 +4102,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 208
+          "retrieve_ms": 351
         }
       },
       "degraded": []
@@ -4128,7 +4128,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 345
         }
       },
       "degraded": []
@@ -4154,7 +4154,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 360
         }
       },
       "degraded": []
@@ -4180,7 +4180,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 367
         }
       },
       "degraded": []
@@ -4206,7 +4206,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 352
         }
       },
       "degraded": []
@@ -4232,7 +4232,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 204
+          "retrieve_ms": 348
         }
       },
       "degraded": []
@@ -4258,7 +4258,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 358
         }
       },
       "degraded": []
@@ -4284,7 +4284,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 325
         }
       },
       "degraded": []
@@ -4310,7 +4310,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 340
         }
       },
       "degraded": []
@@ -4336,7 +4336,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 341
         }
       },
       "degraded": []
@@ -4362,7 +4362,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 360
         }
       },
       "degraded": []
@@ -4388,7 +4388,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 336
         }
       },
       "degraded": []
@@ -4411,7 +4411,7 @@
             "clean": true,
             "n_chunks": 0
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 352
         }
       },
       "degraded": []
@@ -4434,7 +4434,7 @@
             "clean": true,
             "n_chunks": 0
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 386
         }
       },
       "degraded": []
@@ -4460,7 +4460,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 339
         }
       },
       "degraded": []
@@ -4486,7 +4486,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 358
         }
       },
       "degraded": []
@@ -4512,7 +4512,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 336
         }
       },
       "degraded": []
@@ -4538,7 +4538,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 395
         }
       },
       "degraded": []
@@ -4564,7 +4564,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 358
         }
       },
       "degraded": []
@@ -4590,7 +4590,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 319
         }
       },
       "degraded": []
@@ -4616,7 +4616,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 650
         }
       },
       "degraded": []
@@ -4642,7 +4642,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 334
         }
       },
       "degraded": []
@@ -4668,7 +4668,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 327
         }
       },
       "degraded": []
@@ -4694,7 +4694,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 428
         }
       },
       "degraded": []
@@ -4720,7 +4720,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 340
         }
       },
       "degraded": []
@@ -4746,7 +4746,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 389
         }
       },
       "degraded": []
@@ -4772,7 +4772,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 351
         }
       },
       "degraded": []
@@ -4798,7 +4798,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 209
+          "retrieve_ms": 361
         }
       },
       "degraded": []
@@ -4824,7 +4824,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 347
         }
       },
       "degraded": []
@@ -4850,7 +4850,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 366
         }
       },
       "degraded": []
@@ -4876,7 +4876,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 339
         }
       },
       "degraded": []
@@ -4902,7 +4902,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 363
         }
       },
       "degraded": []
@@ -4928,7 +4928,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 381
         }
       },
       "degraded": []
@@ -4954,7 +4954,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 207
+          "retrieve_ms": 337
         }
       },
       "degraded": []
@@ -4980,7 +4980,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 205
+          "retrieve_ms": 347
         }
       },
       "degraded": []
@@ -5006,7 +5006,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 342
         }
       },
       "degraded": []
@@ -5032,7 +5032,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 209
+          "retrieve_ms": 338
         }
       },
       "degraded": []
@@ -5058,7 +5058,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 335
         }
       },
       "degraded": []
@@ -5084,7 +5084,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 215
+          "retrieve_ms": 353
         }
       },
       "degraded": []
@@ -5110,7 +5110,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 208
+          "retrieve_ms": 350
         }
       },
       "degraded": []
@@ -5139,7 +5139,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 217
+          "retrieve_ms": 393
         }
       },
       "degraded": []
@@ -5168,7 +5168,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 464
         }
       },
       "degraded": []
@@ -5194,7 +5194,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 209
+          "retrieve_ms": 544
         }
       },
       "degraded": []
@@ -5220,7 +5220,241 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 354
+        }
+      },
+      "degraded": []
+    },
+    {
+      "id": "g3_cv01",
+      "pair_id": "dao_tao_nghe_phoi_hop_co_so_gdnn",
+      "question": "Nhà nước khuyến khích người sử dụng lao động phối hợp với cơ sở giáo dục nghề nghiệp để đào tạo những chương trình, trình độ nào cho người lao động?",
+      "as_of_date": "2024-06-01",
+      "temporal_kind": "clause_version",
+      "expected_behavior": "answer",
+      "has_gold": true,
+      "multi_clause": false,
+      "retrieve_ms": 0,
+      "arms": {
+        "pre_filter": {
+          "context": {
+            "gold_rank": 1,
+            "clause_ranks": [],
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 359
+        }
+      },
+      "degraded": []
+    },
+    {
+      "id": "g3_cv02",
+      "pair_id": "dao_tao_nghe_phoi_hop_co_so_gdnn",
+      "question": "Nhà nước khuyến khích người sử dụng lao động phối hợp với cơ sở giáo dục nghề nghiệp để đào tạo những chương trình, trình độ nào cho người lao động?",
+      "as_of_date": "2026-03-01",
+      "temporal_kind": "clause_version",
+      "expected_behavior": "answer",
+      "has_gold": true,
+      "multi_clause": false,
+      "retrieve_ms": 0,
+      "arms": {
+        "pre_filter": {
+          "context": {
+            "gold_rank": 1,
+            "clause_ranks": [],
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 191
+        }
+      },
+      "degraded": []
+    },
+    {
+      "id": "g3_cv03",
+      "pair_id": "hoc_nghe_tap_nghe_nghia_vu_nsdld",
+      "question": "Người sử dụng lao động tuyển người vào học nghề, tập nghề để làm việc cho mình thì phải tuân thủ những quy định gì?",
+      "as_of_date": "2025-05-01",
+      "temporal_kind": "clause_version",
+      "expected_behavior": "answer",
+      "has_gold": true,
+      "multi_clause": false,
+      "retrieve_ms": 0,
+      "arms": {
+        "pre_filter": {
+          "context": {
+            "gold_rank": 1,
+            "clause_ranks": [],
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 333
+        }
+      },
+      "degraded": []
+    },
+    {
+      "id": "g3_cv04",
+      "pair_id": "hoc_nghe_tap_nghe_nghia_vu_nsdld",
+      "question": "Người sử dụng lao động tuyển người vào học nghề, tập nghề để làm việc cho mình thì phải tuân thủ những quy định gì?",
+      "as_of_date": "2026-02-01",
+      "temporal_kind": "clause_version",
+      "expected_behavior": "answer",
+      "has_gold": true,
+      "multi_clause": false,
+      "retrieve_ms": 0,
+      "arms": {
+        "pre_filter": {
+          "context": {
+            "gold_rank": 1,
+            "clause_ranks": [],
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 191
+        }
+      },
+      "degraded": []
+    },
+    {
+      "id": "g3_cv05",
+      "pair_id": "lao_dong_nam_vo_sinh_con_thu_hai",
+      "question": "Lao động nam đang tham gia bảo hiểm xã hội bắt buộc có vợ sinh con thứ hai (sinh một con, sinh thường, không phải phẫu thuật, đủ tuần tuổi) thì được nghỉ việc hưởng chế độ thai sản bao nhiêu ngày làm việc?",
+      "as_of_date": "2026-03-01",
+      "temporal_kind": "clause_version",
+      "expected_behavior": "answer",
+      "has_gold": true,
+      "multi_clause": false,
+      "retrieve_ms": 0,
+      "arms": {
+        "pre_filter": {
+          "context": {
+            "gold_rank": 1,
+            "clause_ranks": [],
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 401
+        }
+      },
+      "degraded": []
+    },
+    {
+      "id": "g3_cv06",
+      "pair_id": "lao_dong_nam_vo_sinh_con_thu_hai",
+      "question": "Lao động nam đang tham gia bảo hiểm xã hội bắt buộc có vợ sinh con thứ hai (sinh một con, sinh thường, không phải phẫu thuật, đủ tuần tuổi) thì được nghỉ việc hưởng chế độ thai sản bao nhiêu ngày làm việc?",
+      "as_of_date": "2026-09-01",
+      "temporal_kind": "clause_version",
+      "expected_behavior": "answer",
+      "has_gold": true,
+      "multi_clause": false,
+      "retrieve_ms": 0,
+      "arms": {
+        "pre_filter": {
+          "context": {
+            "gold_rank": 1,
+            "clause_ranks": [],
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 195
+        }
+      },
+      "degraded": []
+    },
+    {
+      "id": "g3_cv07",
+      "pair_id": "tuoi_huong_luong_huu_dieu_kien_binh_thuong",
+      "question": "Người lao động tham gia bảo hiểm xã hội bắt buộc, làm việc trong điều kiện bình thường, khi nghỉ việc có đủ 20 năm đóng bảo hiểm xã hội thì được hưởng lương hưu khi đủ bao nhiêu tuổi?",
+      "as_of_date": "2019-06-01",
+      "temporal_kind": "clause_version",
+      "expected_behavior": "answer",
+      "has_gold": true,
+      "multi_clause": false,
+      "retrieve_ms": 0,
+      "arms": {
+        "pre_filter": {
+          "context": {
+            "gold_rank": 1,
+            "clause_ranks": [],
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 564
+        }
+      },
+      "degraded": []
+    },
+    {
+      "id": "g3_cv08",
+      "pair_id": "luong_huu_suy_giam_kha_nang_lao_dong_81",
+      "question": "Người lao động có đủ 20 năm đóng bảo hiểm xã hội bắt buộc, bị suy giảm khả năng lao động từ 81% trở lên thì phải đủ bao nhiêu tuổi để được hưởng lương hưu với mức thấp hơn?",
+      "as_of_date": "2018-03-01",
+      "temporal_kind": "clause_version",
+      "expected_behavior": "answer",
+      "has_gold": true,
+      "multi_clause": false,
+      "retrieve_ms": 0,
+      "arms": {
+        "pre_filter": {
+          "context": {
+            "gold_rank": 2,
+            "clause_ranks": [],
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 649
+        }
+      },
+      "degraded": []
+    },
+    {
+      "id": "g3_cv09",
+      "pair_id": "luong_huu_suy_giam_kha_nang_lao_dong_81",
+      "question": "Người lao động có đủ 20 năm đóng bảo hiểm xã hội bắt buộc, bị suy giảm khả năng lao động từ 81% trở lên thì phải đủ bao nhiêu tuổi để được hưởng lương hưu với mức thấp hơn?",
+      "as_of_date": "2023-03-01",
+      "temporal_kind": "clause_version",
+      "expected_behavior": "answer",
+      "has_gold": true,
+      "multi_clause": false,
+      "retrieve_ms": 0,
+      "arms": {
+        "pre_filter": {
+          "context": {
+            "gold_rank": 1,
+            "clause_ranks": [],
+            "gold_coverage": 1.0,
+            "gold": true,
+            "distractor": false,
+            "clean": true,
+            "n_chunks": 8
+          },
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -5229,25 +5463,25 @@
   "summary": {
     "overall": {
       "pre_filter": {
-        "n": 199,
-        "context_gold": 0.9849246231155779,
-        "context_gold_coverage": 0.9874371859296482,
+        "n": 208,
+        "context_gold": 0.9855769230769231,
+        "context_gold_coverage": 0.9879807692307693,
         "context_distractor": 0.0,
-        "context_clean": 0.9849246231155779,
-        "avg_chunks": 7.839195979899498,
-        "recall_at_1": 0.7849462365591398,
-        "recall_at_3": 0.9139784946236559,
-        "recall_at_5": 0.9354838709677419,
-        "recall_at_8": 0.9838709677419355,
-        "mrr": 0.8526561699948797,
-        "recall_at_1_single": 0.8588235294117647,
-        "n_single": 170,
+        "context_clean": 0.9855769230769231,
+        "avg_chunks": 7.846153846153846,
+        "recall_at_1": 0.7897435897435897,
+        "recall_at_3": 0.9179487179487179,
+        "recall_at_5": 0.9384615384615385,
+        "recall_at_8": 0.9846153846153847,
+        "mrr": 0.8568925518925519,
+        "recall_at_1_single": 0.8603351955307262,
+        "n_single": 179,
         "multi_coverage_at_3": 0.65625,
         "multi_coverage_at_5": 0.78125,
         "multi_coverage_at_8": 0.96875,
         "n_multi": 16,
-        "retrieve_ms_p50": 199.0,
-        "retrieve_ms_p95": 210.0
+        "retrieve_ms_p50": 351.0,
+        "retrieve_ms_p95": 547.0
       }
     },
     "by_kind": {
@@ -5266,27 +5500,27 @@
           "mrr": 0.5833333333333334,
           "recall_at_1_single": 0.5,
           "n_single": 4,
-          "retrieve_ms_p50": 198.0,
-          "retrieve_ms_p95": 201.0
+          "retrieve_ms_p50": 191.0,
+          "retrieve_ms_p95": 346.0
         }
       },
       "clause_version": {
         "pre_filter": {
-          "n": 4,
+          "n": 13,
           "context_gold": 1.0,
           "context_gold_coverage": 1.0,
           "context_distractor": 0.0,
           "context_clean": 1.0,
           "avg_chunks": 8.0,
-          "recall_at_1": 1.0,
+          "recall_at_1": 0.9230769230769231,
           "recall_at_3": 1.0,
           "recall_at_5": 1.0,
           "recall_at_8": 1.0,
-          "mrr": 1.0,
-          "recall_at_1_single": 1.0,
-          "n_single": 4,
-          "retrieve_ms_p50": 196.0,
-          "retrieve_ms_p95": 199.0
+          "mrr": 0.9615384615384616,
+          "recall_at_1_single": 0.9230769230769231,
+          "n_single": 13,
+          "retrieve_ms_p50": 333.0,
+          "retrieve_ms_p95": 649.0
         }
       },
       "compliance": {
@@ -5304,8 +5538,8 @@
           "mrr": 1.0,
           "recall_at_1_single": 1.0,
           "n_single": 3,
-          "retrieve_ms_p50": 197.0,
-          "retrieve_ms_p95": 202.0
+          "retrieve_ms_p50": 339.0,
+          "retrieve_ms_p95": 351.0
         }
       },
       "control": {
@@ -5323,8 +5557,8 @@
           "mrr": 1.0,
           "recall_at_1_single": 1.0,
           "n_single": 4,
-          "retrieve_ms_p50": 198.0,
-          "retrieve_ms_p95": 203.0
+          "retrieve_ms_p50": 191.0,
+          "retrieve_ms_p95": 381.0
         }
       },
       "doc_version": {
@@ -5342,8 +5576,8 @@
           "mrr": 0.831845238095238,
           "recall_at_1_single": 0.7142857142857143,
           "n_single": 28,
-          "retrieve_ms_p50": 197.0,
-          "retrieve_ms_p95": 209.0
+          "retrieve_ms_p50": 336.0,
+          "retrieve_ms_p95": 367.0
         }
       },
       "false_premise": {
@@ -5361,8 +5595,8 @@
           "mrr": 0.6845238095238095,
           "recall_at_1_single": 0.5714285714285714,
           "n_single": 7,
-          "retrieve_ms_p50": 198.0,
-          "retrieve_ms_p95": 214.0
+          "retrieve_ms_p50": 371.0,
+          "retrieve_ms_p95": 560.0
         }
       },
       "multi_clause": {
@@ -5382,8 +5616,8 @@
           "multi_coverage_at_5": 0.78125,
           "multi_coverage_at_8": 0.96875,
           "n_multi": 16,
-          "retrieve_ms_p50": 199.0,
-          "retrieve_ms_p95": 217.0
+          "retrieve_ms_p50": 354.0,
+          "retrieve_ms_p95": 536.0
         }
       },
       "out_of_range": {
@@ -5394,8 +5628,8 @@
           "context_distractor": 0.0,
           "context_clean": 1.0,
           "avg_chunks": 0.0,
-          "retrieve_ms_p50": 192.0,
-          "retrieve_ms_p95": 196.0
+          "retrieve_ms_p50": 345.0,
+          "retrieve_ms_p95": 386.0
         }
       },
       "out_of_scope": {
@@ -5406,8 +5640,8 @@
           "context_distractor": 0.0,
           "context_clean": 1.0,
           "avg_chunks": 8.0,
-          "retrieve_ms_p50": 198.0,
-          "retrieve_ms_p95": 216.0
+          "retrieve_ms_p50": 354.0,
+          "retrieve_ms_p95": 567.0
         }
       },
       "single_clause": {
@@ -5425,8 +5659,8 @@
           "mrr": 0.943077230892357,
           "recall_at_1_single": 0.907563025210084,
           "n_single": 119,
-          "retrieve_ms_p50": 201.0,
-          "retrieve_ms_p95": 210.0
+          "retrieve_ms_p50": 354.0,
+          "retrieve_ms_p95": 547.0
         }
       },
       "table_lookup": {
@@ -5444,8 +5678,8 @@
           "mrr": 1.0,
           "recall_at_1_single": 1.0,
           "n_single": 1,
-          "retrieve_ms_p50": 201.0,
-          "retrieve_ms_p95": 201.0
+          "retrieve_ms_p50": 327.0,
+          "retrieve_ms_p95": 327.0
         }
       }
     }

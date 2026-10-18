@@ -145,7 +145,7 @@ def _init_rag_sync() -> None:
     import src.rag.retriever as r_module
 
     from src.rag.embedder import get_embedder
-    from src.rag.vector_backend import get_backend, make_llamaindex_vector_store, count_chunks
+    from src.rag.vector_backend import get_backend, make_llamaindex_vector_store, count_chunks, corpus_fingerprint
     from src.rag.retriever import build_hybrid_retriever
     settings = get_settings()
 
@@ -164,9 +164,6 @@ def _init_rag_sync() -> None:
         raise EmptyCollection(
             f"'{collection_name}' ({backend.provider}) có 0 chunk — chưa ingest/migrate corpus"
         )
-    # Mọi trace từ đây mang metadata "index" — câu trả lời sai chạy trên index nào.
-    set_index_version(f"{backend.provider}/{collection_name}/{settings.embedding_model}/{count}")
-
     vector_store = make_llamaindex_vector_store(backend)
     storage_ctx = StorageContext.from_defaults(vector_store=vector_store)
 
@@ -179,6 +176,12 @@ def _init_rag_sync() -> None:
     # Load existing nodes from the vector store for the BM25 corpus
     existing_nodes = _load_nodes_from_backend(backend)
     logger.info("Loaded {} nodes from {} for BM25 index", len(existing_nodes), backend.provider)
+    # Mọi trace từ đây mang metadata "index" — câu trả lời sai chạy trên index nào. Hash
+    # nội dung phân biệt hai index cùng số chunk; so với `ingest_documents.py --dry-run`
+    # để biết index có khớp code hiện tại không.
+    fingerprint = corpus_fingerprint((n.text, n.metadata) for n in existing_nodes) if existing_nodes else "?"
+    set_index_version(f"{backend.provider}/{collection_name}/{settings.embedding_model}/{count}/{fingerprint}")
+    logger.info("Index fingerprint {} ({} chunks)", fingerprint, len(existing_nodes))
     from src.api.routes.documents import set_indexed_documents
     set_indexed_documents(existing_nodes)
 
