@@ -1,0 +1,164 @@
+{
+  "about": "Thử nghiệm truy hồi 2026-10-18 sau khi người duyệt xác nhận 29 câu truy hồi sai (truy_hoi_khac 26 + dien_dat_xa 3), legal_qa_200, index documind_legal_fpt 1249 đoạn (chunk H1). (1) rerank FPT pool 10: chép nguyên meta + summary.overall. (2) doc2query: FPT sinh 4 câu hỏi đời thường/đoạn (4.992 câu), nhánh điểm = max cosine câu hỏi người dùng ↔ câu hỏi sinh ra trên đoạn qua bộ lọc RetrievalContext; gộp RRF k=60 với top-20 của pipeline hiện tại — tính từ hạng gold trong top-8 của từng biến thể. KẾT LUẬN: không bật cả hai.",
+  "rerank": {
+    "no_rerank": {
+      "meta": {
+        "gold_set": "data/eval/legal_qa_200.json",
+        "n_questions": 208,
+        "arms": [
+          "pre_filter"
+        ],
+        "retrieval_only": true,
+        "corpus_earliest_point_in_time": "2015-01-01",
+        "retriever": "hybrid BM25 + dense, RRF fusion → top-8",
+        "reranker_active": false,
+        "index": "chroma/documind_legal_fpt/Vietnamese_Embedding/1249/5ce81d96ccb9",
+        "git_sha": "bed62de",
+        "n_degraded": 0,
+        "embed_cache": true
+      },
+      "overall": {
+        "n": 208,
+        "context_gold": 0.9855769230769231,
+        "context_gold_coverage": 0.9879807692307693,
+        "context_distractor": 0.0,
+        "context_clean": 0.9855769230769231,
+        "avg_chunks": 7.846153846153846,
+        "recall_at_1": 0.7897435897435897,
+        "recall_at_3": 0.9179487179487179,
+        "recall_at_5": 0.9384615384615385,
+        "recall_at_8": 0.9846153846153847,
+        "mrr": 0.8568925518925519,
+        "recall_at_1_single": 0.8603351955307262,
+        "n_single": 179,
+        "multi_coverage_at_3": 0.65625,
+        "multi_coverage_at_5": 0.78125,
+        "multi_coverage_at_8": 0.96875,
+        "n_multi": 16,
+        "retrieve_ms_p50": 438.0,
+        "retrieve_ms_p95": 543.0
+      }
+    },
+    "rerank_pool10": {
+      "meta": {
+        "gold_set": "data/eval/legal_qa_200.json",
+        "n_questions": 208,
+        "arms": [
+          "pre_filter"
+        ],
+        "retrieval_only": true,
+        "corpus_earliest_point_in_time": "2015-01-01",
+        "retriever": "hybrid BM25 + dense, RRF fusion → top-8",
+        "reranker_active": true,
+        "index": "chroma/documind_legal_fpt/Vietnamese_Embedding/1249/5ce81d96ccb9",
+        "git_sha": "bed62de",
+        "n_degraded": 29,
+        "embed_cache": true
+      },
+      "overall": {
+        "n": 208,
+        "context_gold": 0.9807692307692307,
+        "context_gold_coverage": 0.9831730769230769,
+        "context_distractor": 0.0,
+        "context_clean": 0.9807692307692307,
+        "avg_chunks": 7.846153846153846,
+        "recall_at_1": 0.8256410256410256,
+        "recall_at_3": 0.9179487179487179,
+        "recall_at_5": 0.9487179487179487,
+        "recall_at_8": 0.9794871794871794,
+        "mrr": 0.8799206349206348,
+        "recall_at_1_single": 0.8994413407821229,
+        "n_single": 179,
+        "multi_coverage_at_3": 0.71875,
+        "multi_coverage_at_5": 0.84375,
+        "multi_coverage_at_8": 0.96875,
+        "n_multi": 16,
+        "retrieve_ms_p50": 1199.0,
+        "retrieve_ms_p95": 1264.0
+      },
+      "note": "29 câu rerank_failed (429) dù giới hạn 50 lượt/phút — các câu đó đo theo thứ tự RRF"
+    }
+  },
+  "doc2query": {
+    "base": {
+      "recall_at_1_single": 0.8603,
+      "recall_at_8_single": 0.9888,
+      "multi_coverage_at_8": 0.9688,
+      "confirmed_misses_at_rank_1": 4,
+      "n_confirmed_misses": 29
+    },
+    "fused_rrf_w0.5": {
+      "recall_at_1_single": 0.7877,
+      "recall_at_8_single": 0.9832,
+      "multi_coverage_at_8": 0.9375,
+      "confirmed_misses_at_rank_1": 8,
+      "n_confirmed_misses": 29
+    },
+    "fused_rrf_w1.0": {
+      "recall_at_1_single": 0.7542,
+      "recall_at_8_single": 0.9832,
+      "multi_coverage_at_8": 0.9062,
+      "confirmed_misses_at_rank_1": 10,
+      "n_confirmed_misses": 29
+    },
+    "fused_rrf_w2.0": {
+      "recall_at_1_single": 0.6536,
+      "recall_at_8_single": 0.9721,
+      "multi_coverage_at_8": 0.875,
+      "confirmed_misses_at_rank_1": 11,
+      "n_confirmed_misses": 29
+    },
+    "chỉ_xếp_lại_0.5": {
+      "recall_at_1_single": 0.8156,
+      "recall_at_8_single": 0.9888,
+      "multi_coverage_at_8": 0.9688,
+      "confirmed_misses_at_rank_1": 6,
+      "n_confirmed_misses": 29
+    },
+    "chỉ_xếp_lại_1.0": {
+      "recall_at_1_single": 0.7877,
+      "recall_at_8_single": 0.9888,
+      "multi_coverage_at_8": 0.9688,
+      "confirmed_misses_at_rank_1": 9,
+      "n_confirmed_misses": 29
+    },
+    "riêng_câu_hỏi": {
+      "recall_at_1_single": 0.4581,
+      "recall_at_8_single": 0.8883,
+      "multi_coverage_at_8": 0.7188,
+      "confirmed_misses_at_rank_1": 11,
+      "n_confirmed_misses": 29
+    }
+  },
+  "confirmed_misses": [
+    "g2_a003",
+    "g2_a010",
+    "g2_a017",
+    "g2_a027",
+    "g2_a034",
+    "g2_a037",
+    "g2_a048",
+    "g2_b004",
+    "g2_b012",
+    "g2_b019",
+    "g2_b031",
+    "g2_b032",
+    "g2_b034",
+    "g2_b037",
+    "g2_c006",
+    "g2_c025",
+    "g2_c027",
+    "g2_c028",
+    "g2_d014",
+    "ld_t04a",
+    "ld_t04b",
+    "ld_t06b",
+    "ld_t07a",
+    "ld_t09a",
+    "ld_t10a",
+    "ld_t10b",
+    "lh_b02a",
+    "lh_b02b",
+    "lh_f01"
+  ]
+}
