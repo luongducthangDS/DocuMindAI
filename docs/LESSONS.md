@@ -176,6 +176,38 @@ chọn sai lần hai.
 
 ## Dữ liệu & đánh giá
 
+### Hiệu lực gán theo văn bản, không theo khoản đi sửa luật khác (2021 → 2026-10-18)
+- **Đã quyết:** mỗi đoạn mang hiệu lực của văn bản chứa nó; chỉ khoản bị *chính văn bản khác sửa*
+  (`sua_doi_in_place`) mới có cửa sổ riêng. BLLĐ 2019 còn hiệu lực → mọi đoạn BLLĐ mở tới 9999.
+- **Sai ở đâu:** Điều 219 khoản 1 BLLĐ không phải quy định lao động mà là văn bản sửa Luật BHXH
+  58/2014 (điều kiện lương hưu "đủ 20 năm"). Luật đó bị 41/2024 thay từ 01/7/2025, nên khoản này hết
+  áp dụng theo — nhưng index vẫn mở. Bộ tách khoản cũng không phân biệt được "2.", "3." *trong* phần
+  trích “…” với khoản thật, nên kể cả khai báo cũng sẽ cắt sai. Cùng loại: 41/2024 Điều 139 khoản 2
+  sửa Luật Việc làm 38/2013.
+- **Cái giá:** đo 2026-10-18 (eval đầu cuối k=8): lh_m05b trả lời "không đủ điều kiện vì chưa đủ 20
+  năm", g2_b037 xác nhận tiền đề sai "phải đủ 20 năm" — câu lương hưu sai kiểu có thẩm quyền. Không
+  metric truy hồi nào báo: gold vẫn trong top-8, `context_distractor` = 0% vì chỉ đếm văn bản liệt
+  kê sẵn trong `distractor_docs`; judge faithfulness chấm cả hai 1.0 (câu trả lời *bám đúng* đoạn đó).
+- **Bài học:** điều "Sửa đổi, bổ sung … của luật X" sống theo luật X, không theo văn bản chứa nó.
+  Và lỗi hiệu lực chỉ lộ khi đọc câu trả lời, không lộ ở recall — phải đọc câu sai, không chỉ đếm.
+- **Giờ làm thế nào:** `loai_sua: het_hieu_luc` trong manifest (khoản đóng tại ngày luật X bị thay,
+  không có bản mới); bộ tách khoản bỏ qua đầu khoản trong “…” (`chunker._split_amended_dieu`).
+  Rà mọi điều tên "Sửa đổi, bổ sung" khi thêm văn bản (grep `^Điều .*Sửa đổi, bổ sung`).
+  Sau sửa: gold trong ngữ cảnh 0.970 → 0.980, độ phủ câu nhiều điều 0.912 → 0.941.
+
+### Coi faithfulness judge là thước đo an toàn câu trả lời (09-23 → 2026-10-18)
+- **Đã quyết:** README/eval báo faithfulness (LLM judge) bên cạnh answer accuracy chấm chuỗi, như
+  hai chỉ số đủ để nói câu trả lời có đáng tin.
+- **Sai ở đâu:** chưa ai so judge với người chấm. Eval 6 cấu hình (2026-10-18): faithfulness 0.988–0.996
+  ở mọi cấu hình — không phân biệt được gì; cho 1.0 hai câu sai nêu trên. Chấm chuỗi thì báo sai ít nhất
+  3/10 câu đúng (diễn đạt khác chuỗi kỳ vọng) và cho qua lh_m05b sai.
+- **Cái giá:** số "0.99 faithfulness" trông như bảo chứng an toàn trong khi nó chỉ đo "có trích từ
+  ngữ cảnh"; chọn cấu hình theo hai số này là chọn theo nhiễu.
+- **Bài học:** faithfulness đo bám nguồn, không đo đúng luật — nguồn hết hiệu lực vẫn "faithful".
+  Một bộ chấm tự động chưa hiệu chỉnh với người là ước lượng chưa biết sai số.
+- **Giờ làm thế nào:** 30 câu trả lời k=8 + 36 câu trượt ở bảng duyệt (artifact, xem CLAUDE.md) cho
+  người chấm; tính độ khớp judge/chuỗi với người trước khi dùng chúng để chọn cấu hình.
+
 ### Ngưỡng cosine của grader là hằng số chung cho mọi model embedding (09-27 → 2026-10-17)
 - **Đã quyết:** `CONFIDENT_COSINE = 0.75` / `HOPELESS_COSINE = 0.60` đo trên gemini-embedding-001,
   đặt thành hằng số module; comment ghi "đổi EMBEDDING_MODEL là phải đo lại" nhưng code không

@@ -44,6 +44,7 @@ Usage:
 
 from __future__ import annotations
 
+from collections import Counter
 import argparse
 import json
 import os
@@ -708,8 +709,9 @@ def main() -> None:
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"Đã ghi báo cáo: {args.output}")
     if report["meta"].get("n_degraded"):
-        logger.warning("{} câu chạy thiếu nhánh dense (quota embedding?) — số đo của chúng là BM25, "
-                       "đừng so A/B trước khi chạy lại", report["meta"]["n_degraded"])
+        flags = Counter(f for r in report["rows"] for f in r.get("degraded", []))
+        logger.warning("{} câu chạy thiếu bước ({}) — dense_skipped: số đo BM25; rerank_failed: thứ tự RRF. "
+                       "Đừng so A/B trước khi chạy lại", report["meta"]["n_degraded"], dict(flags))
     if args.mlflow is not None:
         log_to_mlflow(report, args.output, args.mlflow or None)
 

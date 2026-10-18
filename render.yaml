@@ -57,7 +57,7 @@ services:
         value: ""
       - key: GEMINI_JUDGE_MODELS
         value: ""
-      # Corpus nằm ở Qdrant Cloud (documind_legal_fpt: 1247 chunks, 1024-dim, migrate 2026-10-18,
+      # Corpus nằm ở Qdrant Cloud (documind_legal_fpt: 1249 chunks, 1024-dim, migrate 2026-10-18,
       # verify top-1 khớp ChromaDB nguồn). Disk Render ephemeral nên ChromaDB local
       # trong container luôn rỗng — đừng quay lại provider chroma ở production.
       # QDRANT_URL/QDRANT_API_KEY sync:false => điền tay ở dashboard.

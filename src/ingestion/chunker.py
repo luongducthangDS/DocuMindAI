@@ -210,8 +210,12 @@ def _split_amended_dieu(
     if whole is not None:
         buckets = [(whole, dieu_text.split("\n"))]
 
+    # Điều sửa luật khác trích nguyên văn điều được sửa trong “…” — các dòng "2.", "3."
+    # trong đó là khoản của luật KIA, không phải khoản kế tiếp của điều này.
+    in_quote = 0
     for line in ([] if whole is not None else dieu_text.split("\n")):
-        m = _KHOAN_HEAD_RE.match(line.strip())
+        quoted, in_quote = in_quote > 0, max(0, in_quote + line.count("“") - line.count("”"))
+        m = None if quoted else _KHOAN_HEAD_RE.match(line.strip())
         if m:
             key = (int(m.group(1)), m.group(2))
             if key in wanted:
@@ -227,7 +231,8 @@ def _split_amended_dieu(
     segment = 0
     for amendment, body in buckets:
         text = "\n".join(body).strip()
-        if len(text) < 50:
+        # Khoản 1 bị tách ra thì phần đầu chỉ còn dòng "Điều N. Tên điều" — không phải đoạn.
+        if len(text) < 50 or text == dieu_text.split("\n", 1)[0].strip():
             continue
         if amendment is None:
             # Un-amended remainder of the article. Pulling a khoản out can leave
@@ -265,7 +270,8 @@ def _split_amended_dieu(
                     amendment.effective_from,
                     doc_meta.get("as_of") or date.today().isoformat(),
                 )
-                version["superseded_by"] = f"{amendment.clause_uid}__v{amendment.effective_from}"
+                if amendment.loai_sua != "het_hieu_luc":   # hết hiệu lực: không có bản nào thay
+                    version["superseded_by"] = f"{amendment.clause_uid}__v{amendment.effective_from}"
         meta = {**_legacy_meta(doc_meta, dieu_text), **version, "char_count": len(text)}
         chunks.append(LegalChunk(text=text, metadata=meta))
     return chunks

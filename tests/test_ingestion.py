@@ -202,8 +202,9 @@ class TestManifest:
             assert isinstance(entry.effective_to, str)
 
     def test_in_place_amendments_parsed_for_bo_luat_lao_dong(self, manifest):
-        amendments = manifest["45-2019-QH14"].in_place_amended_clauses
-        # T4: đúng 4 khoản/điểm bị sửa in-place
+        amendments = [a for a in manifest["45-2019-QH14"].in_place_amended_clauses
+                      if a.loai_sua != "het_hieu_luc"]
+        # T4: đúng 4 khoản/điểm bị sửa in-place (Điều 219 khoản 1 là hết hiệu lực, không phải sửa)
         assert len(amendments) == 4
         by_uid = {a.clause_uid: a for a in amendments}
         d139 = by_uid["45-2019-QH14__d139_k1"]
@@ -319,6 +320,35 @@ class TestClauseChunking:
     def test_consolidated_footnotes_stripped_from_text(self, bo_luat_chunks):
         joined = "\n".join(c.text for c in bo_luat_chunks)
         assert "Khoản này được sửa đổi, bổ sung theo quy định tại" not in joined
+
+
+class TestLapsedClause:
+    """Điều 219 khoản 1 BLLĐ sửa điều kiện lương hưu "đủ 20 năm" của Luật BHXH 58/2014 —
+    hết áp dụng khi 41/2024/QH15 thay luật đó (01/7/2025). Đo 2026-10-18: để mở tới 9999
+    thì đoạn này làm câu trả lời lương hưu sau 7/2025 nói "chưa đủ 20 năm"."""
+
+    @staticmethod
+    def _by_uid(chunks):
+        return {c.metadata["clause_uid"]: c for c in chunks if c.metadata["dieu"] == 219}
+
+    def test_khoan_1_ends_when_the_amended_law_was_replaced(self, bo_luat_chunks):
+        k1 = self._by_uid(bo_luat_chunks)["45-2019-QH14__d219_k1"]
+        assert k1.metadata["effective_to"] == "2025-07-01"
+        assert not k1.metadata.get("superseded_by")   # không có bản nào thay nó
+
+    def test_quoted_khoan_stay_inside_khoan_1(self, bo_luat_chunks):
+        # "2.", "3.", "4." trong “Điều 54 …” là khoản của luật được sửa — tách ở đó thì quy
+        # tắc 20 năm rơi sang đoạn còn hiệu lực.
+        by_uid = self._by_uid(bo_luat_chunks)
+        assert "b) Đủ 20 năm đóng bảo hiểm xã hội trở lên" in by_uid["45-2019-QH14__d219_k1"].text
+        rest = [c for u, c in by_uid.items() if u != "45-2019-QH14__d219_k1"]
+        assert rest and all("20 năm" not in c.text for c in rest)
+        assert all(c.metadata["effective_to"] == "9999-12-31" for c in rest)
+
+    def test_no_chunk_is_only_the_article_title(self, bo_luat_chunks):
+        titles = [c for c in bo_luat_chunks if c.text.splitlines()[-1].startswith("Điều ")
+                  and len(c.text.splitlines()) <= 2]
+        assert titles == []
 
 
 @pytest.fixture(scope="module")

@@ -103,6 +103,17 @@ documents:
         effective_from: "2026-01-01"
         amended_by_doc: "124/2025/QH15"
         version_cu: "_versions/45-2019-QH14__d61_k3__2021.md"
+      # Không phải sửa đổi BLLĐ: khoản 1 Điều 219 sửa Điều 54, 55, 73 Luật BHXH 58/2014
+      # (điều kiện lương hưu "đủ 20 năm"), nên hết áp dụng cùng luật đó khi 41/2024/QH15 có
+      # hiệu lực. Thiếu dòng này, đoạn ấy mở tới 9999 và đo 2026-10-18 làm sai câu trả lời
+      # lương hưu sau 01/7/2025 (lh_m05b, g2_b037: "chưa đủ 20 năm" thay vì 15 năm của Điều 64).
+      - clause_uid: "45-2019-QH14__d219_k1"
+        dieu: 219
+        khoan: 1
+        dieu_tieu_de: "Sửa đổi, bổ sung một số điều của các luật có liên quan đến lao động"
+        effective_from: "2025-07-01"
+        amended_by_doc: "41/2024/QH15"
+        loai_sua: "het_hieu_luc"
     cau_truc: "17 chương / 220 điều"
     nguon: "https://vanban.chinhphu.vn/?pageid=27160&docid=198540"
     verify_status: "VERIFIED"
@@ -230,6 +241,15 @@ documents:
         amended_by_doc: "113/2025/QH15"
         loai_sua: "sua_doi_khong_co_vbhn"
         version_moi: "_versions/41-2024-QH15__d53_k2_pc__2026-07-01.md"
+      # Cùng loại với 45-2019-QH14__d219_k1: khoản này sửa Điều 57 Luật Việc làm 38/2013,
+      # hết áp dụng khi 74/2025/QH15 thay luật đó (2026-01-01).
+      - clause_uid: "41-2024-QH15__d139_k2"
+        dieu: 139
+        khoan: 2
+        dieu_tieu_de: "Sửa đổi, bổ sung một số luật có liên quan đến bảo hiểm xã hội"
+        effective_from: "2026-01-01"
+        amended_by_doc: "74/2025/QH15"
+        loai_sua: "het_hieu_luc"
     ghi_chu: "Điểm mới demoable: giảm năm đóng tối thiểu hưởng lương hưu 20 -> 15 năm; trợ cấp hưu trí xã hội; siết BHXH một lần. Bản thân Luật BHXH 2024 KHÔNG sửa BLLĐ (xem 45-2019-QH14.sua_doi_boi), nhưng CHÍNH Luật BHXH 2024 bị 113/2025/QH15 sửa 1 điểm (Điều 53 k2 điểm c, nghỉ của lao động nam) — xem sua_doi_boi trên."
 
   - doc_id: "158-2025-ND-CP"

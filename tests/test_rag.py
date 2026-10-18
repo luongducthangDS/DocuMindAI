@@ -331,6 +331,26 @@ class TestFptPrimary:
         # 401 đẩy model FPT vào cooldown: câu sau đi thẳng Gemini, không gọi lại key hỏng.
         assert all(k != gen._FPT_KEY for k, _ in gen._gemini_pairs())
 
+    def test_tool_call_junk_rotates_to_next_fpt_model(self, monkeypatch):
+        import src.rag.generator as gen
+
+        monkeypatch.setenv("FPT_API_KEY", "fpt-test")
+        monkeypatch.setattr(gen, "_PAIR_DOWN_UNTIL", {})
+        gen.get_settings.cache_clear()
+        junk = {"choices": [{"message": {"content": "<tool_call>"}}]}
+        good = {"choices": [{"message": {"content": "Trả lời [1]"}}]}
+        with patch("requests.post", side_effect=[self._resp(200, junk), self._resp(200, good)]) as post, \
+             patch("src.rag.generator.record_generation"):
+            assert gen.gemini_generate("q") == "Trả lời [1]"
+        assert [c.kwargs["json"]["model"] for c in post.call_args_list] == ["Qwen3.8-27B", "DeepSeek-V4-Flash"]
+
+    def test_tool_call_junk_fails_stream_before_first_token(self):
+        import src.rag.generator as gen
+
+        r = MagicMock(iter_lines=lambda: iter([b'data: {"choices":[{"delta":{"content":"<tool_call>"}}]}']))
+        with pytest.raises(RuntimeError, match="token rác"):
+            list(gen._fpt_stream(r))
+
 
 class TestFptRerank:
     """Reranker qua FPT /v1/rerank: sắp theo relevance_score; API lỗi thì giữ thứ tự

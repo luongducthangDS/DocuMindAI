@@ -24,10 +24,13 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   cấp khoản). Index có **19** `doc_id`: `18-VBHN-VPQH` là bản hợp nhất, nạp làm nội dung của `45-2019-QH14`
   (`consolidated_from`) — `/documents` hiện 19 là đúng. Corpus ngân hàng cũ đã bỏ — `data/raw/banking_docs/` không còn tồn tại.
 - ChromaDB `data/chroma_db/`: local dùng **`documind_legal_fpt`** (FPT `Vietnamese_Embedding`, 1024-dim,
-  **1247 chunks**, từ 2026-10-17 — `.env` CHROMA_COLLECTION/EMBEDDING_MODEL); `documind_legal` (gemini-embedding-2,
-  1247) và `documind_legal__backup_gemini-embedding-001` (1151, corpus cũ) còn giữ. Ingest lại 2026-10-17 sau
-  khi bù 145/2020 Điều 102–115 + phụ lục, sửa bảng/công thức; Qdrant vẫn là bản 1151 chunk cũ.
-  Qdrant Cloud (production đọc từ đây): collection **`documind_legal_fpt`** (1247 point, FPT
+  **1249 chunks**, từ 2026-10-17 — `.env` CHROMA_COLLECTION/EMBEDDING_MODEL); `documind_legal` (gemini-embedding-2,
+  1247, **chưa có** bản sửa khoản hết hiệu lực bên dưới) và `documind_legal__backup_gemini-embedding-001`
+  (1151, corpus cũ) còn giữ. Ingest lại 2026-10-17 sau khi bù 145/2020 Điều 102–115 + phụ lục, sửa
+  bảng/công thức. 2026-10-18: khoản đi sửa một luật đã bị thay (`loai_sua: het_hieu_luc` — BLLĐ Điều 219
+  khoản 1 sửa Luật BHXH 58/2014, Luật BHXH 41/2024 Điều 139 khoản 2 sửa Luật Việc làm 38/2013) tách ra
+  và đóng hiệu lực cùng luật đó → 1249; vá tại chỗ cả Chroma lẫn Qdrant, đối chiếu khớp bản ingest mới.
+  Qdrant Cloud (production đọc từ đây): collection **`documind_legal_fpt`** (1249 point, FPT
   `Vietnamese_Embedding` 1024-dim, migrate + verify 2026-10-18); env Render + CI đặt
   `QDRANT_COLLECTION=documind_legal_fpt`, `EMBEDDING_MODEL=Vietnamese_Embedding`. Collection cũ
   `documind_legal` (gemini-embedding-001, 1151, corpus cũ) giữ nguyên làm đường quay lui — đổi lại
@@ -63,7 +66,7 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   Report nào ghi rerank phải xem `meta.reranker_active`, không tin `ENABLE_RERANKER`.
   torch/sentence-transformers/transformers **không** còn trong `requirements.txt` (2026-09-27,
   image production không cài ~1.3GB này) — muốn chạy reranker: `pip install -r requirements-rerank.txt`.
-- Test suite: 646 passed (đo 2026-10-17). Test không gửi trace ra Langfuse/LangSmith
+- Test suite: 655 passed (đo 2026-10-18). Test không gửi trace ra Langfuse/LangSmith
   (`conftest.py::patch_settings` xoá key).
 
 **Stack:**
@@ -81,8 +84,15 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   bàn — chỉ đổi thứ tự, không đổi điểm. Đo 2026-10-17 (legal_qa_200, recall@1 câu một điều):
   FPT embedding 0.828 → luật 0.834 → + rerank pool 10 **0.882** (`reports/temporal_eval_vnembed_rerank10.json`,
   rerank API p50 250ms); Gemini-2 0.72 → 0.78 với luật. Đọc theo cặp, không theo tỷ lệ (n=169, CI95 ±0.05):
-  rerank thắng 13/thua 5 ở hạng 1 (p≈0.10), không tăng top-8 → production TẮT rerank cho tới khi eval đầu
-  cuối (k × rerank, answer accuracy + faithfulness) cho thấy lợi ích. `ci_gate` in bảng thắng/thua theo câu;
+  rerank thắng 13/thua 5 ở hạng 1 (p≈0.10), không tăng top-8 → production TẮT rerank. Eval đầu cuối
+  2026-10-18 (`reports/e2e_k_rerank.json`, k = số đoạn vào LLM ∈ {3,5,8} × rerank) giữ quyết định đó:
+  k=8 không rerank (= production, `top_n=8`) accuracy 0.950; rerank ở k=8 thắng 3/thua 1 câu — trong mức
+  dao động 2–3 câu giữa hai lượt cùng cấu hình (FPT temperature 0 vẫn không tất định) — mà p95 +0.7s và
+  /v1/rerank 429 khi tải (chung hạn mức key với LLM). k mới là đòn bẩy: k=8 so k=3 thắng 9/thua 2.
+  Faithfulness judge ≈0.99 ở cả 6 cấu hình và cho 1.0 cả câu sai bám đúng một đoạn đã hết hiệu lực →
+  chưa dùng làm thước đo an toàn được; chấm chuỗi cũng báo sai câu đúng. Hiệu chỉnh cả hai bằng người
+  chấm: bảng duyệt https://claude.ai/artifact/GwULtyAAPsxS5LewLzjcdn (36 câu trượt hạng 1 + 30 câu trả
+  lời k=8; nhãn ở collection `reviews` của artifact, Claude đọc bằng ArtifactData). `ci_gate` in bảng thắng/thua theo câu;
   câu nhiều điều khoản đo bằng `multi_coverage_at_k` (recall@1 của chúng luôn = 0 theo định nghĩa).
 - LLM: **chỉ FPT AI Marketplace** (2026-10-18): `GEMINI_GENERATION_MODELS`, `GEMINI_GENERATION_MODELS_COMPLEX`,
   `GEMINI_JUDGE_MODELS` để TRỐNG ở `.env` và Render ⇒ không còn cặp Gemini; FPT hỏng cả hai model thì trích
@@ -129,7 +139,7 @@ Lệnh ingest tài liệu:
 ```powershell
 # Ingest corpus lao động vào ChromaDB.
 # BẮT BUỘC có --manifest: thiếu cờ này script rơi về chế độ quét thư mục, nuốt luôn
-# _versions/ thành tài liệu độc lập (chunk rác thay vì 1247).
+# _versions/ thành tài liệu độc lập (chunk rác thay vì 1249).
 python scripts/ingest_documents.py --source-dir data/raw/lao_dong `
   --manifest docs/corpus/corpus_manifest.yaml --reset
 
