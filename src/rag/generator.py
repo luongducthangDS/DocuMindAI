@@ -238,6 +238,46 @@ def _as_of_block(as_of_date: str | None) -> str:
     )
 
 
+# Câu Có/Không: "… có đủ điều kiện … không?", "…, đúng không?". ponytail: regex, không phải
+# classifier — câu Có/Không thiếu chữ "có" ("được … không?") đi đường thường như trước.
+_YES_NO_RE = re.compile(r"\bcó\b[^?]*?\bkhông\s*(?:[?,]|$)", re.IGNORECASE)
+
+_ANALYZE_PROMPT = """Bạn phân tích một câu hỏi tra cứu {domain} TRƯỚC khi trả lời. CHỈ dùng các đoạn văn bản tham chiếu dưới đây — luật đã sửa nhiều lần, điều bạn nhớ có thể là bản cũ.
+
+**Văn bản tham chiếu:**
+{context}
+
+**Câu hỏi:** {query}
+
+Làm lần lượt, ngắn gọn, không viết câu trả lời cho người dùng:
+1. Trích nguyên văn (kèm [N]) các điều kiện, quy định quyết định câu trả lời — lấy từ điều quy định điều kiện, không phải cách tính mức hưởng.
+2. Áp từng điều kiện vào dữ kiện trong câu hỏi; tính con số nếu cần.
+3. Kết luận Có/Không cho từng ý được hỏi."""
+
+
+def _analysis_block(query: str, context: str) -> str:
+    """Câu Có/Không: một lượt phân tích điều kiện TRƯỚC khi trả lời, nối vào ngữ cảnh.
+
+    Rule 8 (BLUF) bắt câu đầu là kết luận và suy luận đang tắt (enable_thinking=false), nên
+    model chốt Có/Không theo luật cũ nó nhớ rồi mới viết lý do: lh_m05b "16 năm đóng chưa đủ,
+    phải 20" (Luật BHXH 2024 chỉ cần 15) đúng 10/24 lần dù Điều 64 nằm trong ngữ cảnh. Phân tích
+    trước, trả lời sau: 24/24 trên ba câu từng sai, 30 câu Có/Không của gold không câu nào sai
+    thêm, +2.0s p50 (đo 2026-10-18). Lượt này lỗi thì bỏ qua — không bao giờ chặn câu trả lời.
+    """
+    if not _YES_NO_RE.search(query):
+        return ""
+    try:
+        analysis = gemini_generate(
+            _ANALYZE_PROMPT.format(domain=DOMAIN_NAME, context=context, query=query),
+            log_input=f"**Câu hỏi:** {query}", name="analyze-conditions",
+        )
+    except Exception as exc:
+        logger.warning("Phân tích điều kiện lỗi, trả lời không có bước này: {}", exc)
+        return ""
+    return ("\n\n**Phân tích đối chiếu điều kiện (đã kiểm với văn bản tham chiếu — kết luận theo "
+            f"phân tích này):**\n{analysis.strip()}")
+
+
 UPLOAD_ORIGIN = "user_upload"
 _DOC_TAG_RE = re.compile(r"<(/?)(document)", re.IGNORECASE)
 
@@ -813,12 +853,14 @@ def generate_answer(
 
     context, citation_list = _build_context(chunks)
     context = _as_of_block(as_of_date) + context
+    context += _analysis_block(query, context)
 
     # FPT trước, Gemini dự phòng — chịu lỗi nằm ở vòng xoay bên trong _call_gemini;
     # hết mọi cặp thì rơi về trích dẫn nguyên văn.
     try:
         info: dict = {}
-        answer = _call_gemini(query, context, history=history, models=_select_models(complex_query), info=info)
+        answer = _drop_empty_followup(
+            _call_gemini(query, context, history=history, models=_select_models(complex_query), info=info))
         used_llm = info.get("provider", "gemini")
         logger.info("{} answered query ({} chars)", used_llm, len(answer or ""))
     except Exception as exc:
@@ -856,7 +898,57 @@ def _stream_chunks_in_thread(model_name: str, api_key: str, prompt: str, q: queu
         q.put(("end", None))
 
 
+# Prompt (rule 4) cho bỏ phần hỏi lại khi không có chủ đề gần, nhưng model vẫn in tiêu đề rồi
+# để trống (lh_o01, người chấm 2026-10-18; lặp lại ở bản sau sửa) — chặn bằng code, không bằng prompt.
+_FOLLOWUP_HEAD = "**Bạn muốn hỏi cụ thể:**"
+_FOLLOWUP_ITEM_RE = re.compile(r"^\s*-\s+\S", re.M)
+
+
+def _drop_empty_followup(answer: str) -> str:
+    head, sep, tail = (answer or "").rpartition(_FOLLOWUP_HEAD)
+    return head.rstrip() if sep and not _FOLLOWUP_ITEM_RE.search(tail) else answer
+
+
+async def _hold_empty_followup(tokens: AsyncIterator[str]) -> AsyncIterator[str]:
+    """Stream không rút lại được token đã gửi: giữ tiêu đề phần hỏi lại tới khi thấy dòng gợi ý
+    đầu tiên; luồng kết thúc mà chưa có dòng nào thì tiêu đề không bao giờ ra tới người dùng."""
+    buf, released = "", False
+    async for token in tokens:
+        if released:
+            yield token
+            continue
+        buf += token
+        i = buf.find(_FOLLOWUP_HEAD)
+        if i < 0:
+            # đuôi buf có thể là nửa đầu của tiêu đề — giữ lại phần đó
+            keep = next((k for k in range(min(len(buf), len(_FOLLOWUP_HEAD) - 1), 0, -1)
+                         if _FOLLOWUP_HEAD.startswith(buf[-k:])), 0)
+            if len(buf) > keep:
+                yield buf[:len(buf) - keep]
+                buf = buf[len(buf) - keep:]
+            continue
+        if i:
+            yield buf[:i]
+            buf = buf[i:]
+        if _FOLLOWUP_ITEM_RE.search(buf[len(_FOLLOWUP_HEAD):]):
+            yield buf
+            buf, released = "", True
+    if buf:
+        rest = _drop_empty_followup(buf)
+        if rest:
+            yield rest
+
+
 async def stream_answer(
+    query: str,
+    chunks: list[RetrievedChunk],
+    as_of_date: str | None = None,
+) -> AsyncIterator[str]:
+    async for token in _hold_empty_followup(_stream_answer_raw(query, chunks, as_of_date)):
+        yield token
+
+
+async def _stream_answer_raw(
     query: str,
     chunks: list[RetrievedChunk],
     as_of_date: str | None = None,
@@ -902,6 +994,9 @@ async def stream_answer(
                                 "— trả lời bằng trích nguyên văn")
         yield _build_extractive_answer(query, chunks)
         return
+
+    # Thread: lượt phân tích là lời gọi HTTP đồng bộ — chạy thẳng ở đây là đứng cả event loop.
+    context += await asyncio.to_thread(_analysis_block, query, context)
 
     variable_part = f"**Văn bản tham chiếu:**\n{context}\n\n**Câu hỏi:** {query}"
     full_prompt = f"{_SYSTEM_PROMPT}\n\n{variable_part}"

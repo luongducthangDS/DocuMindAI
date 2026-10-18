@@ -20,6 +20,21 @@ chọn sai lần hai.
 
 ## Chọn công nghệ / kiến trúc
 
+### Ép kết luận ở câu đầu (BLUF) trong khi model đã tắt suy luận (07-03 → 2026-10-18)
+- **Đã quyết:** rule 8 của `_SYSTEM_PROMPT` — câu đầu tiên là câu trả lời trực tiếp (con số, Có/Không) —
+  thêm như một quy tắc định dạng cho dễ đọc quét; sau đó tắt `enable_thinking` vì Qwen suy luận mất 23s.
+- **Sai ở đâu:** cộng hai quyết định lại, với câu Có/Không model chốt kết luận ở token đầu tiên trước khi
+  đọc điều kiện — kết luận đến từ luật nó nhớ (thường là bản cũ), lý do viết sau để biện minh. `lh_m05b`:
+  "16 năm chưa đủ, phải 20" đúng 10/24 lần dù Điều 64 Luật BHXH 2024 (15 năm) nằm hạng 2 trong ngữ cảnh.
+  Không ai đo, vì BLUF vào code như một thay đổi trình bày.
+- **Cái giá:** dạng sai nguy hiểm nhất của sản phẩm — phán quyết sai kèm trích dẫn đúng điều luật — ở
+  đúng loại câu người dùng hỏi về quyền lợi của chính họ.
+- **Bài học:** khi suy luận tắt, quy tắc định dạng đầu ra cũng là quy tắc suy luận: thứ tự token là thứ
+  tự model "nghĩ". Quy tắc trình bày mới phải đo trên câu cần suy luận, không chỉ xem có đẹp không.
+- **Giờ làm thế nào:** giữ BLUF; câu Có/Không (`_YES_NO_RE`) đi qua một lượt `analyze-conditions` (trích
+  điều kiện → áp vào dữ kiện → kết luận) rồi lượt trả lời mới nhận phân tích đó. 24/24 trên ba câu từng
+  sai, 30 câu Có/Không của gold không sai thêm, +2.0s p50. Các cách đã thử và loại: CLAUDE.md mục LLM.
+
 ### Hai đường sinh câu trả lời tự dựng prompt, eval đo đường UI không đi (→ 2026-10-18)
 - **Đã quyết:** `generate_answer` (REST/agent — và mọi eval đầu cuối) và `stream_answer` (WebSocket —
   UI web) mỗi hàm tự dựng prompt. Khối "Thời điểm tra cứu" (`_as_of_block`) chỉ được thêm vào

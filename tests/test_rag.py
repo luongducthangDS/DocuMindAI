@@ -370,6 +370,42 @@ class TestFptPrimary:
             list(gen._fpt_stream(r))
 
 
+class TestEmptyFollowupSection:
+    """lh_o01 (người chấm 2026-10-18): "**Bạn muốn hỏi cụ thể:**" rồi không có câu gợi ý nào."""
+
+    OOS = "Câu hỏi này nằm ngoài phạm vi pháp luật lao động.\n\n**Bạn muốn hỏi cụ thể:**"
+
+    def test_empty_section_is_dropped(self):
+        from src.rag.generator import _drop_empty_followup
+
+        assert _drop_empty_followup(self.OOS) == "Câu hỏi này nằm ngoài phạm vi pháp luật lao động."
+        kept = self.OOS + "\n- Hợp đồng lao động thời vụ được ký tối đa bao lâu?"
+        assert _drop_empty_followup(kept) == kept
+
+    @staticmethod
+    def _stream(pieces):
+        import asyncio
+
+        from src.rag.generator import _hold_empty_followup
+
+        async def gen():
+            for p in pieces:
+                yield p
+
+        async def run():
+            return [t async for t in _hold_empty_followup(gen())]
+        return asyncio.run(run())
+
+    def test_stream_never_sends_an_empty_header(self):
+        # tiêu đề bị cắt qua nhiều token — vẫn phải giữ lại được
+        out = self._stream(["Câu hỏi này nằm ngoài ", "phạm vi.\n\n**Bạn mu", "ốn hỏi cụ thể:**", "\n"])
+        assert "".join(out).rstrip() == "Câu hỏi này nằm ngoài phạm vi."
+
+    def test_stream_releases_header_once_a_suggestion_arrives(self):
+        pieces = ["Không thấy quy định.\n\n**Bạn muốn hỏi cụ thể:**\n", "- Câu A?\n", "- Câu B?"]
+        assert "".join(self._stream(pieces)) == "".join(pieces)
+
+
 class TestFptRerank:
     """Reranker qua FPT /v1/rerank: sắp theo relevance_score; API lỗi thì giữ thứ tự
     RRF VÀ tắt ngưỡng 0.05 cho lượt đó — không thì mọi đoạn (điểm RRF ~0.016) bị
@@ -933,3 +969,79 @@ class TestChromaHttpFailFast:
         client, collection = embedder.get_chroma_collection(verify=False)
         assert collection.name == get_settings().chroma_collection
         assert isinstance(client, chromadb.api.client.Client)
+
+
+# ── Câu Có/Không: phân tích điều kiện trước khi trả lời ────────────────────────
+
+class TestYesNoAnalysis:
+    YN = "Lao động nam đã đóng BHXH 16 năm, người này có đủ điều kiện hưởng lương hưu không?"
+    CHUNK = RetrievedChunk(text="Điều 64. … từ đủ 15 năm trở lên …", score=0.9, metadata={"title": "Luật BHXH"})
+
+    @pytest.mark.parametrize("q", [
+        YN,
+        "Mức lương này có vi phạm quy định về lương tối thiểu không?",
+        "Lao động chưa đủ 15 tuổi có thể làm thêm giờ nếu cha mẹ đồng ý, đúng không?",
+    ])
+    def test_detects_yes_no_questions(self, q):
+        from src.rag.generator import _YES_NO_RE
+        assert _YES_NO_RE.search(q)
+
+    @pytest.mark.parametrize("q", [
+        "Bảo hiểm xã hội tự nguyện gồm những chế độ nào?",
+        "Người có thời gian đóng không liên tục được tính thế nào?",
+        "Trường hợp nào không được hưởng trợ cấp thất nghiệp?",
+    ])
+    def test_other_questions_are_not_yes_no(self, q):
+        from src.rag.generator import _YES_NO_RE
+        assert not _YES_NO_RE.search(q)
+
+    def test_analysis_runs_before_and_feeds_the_answer_call(self):
+        from src.rag.generator import generate_answer
+        seen = {}
+
+        def fake_call(prompt, context, **kw):
+            seen["context"] = context
+            return "Có đủ điều kiện [1]."
+
+        with patch("src.rag.generator.gemini_generate", return_value="1. Điều 64 [1]: từ đủ 15 năm") as analyze, \
+             patch("src.rag.generator._call_gemini", side_effect=fake_call):
+            generate_answer(self.YN, [self.CHUNK], min_score=0.0)
+        assert analyze.call_args.kwargs["name"] == "analyze-conditions"
+        assert "Phân tích đối chiếu điều kiện" in seen["context"] and "từ đủ 15 năm" in seen["context"]
+
+    def test_other_questions_make_no_extra_call(self):
+        from src.rag.generator import generate_answer
+        with patch("src.rag.generator.gemini_generate") as analyze, \
+             patch("src.rag.generator._call_gemini", return_value="Hưu trí, tử tuất [1]."):
+            generate_answer("Bảo hiểm xã hội tự nguyện gồm những chế độ nào?", [self.CHUNK], min_score=0.0)
+        analyze.assert_not_called()
+
+    def test_failed_analysis_never_blocks_the_answer(self):
+        from src.rag.generator import generate_answer
+        seen = {}
+
+        def fake_call(prompt, context, **kw):
+            seen["context"] = context
+            return "Có đủ điều kiện [1]."
+
+        with patch("src.rag.generator.gemini_generate", side_effect=RuntimeError("503 unavailable")), \
+             patch("src.rag.generator._call_gemini", side_effect=fake_call):
+            result = generate_answer(self.YN, [self.CHUNK], min_score=0.0)
+        assert result["answer"] == "Có đủ điều kiện [1]."
+        assert "Phân tích đối chiếu điều kiện" not in seen["context"]
+
+    @pytest.mark.asyncio
+    async def test_stream_path_analyzes_too(self):
+        from src.rag.generator import stream_answer
+        prompts = []
+
+        def fake_thread(model_name, api_key, prompt, q):
+            prompts.append(prompt)
+            q.put(("token", "Có đủ điều kiện [1]."))
+            q.put(("end", None))
+
+        with patch("src.rag.generator.gemini_generate", return_value="1. Điều 64 [1]: từ đủ 15 năm"), \
+             patch("src.rag.generator._gemini_pairs", return_value=[("k", "m")]), \
+             patch("src.rag.generator._stream_chunks_in_thread", side_effect=fake_thread):
+            [t async for t in stream_answer(self.YN, [self.CHUNK], as_of_date="2026-03-01")]
+        assert "Phân tích đối chiếu điều kiện" in prompts[0]

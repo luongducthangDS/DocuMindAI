@@ -438,7 +438,9 @@ def run(
             # Thiếu nó, report 2026-09-23 không trả lời được "đo trên 1146 hay 1151, Chroma
             # hay Qdrant" và README phải suy luận.
             "index": langfuse_otel._index_version,
-            "git_sha": _git("rev-parse", "--short", "HEAD"),
+            # "-dirty" = chạy trên code chưa commit — SHA trần khai một trạng thái nó không chạy
+            # (report 2026-10-18 có lượt phân tích Có/Không nhưng ghi 81997fb, bản chưa có nó).
+            "git_sha": langfuse_otel.app_release(),
             "n_degraded": sum(1 for r in rows if r.get("degraded")),
         },
         "rows": rows,
