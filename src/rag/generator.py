@@ -72,8 +72,10 @@ Quy tắc bắt buộc:
 _CITATION_SUFFIX = "\n\n**Nguồn trích dẫn:**\n{citations}"
 
 
-_MAX_CHUNK_CHARS = 3_000   # ~750 tokens per chunk
-_MAX_TOTAL_CHARS = 15_000  # ~3750 tokens — expanded to support top_k=20 candidate set
+# Ngân sách cho cả khối ngữ cảnh, không cắt từng đoạn: đoạn không vừa thì bỏ nguyên đoạn.
+# Bản cũ cắt mọi đoạn ở 3.000 ký tự (95/1249 đoạn dài hơn — phần đuôi LLM không bao giờ
+# thấy). 8 đoạn × p90 2.7k ≈ 22k; đoạn dài nhất 4.6k (đo 2026-10-18).
+_MAX_TOTAL_CHARS = 24_000
 _EXTRACTIVE_CHARS_PER_SOURCE = 700
 # Không có LLM chọn lọc thì mỗi chunk dán ra là một "nguồn" người dùng phải tự
 # đọc — 5 nguồn, có cả biểu mẫu/phụ lục, là đống trích dẫn chứ không phải câu trả lời.
@@ -91,13 +93,13 @@ _MIN_RELEVANCE_SCORE = 0.05
 # ponytail: heuristic rẻ tiền, không phải classifier ML — nâng cấp lên model/
 # nhãn thật khi có đủ traffic để đo lệch. Dùng CHUNG cho cả việc chọn model
 # tier (RPD thấp hơn nhưng mạnh hơn flash-lite) và số chunk đưa vào context:
-# câu "khó" giữ nguyên top_n=8 của retriever để không mất nguồn cần đối chiếu,
-# câu thường cắt bớt để giảm token input.
+# (Bản cũ còn cắt câu "thường" xuống 5 đoạn để giảm token: 131/186 câu gold đi đường đó, 3 câu
+# có gold ở hạng 6–8 nên đoạn gold không tới LLM và câu trả lời thành "không tìm thấy" — đo
+# 2026-10-18. Mọi câu giờ nhận đủ top_n của retriever, trong ngân sách _MAX_TOTAL_CHARS.)
 _COMPLEX_MIN_QUERY_CHARS = 150
 _COMPLEX_KEYWORDS = ("so sánh", "khác nhau")
 _COMPLEX_MIN_HISTORY_TURNS = 4
 _DOC_REF_RE = re.compile(r"\d{1,3}[-/]\d{4}")
-_SIMPLE_QUERY_MAX_CHUNKS = 5
 
 
 def _is_complex_query(query: str, history: list[dict] | None = None) -> bool:
@@ -270,7 +272,9 @@ def spotlight_documents(docs: list[tuple[str, str, str]]) -> str:
 
 
 def _build_context(chunks: list[RetrievedChunk]) -> tuple[str, str]:
-    """Returns (context_block, citation_list). Truncates to stay within LLM limits.
+    """Returns (context_block, citation_list) within _MAX_TOTAL_CHARS, in rank order.
+    A chunk that does not fit is left out whole; only a lone first chunk larger than the
+    whole budget is cut.
 
     Mỗi chunk vẫn mở đầu bằng "[i]" bên trong thẻ — model trích dẫn theo đúng số đó.
     """
@@ -280,10 +284,10 @@ def _build_context(chunks: list[RetrievedChunk]) -> tuple[str, str]:
 
     for i, chunk in enumerate(chunks, 1):
         text = chunk.text
-        if len(text) > _MAX_CHUNK_CHARS:
-            text = text[:_MAX_CHUNK_CHARS] + "…"
         if total_chars + len(text) > _MAX_TOTAL_CHARS:
-            break
+            if docs:
+                continue
+            text = text[:_MAX_TOTAL_CHARS] + "…"
         docs.append((str(i), chunk_origin(chunk.metadata), f"[{i}] {text}"))
         citations.append(f"[{i}] {chunk.citation_label}")
         total_chars += len(text)
@@ -806,8 +810,6 @@ def generate_answer(
     chunks = relevant_chunks
 
     complex_query = _is_complex_query(query, history)
-    if not complex_query and len(chunks) > _SIMPLE_QUERY_MAX_CHUNKS:
-        chunks = chunks[:_SIMPLE_QUERY_MAX_CHUNKS]
 
     context, citation_list = _build_context(chunks)
     context = _as_of_block(as_of_date) + context
@@ -883,8 +885,6 @@ async def stream_answer(
     chunks = relevant_chunks
 
     complex_query = _is_complex_query(query)
-    if not complex_query and len(chunks) > _SIMPLE_QUERY_MAX_CHUNKS:
-        chunks = chunks[:_SIMPLE_QUERY_MAX_CHUNKS]
 
     context, citation_list = _build_context(chunks)
 

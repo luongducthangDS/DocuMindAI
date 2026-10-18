@@ -184,7 +184,8 @@ def build_clause_chunks(entry: DocEntry, corpus_dir: Path, as_of: str) -> list[L
         if not v.is_valid:  # đo trên thân, trước khi gắn tiền tố Chương
             continue
         h = heading.get(v.metadata.get("dieu"), {})
-        chunks.append(_with_heading(v, h.get("chuong", ""), h.get("muc", "")))
+        title = f"Điều {v.metadata.get('dieu')}. {v.metadata.get('dieu_tieu_de') or h.get('dieu_tieu_de', '')}"
+        chunks.append(_with_heading(v, h.get("chuong", ""), h.get("muc", ""), title.rstrip(". ")))
     return [c for c in chunks if c.is_valid]
 
 

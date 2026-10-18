@@ -1,0 +1,321 @@
+{
+  "about": "Chunk đủ ngữ cảnh + ngân sách ngữ cảnh (2026-10-18), legal_qa_200, arm pre_filter, rerank tắt, embed cache. retrieval: base = chunk cũ; h1 = đoạn tách mang 'Điều N. Tiêu đề' + câu dẫn (CHỌN); h2 = h1 + tên văn bản đầy đủ trên mọi đoạn; h3 = h1 + nhãn văn bản ngắn. e2e k=8: before = generator cắt câu ngắn còn 5 đoạn và cắt mỗi đoạn ở 3000 ký tự (chunk cũ); after = h1 + mọi đoạn top-8 nguyên vẹn trong ngân sách 24k ký tự. Số chép nguyên meta + summary.overall; chấm chuỗi chưa hiệu chỉnh với người.",
+  "retrieval": {
+    "base": {
+      "meta": {
+        "gold_set": "data/eval/legal_qa_200.json",
+        "n_questions": 199,
+        "arms": [
+          "pre_filter"
+        ],
+        "retrieval_only": true,
+        "corpus_earliest_point_in_time": "2015-01-01",
+        "retriever": "hybrid BM25 + dense, RRF fusion → top-8",
+        "reranker_active": false,
+        "index": "chroma/documind_legal_fpt/Vietnamese_Embedding/1249",
+        "git_sha": "25f94aa",
+        "n_degraded": 0,
+        "embed_cache": true
+      },
+      "overall": {
+        "n": 199,
+        "context_gold": 0.9798994974874372,
+        "context_gold_coverage": 0.9849246231155779,
+        "context_distractor": 0.0,
+        "context_clean": 0.9798994974874372,
+        "avg_chunks": 7.839195979899498,
+        "recall_at_1": 0.7634408602150538,
+        "recall_at_3": 0.9139784946236559,
+        "recall_at_5": 0.9301075268817204,
+        "recall_at_8": 0.978494623655914,
+        "mrr": 0.8400281618023553,
+        "recall_at_1_single": 0.8402366863905325,
+        "n_single": 169,
+        "multi_coverage_at_3": 0.7058823529411765,
+        "multi_coverage_at_5": 0.7941176470588235,
+        "multi_coverage_at_8": 0.9411764705882353,
+        "n_multi": 17,
+        "retrieve_ms_p50": 275.0,
+        "retrieve_ms_p95": 294.0
+      }
+    },
+    "h1_article_head": {
+      "meta": {
+        "gold_set": "data/eval/legal_qa_200.json",
+        "n_questions": 199,
+        "arms": [
+          "pre_filter"
+        ],
+        "retrieval_only": true,
+        "corpus_earliest_point_in_time": "2015-01-01",
+        "retriever": "hybrid BM25 + dense, RRF fusion → top-8",
+        "reranker_active": false,
+        "index": "chroma/documind_legal_fpt_h1/Vietnamese_Embedding/1249",
+        "git_sha": "25f94aa",
+        "n_degraded": 0,
+        "embed_cache": true
+      },
+      "overall": {
+        "n": 199,
+        "context_gold": 0.9849246231155779,
+        "context_gold_coverage": 0.9874371859296482,
+        "context_distractor": 0.0,
+        "context_clean": 0.9849246231155779,
+        "avg_chunks": 7.839195979899498,
+        "recall_at_1": 0.7634408602150538,
+        "recall_at_3": 0.9086021505376344,
+        "recall_at_5": 0.9301075268817204,
+        "recall_at_8": 0.9838709677419355,
+        "mrr": 0.8398873527905786,
+        "recall_at_1_single": 0.8402366863905325,
+        "n_single": 169,
+        "multi_coverage_at_3": 0.6764705882352942,
+        "multi_coverage_at_5": 0.7941176470588235,
+        "multi_coverage_at_8": 0.9705882352941176,
+        "n_multi": 17,
+        "retrieve_ms_p50": 276.0,
+        "retrieve_ms_p95": 295.0
+      }
+    },
+    "h2_full_doc_title": {
+      "meta": {
+        "gold_set": "data/eval/legal_qa_200.json",
+        "n_questions": 199,
+        "arms": [
+          "pre_filter"
+        ],
+        "retrieval_only": true,
+        "corpus_earliest_point_in_time": "2015-01-01",
+        "retriever": "hybrid BM25 + dense, RRF fusion → top-8",
+        "reranker_active": false,
+        "index": "chroma/documind_legal_fpt_h2/Vietnamese_Embedding/1249",
+        "git_sha": "25f94aa",
+        "n_degraded": 0,
+        "embed_cache": true
+      },
+      "overall": {
+        "n": 199,
+        "context_gold": 0.964824120603015,
+        "context_gold_coverage": 0.9773869346733668,
+        "context_distractor": 0.0,
+        "context_clean": 0.964824120603015,
+        "avg_chunks": 7.839195979899498,
+        "recall_at_1": 0.7956989247311828,
+        "recall_at_3": 0.9139784946236559,
+        "recall_at_5": 0.9354838709677419,
+        "recall_at_8": 0.9623655913978495,
+        "mrr": 0.8559651817716336,
+        "recall_at_1_single": 0.8757396449704142,
+        "n_single": 169,
+        "multi_coverage_at_3": 0.6470588235294118,
+        "multi_coverage_at_5": 0.7058823529411765,
+        "multi_coverage_at_8": 0.8529411764705882,
+        "n_multi": 17,
+        "retrieve_ms_p50": 272.0,
+        "retrieve_ms_p95": 290.0
+      }
+    },
+    "h3_short_doc_label": {
+      "meta": {
+        "gold_set": "data/eval/legal_qa_200.json",
+        "n_questions": 199,
+        "arms": [
+          "pre_filter"
+        ],
+        "retrieval_only": true,
+        "corpus_earliest_point_in_time": "2015-01-01",
+        "retriever": "hybrid BM25 + dense, RRF fusion → top-8",
+        "reranker_active": false,
+        "index": "chroma/documind_legal_fpt_h3/Vietnamese_Embedding/1249",
+        "git_sha": "25f94aa",
+        "n_degraded": 0,
+        "embed_cache": true
+      },
+      "overall": {
+        "n": 199,
+        "context_gold": 0.964824120603015,
+        "context_gold_coverage": 0.9773869346733668,
+        "context_distractor": 0.0,
+        "context_clean": 0.964824120603015,
+        "avg_chunks": 7.839195979899498,
+        "recall_at_1": 0.7741935483870968,
+        "recall_at_3": 0.9139784946236559,
+        "recall_at_5": 0.9354838709677419,
+        "recall_at_8": 0.9623655913978495,
+        "mrr": 0.8444636456733231,
+        "recall_at_1_single": 0.8520710059171598,
+        "n_single": 169,
+        "multi_coverage_at_3": 0.6764705882352942,
+        "multi_coverage_at_5": 0.7647058823529411,
+        "multi_coverage_at_8": 0.8529411764705882,
+        "n_multi": 17,
+        "retrieve_ms_p50": 141.0,
+        "retrieve_ms_p95": 147.0
+      }
+    }
+  },
+  "e2e": {
+    "before_cap5_run1": {
+      "meta": {
+        "gold_set": "data/eval/legal_qa_200.json",
+        "n_questions": 199,
+        "arms": [
+          "pre_filter"
+        ],
+        "retrieval_only": false,
+        "corpus_earliest_point_in_time": "2015-01-01",
+        "retriever": "hybrid BM25 + dense, RRF fusion → top-8",
+        "reranker_active": false,
+        "index": "chroma/documind_legal_fpt/Vietnamese_Embedding/1247",
+        "git_sha": "6be77b3",
+        "n_degraded": 0,
+        "embed_cache": true
+      },
+      "overall": {
+        "n": 199,
+        "context_gold": 0.9698492462311558,
+        "context_gold_coverage": 0.9773869346733668,
+        "context_distractor": 0.0,
+        "context_clean": 0.9698492462311558,
+        "avg_chunks": 7.839195979899498,
+        "recall_at_1": 0.7580645161290323,
+        "recall_at_3": 0.9032258064516129,
+        "recall_at_5": 0.9247311827956989,
+        "recall_at_8": 0.967741935483871,
+        "mrr": 0.8343830005120326,
+        "recall_at_1_single": 0.834319526627219,
+        "n_single": 169,
+        "multi_coverage_at_3": 0.6764705882352942,
+        "multi_coverage_at_5": 0.7941176470588235,
+        "multi_coverage_at_8": 0.9117647058823529,
+        "n_multi": 17,
+        "retrieve_ms_p50": 231.0,
+        "retrieve_ms_p95": 296.0,
+        "answer_accuracy": 0.949748743718593,
+        "e2e_ms_p50": 1479.0,
+        "e2e_ms_p95": 2825.0,
+        "faithfulness": 0.9940217391304348,
+        "faithfulness_n": 184
+      }
+    },
+    "before_cap5_run2": {
+      "meta": {
+        "gold_set": "data/eval/legal_qa_200.json",
+        "n_questions": 199,
+        "arms": [
+          "pre_filter"
+        ],
+        "retrieval_only": false,
+        "corpus_earliest_point_in_time": "2015-01-01",
+        "retriever": "hybrid BM25 + dense, RRF fusion → top-8",
+        "reranker_active": false,
+        "index": "chroma/documind_legal_fpt_t219/Vietnamese_Embedding/1247",
+        "git_sha": "6be77b3",
+        "n_degraded": 0,
+        "embed_cache": true
+      },
+      "overall": {
+        "n": 199,
+        "context_gold": 0.9798994974874372,
+        "context_gold_coverage": 0.9849246231155779,
+        "context_distractor": 0.0,
+        "context_clean": 0.9798994974874372,
+        "avg_chunks": 7.839195979899498,
+        "recall_at_1": 0.7634408602150538,
+        "recall_at_3": 0.9139784946236559,
+        "recall_at_5": 0.9301075268817204,
+        "recall_at_8": 0.978494623655914,
+        "mrr": 0.8400281618023553,
+        "recall_at_1_single": 0.8402366863905325,
+        "n_single": 169,
+        "multi_coverage_at_3": 0.7058823529411765,
+        "multi_coverage_at_5": 0.7941176470588235,
+        "multi_coverage_at_8": 0.9411764705882353,
+        "n_multi": 17,
+        "retrieve_ms_p50": 269.0,
+        "retrieve_ms_p95": 292.0,
+        "answer_accuracy": 0.9547738693467337,
+        "e2e_ms_p50": 1456.0,
+        "e2e_ms_p95": 2838.0,
+        "faithfulness": 0.9927536231884059,
+        "faithfulness_n": 184
+      }
+    },
+    "after_h1_nocap": {
+      "meta": {
+        "gold_set": "data/eval/legal_qa_200.json",
+        "n_questions": 199,
+        "arms": [
+          "pre_filter"
+        ],
+        "retrieval_only": false,
+        "corpus_earliest_point_in_time": "2015-01-01",
+        "retriever": "hybrid BM25 + dense, RRF fusion → top-8",
+        "reranker_active": false,
+        "index": "chroma/documind_legal_fpt_h1/Vietnamese_Embedding/1249",
+        "git_sha": "25f94aa",
+        "n_degraded": 0,
+        "embed_cache": true
+      },
+      "overall": {
+        "n": 199,
+        "context_gold": 0.9849246231155779,
+        "context_gold_coverage": 0.9874371859296482,
+        "context_distractor": 0.0,
+        "context_clean": 0.9849246231155779,
+        "avg_chunks": 7.839195979899498,
+        "recall_at_1": 0.7634408602150538,
+        "recall_at_3": 0.9086021505376344,
+        "recall_at_5": 0.9301075268817204,
+        "recall_at_8": 0.9838709677419355,
+        "mrr": 0.8398873527905786,
+        "recall_at_1_single": 0.8402366863905325,
+        "n_single": 169,
+        "multi_coverage_at_3": 0.6764705882352942,
+        "multi_coverage_at_5": 0.7941176470588235,
+        "multi_coverage_at_8": 0.9705882352941176,
+        "n_multi": 17,
+        "retrieve_ms_p50": 376.0,
+        "retrieve_ms_p95": 655.0,
+        "answer_accuracy": 0.9748743718592965,
+        "e2e_ms_p50": 2075.0,
+        "e2e_ms_p95": 3804.0,
+        "faithfulness": 0.9890374331550802,
+        "faithfulness_n": 187
+      }
+    }
+  },
+  "paired_e2e": {
+    "after_vs_run1": {
+      "a_only_correct": [
+        "g2_a012",
+        "g2_b034",
+        "g2_b036",
+        "g2_b037",
+        "ld_t10b",
+        "lh_b02b",
+        "lh_f01"
+      ],
+      "b_only_correct": [
+        "g2_b023",
+        "lh_c01"
+      ]
+    },
+    "after_vs_run2": {
+      "a_only_correct": [
+        "g2_a042",
+        "g2_b034",
+        "g2_b036",
+        "g2_b037",
+        "g2_d028",
+        "ld_t10b",
+        "lh_f01"
+      ],
+      "b_only_correct": [
+        "g2_b023",
+        "lh_c01",
+        "lh_m05b"
+      ]
+    }
+  }
+}

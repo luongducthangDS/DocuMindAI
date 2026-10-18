@@ -196,6 +196,49 @@ chọn sai lần hai.
 
 ## Dữ liệu & đánh giá
 
+### Trang duyệt gold cắt văn bản mà không báo (Claude, 2026-10-18)
+- **Đã làm:** dựng bảng duyệt cho người chấm 36 câu trượt; để trang nhẹ, cắt đoạn gold ở 900 và
+  đoạn hạng 1 ở 700 ký tự, không có "…", không ghi số ký tự.
+- **Sai ở đâu:** 198 đoạn hiển thị bị cụt; người duyệt thấy văn bản đứt giữa câu và kết luận đúng
+  theo những gì trang cho thấy — "gold/chunk mất ký tự" — gán `gold_sai` 32/36 câu. Đo lại trên
+  index: chunker làm rơi 31/342.494 từ (0,01%), mọi đáp án gold có nguyên văn trong chunk gold.
+- **Cái giá:** một lượt duyệt của chuyên gia không dùng được; suýt sửa gold theo bằng chứng do
+  chính công cụ làm sai.
+- **Bài học:** công cụ cho người phán xét phải hiện nguyên bằng chứng hoặc nói rõ đã rút gọn —
+  rút gọn im lặng biến lỗi hiển thị thành lỗi dữ liệu trong đầu người đọc.
+- **Giờ làm thế nào:** trang hiện toàn văn kèm số ký tự; nhãn lưu trước khi nạp toàn văn hiện
+  "cần xem lại" (`text_full_since`), không bị tính là đã duyệt.
+
+### Cắt ngữ cảnh LLM để tiết kiệm token, và đo "gold trong ngữ cảnh" ở chỗ khác (→ 2026-10-18)
+- **Đã quyết:** generator cắt câu "đơn giản" (< 150 ký tự, không so sánh) còn 5 đoạn và cắt mọi
+  đoạn ở 3.000 ký tự — từ thời quota Gemini, để giảm token input. Eval tính `context_gold` trên
+  các đoạn retriever trả về, không trên các đoạn thật sự gửi LLM.
+- **Sai ở đâu:** 131/186 câu gold đi đường 5 đoạn; 3 câu có gold ở hạng 6–8 (ld_t10b, lh_f01,
+  g2_b037) nên LLM không bao giờ thấy đoạn gold và trả lời "không tìm thấy" — trong khi eval báo
+  gold có trong ngữ cảnh. Claude đã đoán đó là LLM "lạc giữa ngữ cảnh" thay vì đo đường đi.
+- **Cái giá:** answer accuracy 0.950–0.955 thay vì 0.975 (k=8, bỏ cắt + header H1:
+  `reports/chunk_context_budget.json`, thắng 7/thua 2–3 theo cặp); ghi chú "k=8 = production" sai
+  với 70% câu hỏi.
+- **Bài học:** tiết kiệm ở bước cuối (cắt ngữ cảnh) xoá công của mọi bước trước; và một chỉ số
+  phải đo tại đúng chỗ quyết định — thứ LLM nhận, không phải thứ retriever trả.
+- **Giờ làm thế nào:** mọi câu nhận đủ top_n; ngân sách tổng `_MAX_TOTAL_CHARS = 24_000`, đoạn
+  không vừa thì bỏ nguyên đoạn, không cắt giữa chừng. Đổi lại p50 đầu cuối 1.5 → 2.1 s.
+
+### Đoạn tách từ điều dài chỉ mang tiền tố Chương (→ 2026-10-18)
+- **Đã quyết:** điều > 4.000 ký tự và điều có khoản sửa tại chỗ được tách theo khoản; mỗi mảnh
+  chỉ được gắn "Chương — Mục". Mảnh đầu bị bỏ nếu chỉ còn dòng tiêu đề.
+- **Sai ở đâu:** 193/270 mảnh không có dòng "Điều N." — embedder, BM25 và LLM thấy "7. Trường
+  hợp…" mà không biết của điều nào, luật nào; tiêu đề Điều 139/219 không nằm trong đoạn nào; khoản 9
+  Điều 154 (47 ký tự, sau khoản 8a) rơi khỏi index vì dưới ngưỡng 50 ký tự.
+- **Cái giá:** g2_b036 (gold là khoản 7 Điều 33) ngoài top-8; độ phủ câu nhiều điều 0.941.
+- **Bài học:** đầy đủ chữ chưa phải đầy đủ ngữ cảnh — đo cả hai. Và header ngữ cảnh không phải
+  càng nhiều càng tốt: gắn tên văn bản lên mọi đoạn (contextual header kiểu Anthropic) tăng
+  recall@1 (0.840 → 0.876) nhưng làm các đoạn cùng văn bản hút nhau, độ phủ câu nhiều điều tụt
+  0.941 → 0.853 — production dùng top-8 nên không lấy.
+- **Giờ làm thế nào:** mảnh không mở đầu bằng "Điều N." mang "Điều N. Tiêu đề" + câu dẫn ≤ 300 ký
+  tự (`chunker._article_head`); mảnh ngắn sau khoản sửa gộp vào phần không sửa. Test:
+  `TestChunksAreComplete` (chunker làm rơi ≤ 6 từ của văn bản đã làm sạch; mọi mảnh có dòng Điều).
+
 ### Hiệu lực gán theo văn bản, không theo khoản đi sửa luật khác (2021 → 2026-10-18)
 - **Đã quyết:** mỗi đoạn mang hiệu lực của văn bản chứa nó; chỉ khoản bị *chính văn bản khác sửa*
   (`sua_doi_in_place`) mới có cửa sổ riêng. BLLĐ 2019 còn hiệu lực → mọi đoạn BLLĐ mở tới 9999.
