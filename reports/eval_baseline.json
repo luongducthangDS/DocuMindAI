@@ -10,7 +10,7 @@
     "retriever": "hybrid BM25 + dense, RRF fusion → top-8",
     "reranker_active": false,
     "index": "qdrant/documind_legal_fpt/Vietnamese_Embedding/1249",
-    "git_sha": "065b5ad",
+    "git_sha": "719f1f2",
     "n_degraded": 0,
     "embed_cache": true
   },
@@ -36,7 +36,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 362
         }
       },
       "degraded": []
@@ -62,7 +62,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 345
         }
       },
       "degraded": []
@@ -88,7 +88,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 345
         }
       },
       "degraded": []
@@ -114,7 +114,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 341
         }
       },
       "degraded": []
@@ -140,7 +140,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 340
         }
       },
       "degraded": []
@@ -166,7 +166,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 341
         }
       },
       "degraded": []
@@ -192,7 +192,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -218,7 +218,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -244,7 +244,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -270,7 +270,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 194
+          "retrieve_ms": 188
         }
       },
       "degraded": []
@@ -296,7 +296,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -322,7 +322,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -348,7 +348,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 194
+          "retrieve_ms": 188
         }
       },
       "degraded": []
@@ -374,7 +374,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -400,7 +400,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -426,7 +426,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 194
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -452,7 +452,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -478,7 +478,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -504,7 +504,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -522,7 +522,7 @@
       "arms": {
         "pre_filter": {
           "context": {
-            "gold_rank": 7,
+            "gold_rank": 8,
             "clause_ranks": [],
             "gold_coverage": 1.0,
             "gold": true,
@@ -530,7 +530,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -556,7 +556,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 193
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -608,7 +608,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -634,7 +634,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -660,7 +660,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -686,7 +686,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -712,7 +712,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -738,7 +738,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -761,7 +761,7 @@
             "clean": true,
             "n_chunks": 0
           },
-          "retrieve_ms": 190
+          "retrieve_ms": 181
         }
       },
       "degraded": []
@@ -784,7 +784,7 @@
             "clean": true,
             "n_chunks": 0
           },
-          "retrieve_ms": 188
+          "retrieve_ms": 183
         }
       },
       "degraded": []
@@ -813,7 +813,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -831,10 +831,10 @@
       "arms": {
         "pre_filter": {
           "context": {
-            "gold_rank": 3,
+            "gold_rank": 5,
             "clause_ranks": [
-              1,
-              3
+              3,
+              5
             ],
             "gold_coverage": 1.0,
             "gold": true,
@@ -842,7 +842,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -871,7 +871,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -900,7 +900,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -929,7 +929,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 346
         }
       },
       "degraded": []
@@ -984,7 +984,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -1010,7 +1010,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -1036,7 +1036,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -1062,7 +1062,7 @@
             "clean": false,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -1088,7 +1088,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -1114,7 +1114,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 194
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -1140,7 +1140,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -1166,7 +1166,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 349
         }
       },
       "degraded": []
@@ -1192,7 +1192,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -1218,7 +1218,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -1244,7 +1244,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 194
+          "retrieve_ms": 188
         }
       },
       "degraded": []
@@ -1270,7 +1270,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -1296,7 +1296,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 193
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -1322,7 +1322,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -1348,7 +1348,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -1374,7 +1374,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -1400,7 +1400,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -1426,7 +1426,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -1452,7 +1452,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -1478,7 +1478,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -1504,7 +1504,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -1530,7 +1530,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -1556,7 +1556,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 188
         }
       },
       "degraded": []
@@ -1582,7 +1582,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -1608,7 +1608,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -1634,7 +1634,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 194
         }
       },
       "degraded": []
@@ -1660,7 +1660,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -1686,7 +1686,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 194
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -1712,7 +1712,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -1738,7 +1738,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -1764,7 +1764,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -1790,7 +1790,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 192
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -1816,7 +1816,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 197
         }
       },
       "degraded": []
@@ -1842,7 +1842,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 193
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -1868,7 +1868,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 193
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -1894,7 +1894,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 357
         }
       },
       "degraded": []
@@ -1920,7 +1920,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -1946,7 +1946,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 193
+          "retrieve_ms": 188
         }
       },
       "degraded": []
@@ -1972,7 +1972,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -1998,7 +1998,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -2024,7 +2024,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -2050,7 +2050,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 188
         }
       },
       "degraded": []
@@ -2076,7 +2076,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -2102,7 +2102,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -2128,7 +2128,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 194
         }
       },
       "degraded": []
@@ -2154,7 +2154,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -2180,7 +2180,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -2206,7 +2206,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -2232,7 +2232,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -2258,7 +2258,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 188
         }
       },
       "degraded": []
@@ -2284,7 +2284,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -2310,7 +2310,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 187
         }
       },
       "degraded": []
@@ -2336,7 +2336,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 191
+          "retrieve_ms": 187
         }
       },
       "degraded": []
@@ -2365,7 +2365,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 188
         }
       },
       "degraded": []
@@ -2394,7 +2394,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 194
         }
       },
       "degraded": []
@@ -2423,7 +2423,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 192
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -2452,7 +2452,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -2481,7 +2481,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 413
         }
       },
       "degraded": []
@@ -2507,7 +2507,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -2533,7 +2533,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 203
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -2559,7 +2559,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -2585,7 +2585,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -2611,7 +2611,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -2637,7 +2637,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -2663,7 +2663,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -2689,7 +2689,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -2715,7 +2715,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -2741,7 +2741,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -2767,7 +2767,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -2793,7 +2793,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -2819,7 +2819,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -2845,7 +2845,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -2871,7 +2871,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 187
         }
       },
       "degraded": []
@@ -2897,7 +2897,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -2923,7 +2923,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 188
         }
       },
       "degraded": []
@@ -2949,7 +2949,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 191
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -2975,7 +2975,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -3001,7 +3001,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -3027,7 +3027,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -3053,7 +3053,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -3079,7 +3079,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 202
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -3105,7 +3105,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 350
         }
       },
       "degraded": []
@@ -3131,7 +3131,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -3157,7 +3157,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -3183,7 +3183,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -3209,7 +3209,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -3235,7 +3235,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -3261,7 +3261,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -3287,7 +3287,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -3313,7 +3313,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -3339,7 +3339,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 195
         }
       },
       "degraded": []
@@ -3365,7 +3365,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -3391,7 +3391,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -3443,7 +3443,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 194
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -3472,7 +3472,7 @@
             "clean": false,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -3501,7 +3501,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -3530,7 +3530,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -3548,18 +3548,18 @@
       "arms": {
         "pre_filter": {
           "context": {
-            "gold_rank": null,
+            "gold_rank": 8,
             "clause_ranks": [
-              null,
+              8,
               1
             ],
-            "gold_coverage": 0.5,
-            "gold": false,
+            "gold_coverage": 1.0,
+            "gold": true,
             "distractor": false,
-            "clean": false,
+            "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -3585,7 +3585,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 193
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -3611,7 +3611,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -3637,7 +3637,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -3689,7 +3689,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -3715,7 +3715,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 188
         }
       },
       "degraded": []
@@ -3741,7 +3741,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -3767,7 +3767,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 194
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -3793,7 +3793,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -3819,7 +3819,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -3845,7 +3845,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 193
+          "retrieve_ms": 354
         }
       },
       "degraded": []
@@ -3871,7 +3871,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -3897,7 +3897,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -3923,7 +3923,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 194
+          "retrieve_ms": 186
         }
       },
       "degraded": []
@@ -3949,7 +3949,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 198
         }
       },
       "degraded": []
@@ -3975,7 +3975,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -4001,7 +4001,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 206
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -4027,7 +4027,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -4053,7 +4053,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -4079,7 +4079,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -4131,7 +4131,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -4157,7 +4157,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -4183,7 +4183,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -4209,7 +4209,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -4235,7 +4235,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -4261,7 +4261,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 192
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -4287,7 +4287,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 188
         }
       },
       "degraded": []
@@ -4313,7 +4313,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -4339,7 +4339,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -4365,7 +4365,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -4391,7 +4391,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -4414,7 +4414,7 @@
             "clean": true,
             "n_chunks": 0
           },
-          "retrieve_ms": 188
+          "retrieve_ms": 183
         }
       },
       "degraded": []
@@ -4437,7 +4437,7 @@
             "clean": true,
             "n_chunks": 0
           },
-          "retrieve_ms": 190
+          "retrieve_ms": 183
         }
       },
       "degraded": []
@@ -4463,7 +4463,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -4489,7 +4489,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -4515,7 +4515,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 196
         }
       },
       "degraded": []
@@ -4541,7 +4541,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 194
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -4567,7 +4567,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -4593,7 +4593,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -4619,7 +4619,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -4645,7 +4645,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -4671,7 +4671,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -4697,7 +4697,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -4723,7 +4723,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 197
+          "retrieve_ms": 187
         }
       },
       "degraded": []
@@ -4749,7 +4749,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -4775,7 +4775,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 198
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -4801,7 +4801,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -4827,7 +4827,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -4853,7 +4853,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 191
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -4879,7 +4879,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 194
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -4905,7 +4905,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 188
         }
       },
       "degraded": []
@@ -4931,7 +4931,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 188
         }
       },
       "degraded": []
@@ -4957,7 +4957,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 195
+          "retrieve_ms": 190
         }
       },
       "degraded": []
@@ -4983,7 +4983,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 193
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -5009,7 +5009,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -5035,7 +5035,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -5087,7 +5087,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 201
+          "retrieve_ms": 193
         }
       },
       "degraded": []
@@ -5113,7 +5113,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 189
         }
       },
       "degraded": []
@@ -5142,7 +5142,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 196
+          "retrieve_ms": 192
         }
       },
       "degraded": []
@@ -5171,7 +5171,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 194
+          "retrieve_ms": 191
         }
       },
       "degraded": []
@@ -5197,7 +5197,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 200
+          "retrieve_ms": 194
         }
       },
       "degraded": []
@@ -5223,7 +5223,7 @@
             "clean": true,
             "n_chunks": 8
           },
-          "retrieve_ms": 199
+          "retrieve_ms": 188
         }
       },
       "degraded": []
@@ -5233,24 +5233,24 @@
     "overall": {
       "pre_filter": {
         "n": 199,
-        "context_gold": 0.9798994974874372,
-        "context_gold_coverage": 0.9849246231155779,
+        "context_gold": 0.9849246231155779,
+        "context_gold_coverage": 0.9874371859296482,
         "context_distractor": 0.0,
-        "context_clean": 0.9798994974874372,
+        "context_clean": 0.9849246231155779,
         "avg_chunks": 7.839195979899498,
         "recall_at_1": 0.7634408602150538,
-        "recall_at_3": 0.9139784946236559,
+        "recall_at_3": 0.9086021505376344,
         "recall_at_5": 0.9301075268817204,
-        "recall_at_8": 0.978494623655914,
-        "mrr": 0.8400281618023553,
+        "recall_at_8": 0.9838709677419355,
+        "mrr": 0.8398873527905786,
         "recall_at_1_single": 0.8402366863905325,
         "n_single": 169,
-        "multi_coverage_at_3": 0.7058823529411765,
+        "multi_coverage_at_3": 0.6764705882352942,
         "multi_coverage_at_5": 0.7941176470588235,
-        "multi_coverage_at_8": 0.9411764705882353,
+        "multi_coverage_at_8": 0.9705882352941176,
         "n_multi": 17,
-        "retrieve_ms_p50": 197.0,
-        "retrieve_ms_p95": 200.0
+        "retrieve_ms_p50": 191.0,
+        "retrieve_ms_p95": 341.0
       }
     },
     "by_kind": {
@@ -5269,8 +5269,8 @@
           "mrr": 0.5833333333333334,
           "recall_at_1_single": 0.5,
           "n_single": 4,
-          "retrieve_ms_p50": 196.0,
-          "retrieve_ms_p95": 199.0
+          "retrieve_ms_p50": 191.0,
+          "retrieve_ms_p95": 192.0
         }
       },
       "clause_version": {
@@ -5288,8 +5288,8 @@
           "mrr": 1.0,
           "recall_at_1_single": 1.0,
           "n_single": 4,
-          "retrieve_ms_p50": 194.0,
-          "retrieve_ms_p95": 199.0
+          "retrieve_ms_p50": 189.0,
+          "retrieve_ms_p95": 194.0
         }
       },
       "compliance": {
@@ -5307,8 +5307,8 @@
           "mrr": 1.0,
           "recall_at_1_single": 1.0,
           "n_single": 3,
-          "retrieve_ms_p50": 194.0,
-          "retrieve_ms_p95": 198.0
+          "retrieve_ms_p50": 192.0,
+          "retrieve_ms_p95": 195.0
         }
       },
       "control": {
@@ -5326,8 +5326,8 @@
           "mrr": 1.0,
           "recall_at_1_single": 1.0,
           "n_single": 4,
-          "retrieve_ms_p50": 196.0,
-          "retrieve_ms_p95": 197.0
+          "retrieve_ms_p50": 189.0,
+          "retrieve_ms_p95": 189.0
         }
       },
       "doc_version": {
@@ -5342,11 +5342,11 @@
           "recall_at_3": 0.9642857142857143,
           "recall_at_5": 0.9642857142857143,
           "recall_at_8": 1.0,
-          "mrr": 0.8146258503401359,
+          "mrr": 0.8139880952380951,
           "recall_at_1_single": 0.6785714285714286,
           "n_single": 28,
-          "retrieve_ms_p50": 197.0,
-          "retrieve_ms_p95": 201.0
+          "retrieve_ms_p50": 192.0,
+          "retrieve_ms_p95": 345.0
         }
       },
       "false_premise": {
@@ -5364,29 +5364,29 @@
           "mrr": 0.6845238095238095,
           "recall_at_1_single": 0.5714285714285714,
           "n_single": 7,
-          "retrieve_ms_p50": 197.0,
-          "retrieve_ms_p95": 203.0
+          "retrieve_ms_p50": 191.0,
+          "retrieve_ms_p95": 193.0
         }
       },
       "multi_clause": {
         "pre_filter": {
           "n": 17,
-          "context_gold": 0.8823529411764706,
-          "context_gold_coverage": 0.9411764705882353,
+          "context_gold": 0.9411764705882353,
+          "context_gold_coverage": 0.9705882352941176,
           "context_distractor": 0.0,
-          "context_clean": 0.8823529411764706,
+          "context_clean": 0.9411764705882353,
           "avg_chunks": 8.0,
           "recall_at_1": 0.0,
-          "recall_at_3": 0.47058823529411764,
+          "recall_at_3": 0.4117647058823529,
           "recall_at_5": 0.5882352941176471,
-          "recall_at_8": 0.8823529411764706,
-          "mrr": 0.24026610644257704,
-          "multi_coverage_at_3": 0.7058823529411765,
+          "recall_at_8": 0.9411764705882353,
+          "mrr": 0.23977591036414564,
+          "multi_coverage_at_3": 0.6764705882352942,
           "multi_coverage_at_5": 0.7941176470588235,
-          "multi_coverage_at_8": 0.9411764705882353,
+          "multi_coverage_at_8": 0.9705882352941176,
           "n_multi": 17,
-          "retrieve_ms_p50": 196.0,
-          "retrieve_ms_p95": 200.0
+          "retrieve_ms_p50": 191.0,
+          "retrieve_ms_p95": 413.0
         }
       },
       "out_of_range": {
@@ -5397,8 +5397,8 @@
           "context_distractor": 0.0,
           "context_clean": 1.0,
           "avg_chunks": 0.0,
-          "retrieve_ms_p50": 188.0,
-          "retrieve_ms_p95": 190.0
+          "retrieve_ms_p50": 183.0,
+          "retrieve_ms_p95": 183.0
         }
       },
       "out_of_scope": {
@@ -5409,8 +5409,8 @@
           "context_distractor": 0.0,
           "context_clean": 1.0,
           "avg_chunks": 8.0,
-          "retrieve_ms_p50": 197.0,
-          "retrieve_ms_p95": 200.0
+          "retrieve_ms_p50": 192.0,
+          "retrieve_ms_p95": 349.0
         }
       },
       "single_clause": {
@@ -5428,8 +5428,8 @@
           "mrr": 0.9341202582728007,
           "recall_at_1_single": 0.8898305084745762,
           "n_single": 118,
-          "retrieve_ms_p50": 197.0,
-          "retrieve_ms_p95": 201.0
+          "retrieve_ms_p50": 190.0,
+          "retrieve_ms_p95": 196.0
         }
       },
       "table_lookup": {
@@ -5447,8 +5447,8 @@
           "mrr": 1.0,
           "recall_at_1_single": 1.0,
           "n_single": 1,
-          "retrieve_ms_p50": 197.0,
-          "retrieve_ms_p95": 197.0
+          "retrieve_ms_p50": 191.0,
+          "retrieve_ms_p95": 191.0
         }
       }
     }

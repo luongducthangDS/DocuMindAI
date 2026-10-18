@@ -86,13 +86,15 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   rerank API p50 250ms); Gemini-2 0.72 → 0.78 với luật. Đọc theo cặp, không theo tỷ lệ (n=169, CI95 ±0.05):
   rerank thắng 13/thua 5 ở hạng 1 (p≈0.10), không tăng top-8 → production TẮT rerank. Eval đầu cuối
   2026-10-18 (`reports/e2e_k_rerank.json`, k = số đoạn vào LLM ∈ {3,5,8} × rerank) giữ quyết định đó:
-  k=8 không rerank (= production, `top_n=8`) accuracy 0.950; rerank ở k=8 thắng 3/thua 1 câu — trong mức
+  k=8 không rerank accuracy 0.950 (lúc đó câu < 150 ký tự thực ra chỉ nhận 5 đoạn — xem dưới); rerank ở k=8 thắng 3/thua 1 câu — trong mức
   dao động 2–3 câu giữa hai lượt cùng cấu hình (FPT temperature 0 vẫn không tất định) — mà p95 +0.7s và
   /v1/rerank 429 khi tải (chung hạn mức key với LLM). k mới là đòn bẩy: k=8 so k=3 thắng 9/thua 2.
   Faithfulness judge ≈0.99 ở cả 6 cấu hình và cho 1.0 cả câu sai bám đúng một đoạn đã hết hiệu lực →
   chưa dùng làm thước đo an toàn được; chấm chuỗi cũng báo sai câu đúng. Hiệu chỉnh cả hai bằng người
   chấm: bảng duyệt https://claude.ai/artifact/GwULtyAAPsxS5LewLzjcdn (36 câu trượt hạng 1 + 30 câu trả
-  lời k=8; nhãn ở collection `reviews` của artifact, Claude đọc bằng ArtifactData). `ci_gate` in bảng thắng/thua theo câu;
+  lời k=8; nhãn ở collection `reviews` của artifact, Claude đọc bằng ArtifactData). Lượt duyệt đầu (2026-10-18,
+  32/36 `gold_sai`) chấm trên văn bản bị trang cắt ở 700–900 ký tự → không dùng; trang đã nạp toàn văn,
+  nhãn cũ hiện "cần xem lại" (`text_full_since`). `ci_gate` in bảng thắng/thua theo câu;
   câu nhiều điều khoản đo bằng `multi_coverage_at_k` (recall@1 của chúng luôn = 0 theo định nghĩa).
 - LLM: **chỉ FPT AI Marketplace** (2026-10-18): `GEMINI_GENERATION_MODELS`, `GEMINI_GENERATION_MODELS_COMPLEX`,
   `GEMINI_JUDGE_MODELS` để TRỐNG ở `.env` và Render ⇒ không còn cặp Gemini; FPT hỏng cả hai model thì trích
@@ -299,6 +301,16 @@ logs/
 for k in ("HF_HOME", "HF_HUB_CACHE", "TRANSFORMERS_CACHE", "SENTENCE_TRANSFORMERS_HOME"):
     os.environ[k] = str(local_hf_path)
 ```
+
+**Chunk (2026-10-18):** một Điều = một đoạn; điều > 4.000 ký tự tách theo khoản, điều có khoản sửa tại chỗ tách
+quanh khoản đó (bỏ qua "2.", "3." nằm trong phần trích “…”). Mọi đoạn mang "Chương — Mục"; mảnh không mở đầu bằng
+"Điều N." mang thêm "Điều N. Tiêu đề" + câu dẫn ≤ 300 ký tự (`chunker._article_head`). KHÔNG gắn tên văn bản lên mọi
+đoạn — đo: recall@1 tăng nhưng độ phủ câu nhiều điều 0.941 → 0.853 (`reports/chunk_context_budget.json`). Chunker
+làm rơi ≤ 6 từ của văn bản đã làm sạch (`TestChunksAreComplete`); kiểm lại toàn corpus bằng phép phủ cụm 8 từ.
+
+**Ngữ cảnh LLM:** mọi câu nhận đủ top_n (8) đoạn, nguyên vẹn, trong ngân sách `_MAX_TOTAL_CHARS = 24_000`; đoạn không
+vừa thì bỏ nguyên đoạn. Trước 2026-10-18 câu < 150 ký tự bị cắt còn 5 đoạn và mỗi đoạn cắt ở 3.000 ký tự — 3 câu gold
+mất đoạn gold; bỏ cắt + header: accuracy 0.950 → 0.975, p50 đầu cuối 1.5 → 2.1 s.
 
 **Score filtering:** `generator.py` lọc chunk có `score < 0.05` trước khi gọi LLM. Nếu tất cả chunk dưới ngưỡng → trả về message "không tìm thấy" + gợi ý upload, không gọi LLM, không show nguồn.
 

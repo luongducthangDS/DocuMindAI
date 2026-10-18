@@ -436,8 +436,10 @@ class TestQueryComplexityRouting:
         assert "gemini-3.7-flash" in models
 
     @patch("src.rag.generator._call_gemini")
-    def test_generate_answer_trims_chunks_for_simple_query(self, mock_gemini):
-        from src.rag.generator import _SIMPLE_QUERY_MAX_CHUNKS, generate_answer
+    def test_generate_answer_sends_every_retrieved_chunk_for_simple_query(self, mock_gemini):
+        """Bản cũ cắt câu ngắn xuống 5 đoạn: gold ở hạng 6–8 (ld_t10b, lh_f01, g2_b037) không
+        tới LLM và câu trả lời thành "không tìm thấy"."""
+        from src.rag.generator import generate_answer
 
         mock_gemini.return_value = "Tra loi [1]"
         chunks = [
@@ -445,9 +447,23 @@ class TestQueryComplexityRouting:
             for i in range(8)
         ]
         generate_answer("cau hoi ngan don gian", chunks)
-        called_context = mock_gemini.call_args.args[1]
-        assert f"[{_SIMPLE_QUERY_MAX_CHUNKS}]" in called_context
-        assert f"[{_SIMPLE_QUERY_MAX_CHUNKS + 1}]" not in called_context
+        assert "[8] Noi dung 7" in mock_gemini.call_args.args[1]
+
+    def test_long_chunk_reaches_the_llm_whole(self):
+        """Bản cũ cắt mọi đoạn ở 3.000 ký tự (95 đoạn của corpus dài hơn)."""
+        from src.rag.generator import _build_context
+
+        long = "a " * 2000 + "ĐUÔI_ĐOẠN"
+        ctx, _ = _build_context([RetrievedChunk(text=long, score=0.9, metadata={"title": "L"})])
+        assert "ĐUÔI_ĐOẠN" in ctx
+
+    def test_chunk_over_budget_is_left_out_whole_not_cut(self):
+        from src.rag import generator
+
+        chunks = [RetrievedChunk(text=t, score=0.9, metadata={"title": "L"})
+                  for t in ("x" * 100, "y" * generator._MAX_TOTAL_CHARS, "z" * 100)]
+        ctx, cites = generator._build_context(chunks)
+        assert "y" * 50 not in ctx and "z" * 100 in ctx
 
     @patch("src.rag.generator._call_gemini")
     def test_generate_answer_keeps_all_chunks_for_complex_query(self, mock_gemini):

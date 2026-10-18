@@ -97,17 +97,46 @@ def _heading_blocks(text: str) -> list[tuple[int, int, str, str]]:
     return blocks
 
 
-def _with_heading(chunk: "LegalChunk", chuong: str, muc: str) -> "LegalChunk":
+def _with_heading(chunk: "LegalChunk", chuong: str, muc: str, article_head: str = "") -> "LegalChunk":
     """Prefix the chapter/section a chunk sits in. Without it "Điều 54. Điều kiện hưởng
     lương hưu" (Chương III, BHXH bắt buộc) and "Điều 73. Điều kiện hưởng lương hưu"
     (Chương IV, tự nguyện) are indistinguishable — measured 2026-10-17: ~18/186 gold
-    questions got the voluntary article for a mandatory question."""
-    if not chuong:
+    questions got the voluntary article for a mandatory question.
+
+    A piece split off a long or amended article starts at "2. …" with nothing saying
+    which article it is — and embedder, BM25 and LLM only ever see the text. Such a piece
+    also gets the article's title line and lead-in (measured 2026-10-18: 193/270 pieces
+    had no "Điều N." line)."""
+    lines = [f"{chuong} — {muc}" if muc else chuong] if chuong else []
+    if article_head and not _DIEU_HEAD_RE.match(chunk.text.lstrip().split("\n", 1)[0]):
+        lines.append(article_head)
+    if not lines:
         return chunk
-    context = f"{chuong} — {muc}" if muc else chuong
-    chunk.text = f"{context}\n{chunk.text}"
-    chunk.metadata.update(chuong=chuong, muc=muc, char_count=len(chunk.text))
+    chunk.text = "\n".join([*lines, chunk.text])
+    chunk.metadata.update(char_count=len(chunk.text))
+    if chuong:
+        chunk.metadata.update(chuong=chuong, muc=muc)
     return chunk
+
+
+_LEAD_IN_MAX = 300
+
+
+def _article_head(dieu_text: str) -> str:
+    """"Điều N. Tiêu đề" + the lead-in before khoản 1 ("… khi thuộc một trong các trường
+    hợp sau đây:") — the sentence every later khoản of the article completes."""
+    lines = dieu_text.strip().split("\n")
+    lead = []
+    for line in lines[1:]:
+        s = line.strip()
+        if _KHOAN_HEAD_RE.match(s) or re.match(r"^[a-zđ]\)\s", s):
+            break
+        if s:
+            lead.append(s)
+    lead_in = " ".join(lead)
+    if len(lead_in) > _LEAD_IN_MAX:
+        lead_in = lead_in[:_LEAD_IN_MAX].rsplit(" ", 1)[0] + " …"
+    return lines[0].strip() + (f"\n{lead_in}" if lead_in else "")
 
 
 def split_appendix(text: str) -> tuple[str, str]:
@@ -227,9 +256,22 @@ def _split_amended_dieu(
                 continue
         buckets[-1][1].append(line)
 
+    # Khoản lẻ sau khoản bị sửa ("9. Trường hợp khác theo quy định của Chính phủ.", 47 ký tự,
+    # sau khoản 8a Điều 154) dưới ngưỡng đoạn tối thiểu — gộp vào phần không sửa trước nó
+    # thay vì bỏ (đo 2026-10-18: khoản 9 Điều 154 BLLĐ không nằm trong đoạn nào).
+    title_line = dieu_text.split("\n", 1)[0].strip()
+    merged: list[tuple[InPlaceAmendment | None, list[str]]] = []
+    for amendment, body in buckets:
+        text = "\n".join(body).strip()
+        prev = next((b for a, b in reversed(merged) if a is None), None)
+        if amendment is None and 0 < len(text) < 50 and text != title_line and prev is not None:
+            prev.extend(["", *body])
+            continue
+        merged.append((amendment, body))
+
     chunks: list[LegalChunk] = []
     segment = 0
-    for amendment, body in buckets:
+    for amendment, body in merged:
         text = "\n".join(body).strip()
         # Khoản 1 bị tách ra thì phần đầu chỉ còn dòng "Điều N. Tên điều" — không phải đoạn.
         if len(text) < 50 or text == dieu_text.split("\n", 1)[0].strip():
@@ -338,7 +380,8 @@ def chunk_by_dieu(
             chunks.append(_article_chunk(chunk_text, doc_meta, dieu, dieu_tieu_de))
         # Validity on the body, before the prefix: a heading-only stub ("Điều 19. Chấm
         # dứt ...", 43 chars) must stay out of the index as it always has.
-        chunks[first:] = [_with_heading(c, chuong, muc) for c in chunks[first:] if c.is_valid]
+        head = _article_head(chunk_text) if dieu is not None else ""
+        chunks[first:] = [_with_heading(c, chuong, muc, head) for c in chunks[first:] if c.is_valid]
 
     chunks.extend(_appendix_chunks(appendix, doc_meta))
 

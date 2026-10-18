@@ -322,6 +322,57 @@ class TestClauseChunking:
         assert "Khoản này được sửa đổi, bổ sung theo quy định tại" not in joined
 
 
+class TestChunksAreComplete:
+    """Đo 2026-10-18 trên toàn corpus: chunker làm rơi 31/342.494 từ (tiêu đề các điều được
+    sửa tại chỗ), và 193/270 đoạn tách từ điều dài không có dòng "Điều N." — embedder và
+    LLM thấy "2. Người lao động…" mà không biết của điều nào."""
+
+    @pytest.fixture(scope="class")
+    def corpus(self, manifest):
+        from scripts.ingest_documents import build_clause_chunks, clean_md, split_frontmatter
+        from src.ingestion.cleaner import strip_consolidated_footnotes, strip_consolidated_quotations
+
+        out = []
+        for e in manifest.values():
+            _, body = split_frontmatter((CORPUS_DIR / e.source_file).read_text(encoding="utf-8"))
+            if e.consolidated_from:
+                body = strip_consolidated_footnotes(strip_consolidated_quotations(body))
+            out.append((clean_md(body), build_clause_chunks(e, CORPUS_DIR, "2026-10-18")))
+        return out
+
+    def test_chunker_keeps_every_word_of_the_cleaned_text(self, corpus):
+        import re
+        import unicodedata
+
+        def words(t):
+            return re.findall(r"\w+", unicodedata.normalize("NFC", t).lower())
+
+        n, lost = 8, 0
+        total = 0
+        for body, chunks in corpus:
+            m = re.search(r"^\s*Điều\s+1\.", body, re.M)
+            src = words(body[m.start():] if m else body)
+            dst = words("\n".join(c.text for c in chunks))
+            have = {tuple(dst[i:i + n]) for i in range(len(dst) - n + 1)}
+            cov = [False] * len(src)
+            for i in range(len(src) - n + 1):
+                if tuple(src[i:i + n]) in have:
+                    cov[i:i + n] = [True] * n
+            lost += cov.count(False)
+            total += len(src)
+        # Còn lại đúng 6 từ: câu dẫn cấp chương của 158/2025 Chương II ("… được quy định chi
+        # tiết như sau:") nằm giữa tiêu đề chương và Điều 6 — điều hướng, không có quy phạm.
+        assert lost <= 6, f"chunker làm rơi {lost}/{total} từ"
+
+    def test_every_article_piece_names_its_article(self, corpus):
+        import re
+
+        bad = [c.metadata["version_id"] for _, chunks in corpus for c in chunks
+               if isinstance(c.metadata.get("dieu"), int)
+               and not re.search(rf"^Điều\s+{c.metadata['dieu']}[a-z]?\s*[.:]", c.text, re.M)]
+        assert bad == []
+
+
 class TestLapsedClause:
     """Điều 219 khoản 1 BLLĐ sửa điều kiện lương hưu "đủ 20 năm" của Luật BHXH 58/2014 —
     hết áp dụng khi 41/2024/QH15 thay luật đó (01/7/2025). Đo 2026-10-18: để mở tới 9999
