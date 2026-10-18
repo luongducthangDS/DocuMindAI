@@ -54,7 +54,9 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
 - **Gold set chính: `data/eval/legal_qa_200.json` (208 câu)** = 30 temporal + 19 hard + 150 câu
   Claude soạn (`g2_*`, `reviewed: false`) + 9 câu `g3_cv*` (2026-10-18, `clause_version`, `reviewed: false`):
   corpus chỉ có 6 khoản nhiều phiên bản (12 phiên bản) mà gold cũ phủ 4 — giờ phủ đủ 12, có cặp cùng câu
-  hỏi ở hai thời điểm. Phiên bản theo văn bản (357 chunk, 9 văn bản bị thay) là phần dày của corpus. Kiểm tra với index thật:
+  hỏi ở hai thời điểm. Phiên bản theo văn bản (357 chunk, 9 văn bản bị thay) là phần dày của corpus.
+  Câu Có/Không có thể khai `expect_verdict: "có"|"không"` — câu trả lời phải MỞ ĐẦU bằng kết luận đó (chấm
+  chuỗi không bắt được "**Có** … phải đủ 20 năm"); mới có `lh_b02a/b02b`. Kiểm tra với index thật:
   `python eval/validate_gold.py data/eval/legal_qa_200.json`. Metric: recall@1/3/5/8, MRR,
   faithfulness (`--judge <arms>`), p50/p95; `--mlflow <run>` log vào MLflow (`mlflow.db`, gitignored);
   `--embed-cache` chỉ dùng cho CI (latency khi đó không phải số thật). Kết quả: README mục Đánh giá —
@@ -76,7 +78,7 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   Report nào ghi rerank phải xem `meta.reranker_active`, không tin `ENABLE_RERANKER`.
   torch/sentence-transformers/transformers **không** còn trong `requirements.txt` (2026-09-27,
   image production không cài ~1.3GB này) — muốn chạy reranker: `pip install -r requirements-rerank.txt`.
-- Test suite: 686 passed (đo 2026-10-18). Test không gửi trace ra Langfuse/LangSmith
+- Test suite: 687 passed (đo 2026-10-18). Test không gửi trace ra Langfuse/LangSmith
   (`conftest.py::patch_settings` xoá key).
 
 **Stack:**
@@ -140,6 +142,12 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   thua 6 (`lh_o02` trả lời câu ngoài phạm vi); `enable_thinking` cho câu phức tạp p95 sinh 61s; kiểm SAU
   bản nháp (verifier) 10/12 — model tự phân tích đúng nhưng so với bản nháp lại ghi "GIỮ". So phương án đổi
   prompt/model thì đọc từng câu đổi kết quả — chấm chuỗi thiên vị cấu hình đang chạy (LESSONS).
+  Rule 8 (BLUF) chỉ áp khi các đoạn CÓ nội dung được hỏi; không có thì không nêu con số, dùng khuôn hỏi lại
+  của rule 4 (2026-10-18 — DeepSeek nêu "1,5%" BHYT theo trí nhớ cho câu ngoài phạm vi `lh_o02` 4/12 → 0/12).
+  **Model dự phòng phải eval như model chính:** DeepSeek gánh câu đầu sau mỗi lần Qwen treo/cooldown.
+  `generate_answer` trả `model`, report eval ghi `model` từng câu; DeepSeek trả lời cả 208 câu:
+  `reports/eval_e2e_deepseek_first.json` (0.981, ngoài phạm vi 9/9). Đo DeepSeek: `FPT_MODELS=DeepSeek-V4-Flash,Qwen3.8-27B`.
+  Chạy 2 eval đầu cuối song song trên cùng key FPT = 429 embedding — chạy tuần tự.
 - Frontend: React + Vite (port 5174), proxies `/api` → backend port 8081
 
 **Deploy (2026-07, theo default-tech-stack skill):**

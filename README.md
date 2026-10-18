@@ -211,31 +211,36 @@ Mọi số trong bảng lấy nguyên từ `summary.overall` / `summary.by_kind`
 | Recall@5 | 0.918 | **0.938** |
 | MRR | 0.725 | **0.857** |
 | Ngữ cảnh lẫn bản luật hết hiệu lực | 24.5% | **0.0%** |
-| Answer accuracy (208 câu) | 0.812 | **0.986** |
-| — riêng câu đổi phiên bản văn bản (n=28) | 0.46 | **1.00** |
-| — riêng câu đổi phiên bản khoản (n=13) | 0.38 | **0.92** |
-| Faithfulness (LLM judge; n=199 / 196 câu judge chấm được) | 0.985 | 0.989 |
-| Latency truy hồi p95 | 1069 ms | 1059 ms |
-| Latency end-to-end p50 / p95 | 2.0 s / 5.3 s | 1.9 s / 5.7 s |
+| Answer accuracy (208 câu) | 0.798 | **0.981** |
+| — riêng câu đổi phiên bản văn bản (n=28) | 0.43 | **1.00** |
+| — riêng câu đổi phiên bản khoản (n=13) | 0.38 | **0.85** |
+| Faithfulness (LLM judge; n=200 / 196 câu judge chấm được) | 0.982 | 0.983 |
+| Latency truy hồi p95 | 1141 ms | 1251 ms |
+| Latency end-to-end p50 / p95 | 2.1 s / 4.8 s | 1.9 s / 5.4 s |
 
 Đọc bảng cho đúng:
 - Chạy 2026-10-18, `meta.index` = `qdrant/documind_legal_fpt/Vietnamese_Embedding/1249/5ce81d96ccb9`
   — đuôi là hash nội dung, trùng Chroma local và `ingest_documents.py --dry-run` của code hiện tại,
-  tức đúng index production đang đọc. LLM FPT, không reranker, 0 câu thiếu nhánh dense. Report ghi git
-  `81997fb` nhưng chạy trên bản đó **cộng** lượt phân tích Có/Không chưa commit (harness giờ ghi `-dirty`).
-- Câu Có/Không (30/208) đi qua một lượt phân tích điều kiện trước khi trả lời (CLAUDE.md, mục LLM):
-  `lh_m05b` — có Điều 64 Luật BHXH 2024 trong ngữ cảnh mà trước đó kết luận "phải đủ 20 năm" — giờ đúng;
-  so lượt trước, 30 câu này ở arm "sau" thắng 1, thua 0. Câu Có/Không chậm hơn một lượt LLM — phần lớn
-  chênh lệch p95 đầu cuối so với lượt trước (4.5 s).
-- Accuracy chấm bằng chuỗi. 3 câu arm "sau" bị chấm sai đều không phải câu Có/Không (prompt của chúng
-  không đổi — chênh với lượt trước là dao động của FPT): `g2_b023`, `g3_cv08` trả lời đúng mà lệch chuỗi
-  gold; `lh_o02` sai thật — câu ngoài phạm vi (tỷ lệ đóng BHYT) mà vẫn trả lời "1,5%" theo trí nhớ, gặp ở
-  2/4 lượt chạy hôm đó. Trước lượt này đã sửa 3 câu gold lệch chuỗi (`ld_t07a`, `g2_b004`, `g2_b027`) sau
-  khi đọc đầu ra — sửa thước đo, áp cho cả hai arm.
-- Faithfulness ≈0.98–0.99 ở cả hai arm dù accuracy lệch 17 điểm — judge không phân biệt được câu bám
+  tức đúng index production đang đọc. LLM FPT — Qwen3.8-27B trả lời mọi câu (report giờ ghi `model`),
+  không reranker, 0 câu thiếu nhánh dense. Git `4d59779369ed-dirty` = bản đó cộng thay đổi chưa commit của
+  chính lượt sửa này (rule 8, `expect_verdict`).
+- Câu Có/Không (30/208) đi qua một lượt phân tích điều kiện trước khi trả lời (CLAUDE.md, mục LLM) — hết
+  chốt kết luận theo luật cũ model nhớ (`lh_m05b`, `lh_b02a`). Câu mà đoạn nguồn không có nội dung được
+  hỏi: rule 8 (câu đầu là đáp án) nhường khuôn hỏi lại — `lh_o02` (tỷ lệ đóng BHYT, ngoài phạm vi) hết nêu
+  "1,5%" theo trí nhớ.
+- Accuracy chấm bằng chuỗi, cộng `expect_verdict` cho câu Có/Không (`lh_b02a/b`: câu "**Có** … phải đủ 20
+  năm" chứa đủ chuỗi gold mà kết luận sai). Đọc 4 câu arm "sau" bị chấm sai: 3 câu trả lời đúng mà lệch
+  chuỗi gold (`g2_a006`, `g2_d028`, `g3_cv08`); 1 câu sai thật — `g3_cv06` trả lời 05 ngày thay vì 10 (vợ
+  sinh con thứ hai, từ 01/7/2026), lỗi chập chờn đã gặp ở lượt trước. Hai lượt cùng cấu hình lệch nhau 2–3
+  câu (FPT không tất định). Gold đã sửa sau khi đọc đầu ra — `ld_t07a`, `g2_b004`, `g2_b027` (lệch chuỗi),
+  `lh_b02a/b` (thêm kiểm kết luận) — áp cho cả hai arm.
+- Model dự phòng (DeepSeek-V4-Flash gánh câu hỏi khi Qwen lỗi/cooldown — thường là câu đầu sau lúc nhàn
+  rỗi): cùng 208 câu cho DeepSeek trả lời trước ([`reports/eval_e2e_deepseek_first.json`](reports/eval_e2e_deepseek_first.json))
+  — arm "sau" accuracy 0.981, câu ngoài phạm vi 9/9.
+- Faithfulness ≈0.98 ở cả hai arm dù accuracy lệch 18 điểm — judge không phân biệt được câu bám
   đúng một đoạn đã hết hiệu lực, nên chưa dùng làm thước đo an toàn.
 - Câu đổi phiên bản khoản: corpus chỉ có 6 khoản nhiều phiên bản; 13 câu phủ đủ 12 phiên bản, đủ
-  để thấy hướng, chưa đủ cho một tỷ lệ chặt (0.92 ở arm "sau" là `g3_cv08` lệch chuỗi).
+  để thấy hướng, chưa đủ cho một tỷ lệ chặt (0.85 ở arm "sau" = `g3_cv06` sai thật + `g3_cv08` lệch chuỗi).
 - Latency đo từ máy local tới Qdrant Cloud (australia-southeast1), không phải từ Render.
 - Câu do Claude soạn (`drafted_by: claude`, `reviewed: false`) **chưa được người duyệt**.
 

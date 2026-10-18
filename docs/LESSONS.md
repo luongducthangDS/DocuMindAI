@@ -20,6 +20,21 @@ chọn sai lần hai.
 
 ## Chọn công nghệ / kiến trúc
 
+### Model dự phòng chưa từng được eval dù nó gánh câu hỏi sau mỗi lần nhàn rỗi (10-17 → 2026-10-18)
+- **Đã quyết:** `FPT_MODELS=Qwen3.8-27B,DeepSeek-V4-Flash` — DeepSeek trả lời khi Qwen lỗi/treo
+  (cooldown 120s). Mọi eval đầu cuối đo trên đường Qwen trả lời; report chỉ ghi `used_llm=fpt`.
+- **Sai ở đâu:** lượt gọi Qwen đầu tiên sau lúc nhàn rỗi hay treo tới timeout (đo 2026-10-17), nên với
+  traffic thấp câu hỏi đầu tiên sau mỗi lần nhàn rỗi thường do DeepSeek trả lời — một đường production có
+  thật mà không eval nào đo. DeepSeek trả lời câu ngoài phạm vi bằng trí nhớ: `lh_o02` (tỷ lệ đóng BHYT)
+  "1,5%" hoặc đổi sang mức đóng BHTN 4/12 lần, Qwen 0/12. Ở report, lỗi đó trông như dao động ngẫu nhiên
+  vì không biết model nào đã trả lời.
+- **Cái giá:** con số bịa, không nguồn, ở đúng câu hỏi đầu tiên người dùng gặp sau lúc hệ thống nghỉ.
+- **Bài học:** mọi model có thể trả lời người dùng là một cấu hình phải eval; kết quả phải ghi model cụ
+  thể, không chỉ nhà cung cấp.
+- **Giờ làm thế nào:** rule 8 nhường khuôn hỏi lại (rule 4) khi các đoạn không có nội dung được hỏi —
+  DeepSeek 12/12 trên `lh_o02`; `generate_answer` trả `model`, report eval ghi `model` từng câu;
+  `reports/eval_e2e_deepseek_first.json`: DeepSeek trả lời cả 208 câu — 0.981, ngoài phạm vi 9/9.
+
 ### Ép kết luận ở câu đầu (BLUF) trong khi model đã tắt suy luận (07-03 → 2026-10-18)
 - **Đã quyết:** rule 8 của `_SYSTEM_PROMPT` — câu đầu tiên là câu trả lời trực tiếp (con số, Có/Không) —
   thêm như một quy tắc định dạng cho dễ đọc quét; sau đó tắt `enable_thinking` vì Qwen suy luận mất 23s.
@@ -226,6 +241,18 @@ chọn sai lần hai.
 - **Giờ làm thế nào:** `use_local_hf_cache()` trong `src/hf_env.py`; `EMBEDDING_MODEL` trong `.env`.
 
 ## Dữ liệu & đánh giá
+
+### Gold câu Có/Không chỉ kiểm con số, không kiểm kết luận (Claude, → 2026-10-18)
+- **Đã làm:** Claude soạn `lh_b02a` ("đóng 17 năm, có được hưởng lương hưu không?", as_of 2025-06-30, đáp
+  án Không) với `expect_contains: [["20 năm"]]` — con số của điều kiện, không phải kết luận.
+- **Sai ở đâu:** câu sai "**Có**, bạn được hưởng lương hưu … phải đủ 20 năm" chứa đúng chuỗi đó — model
+  trả lời như vậy 3–5/6 lần trước khi có lượt phân tích Có/Không, và bộ chấm cho đúng cả 12 lần. Ngược với
+  mục "thiên vị cấu hình" bên dưới: ở đây chấm chuỗi báo ĐÚNG một câu sai mà tự tin.
+- **Cái giá:** README không thấy được dạng sai nguy hiểm nhất; lỗi lộ ra nhờ judge độ đúng của một phiên
+  khác, không phải nhờ eval của dự án.
+- **Bài học:** câu hỏi Có/Không phải kiểm kết luận; con số có mặt không chứng minh câu trả lời đúng chiều.
+- **Giờ làm thế nào:** `expect_verdict: "có"|"không"` — câu trả lời phải MỞ ĐẦU bằng kết luận đó (rule 8
+  đặt nó ở đầu); `lh_b02a/b02b`; `validate_gold` kiểm giá trị. Câu Có/Không khác chưa có trường này.
 
 ### So phương án bằng accuracy chấm chuỗi — thước đo thiên vị cấu hình đang chạy (Claude, 2026-10-18)
 - **Đã làm:** thử 3 cách sửa `lh_m05b` trên 208 câu (bỏ rule BLUF; DeepSeek trước Qwen; bật suy luận

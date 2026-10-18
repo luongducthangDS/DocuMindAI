@@ -152,3 +152,15 @@ def test_gold_rank_accepts_alternate_clause_for_single_clause_question():
     # Câu nhiều điều khoản: điều khoản thay thế không được dùng để "lấp" điều khoản thiếu
     q_multi = {"source_clause": "", "source_clauses": ["luat__d39", "x__d1"], "acceptable_clauses": ["nd__d15"]}
     assert gold_rank(chunks, q_multi) is None
+
+
+def test_expect_verdict_catches_a_wrong_yes_that_still_quotes_the_figure():
+    """lh_b02a: "**Có**, bạn được hưởng … phải đủ 20 năm" chứa đủ chuỗi gold "20 năm" mà kết luận sai."""
+    from eval.temporal_eval import score_answer
+
+    q = {"expect_contains": [["20 năm"]], "expect_absent": [], "expect_verdict": "không"}
+    wrong = "**Có**, bạn được hưởng lương hưu hằng tháng. Điều kiện là phải đủ **20 năm** đóng BHXH."
+    right = "**Không**, bạn chưa đủ điều kiện vì mới đóng 17 năm, chưa đạt **20 năm**."
+    assert score_answer(wrong, q)["wrong_verdict"] and not score_answer(wrong, q)["correct"]
+    assert score_answer(right, q)["correct"]
+    assert score_answer(wrong, {**q, "expect_verdict": None})["correct"]  # không khai thì như cũ

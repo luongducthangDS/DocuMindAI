@@ -54,6 +54,8 @@ def check(q: dict, catalog: dict[str, list[dict]]) -> list[str]:
     errors = [f"thiếu key {k}" for k in sorted(REQUIRED_KEYS - q.keys())]
     if errors:
         return errors
+    if q.get("expect_verdict") not in (None, "có", "không"):
+        errors.append(f"expect_verdict phải là 'có' hoặc 'không': {q['expect_verdict']!r}")
     uids = list(q.get("source_clauses") or []) or ([q["source_clause"]] if q["source_clause"] else [])
     if q["expected_behavior"] != "answer":
         # expect_contains here are refusal phrases ("không tìm thấy"), not law text.
