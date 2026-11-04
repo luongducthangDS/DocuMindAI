@@ -47,6 +47,24 @@ def test_summarise_recall_excludes_questions_without_gold():
     assert agg["retrieve_ms_p95"] == 100
 
 
+def test_confident_wrong_counts_only_non_refusals_and_pipeline_drops_guard_cases():
+    """Người chấm 2026-10-18: "sai mà tự tin" (m05b, b037) nguy hiểm hơn từ chối (t10b); câu
+    out_of_range đo guard tất định nên không được làm đẹp tỷ lệ của pipeline."""
+    def row(kind, verdict, answer):
+        ctx = {"gold": True, "distractor": False, "clean": True, "n_chunks": 8, "gold_rank": 1}
+        arm = {"context": ctx, "answer": answer, "generate_ms": 10, "score": {"correct": verdict == "dung"},
+               "correctness": {"verdict": verdict, "ly_do": ""}}
+        return {"temporal_kind": kind, "has_gold": True, "retrieve_ms": 100, "arms": {"a": arm}}
+
+    rows = [row("x", "dung", "150%"), row("x", "sai", "Không đủ điều kiện, phải đủ 20 năm."),
+            row("x", "sai", "Tôi chưa tìm thấy quy định khớp với câu hỏi này."),
+            row("out_of_range", "dung", "Ngoài phạm vi thời gian.")]
+    s = summarise(rows, ("a",), retrieval_only=False)
+    assert s["overall"]["a"]["confident_wrong"] == 1 / 4
+    assert s["overall"]["a"]["answer_correct_judge"] == 2 / 4
+    assert s["overall_pipeline"]["a"]["answer_correct_judge"] == 1 / 3
+
+
 def test_ci_gate_fails_only_beyond_tolerance():
     from eval.ci_gate import gate
 

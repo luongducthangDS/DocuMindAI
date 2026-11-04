@@ -63,6 +63,15 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
 - Nguyên liệu câu hỏi tổng hợp (CHƯA DUYỆT, không phải gold): `data/eval/synthetic/doc2query_questions.jsonl` —
   4.992 câu đời thường FPT sinh cho 1.249 đoạn (2026-10-18), mỗi dòng mang `text_sha1` của đoạn để biết dòng nào cũ.
   Sinh tiếp cho đoạn mới/đổi: `python scripts/generate_doc2query.py`. Xem README trong thư mục trước khi dùng.
+- **Judge độ đúng** (`--judge-correctness <arms>`, `temporal_eval.judge_correctness`): so câu trả lời với
+  `ground_truth`, 3 mức dung/mot_phan/sai; summary có `answer_correct_judge`, `confident_wrong` (sai mà không phải từ
+  chối — loại lỗi chặn release), `overall_pipeline` (bỏ out_of_range: đo guard, không đo pipeline). Hiệu chỉnh trên
+  30 nhãn tay phần B (`data/eval/judge_calibration/labels_2026-10-18.json`, `python eval/calibrate_judge.py`):
+  khớp người 29/30, ổn định 30/30 giữa 2 lượt, bắt cả 3 câu sai-mà-tự-tin; chấm chuỗi 26/30, faithfulness cho 1.0
+  hai câu sai. 29/30 là TRONG MẪU (prompt viết sau khi đọc nhãn). Trên main 81997fb (208 câu): dung 0.885, mot_phan
+  0.111, confident_wrong 1/208 (lh_b02a — PR #10 sửa: 5/6 → 0/6 khi lặp) trong khi chấm chuỗi 0.995 — nhưng một
+  phần lý do 'mot_phan' là judge dùng hiểu biết riêng và sai (g2_b007). Phần C trang duyệt = 34 câu chấm mù để
+  đo judge ngoài mẫu; verdict của judge ở `partC_judge_2026-10-18.json`. Chưa dùng judge làm gate.
 - CI: `.github/workflows/ci.yml` — pytest + retrieval eval trên Qdrant `documind_legal_fpt`, gate bằng
   `eval/ci_gate.py` so với `reports/eval_baseline.json` (FAIL cả khi report có câu đo thiếu nhánh dense —
   `meta.n_degraded`). Reranker TẮT trong CI như production.
