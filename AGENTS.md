@@ -11,9 +11,8 @@ Hướng dẫn dự án nằm ở `CLAUDE.md`; file này chỉ ghi trạng thái
 - `pytest`: 684 passed, 3 skipped.
 
 **Còn lại**
-- Merge `fix/oos-fallback-model-verdict-gold` vào `main`, rồi rebase `eval/judge-correctness` lên đó:
+- Merge PR #11 (`fix/oos-fallback-model-verdict-gold`) vào `main`, rồi rebase `eval/judge-correctness` lên đó (conflict ở `docs/LESSONS.md`):
   hai nhánh cùng sửa `eval/temporal_eval.py`, `tests/test_eval_metrics.py`, `CLAUDE.md`, `docs/LESSONS.md`.
-- Push `eval/judge-correctness` và mở PR (chưa làm).
 - Chấm mù 34 câu phần C để đo judge ngoài mẫu; chưa dùng judge làm gate.
 
 **Lưu ý**
