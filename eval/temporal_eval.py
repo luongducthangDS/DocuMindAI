@@ -263,6 +263,58 @@ def judge_faithfulness(answer: str, chunks: list) -> float | None:
     return min(supported, claims) / claims
 
 
+# ── Correctness (LLM judge, đối chiếu đáp án gold) ────────────────────────────
+# Faithfulness chỉ đo "bám ngữ cảnh": ngữ cảnh đã hết hiệu lực thì câu sai vẫn được 1.0 (người
+# chấm 2026-10-18: lh_m05b, g2_b037). Judge này so với ĐÁP ÁN GOLD; hiệu chỉnh trên nhãn tay ở
+# data/eval/judge_calibration/ bằng eval/calibrate_judge.py trước khi tin con số của nó.
+
+_CORRECTNESS_PROMPT = """Bạn chấm một câu trả lời tra cứu pháp luật lao động / bảo hiểm xã hội Việt Nam
+so với ĐÁP ÁN CHUẨN. Thời điểm tra cứu: {as_of}.
+
+CÂU HỎI: {question}
+
+ĐÁP ÁN CHUẨN (đúng tại thời điểm tra cứu): {gold}
+
+CÂU TRẢ LỜI CẦN CHẤM:
+{answer}
+
+Chấm một trong ba mức:
+- "dung": kết luận khớp đáp án chuẩn và không nêu con số, điều kiện hay căn cứ nào trái với đáp án
+  chuẩn. Diễn đạt khác, định dạng khác, thêm chi tiết đúng đều không trừ điểm.
+- "mot_phan": kết luận chính đúng nhưng có ít nhất một chi tiết sai (con số, điều kiện, phép tính),
+  hoặc tự mâu thuẫn (hai kết luận khác nhau trong cùng câu trả lời), hoặc bỏ sót một ý được hỏi.
+- "sai": kết luận sai; hoặc từ chối / nói không tìm thấy trong khi đáp án chuẩn có câu trả lời; hoặc
+  không chỉ ra tiền đề sai mà đáp án chuẩn chỉ ra; hoặc câu trả lời rỗng, vô nghĩa, chỉ có ký hiệu kỹ thuật.
+Nếu đáp án chuẩn là từ chối (ngoài phạm vi, ngoài thời gian corpus), từ chối đúng là "dung".
+Chỉ trả về JSON một dòng: {{"verdict": "dung|mot_phan|sai", "ly_do": "<một câu>"}}"""
+
+_VERDICTS = ("dung", "mot_phan", "sai")
+_REFUSAL_PHRASES = ("chưa tìm thấy", "không tìm thấy", "nằm ngoài phạm vi")
+
+
+def is_refusal(answer: str) -> bool:
+    """Câu trả lời mở đầu bằng lời từ chối — "sai" kiểu này ít hại hơn "sai mà tự tin"."""
+    head = (answer or "").strip().lower()[:200]
+    return any(p in head for p in _REFUSAL_PHRASES)
+
+
+def judge_correctness(question: str, gold: str, answer: str, as_of: str | None) -> dict | None:
+    """{"verdict", "ly_do"} so với đáp án gold; None khi judge lỗi (không bao giờ đoán thay)."""
+    from src.rag.generator import gemini_generate
+
+    try:
+        raw = gemini_generate(_CORRECTNESS_PROMPT.format(as_of=as_of or "hiện tại", question=question,
+                                                         gold=gold, answer=answer or "(rỗng)"),
+                              name="eval-judge-correctness")
+        m = re.search(r"\{.*?\}", raw, re.S)
+        verdict = json.loads(m.group(0)) if m else {}
+        if verdict.get("verdict") in _VERDICTS:
+            return {"verdict": verdict["verdict"], "ly_do": str(verdict.get("ly_do", ""))[:300]}
+    except Exception as exc:  # best-effort như judge_faithfulness
+        logger.warning("correctness judge thất bại: {}", exc)
+    return None
+
+
 # ── Arms ──────────────────────────────────────────────────────────────────────
 
 def apply_arm(arm: str, chunks: list, as_of: str, earliest: str) -> tuple[list, bool, str | None]:
@@ -341,6 +393,7 @@ def run(
     arms: tuple[str, ...],
     retrieval_only: bool,
     judge_arms: tuple[str, ...] = (),
+    correctness_arms: tuple[str, ...] = (),
 ) -> dict[str, Any]:
     from src.rag.context import RetrievalContext, degraded_flags, reset_degraded, start_degraded
     from src.rag.generator import generate_answer
@@ -414,6 +467,9 @@ def run(
                 entry["score"] = score_answer(result["answer"], q)
                 if arm in judge_arms and result["used_llm"]:
                     entry["faithfulness"] = judge_faithfulness(result["answer"], used)
+                if arm in correctness_arms:
+                    entry["correctness"] = judge_correctness(
+                        q["question"], q.get("ground_truth", ""), result["answer"], prompt_as_of or q["as_of_date"])
 
             row["arms"][arm] = entry
 
@@ -508,10 +564,20 @@ def summarise(rows: list[dict], arms: tuple[str, ...], retrieval_only: bool) -> 
             if faith:
                 agg["faithfulness"] = sum(faith) / len(faith)
                 agg["faithfulness_n"] = len(faith)
+            judged = [(r["arms"][arm]["correctness"]["verdict"], r["arms"][arm].get("answer", ""))
+                      for r in subset if r["arms"][arm].get("correctness")]
+            if judged:
+                agg["answer_correct_judge"] = sum(v == "dung" for v, _ in judged) / len(judged)
+                agg["answer_partial_judge"] = sum(v == "mot_phan" for v, _ in judged) / len(judged)
+                # sai mà không phải từ chối — loại lỗi chặn release (người chấm 2026-10-18)
+                agg["confident_wrong"] = sum(v == "sai" and not is_refusal(a) for v, a in judged) / len(judged)
+                agg["correctness_n"] = len(judged)
         return agg
 
     for arm in arms:
         out["overall"][arm] = _agg(rows, arm)
+    # out_of_range đo guard tất định, không đo pipeline — gộp vào làm tỷ lệ đẹp lên
+    out["overall_pipeline"] = {arm: _agg([r for r in rows if r["temporal_kind"] != "out_of_range"], arm) for arm in arms}
     for kind in kinds:
         subset = [r for r in rows if r["temporal_kind"] == kind]
         out["by_kind"][kind] = {arm: _agg(subset, arm) for arm in arms}
@@ -530,7 +596,7 @@ def print_report(report: dict) -> None:
     metrics = ["context_gold", "context_distractor", "context_clean"]
     metrics += [f"recall_at_{k}" for k in RECALL_KS] + ["recall_at_1_single", "mrr"]
     if not retrieval_only:
-        metrics += ["answer_accuracy", "faithfulness"]
+        metrics += ["answer_accuracy", "faithfulness", "answer_correct_judge", "confident_wrong"]
 
     print("\n" + "=" * 78)
     print(f"TEMPORAL A/B — {report['meta']['n_questions']} câu nhạy thời điểm")
@@ -674,6 +740,13 @@ def main() -> None:
         help="chấm faithfulness bằng LLM judge cho các arm này (thêm 1 lời gọi Gemini/câu/arm)",
     )
     parser.add_argument(
+        "--judge-correctness",
+        nargs="+",
+        choices=ARMS,
+        default=[],
+        help="chấm độ đúng so với đáp án gold bằng LLM judge (hiệu chỉnh: eval/calibrate_judge.py)",
+    )
+    parser.add_argument(
         "--mlflow",
         nargs="?",
         const="",
@@ -698,7 +771,8 @@ def main() -> None:
     if args.rescore:
         report = rescore(json.loads(args.rescore.read_text(encoding="utf-8")), questions)
     else:
-        report = run(questions, tuple(args.arms), args.retrieval_only, judge_arms=tuple(args.judge))
+        report = run(questions, tuple(args.arms), args.retrieval_only, judge_arms=tuple(args.judge),
+                     correctness_arms=tuple(args.judge_correctness))
     # run() chỉ biết DEFAULT_GOLD — ghi đè bằng file thực sự chạy (--gold)
     gold = args.gold.resolve()
     report["meta"]["gold_set"] = (

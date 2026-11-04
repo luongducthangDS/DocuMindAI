@@ -1,0 +1,546 @@
+{
+  "about": "30 câu trả lời của hệ thống ở lượt e2e k=8, không rerank, FPT — TRƯỚC các bản sửa 2026-10-18 (khoản hết hiệu lực, chặn <tool_call>, bỏ giới hạn 5 đoạn, tên Điều cho mảnh tách). Nhãn tay của người chấm cùng ngày: verdict dung|mot_phan|sai; faithful co|khong|mot_phan|null (null = không áp dụng). Dùng để hiệu chỉnh bộ chấm tự động; n=30 nên khoảng tin cậy rộng (≈ ±16 điểm % quanh 73%).",
+  "config": "reports/e2e_k_rerank.json → configs.k8_norr",
+  "rows": [
+    {
+      "id": "g2_a012",
+      "as_of": "2026-03-19",
+      "kind": "single_clause",
+      "expected_behavior": "answer",
+      "question": "Người lao động đã làm việc thường xuyên từ 12 tháng trở lên, khi chấm dứt hợp đồng lao động đúng luật thì mỗi năm làm việc được trợ cấp thôi việc bằng bao nhiêu tháng tiền lương?",
+      "ground_truth": "Theo khoản 1 Điều 46 Bộ luật Lao động 2019, mỗi năm làm việc người lao động được trợ cấp thôi việc một nửa tháng tiền lương.",
+      "answer": "Mỗi năm làm việc được trợ cấp thôi việc bằng **một nửa (0,5) tháng tiền lương** [1].\n\n- **Điều kiện áp dụng:** Người lao động đã làm việc thường xuyên cho người sử dụng lao động từ **đủ 12 tháng trở lên** và hợp đồng lao động chấm dứt theo các trường hợp quy định tại các khoản 1, 2, 3, 4, 6, 7, 9 và 10 Điều 34 của Bộ luật Lao động [1].\n- **Căn cứ tính tiền lương:** Tiền lương để tính trợ cấp thôi việc là **tiền lương bình quân của 06 tháng liền kề** theo hợp đồng lao động trước khi người lao động thôi việc [1][6].\n- **Thời gian tính trợ cấp:** Là tổng thời gian làm việc thực tế trừ đi thời gian đã tham gia bảo hiểm thất nghiệp và thời gian đã được chi trả trợ cấp thôi việc/mất việc làm trước đó [1][2].\n- **Lưu ý loại trừ:** Không áp dụng trợ cấp thôi việc nếu người lao động đủ điều kiện hưởng lương hưu hoặc tự ý bỏ việc không có lý do chính đáng từ 05 ngày làm việc liên tục trở lên [2].",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": "Bộ chấm chuỗi chấm nhầm"
+      },
+      "auto": {
+        "string_correct": false,
+        "judge_faithfulness": 1.0
+      }
+    },
+    {
+      "id": "g2_a034",
+      "as_of": "2025-12-30",
+      "kind": "single_clause",
+      "expected_behavior": "answer",
+      "question": "Bộ luật Lao động quy định những hình thức xử lý kỷ luật lao động nào, từ nhẹ nhất đến nặng nhất?",
+      "ground_truth": "Theo Điều 124 Bộ luật Lao động 2019, các hình thức xử lý kỷ luật lao động gồm: khiển trách; kéo dài thời hạn nâng lương không quá 06 tháng; cách chức; sa thải.",
+      "answer": "Bộ luật Lao động quy định **04 hình thức** xử lý kỷ luật lao động, được sắp xếp từ nhẹ nhất đến nặng nhất như sau: **Khiển trách**, **Kéo dài thời hạn nâng lương**, **Cách chức**, và **Sa thải** [4].\n\nChi tiết các hình thức này được quy định tại Điều 124 như sau:\n- **Khiển trách**: Là hình thức nhẹ nhất [4].\n- **Kéo dài thời hạn nâng lương**: Thời gian kéo dài **không quá 06 tháng** [4].\n- **Cách chức**: Áp dụng đối với người lao động giữ chức vụ quản lý [4].\n- **Sa thải**: Là hình thức kỷ luật nặng nhất, chấm dứt hợp đồng lao động [4].\n\nLưu ý thêm:\n- Không được áp dụng nhiều hình thức xử lý kỷ luật lao động đối với **một hành vi** vi phạm [1].\n- Khi một người lao động đồng thời có **nhiều hành vi** vi phạm, chỉ áp dụng hình thức kỷ luật **cao nhất** tương ứng với hành vi vi phạm nặng nhất [1].",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": ""
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": 0.8333333333333334
+      }
+    },
+    {
+      "id": "g2_a041",
+      "as_of": "2026-03-30",
+      "kind": "multi_clause",
+      "expected_behavior": "answer",
+      "question": "Một lao động chưa thành niên đã làm việc liên tục 6 năm cho cùng một công ty (công việc trong điều kiện lao động bình thường, không thuộc danh mục nặng nhọc độc hại). Mỗi năm người này được nghỉ hằng năm hưởng nguyên lương bao nhiêu ngày làm việc?",
+      "ground_truth": "Lao động chưa thành niên được nghỉ hằng năm 14 ngày làm việc theo điểm b khoản 1 Điều 113 Bộ luật Lao động 2019; do đã đủ 5 năm làm việc nên được tăng thêm 01 ngày theo Điều 114, tổng cộng 15 ngày làm việc.",
+      "answer": "Người lao động chưa thành niên làm việc trong điều kiện bình thường được nghỉ **14 ngày làm việc** cơ bản mỗi năm, cộng thêm **01 ngày** do thâm niên (đủ 5 năm), tổng cộng là **15 ngày làm việc** [1][8].\n\n- **Cơ sở pháp lý:**\n  - Theo Điều 113 khoản 1 điểm b, người lao động chưa thành niên được nghỉ **14 ngày làm việc** hằng năm, dù làm việc trong điều kiện bình thường [1].\n  - Theo Điều 114, cứ đủ **05 năm** làm việc cho một người sử dụng lao động thì số ngày nghỉ hằng năm được tăng thêm **01 ngày** [8].\n- **Cách tính:**\n  - Số ngày nghỉ cơ bản: **14 ngày** [1].\n  - Số ngày tăng thêm do thâm niên: **01 ngày** (vì đã làm việc 6 năm, vượt quá mốc 5 năm) [8].\n  - Tổng số ngày nghỉ: 14 + 1 = **15 ngày làm việc** [1][8].",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": ""
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": 1.0
+      }
+    },
+    {
+      "id": "g2_b004",
+      "as_of": "2025-10-01",
+      "kind": "single_clause",
+      "expected_behavior": "answer",
+      "question": "Mức tham chiếu trong Luật Bảo hiểm xã hội 2024 được dùng để làm gì?",
+      "ground_truth": "Theo khoản 1 Điều 7 Luật Bảo hiểm xã hội 2024, mức tham chiếu là mức tiền do Chính phủ quyết định dùng để tính mức đóng, mức hưởng một số chế độ bảo hiểm xã hội.",
+      "answer": "Mức tham chiếu trong Luật Bảo hiểm xã hội 2024 là mức tiền do Chính phủ quyết định, dùng để **tính mức đóng** và **mức hưởng** của một số chế độ bảo hiểm xã hội quy định trong Luật [1][2].\n\nCụ thể, mức tham chiếu đóng vai trò là căn cứ để xác định các con số liên quan đến nghĩa vụ đóng và quyền lợi hưởng bảo hiểm xã hội của người lao động và người sử dụng lao động [1][2].",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": "Bộ chấm chuỗi chấm nhầm"
+      },
+      "auto": {
+        "string_correct": false,
+        "judge_faithfulness": 1.0
+      }
+    },
+    {
+      "id": "g2_b027",
+      "as_of": "2025-10-01",
+      "kind": "single_clause",
+      "expected_behavior": "answer",
+      "question": "Khi một người tham gia bảo hiểm xã hội chết, số thân nhân tối đa được hưởng trợ cấp tuất hằng tháng là bao nhiêu người?",
+      "ground_truth": "Theo khoản 2 Điều 87 Luật Bảo hiểm xã hội 2024, khi một người chết thì số thân nhân được hưởng trợ cấp tuất hằng tháng tối đa 04 người.",
+      "answer": "Số thân nhân tối đa được hưởng trợ cấp tuất hằng tháng là **04 người** [1].\n\n- Quy định này áp dụng khi một người chết hoặc bị Tòa án tuyên bố là đã chết thuộc đối tượng quy định tại khoản 1 Điều 86 của Luật Bảo hiểm xã hội [1].\n- Trường hợp có từ **02 người chết** hoặc bị Tòa án tuyên bố là đã chết trở lên, thân nhân được hưởng **02 lần** mức trợ cấp quy định tại khoản 1 Điều 87 [1].",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": "Bộ chấm chuỗi chấm nhầm"
+      },
+      "auto": {
+        "string_correct": false,
+        "judge_faithfulness": 1.0
+      }
+    },
+    {
+      "id": "g2_b028",
+      "as_of": "2025-10-01",
+      "kind": "single_clause",
+      "expected_behavior": "answer",
+      "question": "Người đang hưởng lương hưu chết trong 2 tháng đầu hưởng lương hưu thì thân nhân được nhận trợ cấp tuất một lần bằng bao nhiêu tháng lương hưu?",
+      "ground_truth": "Theo điểm a khoản 2 Điều 89 Luật Bảo hiểm xã hội 2024, nếu người đang hưởng lương hưu chết trong 02 tháng đầu thì mức trợ cấp tuất một lần bằng 48 tháng lương hưu của tháng đang hưởng.",
+      "answer": "Thân nhân được nhận trợ cấp tuất một lần bằng **48 tháng lương hưu** của tháng đang hưởng [1].\n\n- Quy định này áp dụng cho trường hợp người đang hưởng lương hưu hoặc đang tạm dừng hưởng lương hưu chết trong **02 tháng đầu** [1].\n- Mức trợ cấp được tính dựa trên mức lương hưu của tháng mà người đó đang hưởng tại thời điểm chết [1].",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": ""
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": 1.0
+      }
+    },
+    {
+      "id": "g2_b034",
+      "as_of": "2025-10-01",
+      "kind": "multi_clause",
+      "expected_behavior": "answer",
+      "question": "Lao động nam đủ tuổi nghỉ hưu theo quy định, đã đóng bảo hiểm xã hội bắt buộc đủ 20 năm. Người này có đủ điều kiện hưởng lương hưu không, và mức lương hưu hằng tháng bằng bao nhiêu phần trăm mức bình quân tiền lương?",
+      "ground_truth": "Có, vì đã đóng bảo hiểm xã hội bắt buộc từ đủ 15 năm trở lên và đủ tuổi nghỉ hưu (khoản 1 Điều 64 Luật Bảo hiểm xã hội 2024). Theo điểm b khoản 1 Điều 66, lao động nam đóng đủ 20 năm thì mức lương hưu hằng tháng bằng 45% mức bình quân tiền lương làm căn cứ đóng bảo hiểm xã hội.",
+      "answer": "**Có**, người lao động nam đã đóng bảo hiểm xã hội bắt buộc đủ **20 năm** và đủ tuổi nghỉ hưu theo quy định thì **đủ điều kiện hưởng lương hưu** [1]. Mức lương hưu hằng tháng tối thiểu bằng **45%** mức bình quân tiền lương làm căn cứ đóng bảo hiểm xã hội (tương ứng 20 năm đóng), sau đó cứ thêm mỗi năm đóng thì tính thêm **2%**, với mức tối đa là **75%** [1].\n\nChi tiết cách tính và điều kiện:\n- **Điều kiện hưởng:** Lao động nam có thời gian đóng bảo hiểm xã hội bắt buộc từ đủ **20 năm** trở lên và đủ tuổi nghỉ hưu theo quy định tại Điều 64 của Luật Bảo hiểm xã hội [1][5].\n- **Công thức tính mức lương hưu:**\n  - **45%** mức bình quân tiền lương làm căn cứ đóng bảo hiểm xã hội tương ứng **20 năm** đóng [1].\n  - Cứ thêm mỗi năm đóng tiếp theo thì tính thêm **2%** [1].\n  - Mức tối đa bằng **75%** [1].\n- **Lưu ý về mức tham chiếu:** Nếu người lao động thuộc đối tượng quy định tại điểm a, b, c, d, đ, g và i khoản 1 Điều 2 của Luật Bảo hiểm xã hội đã tham gia bảo hiểm xã hội trước ngày **01/7/2025** và có thời gian đóng bảo hiểm xã hội bắt buộc từ đủ **20 năm** trở lên, khi tính mức lương hưu hằng tháng thấp hơn mức tham chiếu thì được tính bằng **mức tham chiếu** [5].",
+      "human": {
+        "verdict": "mot_phan",
+        "faithful": "co",
+        "note": "Kết luận và 45% đúng, nhưng nêu điều kiện là '20 năm'"
+      },
+      "auto": {
+        "string_correct": false,
+        "judge_faithfulness": 1.0
+      }
+    },
+    {
+      "id": "g2_b036",
+      "as_of": "2025-10-01",
+      "kind": "multi_clause",
+      "expected_behavior": "answer",
+      "question": "Người lao động đã đóng bảo hiểm xã hội bắt buộc được 14 năm 8 tháng, đủ tuổi nghỉ hưu theo diện thông thường (Điều 64 Luật Bảo hiểm xã hội). Người này có được đóng một lần cho số tháng còn thiếu để đủ điều kiện hưởng lương hưu không?",
+      "ground_truth": "Có. Theo khoản 7 Điều 33 Luật Bảo hiểm xã hội 2024, người lao động còn thiếu tối đa 06 tháng đóng bảo hiểm xã hội để đủ điều kiện hưởng lương hưu được đóng tiếp một lần cho số tháng còn thiếu. Theo điểm a khoản 2 Điều 12 Thông tư 12/2025/TT-BNV, đối với trường hợp đủ tuổi theo diện thông thường (Điều 64), điều kiện áp dụng là đã có thời gian đóng bảo hiểm xã hội bắt buộc từ đủ 14 năm 6 tháng đến dưới 15 năm — 14 năm 8 tháng thỏa mãn điều kiện này.",
+      "answer": "**Có**, người lao động được đóng một lần cho số tháng còn thiếu để đủ điều kiện hưởng lương hưu.\n\nCụ thể, người lao động đã đóng **14 năm 8 tháng** và đủ tuổi nghỉ hưu theo diện thông thường (Điều 64 Luật Bảo hiểm xã hội) thì thời gian đóng còn thiếu là **3 tháng 8 tháng** (tương đương 38 tháng) để đạt mốc **15 năm** đóng bảo hiểm xã hội bắt buộc. Vì số tháng còn thiếu này **tối đa 06 tháng** (60 tháng), nên người lao động thuộc trường hợp được phép đóng tiếp một lần cho số tháng còn thiếu [1].\n\nMức đóng một lần cho số tháng còn thiếu được tính bằng **tổng mức đóng của người lao động và người sử dụng lao động** trước khi người lao động nghỉ việc vào quỹ hưu trí và tử tuất [1].",
+      "human": {
+        "verdict": "mot_phan",
+        "faithful": "khong",
+        "note": "Kết luận đúng, phép tính sai, thiếu điều kiện của TT 12/2025"
+      },
+      "auto": {
+        "string_correct": false,
+        "judge_faithfulness": 0.5
+      }
+    },
+    {
+      "id": "g2_b037",
+      "as_of": "2025-10-01",
+      "kind": "false_premise",
+      "expected_behavior": "answer",
+      "question": "Theo Luật Bảo hiểm xã hội 2024, người lao động phải đóng bảo hiểm xã hội bắt buộc đủ 20 năm mới đủ điều kiện hưởng lương hưu, đúng không?",
+      "ground_truth": "Sai. Theo khoản 1 Điều 64 Luật Bảo hiểm xã hội 2024, điều kiện về thời gian đóng bảo hiểm xã hội bắt buộc để hưởng lương hưu (diện thông thường) là từ đủ 15 năm trở lên, không phải 20 năm.",
+      "answer": "**Không hoàn toàn đúng.** Theo quy định tại thời điểm 2025-10-01, điều kiện về thời gian đóng bảo hiểm xã hội để hưởng lương hưu không chỉ giới hạn ở mức **20 năm** mà còn có trường hợp ngoại lệ cho lao động nữ là cán bộ, công chức cấp xã hoặc người hoạt động không chuyên trách ở xã, phường, thị trấn với mức đóng từ **đủ 15 năm đến dưới 20 năm** [1].\n\nCụ thể, các điều kiện về thời gian đóng bảo hiểm xã hội để hưởng lương hưu được quy định như sau:\n\n- **Trường hợp chung:** Người lao động (thuộc đối tượng quy định tại các điểm a, b, c, d, g, h và i khoản 1 Điều 2 của Luật Bảo hiểm xã hội) khi nghỉ việc phải có **đủ 20 năm** đóng bảo hiểm xã hội trở lên [1].\n- **Trường hợp đặc biệt (Lao động nữ cấp xã):** Lao động nữ là cán bộ, công chức cấp xã hoặc là người hoạt động không chuyên trách ở xã, phường, thị trấn tham gia bảo hiểm xã hội khi nghỉ việc mà có **từ đủ 15 năm đến dưới 20 năm** đóng bảo hiểm xã hội và đủ tuổi nghỉ hưu quy định tại khoản 2 Điều 169 của Bộ luật Lao động thì được hưởng lương hưu [1].\n- **Trường hợp quân nhân, công an, cơ yếu:** Người lao động quy định tại điểm đ và điểm e khoản 1 Điều 2 của Luật này (quân nhân, công an nhân dân, người làm công tác cơ yếu) nghỉ việc có **đủ 20 năm** đóng bảo hiểm xã hội trở lên được hưởng lương hưu khi thuộc một trong các trường hợp về tuổi và thời gian làm nghề nặng nhọc, độc hại, nguy hiểm hoặc vùng đặc biệt khó khăn [1].\n\nNgoài ra, người lao động đủ điều kiện về tuổi hưởng lương hưu mà thời gian đóng bảo hiểm xã hội bắt buộc còn thiếu **tối đa 06 tháng** để đủ điều kiện hưởng lương hưu thì được đóng tiếp một lần cho số tháng còn thiếu [3].",
+      "human": {
+        "verdict": "sai",
+        "faithful": "co",
+        "note": "Khẳng định 'trường hợp chung 20 năm' (bám nguồn nhưng nguồn đã hết hiệu lực)"
+      },
+      "auto": {
+        "string_correct": false,
+        "judge_faithfulness": 1.0
+      }
+    },
+    {
+      "id": "g2_b038",
+      "as_of": "2025-10-01",
+      "kind": "false_premise",
+      "expected_behavior": "answer",
+      "question": "Mức đóng bảo hiểm xã hội tự nguyện hằng tháng của người tham gia là 25% thu nhập làm căn cứ đóng vào quỹ hưu trí và tử tuất, có đúng không?",
+      "ground_truth": "Sai. Theo khoản 1 Điều 36 Luật Bảo hiểm xã hội 2024, mức đóng bảo hiểm xã hội tự nguyện hằng tháng là 22% mức thu nhập làm căn cứ đóng vào quỹ hưu trí và tử tuất, không phải 25%.",
+      "answer": "Không đúng, mức đóng bảo hiểm xã hội tự nguyện hằng tháng là **22%** thu nhập làm căn cứ đóng vào quỹ hưu trí và tử tuất, không phải 25% [1][4].\n\n- **Mức đóng:** 22% thu nhập làm căn cứ đóng bảo hiểm xã hội tự nguyện [1][4].\n- **Quỹ đóng:** Quỹ hưu trí và tử tuất [1][4].",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": ""
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": 1.0
+      }
+    },
+    {
+      "id": "g2_d028",
+      "as_of": "2026-07-15",
+      "kind": "multi_clause",
+      "expected_behavior": "answer",
+      "question": "Một người lao động đã đóng bảo hiểm thất nghiệp liên tục 20 tháng rồi chấm dứt hợp đồng lao động đúng luật, nộp hồ sơ đề nghị hưởng trợ cấp thất nghiệp sau 1 tháng. Theo Luật Việc làm 2025, người này có đủ điều kiện hưởng trợ cấp thất nghiệp không, và nếu có thì được hưởng trợ cấp thất nghiệp trong bao nhiêu tháng?",
+      "ground_truth": "Theo điểm b khoản 1 Điều 38 Luật Việc làm số 74/2025/QH15, người lao động đã đóng bảo hiểm thất nghiệp từ đủ 12 tháng trở lên trong 24 tháng trước khi chấm dứt hợp đồng và nộp hồ sơ trong thời hạn 03 tháng thì đủ điều kiện hưởng trợ cấp thất nghiệp; theo khoản 2 Điều 39, với 20 tháng đóng bảo hiểm thất nghiệp (từ 12 đến 36 tháng) thì được hưởng 03 tháng trợ cấp thất nghiệp.",
+      "answer": "**Có đủ điều kiện** và được hưởng trợ cấp thất nghiệp trong **04 tháng**.\n\n**1. Điều kiện hưởng trợ cấp thất nghiệp**\nNgười lao động đáp ứng đủ các điều kiện theo quy định tại Điều 38 [1]:\n- **Chấm dứt hợp đồng lao động đúng luật:** Không thuộc trường hợp đơn phương chấm dứt hợp đồng trái pháp luật hoặc nghỉ việc khi đủ điều kiện hưởng lương hưu [1].\n- **Thời gian đóng bảo hiểm thất nghiệp:** Đã đóng **đủ 12 tháng trở lên** trong thời gian 24 tháng trước khi chấm dứt hợp đồng lao động. Với 20 tháng đóng liên tục, người lao động đáp ứng điều kiện này [1].\n- **Thời hạn nộp hồ sơ:** Nộp đủ hồ sơ trong thời hạn **03 tháng** kể từ ngày chấm dứt hợp đồng lao động. Người lao động nộp sau 1 tháng, nên đáp ứng điều kiện này [1].\n- **Không thuộc trường hợp loại trừ:** Trong thời hạn 10 ngày làm việc kể từ ngày nộp đủ hồ sơ, người lao động không thuộc các trường hợp có việc làm, đi học tập có thời hạn trên 12 tháng, chấp hành hình phạt tù, ra nước ngoài định cư hoặc chết [1].\n\n**2. Thời gian hưởng trợ cấp thất nghiệp**\nTheo Điều 39 khoản 2 [5], thời gian hưởng trợ cấp thất nghiệp được tính như sau:\n- Cứ đóng đủ **12 tháng đến đủ 36 tháng** thì được hưởng **03 tháng** trợ cấp thất nghiệp.\n- Sau đó, cứ đóng đủ thêm **12 tháng** thì được hưởng thêm **01 tháng** trợ cấp thất nghiệp.\n- Thời gian hưởng tối đa là **12 tháng** [5].\n\nÁp dụng cho trường hợp đóng **20 tháng**:\n- 12 tháng đầu: Hưởng **03 tháng** trợ cấp.\n- 8 tháng còn lại (20 - 12 = 8 tháng): Chưa đủ 12 tháng để được cộng thêm 01 tháng trợ cấp.\n- **Tổng thời gian hưởng:** **03 tháng**.\n\n*(Lưu ý: Câu hỏi yêu cầu tính theo Luật Việc làm 2025, tuy nhiên các đoạn văn bản cung cấp trích dẫn từ Luật Việc làm 2013 (số 38/2013/QH13) và các nghị định hướng dẫn. Tại thời điểm tra cứu 2026-07-15, các quy định về điều kiện và mức hưởng trong các đoạn [1] và [5] được áp dụng. Nếu Luật Việc làm 2025 có hiệu lực và thay đổi công thức tính thời gian hưởng, cần đối chiếu văn bản mới. Tuy nhiên, dựa trên dữ liệu được cung cấp, công thức tính là 12-36 tháng đóng = 3 tháng hưởng, thêm 12 tháng đóng = thêm 1 tháng hưởng. Với 20 tháng đóng, thời gian hưởng là 3 tháng.)*\n\n**Sửa lại tính toán thời gian hưởng dựa trên dữ liệu [5]:**\n- Điều 39 khoản 2 [5]: \"cứ đóng đủ 12 tháng đến đủ 36 tháng thì được hưởng 03 tháng trợ cấp thất nghiệp, sau đó, cứ đóng đủ thêm 12 tháng thì được hưởng thêm 01 tháng trợ cấp thất nghiệp\".\n- Người lao động đóng **20 tháng**.\n- 20 tháng nằm trong khoảng \"đủ 12 tháng đến đủ 36 tháng\".\n- Do đó, thời gian hưởng là **03 tháng**.\n\n**Kết luận cuối cùng:**\n- **Đủ điều kiện:** Có [1].\n- **Thời gian hưởng:** **03 tháng** [5].",
+      "human": {
+        "verdict": "mot_phan",
+        "faithful": "mot_phan",
+        "note": "Mâu thuẫn 04 và 03 tháng"
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": 0.9
+      }
+    },
+    {
+      "id": "ld_t06a",
+      "as_of": "2024-03-01",
+      "kind": "doc_version",
+      "expected_behavior": "answer",
+      "question": "Tiền lương tháng làm căn cứ đóng bảo hiểm xã hội bắt buộc cao nhất bằng bao nhiêu?",
+      "ground_truth": "Theo khoản 3 Điều 89 Luật Bảo hiểm xã hội 2014 (58/2014/QH13), tiền lương tháng đóng bảo hiểm xã hội bắt buộc cao nhất bằng 20 lần mức lương cơ sở.",
+      "answer": "Tiền lương tháng đóng bảo hiểm xã hội bắt buộc cao nhất bằng **20 lần mức lương cơ sở** [1].\n\n- Quy định này áp dụng khi tiền lương tháng đóng bảo hiểm xã hội (theo chế độ tiền lương do Nhà nước quy định hoặc do người sử dụng lao động quyết định) cao hơn 20 lần mức lương cơ sở [1].\n- Mức trần này được quy định tại khoản 3 Điều 89 của Luật Bảo hiểm xã hội [1].",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": ""
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": 1.0
+      }
+    },
+    {
+      "id": "ld_t10b",
+      "as_of": "2026-05-01",
+      "kind": "doc_version",
+      "expected_behavior": "answer",
+      "question": "Sau khi nộp hồ sơ hưởng trợ cấp thất nghiệp, người lao động phải chưa tìm được việc làm trong bao lâu thì mới đủ điều kiện hưởng?",
+      "ground_truth": "Theo điểm d khoản 1 Điều 38 Luật Việc làm 2025 (74/2025/QH15), trong thời hạn 10 ngày làm việc kể từ ngày nộp đủ hồ sơ mà người lao động không thuộc các trường hợp loại trừ thì đủ điều kiện hưởng trợ cấp thất nghiệp.",
+      "answer": "Tôi chưa tìm thấy quy định khớp với câu hỏi này. Các đoạn văn bản được cung cấp không nêu rõ một khoảng thời gian chờ cụ thể (ví dụ: \"phải chờ X ngày/tuần sau khi nộp hồ sơ mà chưa có việc làm\") để xác định điều kiện đủ hưởng trợ cấp thất nghiệp, mà chỉ quy định về thời hạn nộp hồ sơ, thời hạn giải quyết và các trường hợp chấm dứt hưởng trợ cấp khi có việc làm.\n\n**Bạn muốn hỏi cụ thể:**\n- Thời hạn nộp hồ sơ đề nghị hưởng trợ cấp thất nghiệp là bao lâu kể từ ngày chấm dứt hợp đồng lao động?\n- Người lao động bị chấm dứt hưởng trợ cấp thất nghiệp trong trường hợp nào liên quan đến việc tìm được việc làm?",
+      "human": {
+        "verdict": "sai",
+        "faithful": "co",
+        "note": "Từ chối quá mức"
+      },
+      "auto": {
+        "string_correct": false,
+        "judge_faithfulness": null
+      }
+    },
+    {
+      "id": "ld_t11a",
+      "as_of": "2026-05-01",
+      "kind": "clause_version",
+      "expected_behavior": "answer",
+      "question": "Lao động nữ được nghỉ thai sản trước và sau khi sinh con bao lâu?",
+      "ground_truth": "Theo khoản 1 Điều 139 Bộ luật Lao động 2019 (bản có hiệu lực tại 01/5/2026), lao động nữ được nghỉ thai sản trước và sau khi sinh con là 06 tháng; thời gian nghỉ trước khi sinh không quá 02 tháng.",
+      "answer": "Lao động nữ được nghỉ thai sản trước và sau khi sinh con là **06 tháng**, trong đó thời gian nghỉ trước khi sinh không quá **02 tháng** [1].\n\n- Trường hợp sinh đôi trở lên: tính từ con thứ 02 trở đi, cứ mỗi con, người mẹ được nghỉ thêm **01 tháng** [1].\n- Thời gian nghỉ việc hưởng chế độ thai sản được tính cả ngày nghỉ lễ, tết, ngày nghỉ hằng tuần [4].",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": ""
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": 1.0
+      }
+    },
+    {
+      "id": "ld_t12b",
+      "as_of": "2026-08-01",
+      "kind": "clause_version",
+      "expected_behavior": "answer",
+      "question": "Lao động nữ sinh con thứ hai được nghỉ thai sản mấy tháng?",
+      "ground_truth": "Theo khoản 1 Điều 139 Bộ luật Lao động 2019 (bản sửa đổi có hiệu lực 01/7/2026), lao động nữ sinh con thứ hai được nghỉ thai sản trước và sau khi sinh con là 07 tháng.",
+      "answer": "Lao động nữ sinh con thứ hai được nghỉ thai sản **07 tháng** (bao gồm cả thời gian nghỉ trước và sau khi sinh) [1].\n\n- Thời gian nghỉ trước khi sinh không quá **02 tháng** [1].\n- Trường hợp sinh đôi trở lên thì tính từ con thứ hai trở đi, cứ mỗi con, người mẹ được nghỉ thêm **01 tháng** [1].",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": ""
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": 1.0
+      }
+    },
+    {
+      "id": "ld_t13a",
+      "as_of": "2024-02-01",
+      "kind": "control",
+      "expected_behavior": "answer",
+      "question": "Làm thêm giờ vào ngày thường được trả lương ít nhất bằng bao nhiêu phần trăm?",
+      "ground_truth": "Theo điểm a khoản 1 Điều 98 Bộ luật Lao động 2019, làm thêm giờ vào ngày thường được trả ít nhất bằng 150% đơn giá tiền lương hoặc tiền lương thực trả theo công việc đang làm.",
+      "answer": "Làm thêm giờ vào ngày thường được trả lương ít nhất bằng **150%** so với tiền lương giờ thực trả của công việc đang làm vào ngày làm việc bình thường [1].\n\n- Mức **150%** này áp dụng cho giờ làm thêm vào ngày thường, chưa bao gồm các khoản phụ cấp, trợ cấp không liên quan đến công việc [3].\n- Nếu làm thêm giờ vào ban đêm, ngoài mức 150% (hoặc 200%/300% tùy loại ngày), người lao động còn được trả thêm **30%** tiền lương ban đêm và **20%** tiền lương ban ngày [1][2].",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": ""
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": 1.0
+      }
+    },
+    {
+      "id": "ld_t14a",
+      "as_of": "2024-06-01",
+      "kind": "control",
+      "expected_behavior": "answer",
+      "question": "Người lao động làm đủ 12 tháng trong điều kiện bình thường được nghỉ hằng năm bao nhiêu ngày?",
+      "ground_truth": "Theo điểm a khoản 1 Điều 113 Bộ luật Lao động 2019, người lao động làm việc đủ 12 tháng trong điều kiện bình thường được nghỉ hằng năm 12 ngày làm việc, hưởng nguyên lương.",
+      "answer": "Người lao động làm việc đủ 12 tháng trong điều kiện bình thường được nghỉ hằng năm **12 ngày làm việc** [1].\n\n- Thời điểm tra cứu: 01/06/2024.\n- Mức nghỉ này áp dụng cho người làm công việc trong điều kiện bình thường theo khoản 1 Điều 113 Bộ luật Lao động [1].\n- Nếu có thâm niên làm việc, cứ đủ **05 năm** làm việc cho một người sử dụng lao động thì số ngày nghỉ hằng năm được tăng thêm **01 ngày** [5].",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": ""
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": 1.0
+      }
+    },
+    {
+      "id": "ld_t15",
+      "as_of": "2010-01-01",
+      "kind": "out_of_range",
+      "expected_behavior": "time_out_of_range",
+      "question": "Mức lương tối thiểu vùng I là bao nhiêu?",
+      "ground_truth": "Mốc 01/01/2010 nằm trước phạm vi thời gian corpus phủ (từ 01/01/2015). Hệ thống phải nói rõ giới hạn phủ thay vì trả lời bằng mức lương tối thiểu của văn bản hiện hành.",
+      "answer": "Câu hỏi về thời điểm (2010-01-01) nằm ngoài khoảng thời gian hệ thống phủ. Corpus hiện chỉ phủ từ 2015-01-01 trở đi, nên tôi không có căn cứ để trả lời cho mốc thời gian này.\n\nBạn có thể hỏi lại với một mốc thời điểm từ 2015-01-01 trở đi.",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": ""
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": null
+      }
+    },
+    {
+      "id": "ld_t16",
+      "as_of": "2012-06-01",
+      "kind": "out_of_range",
+      "expected_behavior": "time_out_of_range",
+      "question": "Điều kiện hưởng lương hưu gồm những gì?",
+      "ground_truth": "Mốc 01/6/2012 nằm trước phạm vi thời gian corpus phủ (từ 01/01/2015). Hệ thống phải nói rõ giới hạn phủ thay vì trả lời theo Luật Bảo hiểm xã hội 2014 hoặc 2024.",
+      "answer": "Câu hỏi về thời điểm (2012-06-01) nằm ngoài khoảng thời gian hệ thống phủ. Corpus hiện chỉ phủ từ 2015-01-01 trở đi, nên tôi không có căn cứ để trả lời cho mốc thời gian này.\n\nBạn có thể hỏi lại với một mốc thời điểm từ 2015-01-01 trở đi.",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": ""
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": null
+      }
+    },
+    {
+      "id": "lh_b01a",
+      "as_of": "2025-12-31",
+      "kind": "boundary",
+      "expected_behavior": "answer",
+      "question": "Doanh nghiệp đặt tại địa bàn vùng II phải trả mức lương tối thiểu tháng là bao nhiêu?",
+      "ground_truth": "Ngày 31/12/2025 là ngày cuối cùng Nghị định 74/2024/NĐ-CP còn hiệu lực: vùng II là 4.410.000 đồng/tháng.",
+      "answer": "Mức lương tối thiểu tháng đối với doanh nghiệp đặt tại địa bàn vùng II là **4.410.000 đồng/tháng** [1].\n\n- Mức lương này áp dụng cho người lao động làm việc cho người sử dụng lao động tại địa bàn thuộc vùng II [1].\n- Mức lương theo công việc hoặc chức danh của người lao động làm việc đủ thời giờ làm việc bình thường trong tháng và hoàn thành định mức lao động không được thấp hơn mức lương tối thiểu tháng này [2].",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": ""
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": 1.0
+      }
+    },
+    {
+      "id": "lh_b01b",
+      "as_of": "2026-01-01",
+      "kind": "boundary",
+      "expected_behavior": "answer",
+      "question": "Doanh nghiệp đặt tại địa bàn vùng II phải trả mức lương tối thiểu tháng là bao nhiêu?",
+      "ground_truth": "Từ 01/01/2026 Nghị định 293/2025/NĐ-CP có hiệu lực: vùng II là 4.730.000 đồng/tháng.",
+      "answer": "Mức lương tối thiểu tháng đối với doanh nghiệp đặt tại địa bàn vùng II là **4.730.000 đồng/tháng** [1].\n\n- Mức lương này áp dụng cho người lao động làm việc cho người sử dụng lao động tại địa bàn thuộc vùng II [1].\n- Mức lương theo công việc hoặc chức danh của người lao động làm việc đủ thời giờ làm việc bình thường trong tháng và hoàn thành định mức lao động không được thấp hơn mức lương tối thiểu tháng này [2].",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": ""
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": 1.0
+      }
+    },
+    {
+      "id": "lh_b02b",
+      "as_of": "2025-07-01",
+      "kind": "boundary",
+      "expected_behavior": "answer",
+      "question": "Tôi đã đủ tuổi nghỉ hưu và nghỉ việc hôm nay, đã đóng bảo hiểm xã hội bắt buộc được 17 năm. Tôi có được hưởng lương hưu hằng tháng không?",
+      "ground_truth": "Từ 01/7/2025 Luật BHXH 41/2024/QH15 có hiệu lực: Điều 64 chỉ yêu cầu đủ 15 năm đóng BHXH bắt buộc. 17 năm đủ điều kiện hưởng lương hưu.",
+      "answer": "<tool_call>",
+      "human": {
+        "verdict": "sai",
+        "faithful": null,
+        "note": "Lộ <tool_call>"
+      },
+      "auto": {
+        "string_correct": false,
+        "judge_faithfulness": null
+      }
+    },
+    {
+      "id": "lh_c01",
+      "as_of": "2026-03-01",
+      "kind": "compliance",
+      "expected_behavior": "answer",
+      "question": "Một xưởng cơ khí (điều kiện lao động bình thường, không thuộc ngành được làm thêm 300 giờ/năm) yêu cầu công nhân làm thêm 45 giờ trong tháng này. Như vậy có vi phạm quy định về làm thêm giờ không?",
+      "ground_truth": "Có vi phạm. Điều 107 khoản 2 điểm b: số giờ làm thêm không quá 40 giờ trong 01 tháng; 45 giờ vượt 5 giờ.",
+      "answer": "**Có vi phạm** quy định về giới hạn thời gian làm thêm giờ trong tháng.\n\nTheo quy định tại thời điểm tra cứu (2026-03-01), đối với người lao động làm việc trong điều kiện bình thường (không thuộc các trường hợp đặc biệt được phép làm thêm trên 200 giờ/năm), giới hạn làm thêm giờ được quy định như sau:\n\n- **Giới hạn theo tháng:** Số giờ làm thêm không quá **40 giờ** trong 01 tháng [1].\n- **Giới hạn theo ngày:** Số giờ làm thêm không quá **50%** số giờ làm việc bình thường trong 01 ngày; trường hợp áp dụng quy định thời giờ làm việc bình thường theo tuần thì tổng số giờ làm việc bình thường và số giờ làm thêm không quá **12 giờ** trong 01 ngày [1].\n- **Giới hạn theo năm:** Số giờ làm thêm không quá **200 giờ** trong 01 năm (trừ các trường hợp đặc biệt quy định tại khoản 3 Điều 107) [1].\n\nTrong trường hợp này, xưởng cơ khí yêu cầu công nhân làm thêm **45 giờ** trong tháng, vượt quá mức trần **40 giờ/tháng** được phép theo pháp luật lao động [1]. Do đó, việc yêu cầu này là vi phạm quy định về thời gian làm thêm giờ.\n\n*Lưu ý:* Để việc làm thêm giờ hợp pháp, ngoài việc tuân thủ giới hạn thời gian, người sử dụng lao động còn phải có sự đồng ý của người lao động về thời gian, địa điểm và công việc làm thêm (trừ các trường hợp đặc biệt quy định tại Điều 108) [6].",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": ""
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": 1.0
+      }
+    },
+    {
+      "id": "lh_c02b",
+      "as_of": "2026-02-01",
+      "kind": "compliance",
+      "expected_behavior": "answer",
+      "question": "Doanh nghiệp ở vùng I trả 5.200.000 đồng/tháng cho người lao động làm công việc giản đơn trong điều kiện bình thường, làm đủ thời giờ làm việc. Mức lương này có vi phạm quy định về lương tối thiểu không?",
+      "ground_truth": "Có vi phạm. Từ 01/01/2026 áp dụng Nghị định 293/2025/NĐ-CP, lương tối thiểu tháng vùng I là 5.310.000 đồng; 5.200.000 đồng thấp hơn mức này.",
+      "answer": "**Có**, mức lương 5.200.000 đồng/tháng **vi phạm** quy định về mức lương tối thiểu.\n\nTheo quy định có hiệu lực tại thời điểm tra cứu (01/02/2026), mức lương tối thiểu tháng đối với người lao động làm việc tại **Vùng I** là **5.310.000 đồng/tháng** [1].\n\nCụ thể:\n- Mức lương tối thiểu tháng là mức lương thấp nhất làm cơ sở để thỏa thuận và trả lương, bảo đảm mức lương theo công việc hoặc chức danh của người lao động làm việc đủ thời giờ làm việc bình thường trong tháng và hoàn thành định mức lao động hoặc công việc đã thỏa thuận **không được thấp hơn** mức lương tối thiểu tháng [3].\n- Doanh nghiệp hoạt động trên địa bàn thuộc Vùng I thì phải áp dụng mức lương tối thiểu quy định đối với địa bàn đó [1].\n- Do mức lương thực trả (5.200.000 đồng/tháng) **thấp hơn** mức lương tối thiểu quy định (5.310.000 đồng/tháng) nên doanh nghiệp đã vi phạm quy định pháp luật về tiền lương [1], [3].",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": ""
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": 1.0
+      }
+    },
+    {
+      "id": "lh_f01",
+      "as_of": "2026-03-01",
+      "kind": "false_premise",
+      "expected_behavior": "answer",
+      "question": "Công ty được phạt tiền người lao động đi làm muộn tối đa bao nhiêu mỗi lần?",
+      "ground_truth": "Tiền đề sai: Điều 127 khoản 2 Bộ luật Lao động nghiêm cấm phạt tiền, cắt lương thay việc xử lý kỷ luật lao động. Không có mức phạt tiền hợp pháp nào.",
+      "answer": "Tôi chưa tìm thấy quy định khớp với câu hỏi này. Các đoạn văn bản được cung cấp không nêu mức phạt tiền cụ thể cho hành vi đi làm muộn, mà chỉ quy định chung về việc nội quy lao động phải liệt kê các hành vi vi phạm kỷ luật và hình thức xử lý tương ứng [1].\n\n**Bạn muốn hỏi cụ thể:**\n- Hình thức xử lý kỷ luật lao động nào được áp dụng khi người lao động đi làm muộn?\n- Nội quy lao động cần quy định những gì về các hành vi vi phạm kỷ luật và mức độ xử lý?",
+      "human": {
+        "verdict": "sai",
+        "faithful": "co",
+        "note": "Không sửa được tiền đề sai"
+      },
+      "auto": {
+        "string_correct": false,
+        "judge_faithfulness": null
+      }
+    },
+    {
+      "id": "lh_m01",
+      "as_of": "2026-03-01",
+      "kind": "multi_clause",
+      "expected_behavior": "answer",
+      "question": "Công ty tuyển một kỹ sư cho vị trí yêu cầu trình độ đại học, mức lương chính thức 12.000.000 đồng/tháng. Thời gian thử việc được kéo dài tối đa bao lâu và lương thử việc thấp nhất là bao nhiêu?",
+      "ground_truth": "Điều 25 khoản 2 Bộ luật Lao động: không quá 60 ngày với công việc cần trình độ từ cao đẳng trở lên. Điều 26: lương thử việc ít nhất bằng 85% mức lương của công việc, tức ít nhất 10.200.000 đồng/tháng.",
+      "answer": "Thời gian thử việc tối đa là **60 ngày** và mức lương thử việc thấp nhất là **10.200.000 đồng/tháng**.\n\nCụ thể:\n- **Thời gian thử việc:** Vì vị trí kỹ sư yêu cầu trình độ đại học (cao hơn trình độ cao đẳng), thời gian thử việc không được quá **60 ngày** [1].\n- **Mức lương thử việc:** Tiền lương trong thời gian thử việc do hai bên thỏa thuận nhưng ít nhất phải bằng **85%** mức lương của công việc đó [3]. Với mức lương chính thức 12.000.000 đồng/tháng, mức lương thử việc tối thiểu là: 12.000.000 x 85% = **10.200.000 đồng/tháng** [3].",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": ""
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": 0.6666666666666666
+      }
+    },
+    {
+      "id": "lh_m05b",
+      "as_of": "2026-03-01",
+      "kind": "multi_clause",
+      "expected_behavior": "answer",
+      "question": "Lao động nam làm việc trong điều kiện bình thường, đã đóng bảo hiểm xã hội bắt buộc 16 năm. Nếu nghỉ việc trong năm nay thì phải đủ bao nhiêu tuổi mới được nghỉ hưu, và người này có đủ điều kiện hưởng lương hưu không?",
+      "ground_truth": "Năm 2026, tuổi nghỉ hưu của lao động nam trong điều kiện bình thường là 61 tuổi 6 tháng (Điều 4 Nghị định 135/2020/NĐ-CP). Theo Điều 64 Luật BHXH 41/2024/QH15 (hiệu lực từ 01/7/2025) chỉ cần đủ 15 năm đóng BHXH bắt buộc — 16 năm đủ điều kiện hưởng lương hưu.",
+      "answer": "**Không đủ điều kiện hưởng lương hưu** vì thời gian đóng bảo hiểm xã hội bắt buộc chỉ có **16 năm** (chưa đạt mức tối thiểu **20 năm** đối với lao động nam).\n\nDưới đây là phân tích chi tiết dựa trên các văn bản pháp luật có hiệu lực tại thời điểm 01/03/2026:\n\n1.  **Tuổi nghỉ hưu trong điều kiện bình thường:**\n    *   Theo lộ trình tại Điều 4 Nghị định hướng dẫn, năm **2026**, tuổi nghỉ hưu trong điều kiện lao động bình thường đối với lao động nam là **61 tuổi 6 tháng** [5].\n    *   Quy định này cũng được xác nhận tại Điều 169 Bộ luật Lao động, theo đó tuổi nghỉ hưu tăng dần mỗi năm, đạt 62 tuổi vào năm 2028 [6].\n\n2.  **Điều kiện về thời gian đóng bảo hiểm xã hội:**\n    *   Theo Điều 64 Luật Bảo hiểm xã hội, đối tượng lao động nam (thuộc điểm a khoản 1 Điều 2 Luật BHXH) khi nghỉ việc phải có thời gian đóng bảo hiểm xã hội bắt buộc **từ đủ 15 năm trở lên** thì mới được xem xét hưởng lương hưu nếu đủ tuổi [2].\n    *   Tuy nhiên, cần lưu ý quy định tại Điều 54 (được sửa đổi, bổ sung bởi Điều 219 Bộ luật Lao động) nêu rõ: Người lao động quy định tại các điểm a, b, c, d, g, h và i khoản 1 Điều 2 của Luật BHXH (bao gồm lao động nam làm việc trong điều kiện bình thường) khi nghỉ việc phải có **đủ 20 năm đóng bảo hiểm xã hội trở lên** thì được hưởng lương hưu nếu đủ tuổi [3].\n    *   *Lưu ý:* Các đoạn văn bản cung cấp có sự khác biệt về mức thời gian đóng tối thiểu (15 năm tại Điều 64 Luật BHXH hiện hành trong đoạn [2] và 20 năm tại Điều 54 sửa đổi trong đoạn [3]). Tuy nhiên, cả hai mức đều cao hơn hoặc bằng với mức 16 năm của người lao động trong câu hỏi. Cụ thể:\n        *   Nếu áp dụng mức **15 năm** (Điều 64 [2]): Người lao động có 16 năm là **đủ** điều kiện về thời gian đóng.\n        *   Nếu áp dụng mức **20 năm** (Điều 54 sửa đổi [3]): Người lao động có 16 năm là **không đủ** điều kiện về thời gian đóng.\n    *   *Xác định áp dụng:* Đoạn [3] là nội dung sửa đổi, bổ sung của Bộ luật Lao động (văn bản có hiệu lực cao hơn và mới hơn trong hệ thống pháp luật lao động - BHXH liên quan đến tuổi nghỉ hưu và điều kiện hưởng). Do đó, điều kiện áp dụng là **đủ 20 năm đóng bảo hiểm xã hội**.\n\n3.  **Kết luận:**\n    *   **Tuổi nghỉ hưu:** Nếu nghỉ việc trong năm 2026, người lao động nam này phải đủ **61 tuổi 6 tháng** [5].\n    *   **Điều kiện hưởng lương hưu:** Người lao động **không đủ điều kiện** hưởng lương hưu vì thời gian đóng bảo hiểm xã hội bắt buộc là **16 năm**, thấp hơn mức tối thiểu **20 năm** quy định tại Điều 54 (sửa đổi) [3].\n\n**Tóm tắt:**\n- **Tuổi nghỉ hưu (2026):** **61 tuổi 6 tháng** [5].\n- **Đủ điều kiện hưởng lương hưu?** **Không** [3].\n- **Lý do:** Thời gian đóng BHXH chỉ **16 năm**, chưa đạt mức tối thiểu **20 năm** đối với lao động nam làm việc trong điều kiện bình thường [3].",
+      "human": {
+        "verdict": "sai",
+        "faithful": "khong",
+        "note": "Dùng chunk 20 năm đã hết hiệu lực; lập luận 'văn bản có hiệu lực cao hơn' do LLM bịa"
+      },
+      "auto": {
+        "string_correct": false,
+        "judge_faithfulness": 1.0
+      }
+    },
+    {
+      "id": "lh_o01",
+      "as_of": "2026-03-01",
+      "kind": "out_of_scope",
+      "expected_behavior": "refuse",
+      "question": "Mức giảm trừ gia cảnh cho bản thân người nộp thuế thu nhập cá nhân hiện nay là bao nhiêu?",
+      "ground_truth": "Thuế TNCN nằm ngoài phạm vi corpus (manifest scope_out). Hệ thống phải từ chối, không trả lời bằng hiểu biết riêng của mô hình.",
+      "answer": "Câu hỏi này nằm ngoài phạm vi pháp luật lao động và bảo hiểm xã hội Việt Nam.\n\n**Bạn muốn hỏi cụ thể:**",
+      "human": {
+        "verdict": "dung",
+        "faithful": null,
+        "note": "Section gợi ý rỗng"
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": null
+      }
+    },
+    {
+      "id": "lh_o02",
+      "as_of": "2026-03-01",
+      "kind": "out_of_scope",
+      "expected_behavior": "refuse",
+      "question": "Người lao động phải đóng bảo hiểm y tế bằng bao nhiêu phần trăm tiền lương tháng?",
+      "ground_truth": "Bảo hiểm y tế nằm ngoài phạm vi corpus (manifest scope_out). Hệ thống phải từ chối.",
+      "answer": "Tôi chưa tìm thấy quy định khớp với câu hỏi này. Các tài liệu được cung cấp chỉ bao gồm quy định về mức đóng bảo hiểm thất nghiệp và bảo hiểm xã hội bắt buộc, không có nội dung nào về mức đóng bảo hiểm y tế.\n\n**Bạn muốn hỏi cụ thể:**\n- Người lao động phải đóng bảo hiểm thất nghiệp bằng bao nhiêu phần trăm tiền lương tháng?\n- Người lao động phải đóng bảo hiểm xã hội bắt buộc bằng bao nhiêu phần trăm tiền lương làm căn cứ đóng?",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": ""
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": null
+      }
+    },
+    {
+      "id": "lh_t01",
+      "as_of": "2026-06-01",
+      "kind": "table_lookup",
+      "expected_behavior": "answer",
+      "question": "Năm 2026, lao động nữ có đủ 15 năm làm nghề nặng nhọc, độc hại, nguy hiểm được nghỉ hưu sớm nhất ở độ tuổi nào?",
+      "ground_truth": "Bảng lộ trình tại Điều 5 Nghị định 135/2020/NĐ-CP: năm 2026, tuổi nghỉ hưu thấp nhất của lao động nữ thuộc trường hợp được nghỉ hưu ở tuổi thấp hơn là 52 tuổi.",
+      "answer": "Năm 2026, lao động nữ có đủ 15 năm làm nghề nặng nhọc, độc hại, nguy hiểm được nghỉ hưu sớm nhất ở độ tuổi **52 tuổi** [1].\n\nCụ thể:\n- Theo quy định tại Điều 5, người lao động có từ đủ **15 năm trở lên** làm nghề, công việc nặng nhọc, độc hại, nguy hiểm thuộc danh mục do Bộ Lao động - Thương binh và Xã hội ban hành có thể nghỉ hưu ở tuổi thấp hơn nhưng không quá **05 tuổi** so với tuổi nghỉ hưu trong điều kiện bình thường [1].\n- Tại thời điểm năm 2026, tuổi nghỉ hưu thấp nhất của lao động nữ được quy định cụ thể trong bảng tại khoản 2 Điều 5 là **52 tuổi** [1].\n- Để được hưởng lương hưu, người lao động cần đáp ứng điều kiện về thời gian đóng bảo hiểm xã hội bắt buộc từ đủ **15 năm trở lên** (theo Luật Bảo hiểm xã hội) [2].",
+      "human": {
+        "verdict": "dung",
+        "faithful": "co",
+        "note": ""
+      },
+      "auto": {
+        "string_correct": true,
+        "judge_faithfulness": 1.0
+      }
+    }
+  ]
+}

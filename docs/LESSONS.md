@@ -227,6 +227,17 @@ chọn sai lần hai.
 
 ## Dữ liệu & đánh giá
 
+### Đo trên thư mục làm việc dùng chung mà không xem nó đang chứa gì (Claude, 2026-10-18)
+- **Đã làm:** chạy lại lh_m05b 12 lần trong thư mục repo để kiểm "bản sửa Điều 219 đã đủ chưa": 12/12 đúng →
+  suýt báo "m05b đã ổn trên main".
+- **Sai ở đâu:** một phiên Claude khác đang sửa cùng thư mục; generator.py có bước phân tích Có/Không CHƯA commit
+  của phiên đó. Phép đo chạy trên code đó, không phải main (phiên kia đo main: đúng 10/24).
+- **Cái giá:** suýt gán công một bản sửa cho thứ không sửa nó; hai phiên báo hai con số trái nhau cho cùng một câu.
+- **Bài học:** trước khi đo, xem `git status`/`git diff` — "code hiện tại" chỉ có nghĩa khi biết nó là commit nào
+  cộng thay đổi nào. Report giờ ghi `app_release()` (`-dirty` khi có thay đổi chưa commit).
+- **Giờ làm thế nào:** việc của phiên này làm trong `git worktree` riêng dựng từ `origin/main`; không checkout trong
+  thư mục chung; báo phiên kia bằng tin nhắn trước khi commit chồng file.
+
 ### So phương án bằng accuracy chấm chuỗi — thước đo thiên vị cấu hình đang chạy (Claude, 2026-10-18)
 - **Đã làm:** thử 3 cách sửa `lh_m05b` trên 208 câu (bỏ rule BLUF; DeepSeek trước Qwen; bật suy luận
   cho câu phức tạp), so accuracy chấm chuỗi với lượt đang chạy (0.995): cả ba "tệ hơn" (0.966–0.976).
