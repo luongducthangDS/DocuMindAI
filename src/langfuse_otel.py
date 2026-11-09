@@ -338,6 +338,9 @@ def record_generation(
     thời gian đốt vào xoay vòng key×model thay vì một khoảng trống. `level`:
     WARNING cho lượt thử mà vòng xoay còn đi tiếp — không phải lỗi của câu hỏi,
     không được thổi phồng số ERROR trên Langfuse."""
+    from src import usage  # local: usage -> config, keep this module import-light
+
+    usage.add(model, prompt_tokens, completion_tokens, failed=bool(error))  # counted even with Langfuse off
     if _auth() is None:
         return
     ctx = _ctx.get()

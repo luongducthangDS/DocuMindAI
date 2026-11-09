@@ -21,7 +21,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 
 import src.logger  # noqa: F401 — initializes loguru
-from src.api.routes import actions, documents, health, query, reports
+from src.api.routes import actions, documents, health, metrics, query, reports
 from src.api.routes.query import _get_client_ip
 from src.config import get_settings
 from src.langfuse_otel import set_index_version
@@ -285,6 +285,7 @@ app.include_router(query.router)
 app.include_router(documents.router)
 app.include_router(reports.router)
 app.include_router(actions.router)
+app.include_router(metrics.router)
 app.include_router(health.router)
 
 
