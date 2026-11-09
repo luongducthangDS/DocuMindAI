@@ -164,7 +164,7 @@ class TestPdfProcessing:
             seen["chunk"] = threading.get_ident()
             return ["c1", "c2", "c3"]
 
-        monkeypatch.setattr(documents, "load_pdf", fake_load)
+        monkeypatch.setattr(documents, "load_upload", fake_load)
         monkeypatch.setattr(documents, "chunk_by_dieu", fake_chunk)
         monkeypatch.setattr(documents, "_index_chunks", AsyncMock(return_value=3))
 
@@ -182,10 +182,10 @@ class TestPdfProcessing:
             time.sleep(0.6)
             return None
 
-        monkeypatch.setattr(documents, "load_pdf", slow_load)
+        monkeypatch.setattr(documents, "load_upload", slow_load)
         r = client.post("/api/v1/upload", files=PDF_FILE, headers={"X-Admin-Key": ADMIN_KEY})
         assert r.status_code == 422
-        assert r.json()["detail"] == "PDF processing timed out"
+        assert r.json()["detail"] == "Document processing timed out"
 
     def test_pdf_over_page_limit_rejected(self):
         from src.ingestion.loader import MAX_PDF_PAGES, PdfTooManyPages, load_pdf

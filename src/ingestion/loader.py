@@ -136,6 +136,123 @@ def load_pdf(source: bytes | BinaryIO, filename: str) -> dict | None:
     }
 
 
+# ---------- DOCX / XLSX ----------
+# Cả hai là file zip. Kiểm magic bytes, rồi chặn zip bomb bằng tổng kích thước GIẢI NÉN
+# khai trong central directory trước khi thư viện nào mở file.
+UPLOAD_EXTENSIONS = {".pdf", ".docx", ".xlsx"}
+MAX_UNZIPPED_BYTES = 100 * 1_048_576
+MAX_ZIP_ENTRIES = 5_000
+MAX_XLSX_ROWS = 50_000
+
+
+def _read_all(source: bytes | BinaryIO) -> bytes:
+    if isinstance(source, (bytes, bytearray)):
+        return bytes(source)
+    source.seek(0)
+    return source.read()
+
+
+def _validate_office_bytes(data: bytes) -> None:
+    import zipfile
+
+    settings = get_settings()
+    if len(data) > settings.max_upload_bytes:
+        raise ValueError(f"File exceeds {settings.max_upload_size_mb} MB limit ({len(data) / 1_048_576:.1f} MB)")
+    if data[:4] != b"PK\x03\x04":
+        raise ValueError("Uploaded file is not a valid DOCX/XLSX (wrong magic bytes)")
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as zf:
+            infos = zf.infolist()
+    except zipfile.BadZipFile as exc:
+        raise ValueError("Uploaded file is not a valid DOCX/XLSX (corrupt zip)") from exc
+    if len(infos) > MAX_ZIP_ENTRIES or sum(i.file_size for i in infos) > MAX_UNZIPPED_BYTES:
+        raise ValueError("Uploaded file expands beyond the allowed size (possible zip bomb)")
+
+
+def _upload_doc(filename: str, content: str, kind: str) -> dict:
+    stem = Path(filename).stem[:100]
+    return {"title": stem, "content": content, "url": f"upload://{stem}", "doc_type": f"uploaded_{kind}",
+            "source": "user_upload", "so_hieu": "", "ngay_ban_hanh": ""}
+
+
+def load_docx(source: bytes | BinaryIO, filename: str) -> dict | None:
+    """Paragraphs and tables in document order; table rows become 'a | b | c' lines."""
+    data = _read_all(source)
+    _validate_office_bytes(data)
+    from docx import Document
+    from docx.table import Table
+
+    try:
+        parts = []
+        for block in Document(io.BytesIO(data)).iter_inner_content():
+            if isinstance(block, Table):
+                for row in block.rows:
+                    cells = [c.text.strip() for c in row.cells]
+                    if any(cells):
+                        parts.append(" | ".join(cells))
+            elif block.text.strip():
+                parts.append(block.text.strip())
+    except Exception as exc:
+        logger.error("DOCX extraction failed for {}: {}", filename, exc)
+        return None
+    text = "\n".join(parts)
+    if len(text.strip()) < 100:
+        logger.warning("DOCX '{}' yielded too little text ({} chars)", filename, len(text))
+        return None
+    return _upload_doc(filename, clean_legal_text(text, doc_title=filename), "docx")
+
+
+def load_xlsx(source: bytes | BinaryIO, filename: str) -> dict | None:
+    """One line per row, each value tagged with its column header ('Sheet | Header: value; ...').
+
+    A sliding-window chunk then still says what every number means, which a raw grid dump does not.
+    Formulas are read as their cached values (data_only); a formula string is never indexed.
+    """
+    data = _read_all(source)
+    _validate_office_bytes(data)
+    from openpyxl import load_workbook
+
+    lines: list[str] = []
+    try:
+        wb = load_workbook(io.BytesIO(data), read_only=True, data_only=True)
+        for ws in wb.worksheets:
+            header: list[str] | None = None
+            for row in ws.iter_rows(values_only=True):
+                vals = ["" if v is None else str(v).strip() for v in row]
+                if not any(vals):
+                    continue
+                if header is None:
+                    header = [h or f"Cột {i + 1}" for i, h in enumerate(vals)]
+                    continue
+                pairs = [f"{header[i] if i < len(header) else f'Cột {i + 1}'}: {v}" for i, v in enumerate(vals) if v]
+                lines.append(f"{ws.title} | " + "; ".join(pairs))
+                if len(lines) >= MAX_XLSX_ROWS:
+                    raise ValueError(f"Workbook has more than {MAX_XLSX_ROWS} data rows")
+        wb.close()
+    except ValueError:
+        raise
+    except Exception as exc:
+        logger.error("XLSX extraction failed for {}: {}", filename, exc)
+        return None
+    text = "\n".join(lines)
+    if len(text.strip()) < 100:
+        logger.warning("XLSX '{}' yielded too little text ({} chars)", filename, len(text))
+        return None
+    return _upload_doc(filename, text, "xlsx")
+
+
+def load_upload(source: bytes | BinaryIO, filename: str) -> dict | None:
+    """Dispatch on extension. Content is still verified by magic bytes inside each loader."""
+    ext = Path(filename).suffix.lower()
+    if ext == ".docx":
+        return load_docx(source, filename)
+    if ext == ".xlsx":
+        return load_xlsx(source, filename)
+    if ext == ".pdf":
+        return load_pdf(source, filename)
+    raise ValueError(f"Unsupported file type '{ext}'. Allowed: {', '.join(sorted(UPLOAD_EXTENSIONS))}")
+
+
 def load_json_file(path: Path) -> dict | None:
     """Load a single raw JSON document from disk (crawled data)."""
     try:
