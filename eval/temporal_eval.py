@@ -84,6 +84,7 @@ ARMS = ("no_temporal", "prompt_only", "temporal_filter", "pre_filter")
 DEFAULT_GOLD = _REPO_ROOT / "data" / "eval" / "temporal_questions.json"
 DEFAULT_OUTPUT = _REPO_ROOT / "reports" / "temporal_eval.json"
 RECALL_KS = (1, 3, 5, 8)  # 8 = top_n the generator actually receives
+NDCG_KS = (3, 5, 8)
 
 
 def _percentile(values: list[float], p: int) -> float | None:
@@ -124,6 +125,21 @@ def score_answer(answer: str, question: dict) -> dict:
 
 
 # ── Context scoring (no LLM needed) ───────────────────────────────────────────
+
+def ndcg_at_k(ranks: list[int | None], k: int) -> float:
+    """Binary-relevance nDCG@k. `ranks` = 1-based rank of each gold clause (None = not retrieved).
+
+    One gold clause: 1/log2(rank+1). Several: DCG over those within k, divided by the DCG of the
+    best possible ordering (all gold clauses at the top).
+    """
+    import math
+
+    if not ranks:
+        return 0.0
+    dcg = sum(1 / math.log2(r + 1) for r in ranks if r and r <= k)
+    idcg = sum(1 / math.log2(i + 2) for i in range(min(len(ranks), k)))
+    return dcg / idcg
+
 
 def gold_rank(chunks: list, question: dict) -> int | None:
     """1-based rank at which the gold evidence is complete — basis of recall@k / MRR.
@@ -473,6 +489,11 @@ def summarise(rows: list[dict], arms: tuple[str, ...], retrieval_only: bool) -> 
             for k in RECALL_KS:
                 agg[f"recall_at_{k}"] = sum(1 for x in ranked if x and x <= k) / len(ranked)
             agg["mrr"] = sum(1 / x for x in ranked if x) / len(ranked)
+            # Multi-clause questions are graded per clause (clause_ranks), single ones by gold_rank.
+            per_q = [r["arms"][arm]["context"].get("clause_ranks") or [r["arms"][arm]["context"].get("gold_rank")]
+                     for r in subset if r.get("has_gold")]
+            for k in NDCG_KS:
+                agg[f"ndcg_at_{k}"] = sum(ndcg_at_k(cr, k) for cr in per_q) / len(per_q)
         # Câu nhiều điều khoản lấy hạng của điều khoản KÉM nhất, nên không bao giờ đạt
         # hạng 1 — recall@1 chung có trần < 1 (0.909 trên legal_qa_200). Số này bỏ chúng ra.
         single = [r["arms"][arm]["context"].get("gold_rank") for r in subset
@@ -528,7 +549,7 @@ def print_report(report: dict) -> None:
     arms = report["meta"]["arms"]
     retrieval_only = report["meta"]["retrieval_only"]
     metrics = ["context_gold", "context_distractor", "context_clean"]
-    metrics += [f"recall_at_{k}" for k in RECALL_KS] + ["recall_at_1_single", "mrr"]
+    metrics += [f"recall_at_{k}" for k in RECALL_KS] + ["recall_at_1_single", "mrr"] + [f"ndcg_at_{k}" for k in NDCG_KS]
     if not retrieval_only:
         metrics += ["answer_accuracy", "faithfulness"]
 

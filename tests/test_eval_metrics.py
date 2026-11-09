@@ -152,3 +152,16 @@ def test_gold_rank_accepts_alternate_clause_for_single_clause_question():
     # Câu nhiều điều khoản: điều khoản thay thế không được dùng để "lấp" điều khoản thiếu
     q_multi = {"source_clause": "", "source_clauses": ["luat__d39", "x__d1"], "acceptable_clauses": ["nd__d15"]}
     assert gold_rank(chunks, q_multi) is None
+
+
+def test_ndcg_at_k():
+    import math
+
+    from eval.temporal_eval import ndcg_at_k
+
+    assert ndcg_at_k([1], 5) == 1.0
+    assert ndcg_at_k([3], 5) == 1 / math.log2(4)
+    assert ndcg_at_k([6], 5) == 0.0 and ndcg_at_k([None], 5) == 0.0
+    # two gold clauses at ranks 1 and 3: DCG = 1 + 1/log2(4); ideal = 1 + 1/log2(3)
+    assert abs(ndcg_at_k([1, 3], 5) - (1 + 0.5) / (1 + 1 / math.log2(3))) < 1e-12
+    assert ndcg_at_k([2, 1], 5) == 1.0  # order of the list does not matter, ranks do
