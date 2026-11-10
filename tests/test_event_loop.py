@@ -78,7 +78,7 @@ def _upload(client: TestClient) -> None:
 class TestUploadDoesNotBlock:
     def test_load_pdf_runs_off_loop(self, client):
         started = threading.Event()
-        with patch.object(documents, "load_pdf", _slow(started, None)):
+        with patch.object(documents, "load_upload", _slow(started, None)):
             elapsed = _health_latency_while(client, started, lambda: _upload(client))
         assert elapsed < HEALTH_BUDGET_S
 
@@ -87,7 +87,7 @@ class TestUploadDoesNotBlock:
         doc = {"title": "t", "content": "Điều 1. x", "doc_type": "uploaded_pdf"}
         chunk = SimpleNamespace(text="Điều 1. x", metadata={}, is_valid=True)
         fake_index = SimpleNamespace(insert_nodes=_slow(started))
-        with patch.object(documents, "load_pdf", return_value=doc), \
+        with patch.object(documents, "load_upload", return_value=doc), \
              patch.object(documents, "chunk_by_dieu", return_value=[chunk]), \
              patch.object(documents, "_rebuild_retriever", lambda _m: None), \
              patch("src.rag.retriever._active_index", fake_index):

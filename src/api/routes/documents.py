@@ -1,6 +1,6 @@
 """
 Document management routes:
-  POST /api/v1/upload  — ingest uploaded PDF (admin: X-Admin-Key)
+  POST /api/v1/upload  — ingest uploaded PDF / DOCX / XLSX (admin: X-Admin-Key)
   GET  /api/v1/documents — list indexed documents
   POST /api/v1/reload  — rebuild retriever (admin: X-Admin-Key)
 """
@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 from collections import Counter
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from loguru import logger
@@ -20,7 +21,7 @@ from src.api.routes.query import _get_client_ip
 from src.api.schemas import DocumentListResponse, DocumentMeta, IngestResponse
 from src.config import get_settings
 from src.ingestion.chunker import chunk_by_dieu
-from src.ingestion.loader import load_pdf
+from src.ingestion.loader import UPLOAD_EXTENSIONS, load_upload
 
 router = APIRouter(prefix="/api/v1", tags=["documents"])
 
@@ -49,8 +50,8 @@ def _check_content_length(request: Request) -> None:
 
 
 def _extract_and_chunk(source, filename: str):
-    """Phần CPU-bound của upload (pdfplumber + chunker) — chạy trong thread."""
-    doc = load_pdf(source, filename)
+    """Phần CPU-bound của upload (pdfplumber / python-docx / openpyxl + chunker) — chạy trong thread."""
+    doc = load_upload(source, filename)
     return doc, (chunk_by_dieu(doc["content"], doc) if doc else [])
 
 # Văn bản đang có trong index, gom từ chính các node nạp cho BM25 (init, reload,
@@ -152,15 +153,13 @@ async def upload_document(request: Request) -> IngestResponse:
 
     await ensure_rag_initialized()
 
-    # Validate MIME type before reading body
-    allowed_types = {"application/pdf", "application/x-pdf"}
-    content_type = (file.content_type or "").lower()
-    if content_type not in allowed_types and not filename.lower().endswith(".pdf"):
+    # Extension chọn loader; loader vẫn kiểm magic bytes nên đổi đuôi file không lọt được.
+    if Path(filename).suffix.lower() not in UPLOAD_EXTENSIONS:
         await form.close()
-        _audit_upload_error(filename, 0, "Invalid MIME type", ip, ua)
+        _audit_upload_error(filename, 0, "Unsupported file type", ip, ua)
         raise HTTPException(
             status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-            detail="Only PDF files are accepted",
+            detail="Only PDF, DOCX and XLSX files are accepted",
         )
 
     # Không `await file.read()`: Starlette đã spool upload > 1MB ra file tạm trên
@@ -184,7 +183,7 @@ async def upload_document(request: Request) -> IngestResponse:
         logger.warning("PDF processing timed out after {}s: {}", PDF_PROCESSING_TIMEOUT_S, filename)
         _audit_upload_error(filename, size, "Processing timeout", ip, ua)
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                            detail="PDF processing timed out")
+                            detail="Document processing timed out")
     except ValueError as exc:
         _audit_upload_error(filename, size, str(exc), ip, ua)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
@@ -192,7 +191,7 @@ async def upload_document(request: Request) -> IngestResponse:
         logger.error("PDF processing failed: {}", exc)
         _audit_upload_error(filename, size, f"PDF processing error: {exc}", ip, ua)
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                            detail="Failed to extract text from PDF")
+                            detail="Failed to extract text from document")
     finally:
         # Quá timeout thì thread vẫn chạy; đóng file tạm làm lần đọc kế tiếp của nó
         # lỗi và kết thúc sớm thay vì parse tiếp.
@@ -202,7 +201,7 @@ async def upload_document(request: Request) -> IngestResponse:
         _audit_upload_error(filename, size, "No extractable text", ip, ua)
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="PDF produced no extractable text",
+            detail="Document produced no extractable text",
         )
 
     if not chunks:

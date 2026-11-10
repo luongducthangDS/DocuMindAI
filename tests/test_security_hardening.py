@@ -139,7 +139,7 @@ async def test_unblocked_health(admin_env, app, monkeypatch):
         time.sleep(1.0)  # CPU-bound pdfplumber giả lập — CHẶN thread đang chạy nó
         return None
 
-    monkeypatch.setattr(documents, "load_pdf", slow_pdf)
+    monkeypatch.setattr(documents, "load_upload", slow_pdf)
 
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://t") as c:
@@ -163,7 +163,7 @@ def test_upload_streams_spooled_file_not_bytes(admin_env, app, monkeypatch):
         seen["type"] = type(source)
         return None
 
-    monkeypatch.setattr(documents, "load_pdf", fake_load)
+    monkeypatch.setattr(documents, "load_upload", fake_load)
     TestClient(app).post("/api/v1/upload", files=PDF_FILE, headers=ADMIN)
     assert seen["type"] is not bytes and hasattr(seen["type"], "read")
 

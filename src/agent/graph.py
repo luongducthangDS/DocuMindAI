@@ -21,6 +21,8 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from loguru import logger
 
+from src.agent.actions import proposal_from_query, wants_action
+from src.agent.actions import propose as propose_action
 from src.agent.memory import LongTermMemory, ShortTermMemory
 from src.agent.tools import ALL_TOOLS
 from src.config import DOMAIN_NAME, DOMAIN_SCOPE, DOMAIN_TOPICS, get_settings
@@ -37,6 +39,7 @@ from src.rag.grader import grade_chunks
 from src.ingestion.manifest import corpus_earliest_point_in_time
 from src.rag.context import (
     PUBLIC_CONTEXT,
+    PUBLIC_TENANT,
     degraded_flags,
     mark_degraded,
     reset_current_context,
@@ -427,6 +430,7 @@ def router_node(state: AgentState) -> dict:
         "summarize": "Tóm tắt văn bản",
         "report": "Tạo báo cáo",
         "compliance_check": "Kiểm định tuân thủ",
+        "action": "Đề xuất thao tác (chờ duyệt)",
         "unknown": "Câu hỏi ngoài phạm vi",
     }
     ms = int((time.time() - t0) * 1000)
@@ -471,6 +475,9 @@ def _is_plain_legal_question(query: str) -> bool:
 
 def _keyword_classify(query: str) -> str:
     q = query.lower()
+    # Write actions first: "tạo yêu cầu ... báo cáo" must become a proposal, never a report run.
+    if wants_action(q):
+        return "action"
     if any(w in q for w in ["so sánh", "khác nhau", "giống nhau", "phân biệt"]):
         return "compare"
     if any(w in q for w in ["tóm tắt", "tóm lược", "nội dung chính"]):
@@ -961,6 +968,27 @@ async def report_node(state: AgentState) -> dict:
         return await _fallback_to_retrieval_answer(state)
 
 
+def action_node(state: AgentState) -> dict:
+    """Propose a business action. Never executes: a human approves via /api/v1/actions/{id}/approve."""
+    t0 = time.time()
+    ctx = state.get("retrieval_ctx")
+    tenant = getattr(ctx, "tenant_id", PUBLIC_TENANT)
+    query = state.get("original_query") or state["query"]
+    if tenant == PUBLIC_TENANT:
+        answer = "Thao tác này cần tài khoản doanh nghiệp (API key). Người dùng ẩn danh chỉ tra cứu được."
+        status = "refused"
+    else:
+        row = propose_action("create_hr_request", proposal_from_query(query), tenant, state.get("session_id", "default"))
+        status = row["status"]
+        answer = (f"Đã tạo đề xuất **{row['id'][:8]}**: gửi yêu cầu tới phòng `{row['args']['department']}`. "
+                  "Yêu cầu chỉ được gửi sau khi người có thẩm quyền phê duyệt.")
+    return {
+        "answer": answer, "sources": [], "retrieved_chunks": [], "used_llm": "none",
+        "steps": (state.get("steps") or []) + [
+            {"label": "Đề xuất thao tác", "detail": status, "ms": int((time.time() - t0) * 1000)}],
+    }
+
+
 def persist_node(state: AgentState) -> dict:
     """Log query to SQLite for long-term memory."""
     try:
@@ -990,6 +1018,7 @@ def route_by_intent(state: AgentState) -> str:
         "summarize": "do_summarize",
         "report": "do_report",
         "compliance_check": "do_compliance",
+        "action": "do_action",
         "unknown": "do_retrieve",
         "smalltalk": "do_persist",   # đã có câu trả lời, không cần retrieval
     }
@@ -1026,6 +1055,7 @@ def build_graph() -> StateGraph:
     g.add_node("do_summarize", summarize_node)
     g.add_node("do_report", report_node)
     g.add_node("do_compliance", compliance_check_node)
+    g.add_node("do_action", action_node)
     g.add_node("do_persist", persist_node)
 
     g.add_edge(START, "do_contextualize")
@@ -1042,6 +1072,7 @@ def build_graph() -> StateGraph:
     g.add_edge("do_summarize", "do_persist")
     g.add_edge("do_report", "do_persist")
     g.add_edge("do_compliance", "do_persist")
+    g.add_edge("do_action", "do_persist")
     g.add_edge("do_persist", END)
 
     return g.compile()

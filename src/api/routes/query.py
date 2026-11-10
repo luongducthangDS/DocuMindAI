@@ -24,6 +24,7 @@ from src.api.schemas import ComplianceVerdict, QueryRequest, QueryResponse, Sour
 from src.config import DOMAIN_NAME, get_settings
 from src.guardrails import check_prompt_injection, redact_pii, truncate_ip, validate_citations
 from src.langfuse_otel import end_trace, start_trace
+from src import usage
 from src.rag.context import (
     PUBLIC_TENANT,
     degraded_flags,
@@ -165,6 +166,14 @@ def _get_session(tenant_id: str, session_id: str) -> ShortTermMemory:
     return _sessions[key]
 
 
+def _log_usage(channel: str, intent: str, t0: float, totals: dict, error: bool = False) -> None:
+    """Never let accounting break an answer: a failed write is logged and dropped."""
+    try:
+        usage.log_request(channel, intent, int((time.time() - t0) * 1000), totals, error=error)
+    except Exception as exc:  # pragma: no cover - disk full / locked db
+        logger.warning("usage log failed: {}", exc)
+
+
 @router.post("/query", response_model=QueryResponse, status_code=status.HTTP_200_OK)
 async def query_endpoint(request: Request, body: QueryRequest) -> QueryResponse:
     """
@@ -201,6 +210,7 @@ async def query_endpoint(request: Request, body: QueryRequest) -> QueryResponse:
 
     error_detail: str | None = None
     result: dict = {}
+    meter = usage.begin()
     try:
         from src.api.main import ensure_rag_initialized
 
@@ -215,8 +225,10 @@ async def query_endpoint(request: Request, body: QueryRequest) -> QueryResponse:
     except HTTPException:
         # ensure_rag_initialized() đã trả sẵn 503 kèm loại lỗi — giữ nguyên,
         # đừng bọc lại thành "Agent temporarily unavailable (HTTPException)".
+        _log_usage("rest", "unknown", t0, usage.end(meter), error=True)
         raise
     except Exception as exc:
+        _log_usage("rest", "unknown", t0, usage.end(meter), error=True)
         error_detail = str(exc)
         logger.error("Agent failed for query '{}': {}", body.query[:60], exc)
         get_long_term_memory().log_error("/api/v1/query", type(exc).__name__, body.session_id)
@@ -237,6 +249,8 @@ async def query_endpoint(request: Request, body: QueryRequest) -> QueryResponse:
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"Agent temporarily unavailable ({type(exc).__name__}). Please retry.",
         ) from exc
+
+    _log_usage("rest", result.get("intent", "unknown"), t0, usage.end(meter))
 
     # Guardrail: citation hallucination validation
     answer_text = result.get("answer", "")
@@ -438,6 +452,8 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
                 "documind-ws-query", session_id=session_id,
                 tags=["legal-qa", "feature:websocket-chat", f"env:{get_settings().environment}"],
             )
+            # ponytail: a turn that raises mid-stream is not logged; the next turn's begin() replaces its meter.
+            meter, t_turn = usage.begin(), time.time()
 
             # Browsers cannot set headers on a WebSocket handshake (the WebSocket
             # constructor takes a URL and subprotocols, nothing else), so the UI
@@ -450,6 +466,7 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
                 base_ctx = context_from_headers({"x-api-key": msg_key}) if msg_key else ws_ctx
             except InvalidApiKey as exc:
                 await websocket.send_json({"error": str(exc)})
+                usage.end(meter)
                 end_trace(ctx, lf_token, "documind-ws-query", raw_query, "")
                 continue
             session = _get_session(base_ctx.tenant_id, session_id)
@@ -518,6 +535,7 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
                 reset_current_context(ws_ctx_token)
 
             full_answer = "".join(answer_parts)
+            _log_usage("ws", "simple_qa", t_turn, usage.end(meter))
             sources = _cited_sources(full_answer, chunks)
             await _send_step(websocket, progress, "Tổng hợp câu trả lời", f"{len(sources)} trích dẫn", t_step)
             audit_flags = trace_answer(full_answer, sources, {"chunks": len(chunks)}) or []

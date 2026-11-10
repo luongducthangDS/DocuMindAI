@@ -1,0 +1,32 @@
+{
+  "documents": 44,
+  "principals": 6,
+  "dates": [
+    "2024-06-01",
+    "2026-06-01"
+  ],
+  "paths": {
+    "chroma": {
+      "checks": 528,
+      "failures": 0,
+      "leaks": 0,
+      "pass_rate": 1.0,
+      "examples": []
+    },
+    "qdrant": {
+      "checks": 528,
+      "failures": 0,
+      "leaks": 0,
+      "pass_rate": 1.0,
+      "examples": []
+    },
+    "bm25": {
+      "checks": 528,
+      "failures": 0,
+      "leaks": 0,
+      "pass_rate": 1.0,
+      "examples": []
+    }
+  },
+  "pass_rate": 1.0
+}
