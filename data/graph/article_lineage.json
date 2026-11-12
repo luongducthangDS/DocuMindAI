@@ -1,0 +1,2537 @@
+[
+ {
+  "old": [
+   "115-2015-ND-CP",
+   1
+  ],
+  "new": [
+   "158-2025-ND-CP",
+   1
+  ],
+  "score": 0.973,
+  "cos": 0.947,
+  "jaccard": 1.0,
+  "old_title": "Phạm vi điều chỉnh",
+  "new_title": "Phạm vi điều chỉnh"
+ },
+ {
+  "old": [
+   "115-2015-ND-CP",
+   2
+  ],
+  "new": [
+   "158-2025-ND-CP",
+   2
+  ],
+  "score": 0.963,
+  "cos": 0.926,
+  "jaccard": 1.0,
+  "old_title": "Đối tượng áp dụng",
+  "new_title": "Đối tượng áp dụng"
+ },
+ {
+  "old": [
+   "115-2015-ND-CP",
+   6
+  ],
+  "new": [
+   "158-2025-ND-CP",
+   12
+  ],
+  "score": 0.958,
+  "cos": 0.916,
+  "jaccard": 1.0,
+  "old_title": "Điều kiện hưởng lương hưu",
+  "new_title": "Điều kiện hưởng lương hưu"
+ },
+ {
+  "old": [
+   "115-2015-ND-CP",
+   7
+  ],
+  "new": [
+   "158-2025-ND-CP",
+   13
+  ],
+  "score": 0.805,
+  "cos": 0.943,
+  "jaccard": 0.667,
+  "old_title": "Mức lương hưu hàng tháng",
+  "new_title": "Mức lương hưu hằng tháng"
+ },
+ {
+  "old": [
+   "115-2015-ND-CP",
+   8
+  ],
+  "new": [
+   "158-2025-ND-CP",
+   14
+  ],
+  "score": 0.882,
+  "cos": 0.93,
+  "jaccard": 0.833,
+  "old_title": "Bảo hiểm xã hội một lần",
+  "new_title": "Hưởng bảo hiểm xã hội một lần"
+ },
+ {
+  "old": [
+   "115-2015-ND-CP",
+   9
+  ],
+  "new": [
+   "158-2025-ND-CP",
+   15
+  ],
+  "score": 0.881,
+  "cos": 0.961,
+  "jaccard": 0.8,
+  "old_title": "Mức bình quân tiền lương tháng đóng bảo hiểm xã hội để tính lương hưu, trợ cấp một lần",
+  "new_title": "Mức bình quân tiền lương làm căn cứ đóng bảo hiểm xã hội để tính lương hưu, trợ cấp một lần"
+ },
+ {
+  "old": [
+   "115-2015-ND-CP",
+   10
+  ],
+  "new": [
+   "158-2025-ND-CP",
+   16
+  ],
+  "score": 0.778,
+  "cos": 0.956,
+  "jaccard": 0.6,
+  "old_title": "Điều chỉnh tiền lương đã đóng bảo hiểm xã hội",
+  "new_title": "Điều chỉnh tiền lương làm căn cứ đóng bảo hiểm xã hội bắt buộc"
+ },
+ {
+  "old": [
+   "115-2015-ND-CP",
+   11
+  ],
+  "new": [
+   "158-2025-ND-CP",
+   17
+  ],
+  "score": 0.864,
+  "cos": 0.964,
+  "jaccard": 0.765,
+  "old_title": "Chế độ hưu trí đối với người trước đó có thời gian đóng bảo hiểm xã hội tự nguyện",
+  "new_title": "Chế độ hưu trí đối với người vừa có thời gian đóng bảo hiểm xã hội tự nguyện vừa có thời gian đóng bảo hiểm xã hội bắt buộc"
+ },
+ {
+  "old": [
+   "115-2015-ND-CP",
+   12
+  ],
+  "new": [
+   "158-2025-ND-CP",
+   21
+  ],
+  "score": 0.772,
+  "cos": 0.979,
+  "jaccard": 0.565,
+  "old_title": "Chế độ tử tuất đối với thân nhân của người lao động chết mà trước đó có thời gian đóng bảo hiểm xã hội tự nguyện",
+  "new_title": "Chế độ tử tuất đối với người vừa có thời gian đóng bảo hiểm xã hội tự nguyện vừa có thời gian đóng bảo hiểm xã hội bắt buộc"
+ },
+ {
+  "old": [
+   "115-2015-ND-CP",
+   13
+  ],
+  "new": [
+   "158-2025-ND-CP",
+   19
+  ],
+  "score": 0.711,
+  "cos": 0.948,
+  "jaccard": 0.474,
+  "old_title": "Chế độ tử tuất đối với người đang hưởng lương hưu, trợ cấp mất sức lao động, trợ cấp tai nạn lao động, bệnh nghề nghiệp hàng tháng, trợ cấp tuất hàng tháng",
+  "new_title": "Chế độ tử tuất đối với trường hợp người đang hưởng trợ cấp tai nạn lao động, bệnh nghề nghiệp hằng tháng chưa nghỉ việc hoặc còn bảo lưu thời gian đóng bảo hiểm xã hội và người đang hưởng trợ cấp tai nạn lao động, bệnh nghề nghiệp hằng tháng đồng thời là người đang hưởng lương hưu"
+ },
+ {
+  "old": [
+   "115-2015-ND-CP",
+   16
+  ],
+  "new": [
+   "158-2025-ND-CP",
+   11
+  ],
+  "score": 0.765,
+  "cos": 0.931,
+  "jaccard": 0.6,
+  "old_title": "Tạm dừng đóng bảo hiểm xã hội bắt buộc",
+  "new_title": "Tạm dừng đóng bảo hiểm xã hội bắt buộc theo quy định tại khoản 2 và 3 Điều 37 của Luật Bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "115-2015-ND-CP",
+   17
+  ],
+  "new": [
+   "158-2025-ND-CP",
+   7
+  ],
+  "score": 0.803,
+  "cos": 0.914,
+  "jaccard": 0.692,
+  "old_title": "Tiền lương tháng đóng bảo hiểm xã hội bắt buộc",
+  "new_title": "Tiền lương làm căn cứ đóng bảo hiểm xã hội bắt buộc"
+ },
+ {
+  "old": [
+   "115-2015-ND-CP",
+   18
+  ],
+  "new": [
+   "158-2025-ND-CP",
+   8
+  ],
+  "score": 0.845,
+  "cos": 0.939,
+  "jaccard": 0.75,
+  "old_title": "Truy thu, truy đóng tiền lương tháng đóng bảo hiểm xã hội bắt buộc",
+  "new_title": "Truy thu, truy đóng bảo hiểm xã hội bắt buộc"
+ },
+ {
+  "old": [
+   "115-2015-ND-CP",
+   21
+  ],
+  "new": [
+   "158-2025-ND-CP",
+   32
+  ],
+  "score": 0.972,
+  "cos": 0.945,
+  "jaccard": 1.0,
+  "old_title": "Phụ cấp khu vực đối với người hưởng bảo hiểm xã hội",
+  "new_title": "Phụ cấp khu vực đối với người hưởng bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "115-2015-ND-CP",
+   23
+  ],
+  "new": [
+   "158-2025-ND-CP",
+   34
+  ],
+  "score": 0.981,
+  "cos": 0.963,
+  "jaccard": 1.0,
+  "old_title": "Tính thời gian công tác trước ngày 01 tháng 01 năm 1995 để hưởng bảo hiểm xã hội",
+  "new_title": "Tính thời gian công tác trước ngày 01 tháng 01 năm 1995 để hưởng bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "115-2015-ND-CP",
+   24
+  ],
+  "new": [
+   "158-2025-ND-CP",
+   40
+  ],
+  "score": 0.896,
+  "cos": 0.942,
+  "jaccard": 0.85,
+  "old_title": "Chế độ đối với người đang hưởng trợ cấp hàng tháng mà trước đó có thời gian đóng bảo hiểm xã hội chưa được tính hưởng bảo hiểm xã hội",
+  "new_title": "Chế độ đối với người đang hưởng trợ cấp hằng tháng mà có thời gian đóng bảo hiểm xã hội chưa được tính hưởng bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "115-2015-ND-CP",
+   25
+  ],
+  "new": [
+   "158-2025-ND-CP",
+   41
+  ],
+  "score": 0.92,
+  "cos": 0.952,
+  "jaccard": 0.889,
+  "old_title": "Chế độ đối với người lao động đã có quyết định nghỉ việc chờ giải quyết chế độ hưu trí, trợ cấp hàng tháng",
+  "new_title": "Chế độ đối với người lao động đã có quyết định nghỉ việc chờ giải quyết chế độ hưu trí, trợ cấp hằng tháng"
+ },
+ {
+  "old": [
+   "115-2015-ND-CP",
+   29
+  ],
+  "new": [
+   "158-2025-ND-CP",
+   44
+  ],
+  "score": 0.944,
+  "cos": 0.888,
+  "jaccard": 1.0,
+  "old_title": "Hiệu lực thi hành",
+  "new_title": "Hiệu lực thi hành"
+ },
+ {
+  "old": [
+   "115-2015-ND-CP",
+   30
+  ],
+  "new": [
+   "158-2025-ND-CP",
+   45
+  ],
+  "score": 0.966,
+  "cos": 0.933,
+  "jaccard": 1.0,
+  "old_title": "Trách nhiệm tổ chức thi hành",
+  "new_title": "Trách nhiệm tổ chức thi hành"
+ },
+ {
+  "old": [
+   "134-2015-ND-CP",
+   1
+  ],
+  "new": [
+   "159-2025-ND-CP",
+   1
+  ],
+  "score": 0.972,
+  "cos": 0.944,
+  "jaccard": 1.0,
+  "old_title": "Phạm vi điều chỉnh",
+  "new_title": "Phạm vi điều chỉnh"
+ },
+ {
+  "old": [
+   "134-2015-ND-CP",
+   2
+  ],
+  "new": [
+   "159-2025-ND-CP",
+   2
+  ],
+  "score": 0.968,
+  "cos": 0.936,
+  "jaccard": 1.0,
+  "old_title": "Đối tượng áp dụng",
+  "new_title": "Đối tượng áp dụng"
+ },
+ {
+  "old": [
+   "134-2015-ND-CP",
+   4
+  ],
+  "new": [
+   "159-2025-ND-CP",
+   10
+  ],
+  "score": 0.75,
+  "cos": 0.928,
+  "jaccard": 0.571,
+  "old_title": "Mức bình quân thu nhập tháng đóng bảo hiểm xã hội",
+  "new_title": "Điều chỉnh thu nhập tháng đã đóng bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "134-2015-ND-CP",
+   5
+  ],
+  "new": [
+   "159-2025-ND-CP",
+   11
+  ],
+  "score": 0.863,
+  "cos": 0.961,
+  "jaccard": 0.765,
+  "old_title": "Chế độ hưu trí đối với người trước đó có thời gian đóng bảo hiểm xã hội bắt buộc",
+  "new_title": "Chế độ hưu trí đối với người vừa có thời gian đóng bảo hiểm xã hội bắt buộc vừa có thời gian đóng bảo hiểm xã hội tự nguyện"
+ },
+ {
+  "old": [
+   "134-2015-ND-CP",
+   7
+  ],
+  "new": [
+   "159-2025-ND-CP",
+   9
+  ],
+  "score": 0.936,
+  "cos": 0.873,
+  "jaccard": 1.0,
+  "old_title": "Bảo hiểm xã hội một lần",
+  "new_title": "Bảo hiểm xã hội một lần"
+ },
+ {
+  "old": [
+   "134-2015-ND-CP",
+   8
+  ],
+  "new": [
+   "159-2025-ND-CP",
+   12
+  ],
+  "score": 0.802,
+  "cos": 0.951,
+  "jaccard": 0.652,
+  "old_title": "Chế độ tử tuất đối với thân nhân của người tham gia bảo hiểm xã hội tự nguyện chết mà trước đó có thời gian đóng bảo hiểm xã hội bắt buộc",
+  "new_title": "Chế độ tử tuất đối với người vừa có thời gian đóng bảo hiểm xã hội bắt buộc vừa có thời gian đóng bảo hiểm xã hội tự nguyện"
+ },
+ {
+  "old": [
+   "134-2015-ND-CP",
+   11
+  ],
+  "new": [
+   "159-2025-ND-CP",
+   4
+  ],
+  "score": 0.85,
+  "cos": 0.921,
+  "jaccard": 0.778,
+  "old_title": "Thay đổi phương thức đóng, mức thu nhập tháng đóng bảo hiểm xã hội tự nguyện",
+  "new_title": "Thay đổi phương thức đóng, mức thu nhập làm căn cứ đóng bảo hiểm xã hội tự nguyện"
+ },
+ {
+  "old": [
+   "134-2015-ND-CP",
+   14
+  ],
+  "new": [
+   "159-2025-ND-CP",
+   5
+  ],
+  "score": 0.984,
+  "cos": 0.968,
+  "jaccard": 1.0,
+  "old_title": "Hỗ trợ tiền đóng bảo hiểm xã hội cho người tham gia bảo hiểm xã hội tự nguyện",
+  "new_title": "Hỗ trợ tiền đóng bảo hiểm xã hội cho người tham gia bảo hiểm xã hội tự nguyện"
+ },
+ {
+  "old": [
+   "134-2015-ND-CP",
+   17
+  ],
+  "new": [
+   "159-2025-ND-CP",
+   17
+  ],
+  "score": 0.958,
+  "cos": 0.916,
+  "jaccard": 1.0,
+  "old_title": "Hiệu lực thi hành",
+  "new_title": "Hiệu lực thi hành"
+ },
+ {
+  "old": [
+   "134-2015-ND-CP",
+   18
+  ],
+  "new": [
+   "159-2025-ND-CP",
+   18
+  ],
+  "score": 0.816,
+  "cos": 0.965,
+  "jaccard": 0.667,
+  "old_title": "Trách nhiệm tổ chức thi hành",
+  "new_title": "Trách nhiệm thi hành"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   1
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   1
+  ],
+  "score": 0.982,
+  "cos": 0.964,
+  "jaccard": 1.0,
+  "old_title": "Phạm vi điều chỉnh",
+  "new_title": "Phạm vi điều chỉnh"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   2
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   2
+  ],
+  "score": 0.987,
+  "cos": 0.974,
+  "jaccard": 1.0,
+  "old_title": "Đối tượng áp dụng",
+  "new_title": "Đối tượng áp dụng"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   9
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   28
+  ],
+  "score": 0.959,
+  "cos": 0.917,
+  "jaccard": 1.0,
+  "old_title": "Hoạt động đầu tư từ Quỹ bảo hiểm thất nghiệp",
+  "new_title": "Hoạt động đầu tư từ Quỹ bảo hiểm thất nghiệp"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   12
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   3
+  ],
+  "score": 0.878,
+  "cos": 0.923,
+  "jaccard": 0.833,
+  "old_title": "Đóng bảo hiểm thất nghiệp",
+  "new_title": "Người đang đóng bảo hiểm thất nghiệp"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   17
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   14
+  ],
+  "score": 0.956,
+  "cos": 0.913,
+  "jaccard": 1.0,
+  "old_title": "Nộp hồ sơ đề nghị hưởng trợ cấp thất nghiệp",
+  "new_title": "Nộp hồ sơ đề nghị hưởng trợ cấp thất nghiệp"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   19
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   17
+  ],
+  "score": 0.965,
+  "cos": 0.93,
+  "jaccard": 1.0,
+  "old_title": "Tạm dừng hưởng trợ cấp thất nghiệp",
+  "new_title": "Tạm dừng hưởng trợ cấp thất nghiệp"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   20
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   18
+  ],
+  "score": 0.968,
+  "cos": 0.935,
+  "jaccard": 1.0,
+  "old_title": "Tiếp tục hưởng trợ cấp thất nghiệp",
+  "new_title": "Tiếp tục hưởng trợ cấp thất nghiệp"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   21
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   19
+  ],
+  "score": 0.977,
+  "cos": 0.955,
+  "jaccard": 1.0,
+  "old_title": "Chấm dứt hưởng trợ cấp thất nghiệp",
+  "new_title": "Chấm dứt hưởng trợ cấp thất nghiệp"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   22
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   20
+  ],
+  "score": 0.975,
+  "cos": 0.951,
+  "jaccard": 1.0,
+  "old_title": "Chuyển nơi hưởng trợ cấp thất nghiệp",
+  "new_title": "Chuyển nơi hưởng trợ cấp thất nghiệp"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   27
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   26
+  ],
+  "score": 0.823,
+  "cos": 0.956,
+  "jaccard": 0.69,
+  "old_title": "Giải quyết hỗ trợ kinh phí đào tạo, bồi dưỡng, nâng cao trình độ kỹ năng nghề để duy trì việc làm cho người lao động",
+  "new_title": "Trình tự, thủ tục hỗ trợ người sử dụng lao động đào tạo, bồi dưỡng, nâng cao trình độ kỹ năng nghề để duy trì việc làm cho người lao động"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   28
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   25
+  ],
+  "score": 0.836,
+  "cos": 0.902,
+  "jaccard": 0.769,
+  "old_title": "Tổ chức thực hiện hỗ trợ đào tạo, bồi dưỡng, nâng cao trình độ kỹ năng nghề để duy trì việc làm cho người lao động",
+  "new_title": "Trách nhiệm tổ chức đào tạo, bồi dưỡng, nâng cao trình độ kỹ năng nghề để duy trì việc làm cho người lao động"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   29
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   29
+  ],
+  "score": 0.98,
+  "cos": 0.961,
+  "jaccard": 1.0,
+  "old_title": "Quyền của người lao động",
+  "new_title": "Quyền của người lao động"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   30
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   30
+  ],
+  "score": 0.983,
+  "cos": 0.967,
+  "jaccard": 1.0,
+  "old_title": "Nghĩa vụ của người lao động",
+  "new_title": "Nghĩa vụ của người lao động"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   31
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   31
+  ],
+  "score": 0.978,
+  "cos": 0.955,
+  "jaccard": 1.0,
+  "old_title": "Quyền của người sử dụng lao động",
+  "new_title": "Quyền của người sử dụng lao động"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   32
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   32
+  ],
+  "score": 0.983,
+  "cos": 0.966,
+  "jaccard": 1.0,
+  "old_title": "Trách nhiệm của người sử dụng lao động",
+  "new_title": "Trách nhiệm của người sử dụng lao động"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   33
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   33
+  ],
+  "score": 0.721,
+  "cos": 0.941,
+  "jaccard": 0.5,
+  "old_title": "Quyền của trung tâm dịch vụ việc làm",
+  "new_title": "Quyền của tổ chức dịch vụ việc làm công"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   34
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   34
+  ],
+  "score": 0.741,
+  "cos": 0.936,
+  "jaccard": 0.545,
+  "old_title": "Trách nhiệm của trung tâm dịch vụ việc làm",
+  "new_title": "Trách nhiệm của tổ chức dịch vụ việc làm công"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   35
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   35
+  ],
+  "score": 0.757,
+  "cos": 0.959,
+  "jaccard": 0.556,
+  "old_title": "Quyền của tổ chức bảo hiểm xã hội",
+  "new_title": "Quyền của cơ quan bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   36
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   36
+  ],
+  "score": 0.786,
+  "cos": 0.971,
+  "jaccard": 0.6,
+  "old_title": "Trách nhiệm của tổ chức bảo hiểm xã hội",
+  "new_title": "Trách nhiệm của cơ quan bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   39
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   43
+  ],
+  "score": 0.953,
+  "cos": 0.907,
+  "jaccard": 1.0,
+  "old_title": "Điều khoản chuyển tiếp",
+  "new_title": "Điều khoản chuyển tiếp"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   40
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   44
+  ],
+  "score": 0.939,
+  "cos": 0.878,
+  "jaccard": 1.0,
+  "old_title": "Tổ chức thực hiện",
+  "new_title": "Tổ chức thực hiện"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   41
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   45
+  ],
+  "score": 0.958,
+  "cos": 0.915,
+  "jaccard": 1.0,
+  "old_title": "Hiệu lực thi hành",
+  "new_title": "Hiệu lực thi hành"
+ },
+ {
+  "old": [
+   "28-2015-ND-CP",
+   42
+  ],
+  "new": [
+   "374-2025-ND-CP",
+   46
+  ],
+  "score": 0.974,
+  "cos": 0.947,
+  "jaccard": 1.0,
+  "old_title": "Trách nhiệm thi hành",
+  "new_title": "Trách nhiệm thi hành"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   1
+  ],
+  "new": [
+   "74-2025-QH15",
+   1
+  ],
+  "score": 0.993,
+  "cos": 0.985,
+  "jaccard": 1.0,
+  "old_title": "Phạm vi điều chỉnh",
+  "new_title": "Phạm vi điều chỉnh"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   3
+  ],
+  "new": [
+   "74-2025-QH15",
+   2
+  ],
+  "score": 0.985,
+  "cos": 0.971,
+  "jaccard": 1.0,
+  "old_title": "Giải thích từ ngữ",
+  "new_title": "Giải thích từ ngữ"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   4
+  ],
+  "new": [
+   "74-2025-QH15",
+   3
+  ],
+  "score": 0.991,
+  "cos": 0.981,
+  "jaccard": 1.0,
+  "old_title": "Nguyên tắc về việc làm",
+  "new_title": "Nguyên tắc về việc làm"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   5
+  ],
+  "new": [
+   "74-2025-QH15",
+   4
+  ],
+  "score": 0.973,
+  "cos": 0.946,
+  "jaccard": 1.0,
+  "old_title": "Chính sách của Nhà nước về việc làm",
+  "new_title": "Chính sách của Nhà nước về việc làm"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   6
+  ],
+  "new": [
+   "74-2025-QH15",
+   6
+  ],
+  "score": 0.858,
+  "cos": 0.966,
+  "jaccard": 0.75,
+  "old_title": "Nội dung quản lý nhà nước về việc làm",
+  "new_title": "Quản lý nhà nước về việc làm"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   8
+  ],
+  "new": [
+   "74-2025-QH15",
+   7
+  ],
+  "score": 0.987,
+  "cos": 0.974,
+  "jaccard": 1.0,
+  "old_title": "Trách nhiệm của cơ quan, tổ chức và cá nhân về việc làm",
+  "new_title": "Trách nhiệm của cơ quan, tổ chức và cá nhân về việc làm"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   9
+  ],
+  "new": [
+   "74-2025-QH15",
+   5
+  ],
+  "score": 0.969,
+  "cos": 0.937,
+  "jaccard": 1.0,
+  "old_title": "Những hành vi bị nghiêm cấm",
+  "new_title": "Những hành vi bị nghiêm cấm"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   15
+  ],
+  "new": [
+   "74-2025-QH15",
+   10
+  ],
+  "score": 0.915,
+  "cos": 0.949,
+  "jaccard": 0.882,
+  "old_title": "Hỗ trợ chuyển đổi nghề nghiệp, việc làm cho người lao động ở khu vực nông thôn",
+  "new_title": "Chính sách hỗ trợ chuyển đổi nghề nghiệp, việc làm cho người lao động ở khu vực nông thôn"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   18
+  ],
+  "new": [
+   "74-2025-QH15",
+   11
+  ],
+  "score": 0.814,
+  "cos": 0.914,
+  "jaccard": 0.714,
+  "old_title": "Nội dung chính sách việc làm công",
+  "new_title": "Chính sách việc làm công"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   20
+  ],
+  "new": [
+   "74-2025-QH15",
+   14
+  ],
+  "score": 0.932,
+  "cos": 0.942,
+  "jaccard": 0.923,
+  "old_title": "Hỗ trợ đưa người lao động đi làm việc ở nước ngoài theo hợp đồng",
+  "new_title": "Hỗ trợ người lao động đi làm việc ở nước ngoài theo hợp đồng"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   21
+  ],
+  "new": [
+   "74-2025-QH15",
+   12
+  ],
+  "score": 0.737,
+  "cos": 0.929,
+  "jaccard": 0.545,
+  "old_title": "Hỗ trợ tạo việc làm cho thanh niên",
+  "new_title": "Chính sách hỗ trợ việc làm cho người lao động là thanh niên"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   22
+  ],
+  "new": [
+   "74-2025-QH15",
+   15
+  ],
+  "score": 0.905,
+  "cos": 0.921,
+  "jaccard": 0.889,
+  "old_title": "Hỗ trợ phát triển thị trường lao động",
+  "new_title": "Hoạt động hỗ trợ phát triển thị trường lao động"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   23
+  ],
+  "new": [
+   "74-2025-QH15",
+   20
+  ],
+  "score": 0.826,
+  "cos": 0.902,
+  "jaccard": 0.75,
+  "old_title": "Nội dung thông tin thị trường lao động",
+  "new_title": "Thông tin thị trường lao động"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   29
+  ],
+  "new": [
+   "74-2025-QH15",
+   24
+  ],
+  "score": 0.877,
+  "cos": 0.921,
+  "jaccard": 0.833,
+  "old_title": "Mục đích đánh giá, cấp chứng chỉ kỹ năng nghề quốc gia",
+  "new_title": "Đánh giá, cấp chứng chỉ kỹ năng nghề quốc gia"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   31
+  ],
+  "new": [
+   "74-2025-QH15",
+   25
+  ],
+  "score": 0.861,
+  "cos": 0.944,
+  "jaccard": 0.778,
+  "old_title": "Tổ chức đánh giá kỹ năng nghề",
+  "new_title": "Tổ chức đánh giá kỹ năng nghề quốc gia"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   32
+  ],
+  "new": [
+   "74-2025-QH15",
+   23
+  ],
+  "score": 0.704,
+  "cos": 0.908,
+  "jaccard": 0.5,
+  "old_title": "Xây dựng, công bố tiêu chuẩn kỹ năng nghề quốc gia",
+  "new_title": "Khung trình độ, tiêu chuẩn kỹ năng nghề quốc gia"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   35
+  ],
+  "new": [
+   "74-2025-QH15",
+   26
+  ],
+  "score": 0.967,
+  "cos": 0.934,
+  "jaccard": 1.0,
+  "old_title": "Những công việc yêu cầu phải có chứng chỉ kỹ năng nghề quốc gia",
+  "new_title": "Nghề, công việc yêu cầu phải có chứng chỉ kỹ năng nghề quốc gia"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   36
+  ],
+  "new": [
+   "74-2025-QH15",
+   27
+  ],
+  "score": 0.708,
+  "cos": 0.916,
+  "jaccard": 0.5,
+  "old_title": "Dịch vụ việc làm",
+  "new_title": "Nội dung, tổ chức dịch vụ việc làm"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   39
+  ],
+  "new": [
+   "74-2025-QH15",
+   28
+  ],
+  "score": 0.97,
+  "cos": 0.94,
+  "jaccard": 1.0,
+  "old_title": "Doanh nghiệp hoạt động dịch vụ việc làm",
+  "new_title": "Doanh nghiệp hoạt động dịch vụ việc làm"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   41
+  ],
+  "new": [
+   "74-2025-QH15",
+   29
+  ],
+  "score": 0.983,
+  "cos": 0.967,
+  "jaccard": 1.0,
+  "old_title": "Nguyên tắc bảo hiểm thất nghiệp",
+  "new_title": "Nguyên tắc bảo hiểm thất nghiệp"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   42
+  ],
+  "new": [
+   "74-2025-QH15",
+   30
+  ],
+  "score": 0.971,
+  "cos": 0.942,
+  "jaccard": 1.0,
+  "old_title": "Các chế độ bảo hiểm thất nghiệp",
+  "new_title": "Các chế độ bảo hiểm thất nghiệp"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   44
+  ],
+  "new": [
+   "74-2025-QH15",
+   32
+  ],
+  "score": 0.954,
+  "cos": 0.908,
+  "jaccard": 1.0,
+  "old_title": "Tham gia bảo hiểm thất nghiệp",
+  "new_title": "Tham gia bảo hiểm thất nghiệp"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   45
+  ],
+  "new": [
+   "74-2025-QH15",
+   35
+  ],
+  "score": 0.971,
+  "cos": 0.941,
+  "jaccard": 1.0,
+  "old_title": "Thời gian đóng bảo hiểm thất nghiệp",
+  "new_title": "Thời gian đóng bảo hiểm thất nghiệp"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   49
+  ],
+  "new": [
+   "74-2025-QH15",
+   38
+  ],
+  "score": 0.979,
+  "cos": 0.959,
+  "jaccard": 1.0,
+  "old_title": "Điều kiện hưởng",
+  "new_title": "Điều kiện hưởng"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   50
+  ],
+  "new": [
+   "74-2025-QH15",
+   39
+  ],
+  "score": 0.778,
+  "cos": 0.956,
+  "jaccard": 0.6,
+  "old_title": "Mức, thời gian, thời điểm hưởng trợ cấp thất nghiệp",
+  "new_title": "Mức hưởng, thời gian hưởng, thời điểm hưởng và hồ sơ, trình tự, thủ tục hưởng trợ cấp thất nghiệp"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   52
+  ],
+  "new": [
+   "74-2025-QH15",
+   40
+  ],
+  "score": 0.759,
+  "cos": 0.919,
+  "jaccard": 0.6,
+  "old_title": "Thông báo về việc tìm kiếm việc làm",
+  "new_title": "Trách nhiệm thông báo về việc tìm kiếm việc làm của người lao động"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   53
+  ],
+  "new": [
+   "74-2025-QH15",
+   41
+  ],
+  "score": 0.867,
+  "cos": 0.949,
+  "jaccard": 0.786,
+  "old_title": "Tạm dừng, tiếp tục, chấm dứt hưởng trợ cấp thất nghiệp",
+  "new_title": "Chuyển nơi hưởng, tạm dừng, tiếp tục, chấm dứt hưởng và hủy hưởng trợ cấp thất nghiệp"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   54
+  ],
+  "new": [
+   "74-2025-QH15",
+   36
+  ],
+  "score": 0.959,
+  "cos": 0.919,
+  "jaccard": 1.0,
+  "old_title": "Tư vấn, giới thiệu việc làm",
+  "new_title": "Tư vấn, giới thiệu việc làm"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   57
+  ],
+  "new": [
+   "74-2025-QH15",
+   44
+  ],
+  "score": 0.794,
+  "cos": 0.921,
+  "jaccard": 0.667,
+  "old_title": "Mức đóng, nguồn hình thành và sử dụng Quỹ bảo hiểm thất nghiệp",
+  "new_title": "Nguồn hình thành Quỹ bảo hiểm thất nghiệp"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   58
+  ],
+  "new": [
+   "74-2025-QH15",
+   34
+  ],
+  "score": 0.818,
+  "cos": 0.937,
+  "jaccard": 0.7,
+  "old_title": "Tiền lương làm căn cứ đóng bảo hiểm thất nghiệp",
+  "new_title": "Căn cứ đóng bảo hiểm thất nghiệp"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   59
+  ],
+  "new": [
+   "74-2025-QH15",
+   43
+  ],
+  "score": 0.805,
+  "cos": 0.895,
+  "jaccard": 0.714,
+  "old_title": "Quản lý Quỹ bảo hiểm thất nghiệp",
+  "new_title": "Quỹ bảo hiểm thất nghiệp"
+ },
+ {
+  "old": [
+   "38-2013-QH13",
+   61
+  ],
+  "new": [
+   "74-2025-QH15",
+   54
+  ],
+  "score": 0.934,
+  "cos": 0.868,
+  "jaccard": 1.0,
+  "old_title": "Hiệu lực thi hành",
+  "new_title": "Hiệu lực thi hành"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   1
+  ],
+  "new": [
+   "41-2024-QH15",
+   1
+  ],
+  "score": 0.987,
+  "cos": 0.974,
+  "jaccard": 1.0,
+  "old_title": "Phạm vi điều chỉnh",
+  "new_title": "Phạm vi điều chỉnh"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   3
+  ],
+  "new": [
+   "41-2024-QH15",
+   3
+  ],
+  "score": 0.989,
+  "cos": 0.979,
+  "jaccard": 1.0,
+  "old_title": "Giải thích từ ngữ",
+  "new_title": "Giải thích từ ngữ"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   4
+  ],
+  "new": [
+   "41-2024-QH15",
+   4
+  ],
+  "score": 0.864,
+  "cos": 0.978,
+  "jaccard": 0.75,
+  "old_title": "Các chế độ bảo hiểm xã hội",
+  "new_title": "Loại hình, các chế độ bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   5
+  ],
+  "new": [
+   "41-2024-QH15",
+   5
+  ],
+  "score": 0.993,
+  "cos": 0.986,
+  "jaccard": 1.0,
+  "old_title": "Nguyên tắc bảo hiểm xã hội",
+  "new_title": "Nguyên tắc bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   6
+  ],
+  "new": [
+   "41-2024-QH15",
+   6
+  ],
+  "score": 0.974,
+  "cos": 0.949,
+  "jaccard": 1.0,
+  "old_title": "Chính sách của Nhà nước đối với bảo hiểm xã hội",
+  "new_title": "Chính sách của Nhà nước đối với bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   7
+  ],
+  "new": [
+   "41-2024-QH15",
+   133
+  ],
+  "score": 0.975,
+  "cos": 0.951,
+  "jaccard": 1.0,
+  "old_title": "Nội dung quản lý nhà nước về bảo hiểm xã hội",
+  "new_title": "Nội dung quản lý nhà nước về bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   8
+  ],
+  "new": [
+   "41-2024-QH15",
+   134
+  ],
+  "score": 0.811,
+  "cos": 0.955,
+  "jaccard": 0.667,
+  "old_title": "Cơ quan quản lý nhà nước về bảo hiểm xã hội",
+  "new_title": "Trách nhiệm quản lý nhà nước về bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   10
+  ],
+  "new": [
+   "41-2024-QH15",
+   136
+  ],
+  "score": 0.844,
+  "cos": 0.937,
+  "jaccard": 0.75,
+  "old_title": "Trách nhiệm của Bộ trưởng Bộ Lao động - Thương binh và Xã hội về bảo hiểm xã hội",
+  "new_title": "Trách nhiệm của Bộ Lao động - Thương binh và Xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   11
+  ],
+  "new": [
+   "41-2024-QH15",
+   137
+  ],
+  "score": 0.708,
+  "cos": 0.916,
+  "jaccard": 0.5,
+  "old_title": "Trách nhiệm của Bộ trưởng Bộ Tài chính về bảo hiểm xã hội",
+  "new_title": "Trách nhiệm của Bộ Tài chính"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   12
+  ],
+  "new": [
+   "41-2024-QH15",
+   138
+  ],
+  "score": 0.782,
+  "cos": 0.928,
+  "jaccard": 0.636,
+  "old_title": "Trách nhiệm của Ủy ban nhân dân các cấp về bảo hiểm xã hội",
+  "new_title": "Trách nhiệm của Ủy ban nhân dân các cấp"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   14
+  ],
+  "new": [
+   "41-2024-QH15",
+   14
+  ],
+  "score": 0.988,
+  "cos": 0.976,
+  "jaccard": 1.0,
+  "old_title": "Quyền và trách nhiệm của tổ chức công đoàn, Mặt trận Tổ quốc Việt Nam và các tổ chức thành viên của Mặt trận",
+  "new_title": "Quyền và trách nhiệm của công đoàn, Mặt trận Tổ quốc Việt Nam và các tổ chức thành viên của Mặt trận"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   15
+  ],
+  "new": [
+   "41-2024-QH15",
+   15
+  ],
+  "score": 0.986,
+  "cos": 0.972,
+  "jaccard": 1.0,
+  "old_title": "Quyền và trách nhiệm của tổ chức đại diện người sử dụng lao động",
+  "new_title": "Quyền và trách nhiệm của tổ chức đại diện người sử dụng lao động"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   17
+  ],
+  "new": [
+   "41-2024-QH15",
+   9
+  ],
+  "score": 0.982,
+  "cos": 0.964,
+  "jaccard": 1.0,
+  "old_title": "Các hành vi bị nghiêm cấm",
+  "new_title": "Các hành vi bị nghiêm cấm"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   20
+  ],
+  "new": [
+   "41-2024-QH15",
+   12
+  ],
+  "score": 0.971,
+  "cos": 0.943,
+  "jaccard": 1.0,
+  "old_title": "Quyền của người sử dụng lao động",
+  "new_title": "Quyền của người sử dụng lao động"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   21
+  ],
+  "new": [
+   "41-2024-QH15",
+   13
+  ],
+  "score": 0.98,
+  "cos": 0.96,
+  "jaccard": 1.0,
+  "old_title": "Trách nhiệm của người sử dụng lao động",
+  "new_title": "Trách nhiệm của người sử dụng lao động"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   22
+  ],
+  "new": [
+   "41-2024-QH15",
+   17
+  ],
+  "score": 0.917,
+  "cos": 0.959,
+  "jaccard": 0.875,
+  "old_title": "Quyền của cơ quan bảo hiểm xã hội",
+  "new_title": "Quyền hạn của cơ quan bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   23
+  ],
+  "new": [
+   "41-2024-QH15",
+   18
+  ],
+  "score": 0.987,
+  "cos": 0.975,
+  "jaccard": 1.0,
+  "old_title": "Trách nhiệm của cơ quan bảo hiểm xã hội",
+  "new_title": "Trách nhiệm của cơ quan bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   25
+  ],
+  "new": [
+   "41-2024-QH15",
+   42
+  ],
+  "score": 0.91,
+  "cos": 0.945,
+  "jaccard": 0.875,
+  "old_title": "Điều kiện hưởng chế độ ốm đau",
+  "new_title": "Đối tượng, điều kiện hưởng chế độ ốm đau"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   26
+  ],
+  "new": [
+   "41-2024-QH15",
+   43
+  ],
+  "score": 0.987,
+  "cos": 0.973,
+  "jaccard": 1.0,
+  "old_title": "Thời gian hưởng chế độ ốm đau",
+  "new_title": "Thời gian hưởng chế độ ốm đau"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   29
+  ],
+  "new": [
+   "41-2024-QH15",
+   46
+  ],
+  "score": 0.87,
+  "cos": 0.962,
+  "jaccard": 0.778,
+  "old_title": "Dưỡng sức, phục hồi sức khỏe sau khi ốm đau",
+  "new_title": "Dưỡng sức, phục hồi sức khoẻ sau khi ốm đau"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   31
+  ],
+  "new": [
+   "41-2024-QH15",
+   50
+  ],
+  "score": 0.92,
+  "cos": 0.965,
+  "jaccard": 0.875,
+  "old_title": "Điều kiện hưởng chế độ thai sản",
+  "new_title": "Đối tượng và điều kiện hưởng chế độ thai sản"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   32
+  ],
+  "new": [
+   "41-2024-QH15",
+   51
+  ],
+  "score": 0.834,
+  "cos": 0.969,
+  "jaccard": 0.7,
+  "old_title": "Thời gian hưởng chế độ khi khám thai",
+  "new_title": "Thời gian nghỉ việc hưởng chế độ thai sản khi khám thai"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   34
+  ],
+  "new": [
+   "41-2024-QH15",
+   53
+  ],
+  "score": 0.777,
+  "cos": 0.918,
+  "jaccard": 0.636,
+  "old_title": "Thời gian hưởng chế độ khi sinh con",
+  "new_title": "Thời gian nghỉ việc hưởng chế độ thai sản khi sinh con"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   35
+  ],
+  "new": [
+   "41-2024-QH15",
+   55
+  ],
+  "score": 0.928,
+  "cos": 0.947,
+  "jaccard": 0.909,
+  "old_title": "Chế độ thai sản của lao động nữ mang thai hộ và người mẹ nhờ mang thai hộ",
+  "new_title": "Chế độ thai sản của lao động nữ nhờ mang thai hộ"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   37
+  ],
+  "new": [
+   "41-2024-QH15",
+   57
+  ],
+  "score": 0.899,
+  "cos": 0.953,
+  "jaccard": 0.846,
+  "old_title": "Thời gian hưởng chế độ khi thực hiện các biện pháp tránh thai",
+  "new_title": "Thời gian nghỉ việc hưởng chế độ khi thực hiện các biện pháp tránh thai"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   38
+  ],
+  "new": [
+   "41-2024-QH15",
+   58
+  ],
+  "score": 0.737,
+  "cos": 0.941,
+  "jaccard": 0.533,
+  "old_title": "Trợ cấp một lần khi sinh con hoặc nhận nuôi con nuôi",
+  "new_title": "Trợ cấp một lần khi sinh con, nhận con khi nhờ mang thai hộ hoặc nhận nuôi con nuôi dưới 06 tháng tuổi"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   41
+  ],
+  "new": [
+   "41-2024-QH15",
+   60
+  ],
+  "score": 0.871,
+  "cos": 0.965,
+  "jaccard": 0.778,
+  "old_title": "Dưỡng sức, phục hồi sức khỏe sau thai sản",
+  "new_title": "Dưỡng sức, phục hồi sức khoẻ sau thai sản"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   54
+  ],
+  "new": [
+   "41-2024-QH15",
+   64
+  ],
+  "score": 0.887,
+  "cos": 0.941,
+  "jaccard": 0.833,
+  "old_title": "Điều kiện hưởng lương hưu",
+  "new_title": "Đối tượng và điều kiện hưởng lương hưu"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   55
+  ],
+  "new": [
+   "41-2024-QH15",
+   65
+  ],
+  "score": 0.935,
+  "cos": 0.954,
+  "jaccard": 0.917,
+  "old_title": "Điều kiện hưởng lương hưu khi suy giảm khả năng lao động",
+  "new_title": "Đối tượng và điều kiện hưởng lương hưu khi suy giảm khả năng lao động"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   56
+  ],
+  "new": [
+   "41-2024-QH15",
+   66
+  ],
+  "score": 0.981,
+  "cos": 0.962,
+  "jaccard": 1.0,
+  "old_title": "Mức lương hưu hằng tháng",
+  "new_title": "Mức lương hưu hằng tháng"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   57
+  ],
+  "new": [
+   "41-2024-QH15",
+   67
+  ],
+  "score": 0.972,
+  "cos": 0.943,
+  "jaccard": 1.0,
+  "old_title": "Điều chỉnh lương hưu",
+  "new_title": "Điều chỉnh lương hưu"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   58
+  ],
+  "new": [
+   "41-2024-QH15",
+   68
+  ],
+  "score": 0.973,
+  "cos": 0.946,
+  "jaccard": 1.0,
+  "old_title": "Trợ cấp một lần khi nghỉ hưu",
+  "new_title": "Trợ cấp một lần khi nghỉ hưu"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   59
+  ],
+  "new": [
+   "41-2024-QH15",
+   69
+  ],
+  "score": 0.976,
+  "cos": 0.953,
+  "jaccard": 1.0,
+  "old_title": "Thời điểm hưởng lương hưu",
+  "new_title": "Thời điểm hưởng lương hưu"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   60
+  ],
+  "new": [
+   "41-2024-QH15",
+   70
+  ],
+  "score": 0.902,
+  "cos": 0.97,
+  "jaccard": 0.833,
+  "old_title": "Bảo hiểm xã hội một lần",
+  "new_title": "Hưởng bảo hiểm xã hội một lần"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   61
+  ],
+  "new": [
+   "41-2024-QH15",
+   71
+  ],
+  "score": 0.981,
+  "cos": 0.962,
+  "jaccard": 1.0,
+  "old_title": "Bảo lưu thời gian đóng bảo hiểm xã hội",
+  "new_title": "Bảo lưu thời gian đóng bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   62
+  ],
+  "new": [
+   "41-2024-QH15",
+   72
+  ],
+  "score": 0.888,
+  "cos": 0.977,
+  "jaccard": 0.8,
+  "old_title": "Mức bình quân tiền lương tháng đóng bảo hiểm xã hội để tính lương hưu, trợ cấp một lần",
+  "new_title": "Mức bình quân tiền lương làm căn cứ đóng bảo hiểm xã hội để tính lương hưu, trợ cấp một lần"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   63
+  ],
+  "new": [
+   "41-2024-QH15",
+   73
+  ],
+  "score": 0.78,
+  "cos": 0.96,
+  "jaccard": 0.6,
+  "old_title": "Điều chỉnh tiền lương đã đóng bảo hiểm xã hội",
+  "new_title": "Điều chỉnh tiền lương làm căn cứ đóng bảo hiểm xã hội bắt buộc"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   64
+  ],
+  "new": [
+   "41-2024-QH15",
+   75
+  ],
+  "score": 0.886,
+  "cos": 0.948,
+  "jaccard": 0.824,
+  "old_title": "Tạm dừng, hưởng tiếp lương hưu, trợ cấp bảo hiểm xã hội hằng tháng",
+  "new_title": "Tạm dừng, chấm dứt, tiếp tục hưởng lương hưu, trợ cấp bảo hiểm xã hội hằng tháng"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   65
+  ],
+  "new": [
+   "41-2024-QH15",
+   76
+  ],
+  "score": 0.863,
+  "cos": 0.944,
+  "jaccard": 0.783,
+  "old_title": "Thực hiện chế độ bảo hiểm xã hội đối với người đang hưởng lương hưu, trợ cấp bảo hiểm xã hội hằng tháng ra nước ngoài để định cư",
+  "new_title": "Trợ cấp một lần đối với người đang hưởng lương hưu, trợ cấp bảo hiểm xã hội hằng tháng ra nước ngoài để định cư"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   66
+  ],
+  "new": [
+   "41-2024-QH15",
+   85
+  ],
+  "score": 0.98,
+  "cos": 0.961,
+  "jaccard": 1.0,
+  "old_title": "Trợ cấp mai táng",
+  "new_title": "Trợ cấp mai táng"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   67
+  ],
+  "new": [
+   "41-2024-QH15",
+   86
+  ],
+  "score": 0.985,
+  "cos": 0.97,
+  "jaccard": 1.0,
+  "old_title": "Các trường hợp hưởng trợ cấp tuất hằng tháng",
+  "new_title": "Các trường hợp hưởng trợ cấp tuất hằng tháng"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   68
+  ],
+  "new": [
+   "41-2024-QH15",
+   87
+  ],
+  "score": 0.977,
+  "cos": 0.954,
+  "jaccard": 1.0,
+  "old_title": "Mức trợ cấp tuất hằng tháng",
+  "new_title": "Mức trợ cấp tuất hằng tháng"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   69
+  ],
+  "new": [
+   "41-2024-QH15",
+   88
+  ],
+  "score": 0.973,
+  "cos": 0.946,
+  "jaccard": 1.0,
+  "old_title": "Các trường hợp hưởng trợ cấp tuất một lần",
+  "new_title": "Các trường hợp hưởng trợ cấp tuất một lần"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   70
+  ],
+  "new": [
+   "41-2024-QH15",
+   89
+  ],
+  "score": 0.977,
+  "cos": 0.954,
+  "jaccard": 1.0,
+  "old_title": "Mức trợ cấp tuất một lần",
+  "new_title": "Mức trợ cấp tuất một lần"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   71
+  ],
+  "new": [
+   "41-2024-QH15",
+   111
+  ],
+  "score": 0.98,
+  "cos": 0.96,
+  "jaccard": 1.0,
+  "old_title": "Chế độ hưu trí và chế độ tử tuất đối với người vừa có thời gian đóng bảo hiểm xã hội bắt buộc vừa có thời gian đóng bảo hiểm xã hội tự nguyện",
+  "new_title": "Chế độ hưu trí và chế độ tử tuất đối với người vừa có thời gian đóng bảo hiểm xã hội bắt buộc vừa có thời gian đóng bảo hiểm xã hội tự nguyện"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   73
+  ],
+  "new": [
+   "41-2024-QH15",
+   98
+  ],
+  "score": 0.881,
+  "cos": 0.928,
+  "jaccard": 0.833,
+  "old_title": "Điều kiện hưởng lương hưu",
+  "new_title": "Đối tượng và điều kiện hưởng lương hưu"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   74
+  ],
+  "new": [
+   "41-2024-QH15",
+   99
+  ],
+  "score": 0.977,
+  "cos": 0.955,
+  "jaccard": 1.0,
+  "old_title": "Mức lương hưu hằng tháng",
+  "new_title": "Mức lương hưu hằng tháng"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   75
+  ],
+  "new": [
+   "41-2024-QH15",
+   100
+  ],
+  "score": 0.967,
+  "cos": 0.935,
+  "jaccard": 1.0,
+  "old_title": "Trợ cấp một lần khi nghỉ hưu",
+  "new_title": "Trợ cấp một lần khi nghỉ hưu"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   76
+  ],
+  "new": [
+   "41-2024-QH15",
+   101
+  ],
+  "score": 0.973,
+  "cos": 0.945,
+  "jaccard": 1.0,
+  "old_title": "Thời điểm hưởng lương hưu",
+  "new_title": "Thời điểm hưởng lương hưu"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   77
+  ],
+  "new": [
+   "41-2024-QH15",
+   102
+  ],
+  "score": 0.896,
+  "cos": 0.958,
+  "jaccard": 0.833,
+  "old_title": "Bảo hiểm xã hội một lần",
+  "new_title": "Hưởng bảo hiểm xã hội một lần"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   79
+  ],
+  "new": [
+   "41-2024-QH15",
+   104
+  ],
+  "score": 0.784,
+  "cos": 0.943,
+  "jaccard": 0.625,
+  "old_title": "Mức bình quân thu nhập tháng đóng bảo hiểm xã hội",
+  "new_title": "Mức bình quân thu nhập làm căn cứ đóng bảo hiểm xã hội tự nguyện"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   80
+  ],
+  "new": [
+   "41-2024-QH15",
+   109
+  ],
+  "score": 0.978,
+  "cos": 0.957,
+  "jaccard": 1.0,
+  "old_title": "Trợ cấp mai táng",
+  "new_title": "Trợ cấp mai táng"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   82
+  ],
+  "new": [
+   "41-2024-QH15",
+   117
+  ],
+  "score": 0.972,
+  "cos": 0.943,
+  "jaccard": 1.0,
+  "old_title": "Các nguồn hình thành quỹ bảo hiểm xã hội",
+  "new_title": "Các nguồn hình thành quỹ bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   83
+  ],
+  "new": [
+   "41-2024-QH15",
+   118
+  ],
+  "score": 0.86,
+  "cos": 0.943,
+  "jaccard": 0.778,
+  "old_title": "Các quỹ thành phần của quỹ bảo hiểm xã hội",
+  "new_title": "Các quỹ thành phần của quỹ bảo hiểm xã hội, quỹ bảo hiểm thất nghiệp"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   84
+  ],
+  "new": [
+   "41-2024-QH15",
+   119
+  ],
+  "score": 0.969,
+  "cos": 0.937,
+  "jaccard": 1.0,
+  "old_title": "Sử dụng quỹ bảo hiểm xã hội",
+  "new_title": "Sử dụng quỹ bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   85
+  ],
+  "new": [
+   "41-2024-QH15",
+   33
+  ],
+  "score": 0.856,
+  "cos": 0.961,
+  "jaccard": 0.75,
+  "old_title": "Mức đóng và phương thức đóng của người lao động tham gia bảo hiểm xã hội bắt buộc",
+  "new_title": "Mức đóng, phương thức và thời hạn đóng bảo hiểm xã hội bắt buộc của người lao động"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   87
+  ],
+  "new": [
+   "41-2024-QH15",
+   36
+  ],
+  "score": 0.848,
+  "cos": 0.947,
+  "jaccard": 0.75,
+  "old_title": "Mức đóng và phương thức đóng của người lao động tham gia bảo hiểm xã hội tự nguyện",
+  "new_title": "Mức đóng, phương thức và thời hạn đóng bảo hiểm xã hội của người tham gia bảo hiểm xã hội tự nguyện"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   88
+  ],
+  "new": [
+   "41-2024-QH15",
+   37
+  ],
+  "score": 0.972,
+  "cos": 0.943,
+  "jaccard": 1.0,
+  "old_title": "Tạm dừng đóng bảo hiểm xã hội bắt buộc",
+  "new_title": "Tạm dừng đóng bảo hiểm xã hội bắt buộc"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   91
+  ],
+  "new": [
+   "41-2024-QH15",
+   121
+  ],
+  "score": 0.957,
+  "cos": 0.914,
+  "jaccard": 1.0,
+  "old_title": "Nguyên tắc đầu tư",
+  "new_title": "Nguyên tắc đầu tư"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   93
+  ],
+  "new": [
+   "41-2024-QH15",
+   16
+  ],
+  "score": 0.975,
+  "cos": 0.95,
+  "jaccard": 1.0,
+  "old_title": "Cơ quan bảo hiểm xã hội",
+  "new_title": "Cơ quan bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   94
+  ],
+  "new": [
+   "41-2024-QH15",
+   19
+  ],
+  "score": 0.975,
+  "cos": 0.95,
+  "jaccard": 1.0,
+  "old_title": "Hội đồng quản lý bảo hiểm xã hội",
+  "new_title": "Hội đồng quản lý bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   95
+  ],
+  "new": [
+   "41-2024-QH15",
+   20
+  ],
+  "score": 0.94,
+  "cos": 0.963,
+  "jaccard": 0.917,
+  "old_title": "Nhiệm vụ, quyền hạn của Hội đồng quản lý bảo hiểm xã hội",
+  "new_title": "Nhiệm vụ, quyền hạn và trách nhiệm của Hội đồng quản lý bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   96
+  ],
+  "new": [
+   "41-2024-QH15",
+   25
+  ],
+  "score": 0.95,
+  "cos": 0.9,
+  "jaccard": 1.0,
+  "old_title": "Sổ bảo hiểm xã hội",
+  "new_title": "Sổ bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   98
+  ],
+  "new": [
+   "41-2024-QH15",
+   29
+  ],
+  "score": 0.796,
+  "cos": 0.878,
+  "jaccard": 0.714,
+  "old_title": "Điều chỉnh thông tin tham gia bảo hiểm xã hội",
+  "new_title": "Điều chỉnh thông tin đăng ký kê khai tham gia bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   99
+  ],
+  "new": [
+   "41-2024-QH15",
+   28
+  ],
+  "score": 0.879,
+  "cos": 0.924,
+  "jaccard": 0.833,
+  "old_title": "Giải quyết đăng ký tham gia và cấp sổ bảo hiểm xã hội",
+  "new_title": "Đăng ký tham gia bảo hiểm xã hội và cấp sổ bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   101
+  ],
+  "new": [
+   "41-2024-QH15",
+   61
+  ],
+  "score": 0.862,
+  "cos": 0.946,
+  "jaccard": 0.778,
+  "old_title": "Hồ sơ hưởng chế độ thai sản",
+  "new_title": "Hồ sơ đề nghị hưởng chế độ thai sản"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   103
+  ],
+  "new": [
+   "41-2024-QH15",
+   63
+  ],
+  "score": 0.842,
+  "cos": 0.934,
+  "jaccard": 0.75,
+  "old_title": "Giải quyết hưởng trợ cấp dưỡng sức, phục hồi sức khỏe sau ốm đau, thai sản",
+  "new_title": "Giải quyết hưởng trợ cấp dưỡng sức, phục hồi sức khoẻ sau thai sản"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   109
+  ],
+  "new": [
+   "41-2024-QH15",
+   106
+  ],
+  "score": 0.865,
+  "cos": 0.931,
+  "jaccard": 0.8,
+  "old_title": "Hồ sơ hưởng bảo hiểm xã hội một lần",
+  "new_title": "Hồ sơ đề nghị hưởng bảo hiểm xã hội một lần"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   110
+  ],
+  "new": [
+   "41-2024-QH15",
+   79
+  ],
+  "score": 0.97,
+  "cos": 0.94,
+  "jaccard": 1.0,
+  "old_title": "Giải quyết hưởng lương hưu, bảo hiểm xã hội một lần",
+  "new_title": "Giải quyết hưởng lương hưu, hưởng bảo hiểm xã hội một lần"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   111
+  ],
+  "new": [
+   "41-2024-QH15",
+   90
+  ],
+  "score": 0.855,
+  "cos": 0.933,
+  "jaccard": 0.778,
+  "old_title": "Hồ sơ hưởng chế độ tử tuất",
+  "new_title": "Hồ sơ đề nghị hưởng chế độ tử tuất"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   112
+  ],
+  "new": [
+   "41-2024-QH15",
+   91
+  ],
+  "score": 0.97,
+  "cos": 0.939,
+  "jaccard": 1.0,
+  "old_title": "Giải quyết hưởng chế độ tử tuất",
+  "new_title": "Giải quyết hưởng chế độ tử tuất"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   115
+  ],
+  "new": [
+   "41-2024-QH15",
+   82
+  ],
+  "score": 0.705,
+  "cos": 0.91,
+  "jaccard": 0.5,
+  "old_title": "Chuyển nơi hưởng lương hưu, trợ cấp bảo hiểm xã hội",
+  "new_title": "Thay đổi hình thức nhận, nơi nhận lương hưu, trợ cấp bảo hiểm xã hội hằng tháng"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   116
+  ],
+  "new": [
+   "41-2024-QH15",
+   113
+  ],
+  "score": 0.89,
+  "cos": 0.897,
+  "jaccard": 0.882,
+  "old_title": "Giải quyết hưởng chế độ bảo hiểm xã hội chậm so với thời hạn quy định",
+  "new_title": "Giải quyết hưởng chế độ bảo hiểm xã hội tự nguyện chậm so với thời hạn quy định"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   117
+  ],
+  "new": [
+   "41-2024-QH15",
+   83
+  ],
+  "score": 0.965,
+  "cos": 0.929,
+  "jaccard": 1.0,
+  "old_title": "Hồ sơ, trình tự khám giám định mức suy giảm khả năng lao động để giải quyết chế độ bảo hiểm xã hội",
+  "new_title": "Hồ sơ, trình tự khám giám định mức suy giảm khả năng lao động để giải quyết chế độ bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   118
+  ],
+  "new": [
+   "41-2024-QH15",
+   128
+  ],
+  "score": 0.9,
+  "cos": 0.943,
+  "jaccard": 0.857,
+  "old_title": "Khiếu nại về bảo hiểm xã hội",
+  "new_title": "Quyền khiếu nại về bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   119
+  ],
+  "new": [
+   "41-2024-QH15",
+   130
+  ],
+  "score": 0.787,
+  "cos": 0.959,
+  "jaccard": 0.615,
+  "old_title": "Trình tự giải quyết khiếu nại về bảo hiểm xã hội",
+  "new_title": "Khiếu nại và giải quyết khiếu nại đối với quyết định, hành vi về bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   120
+  ],
+  "new": [
+   "41-2024-QH15",
+   131
+  ],
+  "score": 0.965,
+  "cos": 0.93,
+  "jaccard": 1.0,
+  "old_title": "Tố cáo, giải quyết tố cáo về bảo hiểm xã hội",
+  "new_title": "Tố cáo, giải quyết tố cáo về bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   122
+  ],
+  "new": [
+   "41-2024-QH15",
+   132
+  ],
+  "score": 0.966,
+  "cos": 0.931,
+  "jaccard": 1.0,
+  "old_title": "Xử lý vi phạm pháp luật về bảo hiểm xã hội",
+  "new_title": "Xử lý vi phạm pháp luật về bảo hiểm xã hội"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   123
+  ],
+  "new": [
+   "41-2024-QH15",
+   141
+  ],
+  "score": 0.965,
+  "cos": 0.931,
+  "jaccard": 1.0,
+  "old_title": "Quy định chuyển tiếp",
+  "new_title": "Quy định chuyển tiếp"
+ },
+ {
+  "old": [
+   "58-2014-QH13",
+   124
+  ],
+  "new": [
+   "41-2024-QH15",
+   140
+  ],
+  "score": 0.952,
+  "cos": 0.905,
+  "jaccard": 1.0,
+  "old_title": "Hiệu lực thi hành",
+  "new_title": "Hiệu lực thi hành"
+ },
+ {
+  "old": [
+   "74-2024-ND-CP",
+   1
+  ],
+  "new": [
+   "293-2025-ND-CP",
+   1
+  ],
+  "score": 1.0,
+  "cos": 1.0,
+  "jaccard": 1.0,
+  "old_title": "Phạm vi điều chỉnh",
+  "new_title": "Phạm vi điều chỉnh"
+ },
+ {
+  "old": [
+   "74-2024-ND-CP",
+   2
+  ],
+  "new": [
+   "293-2025-ND-CP",
+   2
+  ],
+  "score": 0.999,
+  "cos": 0.997,
+  "jaccard": 1.0,
+  "old_title": "Đối tượng áp dụng",
+  "new_title": "Đối tượng áp dụng"
+ },
+ {
+  "old": [
+   "74-2024-ND-CP",
+   3
+  ],
+  "new": [
+   "293-2025-ND-CP",
+   3
+  ],
+  "score": 0.997,
+  "cos": 0.993,
+  "jaccard": 1.0,
+  "old_title": "Mức lương tối thiểu",
+  "new_title": "Mức lương tối thiểu"
+ },
+ {
+  "old": [
+   "74-2024-ND-CP",
+   4
+  ],
+  "new": [
+   "293-2025-ND-CP",
+   4
+  ],
+  "score": 1.0,
+  "cos": 1.0,
+  "jaccard": 1.0,
+  "old_title": "Áp dụng mức lương tối thiểu",
+  "new_title": "Áp dụng mức lương tối thiểu"
+ },
+ {
+  "old": [
+   "74-2024-ND-CP",
+   5
+  ],
+  "new": [
+   "293-2025-ND-CP",
+   5
+  ],
+  "score": 0.983,
+  "cos": 0.966,
+  "jaccard": 1.0,
+  "old_title": "Hiệu lực và trách nhiệm thi hành",
+  "new_title": "Hiệu lực và trách nhiệm thi hành"
+ }
+]
