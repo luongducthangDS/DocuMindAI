@@ -456,7 +456,27 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
 
             history = session.as_messages()
             t_step = time.perf_counter()
-            from src.agent.graph import _expand_legal_terms, _normalize_query
+            from src.agent.graph import _expand_legal_terms, _normalize_query, get_conversational_response
+
+            # Chào hỏi / giao tiếp thân thiện / hỏi danh tính & tính năng / trò chuyện:
+            # Phản hồi tức thì (~100ms), bỏ qua hoàn toàn chuỗi RAG 4 bước (8-19s).
+            conv_resp = get_conversational_response(raw_query)
+            if conv_resp:
+                await _send_step(websocket, progress, "Phân loại câu hỏi", "Giao tiếp thân thiện", t_step)
+                words = conv_resp.split(" ")
+                for i in range(0, len(words), 3):
+                    chunk = " ".join(words[i : i + 3])
+                    if i + 3 < len(words):
+                        chunk += " "
+                    await websocket.send_text(chunk)
+                    await asyncio.sleep(0.015)
+
+                session.add("user", raw_query)
+                session.add("assistant", conv_resp)
+
+                await websocket.send_json({"done": True, "sources": [], "degraded": []})
+                end_trace(ctx, lf_token, "documind-ws-query", raw_query, conv_resp, extra_tags=["feature:smalltalk"])
+                continue
 
             # Thêm dấu + diễn giải theo ngữ cảnh: tối đa 1 lời gọi Gemini đồng bộ (tới
             # 20s × vài cặp key/model) — trong thread, không thì đứng cả event loop.
@@ -465,6 +485,25 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
                 websocket, progress, "Phân tích câu hỏi",
                 query if query != raw_query else "Giữ nguyên câu hỏi", t_step,
             )
+
+            # Kiểm tra lại sau khi chuẩn hoá (phòng trường hợp câu viết không dấu trở thành lời chào/giao tiếp)
+            conv_resp = get_conversational_response(query)
+            if conv_resp:
+                await _send_step(websocket, progress, "Phân loại câu hỏi", "Giao tiếp thân thiện", time.perf_counter())
+                words = conv_resp.split(" ")
+                for i in range(0, len(words), 3):
+                    chunk = " ".join(words[i : i + 3])
+                    if i + 3 < len(words):
+                        chunk += " "
+                    await websocket.send_text(chunk)
+                    await asyncio.sleep(0.015)
+
+                session.add("user", raw_query)
+                session.add("assistant", conv_resp)
+
+                await websocket.send_json({"done": True, "sources": [], "degraded": []})
+                end_trace(ctx, lf_token, "documind-ws-query", raw_query, conv_resp, extra_tags=["feature:smalltalk"])
+                continue
 
             # Import retriever to get chunks
             # Per-message as_of so a client can ask the same question at two
@@ -503,6 +542,14 @@ async def websocket_stream(websocket: WebSocket, session_id: str) -> None:
                     f"Áp dụng tại {'/'.join(reversed(as_of.split('-')))}" if as_of else "Quy định hiện hành",
                     time.perf_counter(),
                 )
+
+                # Agentic RAG — cùng vòng với REST (graph.research_node). Gửi bước lên UI sau khi xong.
+                from src.agent.research import research
+
+                chunks, agent_steps = await asyncio.to_thread(research, query, chunks, turn_ctx)
+                for st in agent_steps:
+                    await _send_step(websocket, progress, st["label"], st["detail"],
+                                     time.perf_counter() - st["ms"] / 1000)
 
                 t_step = time.perf_counter()
                 answer_parts = []

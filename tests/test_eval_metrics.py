@@ -164,3 +164,12 @@ def test_expect_verdict_catches_a_wrong_yes_that_still_quotes_the_figure():
     assert score_answer(wrong, q)["wrong_verdict"] and not score_answer(wrong, q)["correct"]
     assert score_answer(right, q)["correct"]
     assert score_answer(wrong, {**q, "expect_verdict": None})["correct"]  # không khai thì như cũ
+
+
+def test_space_before_percent_is_not_a_wrong_answer():
+    """gpt-oss viết "60 %" (U+202F); gold "60%". Khoảng trắng trước % là kiểu chữ, không phải nội dung."""
+    from eval.temporal_eval import score_answer
+
+    q = {"expect_contains": [["60%"]], "expect_absent": [], "expect_verdict": None}
+    assert score_answer("Mức hưởng bằng **60 %** mức bình quân", q)["correct"]
+    assert not score_answer("Mức hưởng bằng 6 0 phần trăm", q)["correct"]

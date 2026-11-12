@@ -301,6 +301,7 @@ def trace_retrieval(query: str, chunks: list[RetrievedChunk], path: str, ctx, st
             {"rank": i, "score": round(c.score, 4),
              **({"cosine": round(c.dense_score, 3)} if c.dense_score is not None else {}),
              **({"bm25": round(c.bm25_score, 2)} if c.bm25_score is not None else {}),
+             **({"graph_via": c.metadata["graph_via"]} if c.metadata.get("graph_via") else {}),
              **chunk_ref(c.metadata)}
             for i, c in enumerate(chunks, 1)
         ],
@@ -525,7 +526,33 @@ def retrieve_with_context(query: str, ctx, top_k: int = 20, top_n: int = 8) -> l
         raw = dense.scores.get(node.node.node_id)
         chunk.dense_score = _as_cosine(raw, provider) if raw is not None else None
         chunk.bm25_score = sparse.scores.get(node.node.node_id) if sparse is not None else None
-    return chunks
+    expand = get_settings().graph_expand
+    return chunks + (_graph_expansion(query, chunks, ctx, expand) if expand > 0 else [])
+
+
+def _graph_expansion(query: str, chunks: list[RetrievedChunk], ctx, limit: int) -> list[RetrievedChunk]:
+    """Đoạn nối sau top-n: điều mà các đoạn đã truy hồi dẫn chiếu tới (src/rag/legal_graph.py)."""
+    from llama_index.core.schema import NodeWithScore
+
+    from src.rag import legal_graph
+    from src.rag.context import degraded_flags
+    from src.rag.embedder import get_embedder
+
+    if not legal_graph._ARTICLES:  # chưa dựng đồ thị: đừng tốn một lần embed
+        return []
+    qvec = None
+    # Nhánh dense vừa hết quota thì embed lại ở đây chỉ để ngủ chờ quota (bộ test từng chậm 3 → 23 phút) —
+    # xếp theo đồ thị thôi, thiếu cosine.
+    if legal_graph._VEC and "dense_skipped" not in degraded_flags():
+        try:
+            qvec = get_embedder().get_query_embedding(query)  # nhánh dense vừa embed câu này — trúng cache
+        except Exception:  # embedding hỏng: vẫn xếp được theo đồ thị, chỉ thiếu cosine
+            qvec = None
+    picked = legal_graph.expand(chunks, ctx.allows, limit=limit, query_vec=qvec)
+    extra = nodes_to_chunks([NodeWithScore(node=n, score=0.0) for n, _ in picked])
+    for c, (_, via) in zip(extra, picked):
+        c.metadata["graph_via"] = via  # đoạn nào đã dẫn tới — trace_retrieval ghi lại
+    return extra
 
 
 def _as_cosine(raw: float, provider: str) -> float:

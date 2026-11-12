@@ -239,8 +239,11 @@ class TestTemporalFilterNode:
 
         edges = set(build_graph().builder.edges)
         assert ("do_retrieve", "do_temporal_filter") in edges
-        assert ("do_temporal_filter", "do_grade") in edges
+        # agentic RAG (research) chen giữa: đọc đoạn ĐÃ lọc, đoạn nó thêm cũng đã lọc (ctx) — grade vẫn sau lọc
+        assert ("do_temporal_filter", "do_research") in edges
+        assert ("do_research", "do_grade") in edges
         assert ("do_retrieve", "do_grade") not in edges
+        assert ("do_retrieve", "do_research") not in edges
 
 
 class TestGeneratorOutOfRange:

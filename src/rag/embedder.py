@@ -231,6 +231,8 @@ class _FptEmbedding(BaseEmbedding):
     (1024 chiều). Không phân biệt query/document như Gemini: model không có task_type."""
 
     fail_fast_queries: bool = False  # cùng nghĩa với _GeminiAPIEmbedding
+    # Một câu hỏi được embed hai lần trong cùng lượt: nhánh dense, rồi legal_graph xếp đoạn mở rộng.
+    _recent: dict = PrivateAttr(default_factory=dict)
 
     def __init__(self, model_name: str, **kwargs):
         kwargs.setdefault("embed_batch_size", 32)
@@ -257,12 +259,20 @@ class _FptEmbedding(BaseEmbedding):
         return self._call(texts)
 
     def _get_query_embedding(self, query: str) -> List[float]:
+        hit = self._recent.get(query)
+        if hit is not None:
+            return hit
         if self.fail_fast_queries:
             try:
-                return self._call([query])[0]
+                vec = self._call([query])[0]
             except Exception as exc:  # noqa: BLE001 — retriever bỏ nhánh dense, chạy BM25
                 raise EmbeddingUnavailable(str(exc)[:200]) from exc
-        return self._embed([query])[0]
+        else:
+            vec = self._embed([query])[0]
+        if len(self._recent) >= 64:
+            self._recent.pop(next(iter(self._recent)))
+        self._recent[query] = vec
+        return vec
 
     def _get_text_embedding(self, text: str) -> List[float]:
         return self._embed([text])[0]

@@ -132,6 +132,35 @@ class Settings(BaseSettings):
     # back to the smaller English "cross-encoder/ms-marco-MiniLM-L-6-v2" via .env,
     # but it scores Vietnamese pairs poorly. bge-reranker-v2-m3 ≈ 2.2GB on first download.
     reranker_model: str = "BAAI/bge-reranker-v2-m3"
+    # graph_expand: số đoạn nối thêm sau top-8 từ đồ thị dẫn chiếu (src/rag/legal_graph.py) — điều
+    # mà các đoạn đã truy hồi dẫn tới. 0 = tắt. 2026-10-19 bị tắt vì đoạn đồ thị nối cuối bị ngân sách
+    # prompt cắt trước tiên; nay generator._budget xếp chỗ cho nó trước. Đo lại 2026-11-09 (đầu cuối, FPT,
+    # đường pre_filter = production, k=0 → 1): legal_qa_200 0.962 → 0.990 (+6/−0; 3 thật nhờ gold vào
+    # prompt — lh_b02a/b, g2_b031 — 3 là bộ chấm so chuỗi), multi-hop 23 câu 0.913 → 0.957 (+1 cũng là
+    # bộ chấm); k=2 không hơn k=1. Chưa giải: mh_01 (Điều 23 dẫn 5 điều, đúng là Điều 67, xếp hạng 3).
+    graph_expand: int = 1
+    # agent_research_rounds: số vòng agentic RAG (src/agent/research.py) — mỗi vòng 1 lời gọi LLM quyết định
+    # đủ / lấy điều được dẫn chiếu / tìm thêm. 0 = tắt (RAG một lượt như trước). Chỉ gọi LLM khi các đoạn dẫn
+    # tới điều chưa có. Đo 2026-11-09 (arm agentic vs pre_filter k=1): multi-hop gold trong prompt 0.913 → 1.000,
+    # đúng đầu cuối +1 thật (mh_01) / −0 thật (mh_17 là bộ chấm); truy hồi p50 0.6 → 3.3 s. legal_qa_200 CHƯA đo
+    # được: FPT key 401 từ câu 40; 37 câu hợp lệ 36/37 (lh_m02: gold vẫn trong prompt, LLM bỏ vế "02 tháng").
+    agent_research_rounds: int = 1
+    # agent_overview: tool global search theo cụm chủ đề (src/rag/graphrag.py) cho câu hỏi tổng quát. TẮT: đo
+    # 2026-11-10 trên 5 câu tổng quát (data/eval/graphrag_questions.json, Gemini) không thắng câu nào, gr_g01 độ phủ
+    # gold 0.75 → 0.50 (điều trong cụm đẩy điều truy hồi đúng ra khỏi prompt) — mà tốn thêm 1 lời gọi LLM.
+    agent_overview: bool = False
+
+    # QA tracker integrations (src/qa/integrations.py) — rỗng = dry-run, chỉ trả payload, không gửi.
+    jira_base_url: str = ""
+    jira_email: str = ""
+    jira_api_token: str = ""
+    jira_project_key: str = ""
+    gitlab_base_url: str = "https://gitlab.com"
+    gitlab_token: str = ""
+    github_token: str = ""
+    testrail_base_url: str = ""
+    testrail_user: str = ""
+    testrail_api_key: str = ""
 
     # Storage
     data_dir: Path = Path("./data")

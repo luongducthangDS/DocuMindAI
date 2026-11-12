@@ -20,6 +20,14 @@ chọn sai lần hai.
 
 ## Chọn công nghệ / kiến trúc
 
+### WebSocket chat endpoint bỏ qua router, ép lời chào và câu giao tiếp vào pipeline RAG 4 bước (2026-11-13)
+- **Đã quyết:** Thêm `websocket_stream` để stream token trực tiếp cho UI web mà không đi qua `run_agent` (tránh overhead LangGraph).
+- **Sai ở đâu:** `run_agent` (REST) có `router_node` và kiểm tra `_SMALLTALK_RE`, nhưng `websocket_stream` lại đâm thẳng vào `_normalize_query` (Gemini) -> `retrieve_with_context` -> `research` -> `stream_answer`. Mặt khác, router chỉ có regex cụt ngủn cho từ < 12 ký tự, câu như "tôi chưa hỏi về công việc, tôi muốn nói chuyện trước" bị trượt regex, gán thành `simple_qa` (fast-path <= 6 từ) rồi chạy RAG.
+- **Cái giá:** Câu "hi" mất 8.1s, câu nói chuyện mất 19.1s. Sau đó bị từ chối bằng khuôn hành chính cứng nhắc: "Tôi chưa tìm thấy quy định khớp... Bạn muốn hỏi cụ thể: ...". Trải nghiệm người dùng câu mở đầu rất tệ, tạo cảm giác hệ thống đơ và máy móc.
+- **Bài học:** Endpoint tương tác chính (WebSocket) phải có đầy đủ cơ chế Intent Routing & Persona Handling như REST. Hệ thống chuyên môn (RAG) không được ép mọi câu giao tiếp đời thường vào khuôn tra cứu văn bản.
+- **Giờ làm thế nào:** Thêm `get_conversational_response` bắt các mẫu giao tiếp (chào hỏi, muốn nói chuyện trước, danh tính, tính năng, cảm ơn, tạm biệt, thăm hỏi) phản hồi tức thì (<100ms) trên cả WebSocket và REST, bỏ qua RAG và cập nhật UI progress `skipped` mượt mà.
+
+
 ### Model dự phòng chưa từng được eval dù nó gánh câu hỏi sau mỗi lần nhàn rỗi (10-17 → 2026-10-18)
 - **Đã quyết:** `FPT_MODELS=Qwen3.8-27B,DeepSeek-V4-Flash` — DeepSeek trả lời khi Qwen lỗi/treo
   (cooldown 120s). Mọi eval đầu cuối đo trên đường Qwen trả lời; report chỉ ghi `used_llm=fpt`.
@@ -241,6 +249,85 @@ chọn sai lần hai.
 - **Giờ làm thế nào:** `use_local_hf_cache()` trong `src/hf_env.py`; `EMBEDDING_MODEL` trong `.env`.
 
 ## Dữ liệu & đánh giá
+
+### Đọc số eval đầu cuối mà không xem `n_degraded` (Claude, 2026-11-10)
+- **Đã làm:** đo GraphRAG trên `data/eval/graphrag_questions.json` (Gemini local) ngay sau khi script dựng
+  tóm tắt cụm vừa gọi 67 lượt LLM; so bảng "trước/sau" theo từng câu và bắt đầu kết luận (5/16 → 9/16 đúng).
+- **Sai ở đâu:** 13/16 câu của lượt "trước" và 5/16 câu của lượt "sau" là `extractive_fallback` — Gemini hết
+  hạn mức theo phút, câu trả lời là trích nguyên văn, chấm chuỗi trên đó là vô nghĩa. Cả hai lượt bị hỏng khác
+  nhau nên phép so sánh trông như có tín hiệu. Chỉ phát hiện khi đi tìm vì sao agent "không làm gì" ở vài câu.
+- **Cái giá:** suýt báo một mức cải thiện không đo được; mất hai lượt chạy.
+- **Bài học:** `ci_gate` đã chặn report có câu degraded cho CI, nhưng đọc report bằng tay thì không có gì chặn.
+  Số đầu cuối chỉ đọc được khi `meta.n_degraded == 0` (hoặc loại đúng các câu đó khỏi CẢ HAI phía).
+- **Giờ làm thế nào:** `temporal_eval.py --pace <giây>` nghỉ giữa các câu; chạy tuần tự, không chạy sau job LLM
+  khác; kiểm `n_degraded` trước khi mở bảng; `src.qa.release` cũng NO-GO khi có câu degraded.
+
+### Đánh giá đồ thị dẫn chiếu bằng kết quả truy hồi, không đo từng cạnh (Claude, 2026-10-19)
+- **Đã làm:** `legal_graph.references` trích cạnh "Điều N của <văn bản>" bằng regex, mặc định "Điều N" trơn
+  là của chính văn bản dẫn; kiểm bằng 4 test câu tự viết và một số đầu cuối (top-8 thiếu gold 2/195 câu,
+  k=1 kéo về cả hai), rồi chuẩn bị bật `graph_expand`.
+- **Sai ở đâu:** chưa đo precision/recall của cạnh trên corpus thật. Chấm tay thì ~120/1170 cạnh (10%) sai,
+  đều do mặc định kia: nghị định/thông tư liệt kê "Điều 111 … Điều 115; … của Bộ luật Lao động" với tên luật
+  ở cuối câu (đúng 1/22), mục liệt kê dưới câu dẫn "các điều, khoản sau đây của Bộ luật Lao động:", phần trích
+  sửa luật khác trong BLLĐ Điều 219 / Luật BHXH 2024 Điều 139, biểu mẫu "QUYẾT ĐỊNH: Điều 1…". Đuôi regex
+  `{0,120}` còn nuốt luôn "Điều N" kế tiếp. Cạnh sai không báo lỗi gì; nó chỉ làm sai in-degree/IDF và kéo
+  điều lạc đề (đang có hiệu lực, nên bộ lọc `as_of` không chặn) vào ngữ cảnh LLM.
+- **Cái giá:** con số 2/195 được đo trên một đồ thị có 10% cạnh sai; nếu đã bật thì LLM nhận điều không liên
+  quan mà trace không cho biết đoạn đó do đồ thị đưa vào (khi ấy chưa có provenance).
+- **Bài học:** với knowledge graph, kết quả đầu cuối không thay được việc đo cạnh — thiếu hay sai cạnh đều im
+  lặng. Mặc định giải thực thể ("trơn = chính nó") phải được đo theo từng loại nguồn (luật khác hẳn nghị định).
+- **Giờ làm thế nào:** "Điều N" trơn chỉ hiểu là của chính văn bản khi nguồn là luật; với NĐ/TT thì lấy văn bản
+  được nêu tên đầu tiên phía sau trong cùng câu; phần trích “…”, sau câu dẫn sửa đổi/liệt kê và trong biểu mẫu
+  thì chỉ giữ dẫn chiếu nêu đích danh; dẫn chiếu trong mô tả văn bản khác được giải theo ngày của văn bản đó.
+  Chấm tay: precision 25/25 cùng văn bản, 24/25 khác văn bản (cạnh sai đã sửa), recall 32/32. Mỗi đoạn được
+  nối thêm mang `graph_via` (đoạn nào dẫn tới) lên trace. Số đầu cuối phải đo lại trên bản này.
+
+### Đo đoạn mở rộng trên danh sách truy hồi, không trên prompt — lặp lại mục 10-18 (Claude, 2026-10-19)
+- **Đã làm:** chấm `graph_expand` bằng `context_gold` của harness — gold có trong danh sách
+  `retrieve_with_context` trả về: legal_qa_200 0.986 → 0.995, bộ multi-hop 23 câu 0.826 → 0.870 (k=1),
+  0.957 (k=2). Đoạn đồ thị được NỐI VÀO CUỐI danh sách.
+- **Sai ở đâu:** `_build_context` cắt prompt ở 24.000 ký tự và bỏ nguyên đoạn không vừa — đoạn cuối danh sách
+  bị bỏ trước tiên. Đo trên đúng prompt: multi-hop k=1 0.826 (không thêm được đoạn nào tới LLM; đoạn "kéo về"
+  `mh_22` bị cắt), k=2 0.913; 30/360 đoạn đồ thị trên 208 câu ở k=2 bị cắt. Đúng lỗi của mục "Cắt ngữ cảnh LLM…"
+  (10-18) bên dưới: chỉ số đo ở chỗ khác chỗ quyết định. Đầu cuối multi-hop k=0/1/2 = 0.913/0.826/0.870 —
+  harness truy hồi báo cải thiện trong khi câu trả lời không tốt lên.
+- **Cái giá:** suýt bật một tính năng dựa trên con số mà LLM không hề nhận được.
+- **Bài học:** đoạn thêm vào ngữ cảnh phải được đo sau ngân sách prompt; và bài học đã ghi chỉ có tác dụng khi
+  thước đo dùng chung code với đường thật, không phải chép lại logic.
+- **Giờ làm thế nào:** `generator._budget()` là chỗ duy nhất quyết định đoạn nào vào prompt; `_build_context`
+  và harness cùng gọi nó; report có `llm_context_gold`. `graph_expand` để 0. Thử lại đồ thị thì đoạn mở rộng
+  phải thay đoạn hạng thấp nhất trong ngân sách, không nối vào cuối — dù trần thấp (k=0 đã đúng 21/23).
+
+### FPT key chết: không chỉ LLM, mà cả embedding và reranker (Claude, 2026-11-09)
+- **Đã làm:** thấy LLM FPT trả 401 thì định "đổi LLM sang Gemini" — 3 biến `GEMINI_*`.
+- **Sai ở đâu (suýt):** FPT gánh BA việc: LLM, reranker (`/v1/rerank`) và embedding (`Vietnamese_Embedding`, index
+  `documind_legal_fpt`). Chỉ đổi LLM thì câu hỏi không embed được ⇒ `_DenseOrSkip` bỏ nhánh dense (cờ
+  `dense_skipped`), rerank lỗi ⇒ giữ thứ tự RRF: hệ thống chạy BM25 thuần mà `/health` vẫn xanh. Eval chạy với
+  `--embed-cache` nên KHÔNG lộ (vector câu hỏi lấy từ cache).
+- **Bài học:** đổi nhà cung cấp = liệt kê mọi chỗ dùng key đó (grep `fpt_api_key`), không chỉ chỗ đang báo lỗi.
+  Model embedding đi theo dữ liệu đã lưu ⇒ đổi model = collection mới (`documind_legal_gemini001`), so fingerprint
+  với index cũ để chắc cùng nội dung.
+- **Giờ làm thế nào:** xem mục đầu "Trạng thái hiện tại" trong AGENTS.md. Eval sau khi đổi provider: chạy một lượt
+  KHÔNG cache embedding, hoặc kiểm `n_degraded` của report.
+
+### Agent đi tìm thứ đã có vì chỉ được xem phần đầu đoạn (Claude, 2026-11-09)
+- **Đã làm:** `src/agent/research.py` cho LLM xem 500 ký tự đầu mỗi đoạn (rẻ) để quyết định đủ / tìm thêm.
+- **Sai ở đâu:** LLM coi phần bị cắt là "thiếu": lh_m02 — "các đoạn trích bị cắt cụt ngay trước khoản 2 Điều 46,
+  47" rồi tìm lại chính hai điều đó. Multi-hop: agent hành động 14/23 câu, chỉ 2 câu thêm được gold.
+- **Cái giá:** truy hồi p50 0.6 → 3.3 s; đoạn thừa chiếm chỗ ngân sách prompt (xếp trước).
+- **Bài học:** đọc `reason` của từng quyết định agent, không chỉ đếm đúng/sai — lý do nói thẳng nó hiểu sai input.
+- **Giờ làm thế nào:** prompt nói rõ phần trích là phần đầu, toàn văn đã có. Chưa đo lại (FPT key 401 từ 09/11 20:49).
+
+### Bật đồ thị: nửa số câu "thắng" là bộ chấm, không phải đồ thị (Claude, 2026-11-09)
+- **Đã làm:** `_budget` xếp chỗ cho đoạn `graph_via` trước, `_build_context` ghi đoạn nào dẫn tới nó; đo đầu cuối
+  k=0→1 trên arm `pre_filter` (arm duy nhất đi qua `retrieve_with_context`, nơi có đồ thị — arm khác của
+  `temporal_eval` KHÔNG mở rộng, lượt đầu suýt đo nhầm arm). legal_qa_200 0.962 → 0.990, +6/−0.
+- **Sai ở đâu (suýt):** 3/6 câu thắng không có đoạn đồ thị nào trong prompt đổi gold — ở k=0 câu trả lời đã đúng
+  nghĩa ("0,5 tháng" so với gold "một nửa tháng tiền lương", "tối đa 06 tháng" so với "không quá 06 tháng"), lượt
+  k=1 LLM chỉ tình cờ viết khớp chuỗi. mh_17 (multi-hop) cũng vậy.
+- **Bài học:** với A/B đầu cuối, đọc từng câu thắng/thua: câu thắng mà `context_llm.gold` không đổi là ứng viên nhiễu.
+- **Giờ làm thế nào:** báo hiệu quả thật = câu thắng có gold vào prompt nhờ đoạn đồ thị (3/208: lh_b02a/b, g2_b031),
+  kèm số hồi quy (0). `expect_contains` của g2_a012/g2_d005/mh_17 nên thêm biến thể "0,5 tháng"/"tối đa".
 
 ### Gold câu Có/Không chỉ kiểm con số, không kiểm kết luận (Claude, → 2026-10-18)
 - **Đã làm:** Claude soạn `lh_b02a` ("đóng 17 năm, có được hưởng lương hưu không?", as_of 2025-06-30, đáp
@@ -479,6 +566,42 @@ chọn sai lần hai.
 - **Giờ làm thế nào:** `hard_questions.json`, `legal_qa_200.json`; cỡ mẫu tính từ pilot thật.
 
 ## Vận hành / xử lý sự cố
+
+### Bake-off LLM giữ cooldown của production, và tin rằng dừng shell là dừng tiến trình (Claude, 2026-10-19)
+- **Đã làm:** so 4 model bằng cách chạy eval với `FPT_MODELS=<một model>` — không dự phòng — trong thư mục
+  chung; khi phát hiện lỗi thì dừng lượt chạy bằng TaskStop rồi chạy lại.
+- **Sai ở đâu:** (1) vòng xoay production cooldown model 120s sau một lỗi tạm thời; có một model thì mọi câu
+  sau rơi về trích nguyên văn ngay lập tức — DeepSeek: một lần FPT ngắt kết nối ⇒ 189/208 câu trích nguyên văn,
+  "xong" sau 2 phút, accuracy 0.764 trông như model kém. (2) TaskStop dừng shell bọc ngoài, vòng lặp bash bên
+  trong mồ côi và chạy tiếp bản cũ, ghi đè `GLM-5.2_r1.json`, `gpt-oss-120b_r1.json` mà vòng mới (bỏ qua file đã
+  có) suýt nhận làm kết quả. (3) Mỗi lượt là một tiến trình mới nạp code từ thư mục chung, trong lúc một phiên
+  khác đang sửa `retriever.py`/`legal_graph.py`.
+- **Cái giá:** gần 1 giờ chạy phải bỏ; suýt kết luận "DeepSeek kém" từ một lỗi của thước đo.
+- **Bài học:** thước đo so model phải tách lỗi hạ tầng khỏi chất lượng model; sau khi dừng việc nền phải kiểm
+  bằng danh sách tiến trình, không tin vào thông báo "đã dừng"; đo dài thì chạy trên bản code đóng băng.
+- **Giờ làm thế nào:** wrapper bake-off đặt cooldown 0, thử lại cùng model tối đa 3 lần cho lỗi tạm thời, ghi
+  số lần thử lại/thất bại thành chỉ số ổn định; chạy từ bản sao `src/`+`eval/` ngoài thư mục chung; mỗi kết quả
+  kèm `.stats.json` — file thiếu nó là của vòng cũ.
+
+### Gọi lỗi là "chập chờn" thay vì tìm nguyên nhân; sửa theo triệu chứng thay vì cơ chế (Claude, 2026-10-18)
+- **Đã làm:** chẩn đoán đúng cơ chế của `lh_m05b` (BLUF + suy luận tắt ⇒ chốt đáp án trước khi xét quy
+  định nào áp dụng) nhưng gắn lượt phân tích cho triệu chứng — câu Có/Không (`_YES_NO_RE`). `g3_cv06` sai ở
+  hai lượt eval thì ghi vào README/PR "lỗi chập chờn, có từ trước" rồi đề nghị merge.
+- **Sai ở đâu:** cơ chế không riêng câu Có/Không. `g3_cv06` ("vợ sinh con thứ hai (sinh thường…) … bao
+  nhiêu ngày?") khớp tình tiết với điểm a (05 ngày), bỏ trường hợp riêng ở điểm c (10 ngày, quy định
+  07/2026) — 2/12 lần, đoạn đúng ở hạng 1. "Chập chờn" là tần suất, không phải nguyên nhân: FPT không tất
+  định chỉ giải thích vì sao lỗi không lặp lại MỌI lần.
+- **Cái giá:** suýt merge với một lỗi sai-có-trích-dẫn đã thấy hai lần; người dùng phải yêu cầu tìm nguyên
+  nhân. Mở rộng lượt phân tích lần đầu còn sinh lỗi mới: phân tích được nối vào kèm "kết luận theo phân tích
+  này", nên khi điều luật gốc không được truy hồi (`g2_b031`, Điều 98 hạng 28) nó suy "20 năm" từ quy định
+  chuyển tiếp của trường hợp khác và câu trả lời sai có thẩm quyền hơn.
+- **Bài học:** lỗi thật gặp từ 2 lần trở lên không được gán cho dao động — tái hiện N lần, xem ngữ cảnh, gọi
+  tên cơ chế, rồi tìm mọi lớp câu hỏi cùng cơ chế. Một bước được nối vào prompt như "căn cứ" phải mang cùng
+  ràng buộc an toàn với prompt chính (rule 8: thiếu căn cứ thì không nêu con số).
+- **Giờ làm thế nào:** lượt phân tích chạy cho Có/Không HOẶC `_is_complex_query` (76/208); prompt phân tích:
+  trường hợp riêng ưu tiên hơn quy định chung, không có quy định cho đúng trường hợp thì ghi "không có",
+  tối đa ~10 dòng. Đo lặp: `g3_cv06` 12/12, `lh_m03` (DeepSeek) 4/4, `g2_b031` hết khẳng định "20 năm" (6/6
+  trả lời "chưa tìm thấy" — đúng khi thiếu căn cứ; muốn đúng hẳn phải sửa truy hồi).
 
 ### Đổi model embedding ở local mà không đổi Qdrant, tin vào check số chiều (2026-10-17)
 - **Đã làm:** theo `gemini.md`, re-embed Chroma local sang `gemini-embedding-2` và đổi default

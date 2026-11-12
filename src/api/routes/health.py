@@ -10,7 +10,7 @@ import asyncio
 import sqlite3
 import time
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
 from loguru import logger
 
 from src.agent.memory import get_long_term_memory
@@ -163,15 +163,17 @@ async def get_metrics() -> MetricsResponse:
     settings = get_settings()
     try:
         conn = sqlite3.connect(str(settings.sqlite_db))
-        conn.row_factory = sqlite3.Row
-
-        total = conn.execute("SELECT COUNT(*) FROM query_log").fetchone()[0]
-        avg_lat = conn.execute(
-            "SELECT AVG(latency_ms) FROM query_log WHERE latency_ms > 0"
-        ).fetchone()[0] or 0
-
-        sessions = conn.execute("SELECT COUNT(DISTINCT session_id) FROM query_log").fetchone()[0]
-        conn.close()
+        try:
+            conn.row_factory = sqlite3.Row
+            total = conn.execute("SELECT COUNT(*) FROM query_log").fetchone()[0]
+            avg_lat = conn.execute(
+                "SELECT AVG(latency_ms) FROM query_log WHERE latency_ms > 0"
+            ).fetchone()[0] or 0
+            sessions = conn.execute(
+                "SELECT COUNT(DISTINCT session_id) FROM query_log"
+            ).fetchone()[0]
+        finally:
+            conn.close()
 
         # Corpus chunk count from ChromaDB (best effort)
         corpus_chunks = await _count_corpus_chunks()
@@ -187,13 +189,10 @@ async def get_metrics() -> MetricsResponse:
         )
     except Exception as exc:
         logger.warning("Metrics query failed: {}", exc)
-        return MetricsResponse(
-            total_queries=0,
-            avg_latency_ms=0,
-            error_rate=0,
-            active_sessions=0,
-            corpus_chunks=0,
-        )
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Metrics temporarily unavailable",
+        ) from exc
 
 
 async def _count_corpus_chunks() -> int:

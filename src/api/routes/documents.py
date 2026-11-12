@@ -330,12 +330,13 @@ def _rebuild_retriever(r_module) -> None:
     try:
         from src.rag.vector_backend import get_backend
         from src.rag.retriever import build_hybrid_retriever
-        from src.api.main import _load_nodes_from_backend
+        from src.api.main import _load_nodes_from_backend, build_legal_graph
         from src.config import get_settings
 
         backend = get_backend()
         nodes = _load_nodes_from_backend(backend)
         set_indexed_documents(nodes)
+        build_legal_graph(backend, nodes)
         r_module._active_retriever = build_hybrid_retriever(
             r_module._active_index, nodes=nodes, rerank=get_settings().enable_reranker
         )

@@ -34,7 +34,9 @@ def patch_settings(tmp_path, monkeypatch):
     # Danh sách model Gemini lấy theo default của code, không theo .env máy dev: .env để
     # trống (tắt Gemini, chỉ chạy FPT — 2026-10-17) từng làm 3 test mock Gemini không còn cặp nào.
     from src.config import Settings
-    for field in ("gemini_generation_models", "gemini_generation_models_complex", "gemini_judge_models"):
+    # fpt_models cũng vậy: .env local đặt FPT_MODELS= (rỗng, 2026-11-09) làm TestFptPrimary không còn cặp FPT.
+    for field in ("gemini_generation_models", "gemini_generation_models_complex", "gemini_judge_models",
+                  "fpt_models"):
         monkeypatch.setenv(field.upper(), Settings.model_fields[field].default)
 
     # Clear lru_cache so settings reload with test env

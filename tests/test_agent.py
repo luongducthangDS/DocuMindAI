@@ -166,6 +166,39 @@ class TestRouter:
         assert route_by_intent({"intent": "simple_qa"}) == "do_retrieve"
         assert route_by_intent({"intent": "unknown"}) == "do_retrieve"
         assert route_by_intent({"intent": "invalid"}) == "do_retrieve"
+        assert route_by_intent({"intent": "smalltalk"}) == "do_persist"
+
+    def test_conversational_responses(self):
+        from src.agent.graph import get_conversational_response
+
+        # Chào hỏi
+        resp = get_conversational_response("hi")
+        assert resp and "DocuMind AI" in resp
+
+        # Muốn nói chuyện trước / chưa hỏi công việc
+        resp = get_conversational_response("tôi chưa hỏi về công việc, tôi muốn nói chuyện trước")
+        assert resp and ("trò chuyện" in resp or "thư thả" in resp)
+
+        # Hỏi danh tính
+        resp = get_conversational_response("bạn là ai?")
+        assert resp and "DocuMind AI" in resp
+
+        # Hỏi chức năng
+        resp = get_conversational_response("bạn có thể làm gì?")
+        assert resp and "Tra cứu quy định" in resp
+
+        # Cảm ơn
+        resp = get_conversational_response("cảm ơn bạn nhé")
+        assert resp and "Không có gì" in resp
+
+        # Tạm biệt
+        resp = get_conversational_response("tạm biệt bot")
+        assert resp and "Tạm biệt" in resp
+
+        # Câu hỏi pháp lý thực sự: không được chặn làm smalltalk
+        assert get_conversational_response("mức lương tối thiểu vùng I là bao nhiêu?") is None
+        assert get_conversational_response("cho tôi hỏi về chế độ thai sản") is None
+        assert get_conversational_response("thử việc 3 tháng cho kế toán có đúng luật không") is None
 
 
 # ── Conversation-history-aware query rewriting ──────────────────────────────────
@@ -231,12 +264,9 @@ class TestContextualizeNode:
 
         from src.agent.graph import _contextualize_query
 
-        mock_gemini_response = MagicMock()
-        mock_gemini_response.text = "câu hỏi đã viết lại bởi Gemini"
-
-        with patch("google.generativeai.configure"), \
-             patch("google.generativeai.GenerativeModel") as mock_model_cls:
-            mock_model_cls.return_value.generate_content.return_value = mock_gemini_response
+        mock_resp = MagicMock()
+        mock_resp.text = "câu hỏi đã viết lại bởi Gemini"
+        with patch("src.rag.generator.gemini_call", return_value=mock_resp):
             result = _contextualize_query("câu hỏi gốc", [{"role": "user", "content": "gì đó"}])
 
         assert result == "câu hỏi đã viết lại bởi Gemini"

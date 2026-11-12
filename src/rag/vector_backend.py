@@ -188,6 +188,22 @@ def fetch_all_chunks(backend: Backend, limit: int = 10_000) -> list[tuple[str, s
     return [(i, d, m or {}) for i, d, m in zip(ids, docs, metas) if d]
 
 
+def fetch_all_vectors(backend: Backend, limit: int = 10_000) -> dict[str, list[float]]:
+    """id → embedding of every chunk, read once at startup.
+
+    legal_graph ranks its expansion candidates by cosine with the query; holding the vectors
+    in process means no extra vector-store round trip per question.
+    """
+    if backend.provider == "qdrant":
+        points, _ = backend.client.scroll(
+            collection_name=backend.collection, limit=limit, with_payload=False, with_vectors=True,
+        )
+        return {str(p.id): p.vector for p in points}
+    result = backend.collection.get(include=["embeddings"], limit=limit)
+    embeddings = result.get("embeddings")  # numpy array in chroma 0.6 — no `or []` truthiness
+    return dict(zip(result.get("ids") or [], embeddings if embeddings is not None else []))
+
+
 # `status` is derived from the date ingest ran (clause_status(as_of=today)), not from
 # the content — the same corpus ingested a day apart may differ only there.
 _FINGERPRINT_SKIP = frozenset({"status"})

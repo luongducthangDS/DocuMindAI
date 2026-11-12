@@ -1046,3 +1046,16 @@ class TestYesNoAnalysis:
              patch("src.rag.generator._stream_chunks_in_thread", side_effect=fake_thread):
             [t async for t in stream_answer(self.YN, [self.CHUNK], as_of_date="2026-03-01")]
         assert "Phân tích đối chiếu điều kiện" in prompts[0]
+
+
+def test_long_situation_question_is_analyzed_too():
+    """g3_cv06 không phải Có/Không: "vợ sinh con thứ hai (sinh thường…) … bao nhiêu ngày?" — model khớp
+    tình tiết với điểm a (05 ngày) mà bỏ trường hợp riêng ở điểm c (10 ngày). Câu dài kể tình huống
+    (_is_complex_query) cũng đi qua lượt phân tích."""
+    from src.rag.generator import _analysis_block
+
+    q = ("Lao động nam đang tham gia bảo hiểm xã hội bắt buộc có vợ sinh con thứ hai (sinh một con, sinh "
+         "thường, không phải phẫu thuật, đủ tuần tuổi) thì được nghỉ việc hưởng chế độ thai sản bao nhiêu ngày làm việc?")
+    with patch("src.rag.generator.gemini_generate", return_value="1. Điểm c [1]: con thứ hai → 10 ngày") as analyze:
+        assert "10 ngày" in _analysis_block(q, "ctx")
+    analyze.assert_called_once()

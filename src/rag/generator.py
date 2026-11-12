@@ -251,22 +251,26 @@ _ANALYZE_PROMPT = """Bạn phân tích một câu hỏi tra cứu {domain} TRƯ�
 
 **Câu hỏi:** {query}
 
-Làm lần lượt, ngắn gọn, không viết câu trả lời cho người dùng:
-1. Trích nguyên văn (kèm [N]) các điều kiện, quy định quyết định câu trả lời — lấy từ điều quy định điều kiện, không phải cách tính mức hưởng.
-2. Áp từng điều kiện vào dữ kiện trong câu hỏi; tính con số nếu cần.
-3. Kết luận Có/Không cho từng ý được hỏi."""
+Làm lần lượt, NGẮN GỌN (tối đa khoảng 10 dòng), không viết câu trả lời cho người dùng:
+1. Xác định đúng trường hợp của câu hỏi (đối tượng, thời điểm, tình tiết). Trích nguyên văn (kèm [N]) quy định áp dụng cho ĐÚNG trường hợp đó — trường hợp được nêu riêng thì ưu tiên hơn quy định chung; điều kiện để được hưởng lấy từ điều quy định điều kiện, không suy từ công thức tính mức hưởng.
+2. Áp quy định vào dữ kiện trong câu hỏi; tính con số nếu cần.
+3. Kết luận cho từng ý được hỏi (Có/Không, con số, thời hạn...).
+Các đoạn KHÔNG có quy định cho đúng trường hợp được hỏi (chỉ có quy định cho trường hợp khác — ví dụ quy định chuyển tiếp kèm điều kiện mà câu hỏi không nêu) thì ghi "không có trong văn bản tham chiếu" cho ý đó — KHÔNG suy con số từ quy định của trường hợp khác hay từ trí nhớ."""
 
 
 def _analysis_block(query: str, context: str) -> str:
-    """Câu Có/Không: một lượt phân tích điều kiện TRƯỚC khi trả lời, nối vào ngữ cảnh.
+    """Câu Có/Không hoặc câu tình huống dài: một lượt phân tích TRƯỚC khi trả lời, nối vào ngữ cảnh.
 
-    Rule 8 (BLUF) bắt câu đầu là kết luận và suy luận đang tắt (enable_thinking=false), nên
-    model chốt Có/Không theo luật cũ nó nhớ rồi mới viết lý do: lh_m05b "16 năm đóng chưa đủ,
-    phải 20" (Luật BHXH 2024 chỉ cần 15) đúng 10/24 lần dù Điều 64 nằm trong ngữ cảnh. Phân tích
-    trước, trả lời sau: 24/24 trên ba câu từng sai, 30 câu Có/Không của gold không câu nào sai
-    thêm, +2.0s p50 (đo 2026-10-18). Lượt này lỗi thì bỏ qua — không bao giờ chặn câu trả lời.
+    Rule 8 (BLUF) bắt câu đầu là đáp án và suy luận đang tắt (enable_thinking=false), nên model
+    chốt đáp án theo luật nó nhớ (thường là bản cũ) trước khi xét quy định nào áp dụng:
+    - lh_m05b "16 năm đóng chưa đủ, phải 20" (Luật BHXH 2024 chỉ cần 15) đúng 10/24 lần dù Điều 64
+      nằm trong ngữ cảnh → 12/12 với lượt này;
+    - g3_cv06 "vợ sinh con thứ hai (sinh thường…)" trả lời điểm a "05 ngày" thay vì điểm c "10 ngày"
+      (quy định mới 07/2026) 2/12 lần dù đoạn đúng ở hạng 1 → 12/12. Câu này không phải Có/Không —
+      nên điều kiện kích hoạt là Có/Không HOẶC _is_complex_query (câu dài kể tình huống).
+    Lượt này lỗi thì bỏ qua — không bao giờ chặn câu trả lời.
     """
-    if not _YES_NO_RE.search(query):
+    if not (_YES_NO_RE.search(query) or _is_complex_query(query)):
         return ""
     try:
         analysis = gemini_generate(
@@ -313,27 +317,65 @@ def spotlight_documents(docs: list[tuple[str, str, str]]) -> str:
     return preamble + "\n\n" + "\n\n".join(blocks)
 
 
+def _budget(chunks: list[RetrievedChunk]) -> list[tuple[int, RetrievedChunk, str]]:
+    """(số thứ tự gốc, đoạn, văn bản) của các đoạn thật sự vào prompt, trong _MAX_TOTAL_CHARS.
+
+    Đoạn không vừa bị bỏ nguyên đoạn; chỉ một đoạn đầu dài hơn cả ngân sách bị cắt. Eval dùng
+    chung hàm này để đo gold trên đúng thứ LLM nhận.
+
+    Đoạn đồ thị dẫn chiếu (metadata `graph_via`) được xếp chỗ TRƯỚC, nên khi chật thì đoạn truy
+    hồi hạng thấp nhất nhường chỗ. Bản cũ xếp theo thứ tự danh sách — đoạn đồ thị nối cuối bị bỏ
+    trước tiên (2026-10-19: multi-hop k=1 không thêm được đoạn nào tới LLM). Kết quả vẫn theo
+    số thứ tự gốc.
+    """
+    # agent_query / agent_step: đoạn agent (src/agent/research.py) tìm thêm vì thiếu — cũng xếp chỗ trước.
+    # Đoạn được một phiên bản cũ/mới đem ra so (lineage_of) cũng giữ chỗ: thiếu nó thì so sánh mất một vế —
+    # gr_c05 (2026-11-10): Điều 38 Luật 74/2025 đứng hạng 8, bị đoạn agent đẩy khỏi prompt, độ phủ 0.5 → 0.
+    compared = {c.metadata.get("lineage_of") for c in chunks if c.metadata.get("lineage_of")}
+    order = sorted(enumerate(chunks, 1),
+                   key=lambda p: not (p[1].metadata.get("graph_via") or p[1].metadata.get("agent_query")
+                                      or p[1].metadata.get("agent_step") or p[1].metadata.get("clause_uid") in compared))
+    out: list[tuple[int, RetrievedChunk, str]] = []
+    total_chars = 0
+    for i, chunk in order:
+        text = chunk.text
+        if total_chars + len(text) > _MAX_TOTAL_CHARS:
+            if out:
+                continue
+            text = text[:_MAX_TOTAL_CHARS] + "…"
+        out.append((i, chunk, text))
+        total_chars += len(text)
+    return sorted(out, key=lambda t: t[0])
+
+
 def _build_context(chunks: list[RetrievedChunk]) -> tuple[str, str]:
-    """Returns (context_block, citation_list) within _MAX_TOTAL_CHARS, in rank order.
-    A chunk that does not fit is left out whole; only a lone first chunk larger than the
-    whole budget is cut.
+    """Returns (context_block, citation_list) within _MAX_TOTAL_CHARS, in rank order (_budget).
 
     Mỗi chunk vẫn mở đầu bằng "[i]" bên trong thẻ — model trích dẫn theo đúng số đó.
     """
-    docs: list[tuple[str, str, str]] = []
-    citations = []
-    total_chars = 0
+    kept = _budget(chunks)
+    # Đoạn đồ thị: nói cho LLM biết đoạn nào dẫn tới nó, để nối hai bước "[2] … theo Điều 98" → "[9] Điều 98. …".
+    # Chỉ trỏ tới số có mặt trong prompt.
+    num = {chunk.metadata.get("clause_uid"): i for i, chunk, _ in kept}
 
-    for i, chunk in enumerate(chunks, 1):
-        text = chunk.text
-        if total_chars + len(text) > _MAX_TOTAL_CHARS:
-            if docs:
-                continue
-            text = text[:_MAX_TOTAL_CHARS] + "…"
-        docs.append((str(i), chunk_origin(chunk.metadata), f"[{i}] {text}"))
-        citations.append(f"[{i}] {chunk.citation_label}")
-        total_chars += len(text)
+    def head(i: int, chunk: RetrievedChunk) -> str:
+        m = chunk.metadata
+        if m.get("agent_step") == "versions":
+            # Phiên bản cũ/mới lấy qua phả hệ (src/rag/graphrag.py) để SO SÁNH — đã bỏ qua lọc hiệu lực, nên nhãn
+            # phải nói rõ có áp dụng tại ngày tra cứu hay không, kẻo LLM trả lời bằng luật đã hết hiệu lực.
+            side = "trước" if m.get("lineage_dir") == "truoc" else "sau"
+            j = num.get(m.get("lineage_of"))
+            status = ("CÒN hiệu lực tại ngày tra cứu" if m.get("in_force_at_query")
+                      else "KHÔNG áp dụng tại ngày tra cứu — chỉ dùng để so sánh thay đổi")
+            return (f"[{i}] (Phiên bản {side} của {m.get('lineage_of_label', '')}{f' — đoạn [{j}]' if j else ''}; "
+                    f"hiệu lực {m.get('effective_from', '?')} → {m.get('effective_to', '?')}; {status})")
+        src = sorted({num[u] for u in m.get("graph_via") or () if u in num})
+        if not src:
+            return f"[{i}]"
+        return f"[{i}] (Điều được dẫn chiếu từ đoạn {', '.join(f'[{j}]' for j in src)})"
 
+    docs = [(str(i), chunk_origin(chunk.metadata), f"{head(i, chunk)} {text}") for i, chunk, text in kept]
+    citations = [f"[{i}] {chunk.citation_label}" for i, chunk, _ in kept]
     return spotlight_documents(docs), "\n".join(citations)
 
 

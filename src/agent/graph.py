@@ -121,22 +121,117 @@ def _get_llm():
     raise RuntimeError("No LLM API key configured. Set GOOGLE_API_KEY.")
 
 
-# Lời chào / lời cảm ơn đứng một mình: trả lời thẳng, KHÔNG tốn lượt gọi LLM nào.
-# Trước đây "chào b" vẫn chạy trọn pipeline RAG 13 bước (~55s) để cuối cùng nói
-# "không tìm thấy quy định" — vừa chậm vừa sai thông điệp.
-# Chỉ khớp khi cả câu là lời chào: "chào bạn, cho tôi hỏi thử việc..." không khớp
-# vì phần đuôi vượt quá giới hạn ký tự.
+# Lời chào / giao tiếp xã giao / hỏi danh tính & tính năng / trò chuyện thân thiện:
+# Trả lời nhanh, ấm áp, thân thiện, KHÔNG tốn lượt gọi RAG / vector search nào.
+# Tránh việc "hi" hoặc "nói chuyện trước" bị ép chạy 4 bước RAG (8-19s) rồi từ chối cứng nhắc.
 _SMALLTALK_RE = re.compile(
     r"^\s*(chao|chào|hi|hello|hey|alo|xin chào|xin chao|cảm ơn|cam on|thanks?|"
-    r"thank you|bye|tạm biệt|tam biet|ok|oke|okay)[\s\w]{0,12}[.!?]*\s*$",
+    r"thank you|bye|tạm biệt|tam biet|ok|oke|okay)[\s\w]{0,20}[.!?]*\s*$",
     re.IGNORECASE,
 )
 
-# Phạm vi lấy từ src/config.py — không viết lại chuỗi mô tả ở đây.
-_SMALLTALK_ANSWER = (
-    f"Chào bạn. Tôi tra cứu {DOMAIN_NAME} — {DOMAIN_SCOPE}.\n\n"
-    f"Bạn có thể hỏi về: {DOMAIN_TOPICS}."
-)
+_CONV_PATTERNS = {
+    "chat_first": re.compile(
+        r"(chưa\s*(hỏi|muốn\s*hỏi|bàn|tra\s*cứu).*công\s*việc|chưa\s*bàn\s*luật|muốn\s*nói\s*chuyện\s*(trước|đã|chút)|"
+        r"nói\s*chuyện\s*(trước|đã|chút|đi)|tâm\s*sự|chuyện\s*trò|làm\s*quen)",
+        re.IGNORECASE,
+    ),
+    "identity": re.compile(
+        r"(bạn\s*(là\s*ai|tên\s*là\s*gì|tên\s*gì)|ai\s*(tạo\s*ra|sinh\s*ra|phát\s*triển)\s*bạn|giới\s*thiệu\s*(về\s*)?bản\s*thân)",
+        re.IGNORECASE,
+    ),
+    "capability": re.compile(
+        r"(bạn\s*(làm|giúp|tra\s*cứu|biết)\s*được\s*gì|bạn\s*có\s*(thể\s*làm\s*gì|tính\s*năng\s*gì|chức\s*năng\s*gì)|"
+        r"hướng\s*dẫn\s*(sử\s*dụng|cách\s*dùng))",
+        re.IGNORECASE,
+    ),
+    "greeting": re.compile(
+        r"^\s*(chao|chào|hi|hello|hey|alo|xin chào|xin chao|good morning|good afternoon)[\s\w]{0,20}[.!?]*\s*$",
+        re.IGNORECASE,
+    ),
+    "thanks": re.compile(
+        r"^\s*(cảm ơn|cam on|thanks?|thank you)[\s\w]{0,20}[.!?]*\s*$",
+        re.IGNORECASE,
+    ),
+    "farewell": re.compile(
+        r"^\s*(bye|tạm biệt|tam biet|hẹn gặp lại|bye bye)[\s\w]{0,20}[.!?]*\s*$",
+        re.IGNORECASE,
+    ),
+    "ack": re.compile(
+        r"^\s*(ok|oke|okay|được rồi|rõ rồi|hiểu rồi|nhất trí)[\s\w]{0,15}[.!?]*\s*$",
+        re.IGNORECASE,
+    ),
+    "wellbeing": re.compile(
+        r"(bạn\s*khỏe\s*không|bạn\s*khoẻ\s*không|hôm\s*nay\s*(thế\s*nào|bạn\s*thế\s*nào))",
+        re.IGNORECASE,
+    ),
+}
+
+_CONVERSATIONAL_RESPONSES = {
+    "chat_first": (
+        "Dạ được chứ bạn! Nghiên cứu hay làm việc mãi nhiều khi cũng căng thẳng, trò chuyện một chút cho thư thả nhé. "
+        "Hôm nay của bạn thế nào? Khi nào bạn sẵn sàng tra cứu hay có câu hỏi gì về công việc, chế độ lao động, bảo hiểm thì cứ nhắn tôi nhé!"
+    ),
+    "greeting": (
+        f"Chào bạn! Rất vui được gặp bạn. Tôi là DocuMind AI — trợ lý tra cứu {DOMAIN_NAME}.\n\n"
+        "Hôm nay bạn cần tôi hỗ trợ tìm hiểu quy định nào hay có tình huống lao động nào cần giải đáp không?"
+    ),
+    "identity": (
+        f"Tôi là DocuMind AI — trợ lý pháp lý AI chuyên sâu về {DOMAIN_NAME} ({DOMAIN_SCOPE}).\n\n"
+        "Tôi được phát triển để giúp người lao động và doanh nghiệp tra cứu nhanh chóng, chính xác các quy định trong Bộ luật Lao động, "
+        "Luật Bảo hiểm xã hội, Luật Việc làm cùng các Nghị định, Thông tư hướng dẫn hiện hành, luôn kèm trích dẫn điều khoản cụ thể."
+    ),
+    "capability": (
+        f"Tôi có thể hỗ trợ bạn các tác vụ pháp lý về {DOMAIN_NAME}:\n\n"
+        "- **Tra cứu quy định**: Hợp đồng lao động, thử việc, tiền lương, thời giờ làm việc & làm thêm giờ, nghỉ phép, kỷ luật, trợ cấp thôi việc...\n"
+        "- **Chế độ bảo hiểm**: Thai sản, ốm đau, tai nạn lao động, hưu trí, bảo hiểm thất nghiệp, BHXH một lần...\n"
+        "- **Kiểm định tuân thủ**: Đánh giá các tình huống cụ thể (ví dụ: 'công ty thử việc 3 tháng cho nhân viên văn phòng có đúng luật không?').\n"
+        "- **Tra cứu theo thời điểm**: Tra cứu chính xác quy định áp dụng tại một mốc thời gian cụ thể (theo luật cũ hay luật mới).\n\n"
+        "Bạn có thể đặt câu hỏi bằng ngôn ngữ tự nhiên, tôi sẽ tìm kiếm và trích dẫn điều khoản chính xác cho bạn!"
+    ),
+    "thanks": (
+        "Không có gì đâu bạn! Rất vui được hỗ trợ bạn. Nếu bạn còn bất kỳ thắc mắc nào về pháp luật lao động hoặc bảo hiểm xã hội, cứ nhắn tôi nhé. Chúc bạn một ngày tốt lành!"
+    ),
+    "farewell": (
+        "Tạm biệt bạn! Chúc bạn làm việc hiệu quả và nhiều niềm vui. Hẹn gặp lại bạn khi cần tra cứu pháp luật nhé!"
+    ),
+    "ack": (
+        "Dạ vâng! Khi nào bạn cần tra cứu hoặc giải đáp tình huống pháp lý nào, cứ gửi câu hỏi cho tôi nhé."
+    ),
+    "wellbeing": (
+        "Tôi là trợ lý AI nên luôn tràn đầy năng lượng và sẵn sàng hỗ trợ bạn bất cứ lúc nào! Cảm ơn bạn đã hỏi thăm nhé. Hôm nay của bạn thế nào?"
+    ),
+}
+
+# Phạm vi lấy từ src/config.py — tương thích ngược
+_SMALLTALK_ANSWER = _CONVERSATIONAL_RESPONSES["greeting"]
+
+
+def get_conversational_response(query: str) -> str | None:
+    """Kiểm tra và trả lời các câu chào hỏi, giao tiếp xã giao, hỏi danh tính / tính năng.
+    Trả về None nếu câu hỏi có chứa nội dung tra cứu pháp lý cần đưa vào pipeline RAG."""
+    q = query.strip()
+    if not q:
+        return None
+
+    # 1. Người dùng chủ động nói muốn nói chuyện trước / chưa hỏi công việc
+    if _CONV_PATTERNS["chat_first"].search(q):
+        return _CONVERSATIONAL_RESPONSES["chat_first"]
+
+    # 2. Nếu có thuật ngữ pháp lý rõ ràng trong câu dài -> nhường cho retrieval / RAG
+    if _has_legal_term(q) and len(q.split()) > 4:
+        return None
+
+    # 3. Khớp các mẫu giao tiếp cụ thể
+    for key in ("identity", "capability", "greeting", "thanks", "farewell", "ack", "wellbeing"):
+        if _CONV_PATTERNS[key].search(q):
+            return _CONVERSATIONAL_RESPONSES[key]
+
+    # 4. Fallback: regex _SMALLTALK_RE cũ
+    if _SMALLTALK_RE.match(q):
+        return _CONVERSATIONAL_RESPONSES["greeting"]
+
+    return None
 
 
 _ROUTER_PROMPT = f"""Phân loại ý định câu hỏi sau vào MỘT trong các loại:
@@ -145,6 +240,7 @@ _ROUTER_PROMPT = f"""Phân loại ý định câu hỏi sau vào MỘT trong cá
 - summarize: yêu cầu tóm tắt một văn bản
 - report: yêu cầu tạo báo cáo PDF hoặc tổng hợp nhiều văn bản
 - compliance_check: kiểm tra một tình huống cụ thể có đáp ứng điều kiện/quy định hay không (ví dụ: "công ty cho làm thêm 250 giờ/năm có đúng luật không?", "thử việc 3 tháng cho vị trí kế toán có hợp lệ không?")
+- smalltalk: chào hỏi, cảm ơn, làm quen, giải trí, trò chuyện thân thiện ngoài lề
 - unknown: không liên quan đến {DOMAIN_NAME}
 
 Chỉ trả về một từ duy nhất (không giải thích)."""
@@ -373,16 +469,17 @@ def router_node(state: AgentState) -> dict:
     settings = get_settings()
     query = state["query"]
 
-    if _SMALLTALK_RE.match(query):
+    conv_answer = get_conversational_response(query)
+    if conv_answer:
         return {
             "intent": "smalltalk",
             "route_source": "smalltalk",
-            "answer": _SMALLTALK_ANSWER,
+            "answer": conv_answer,
             "sources": [],
             "retrieved_chunks": [],
             "used_llm": "none",
             "steps": (state.get("steps") or []) + [
-                {"label": "Phân loại câu hỏi", "detail": "Chào hỏi — không cần tra cứu", "ms": 0}
+                {"label": "Phân loại câu hỏi", "detail": "Giao tiếp thân thiện — không cần tra cứu", "ms": 0}
             ],
         }
 
@@ -415,7 +512,7 @@ def router_node(state: AgentState) -> dict:
             logger.warning("Router LLM failed, using keyword classify: {}", exc)
             intent_raw, route = keyword_intent, "llm_error"
 
-        valid = {"simple_qa", "compare", "summarize", "report", "compliance_check", "unknown"}
+        valid = {"simple_qa", "compare", "summarize", "report", "compliance_check", "unknown", "smalltalk"}
         if intent_raw in valid:
             intent = intent_raw
         else:
@@ -428,10 +525,22 @@ def router_node(state: AgentState) -> dict:
         "report": "Tạo báo cáo",
         "compliance_check": "Kiểm định tuân thủ",
         "unknown": "Câu hỏi ngoài phạm vi",
+        "smalltalk": "Giao tiếp thân thiện",
     }
     ms = int((time.time() - t0) * 1000)
     logger.info("Query classified as: {} | '{}'", intent, query[:60])
     steps = state.get("steps") or []
+
+    if intent == "smalltalk":
+        return {
+            "intent": "smalltalk",
+            "route_source": route,
+            "answer": _CONVERSATIONAL_RESPONSES["greeting"],
+            "sources": [],
+            "retrieved_chunks": [],
+            "used_llm": "gemini" if route == "llm" else "none",
+            "steps": steps + [{"label": "Phân loại câu hỏi", "detail": "Giao tiếp thân thiện — không cần tra cứu", "ms": ms}],
+        }
     return {
         "intent": intent,
         "route_source": route,
@@ -643,6 +752,19 @@ def temporal_filter_node(state: AgentState) -> dict:
         "time_out_of_range": False,
         "steps": steps + [{"label": "Lọc theo hiệu lực", "detail": detail, "ms": ms}],
     }
+
+
+def research_node(state: AgentState) -> dict:
+    """Agentic RAG: LLM đọc các đoạn đã lọc hiệu lực rồi quyết định đủ hay tìm thêm (src/agent/research.py).
+    Chỉ ở lượt truy hồi đầu — lượt sau reformulate đã là một lần "tìm lại" rồi."""
+    if state.get("retry_count", 0) > 0 or state.get("time_out_of_range"):
+        return {"steps": state.get("steps") or []}  # LangGraph: node phải ghi ít nhất một khoá
+    from src.agent.research import research
+    from src.rag.context import RetrievalContext
+
+    ctx = state.get("retrieval_ctx") or RetrievalContext(as_of_date=state.get("as_of_date") or None)
+    chunks, steps = research(state["query"], state.get("retrieved_chunks") or [], ctx)
+    return {"retrieved_chunks": chunks, "steps": (state.get("steps") or []) + steps}
 
 
 def grade_node(state: AgentState) -> dict:
@@ -1019,6 +1141,7 @@ def build_graph() -> StateGraph:
     g.add_node("router", router_node)
     g.add_node("do_retrieve", retrieve_node)
     g.add_node("do_temporal_filter", temporal_filter_node)
+    g.add_node("do_research", research_node)
     g.add_node("do_grade", grade_node)
     g.add_node("do_reformulate", reformulate_node)
     g.add_node("do_answer", answer_node)
@@ -1032,7 +1155,8 @@ def build_graph() -> StateGraph:
     g.add_edge("do_contextualize", "router")
     g.add_conditional_edges("router", route_by_intent)
     g.add_edge("do_retrieve", "do_temporal_filter")
-    g.add_edge("do_temporal_filter", "do_grade")
+    g.add_edge("do_temporal_filter", "do_research")
+    g.add_edge("do_research", "do_grade")
     g.add_conditional_edges(
         "do_grade", route_after_grade, {"do_answer": "do_answer", "do_reformulate": "do_reformulate"}
     )

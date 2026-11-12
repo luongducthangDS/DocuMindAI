@@ -138,6 +138,31 @@ def _load_nodes_from_backend(backend) -> list:
         return []
 
 
+def build_legal_graph(backend, nodes: list) -> None:
+    """Dựng đồ thị dẫn chiếu (src/rag/legal_graph.py) từ đúng các node của BM25 — lúc khởi động và sau mỗi lần
+    upload/reload, để văn bản mới tải lên cũng có cạnh. Lỗi thì truy hồi như không có đồ thị."""
+    from src.config import get_settings
+
+    if get_settings().graph_expand <= 0:
+        return
+    from src.rag import legal_graph
+    from src.rag.vector_backend import fetch_all_vectors
+
+    try:
+        n = legal_graph.build_index(nodes, fetch_all_vectors(backend))
+        logger.info("Legal graph: {} điều, nối thêm tối đa {} đoạn/câu", n, get_settings().graph_expand)
+    except Exception as exc:
+        logger.warning("Legal graph unavailable, retrieval without expansion: {}", exc)
+        return
+    from src.rag import graphrag
+
+    try:  # lớp GraphRAG (phả hệ phiên bản + cụm chủ đề) dựng offline, nằm trên chỉ mục điều vừa nạp
+        n_lineage, n_comm = graphrag.load()
+        logger.info("GraphRAG: {} cạnh phiên bản, {} cụm chủ đề", n_lineage, n_comm)
+    except Exception as exc:
+        logger.warning("GraphRAG unavailable, agent without version/overview tools: {}", exc)
+
+
 def _init_rag_sync() -> None:
     """Synchronous RAG initialization — called from thread pool."""
     from llama_index.core import Settings as LlamaSettings, VectorStoreIndex
@@ -182,6 +207,7 @@ def _init_rag_sync() -> None:
     fingerprint = corpus_fingerprint((n.text, n.metadata) for n in existing_nodes) if existing_nodes else "?"
     set_index_version(f"{backend.provider}/{collection_name}/{settings.embedding_model}/{count}/{fingerprint}")
     logger.info("Index fingerprint {} ({} chunks)", fingerprint, len(existing_nodes))
+    build_legal_graph(backend, existing_nodes)
     from src.api.routes.documents import set_indexed_documents
     set_indexed_documents(existing_nodes)
 
