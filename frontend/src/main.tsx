@@ -426,7 +426,7 @@ function MdText({ text, msgIndex }: { text: string; msgIndex: number }) {
 // (src/api/routes/query.py::websocket_stream). Nhãn lạ vẫn hiện trong nhật ký.
 const STAGES: { id: string; label: string; short: string; steps: string[] }[] = [
   { id: "understand", label: "Hiểu câu hỏi", short: "Hiểu", steps: ["Phân tích câu hỏi", "Khôi phục dấu tiếng Việt", "Diễn giải câu hỏi theo ngữ cảnh", "Phân loại câu hỏi"] },
-  { id: "retrieve", label: "Truy hồi điều khoản", short: "Truy hồi", steps: ["Tìm kiếm tài liệu", "Đánh giá độ liên quan", "Tìm lại với truy vấn khác"] },
+  { id: "retrieve", label: "Truy hồi điều khoản", short: "Truy hồi", steps: ["Tìm kiếm tài liệu", "Đánh giá đủ thông tin", "Tìm thêm", "Đánh giá độ liên quan", "Tìm lại với truy vấn khác"] },
   { id: "filter", label: "Lọc hiệu lực", short: "Hiệu lực", steps: ["Lọc theo hiệu lực"] },
   { id: "answer", label: "Soạn trả lời", short: "Trả lời", steps: ["Tổng hợp câu trả lời", "Kiểm định tuân thủ"] },
 ];

@@ -20,6 +20,21 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
 > đừng viết lại chuỗi mô tả phạm vi ở chỗ khác.
 
 **Trạng thái hiện tại:**
+- **2026-11-09 — LOCAL chuyển sang Gemini toàn bộ** (FPT key trả 401 Invalid API Key từ 20:49): `.env` đặt
+  `FPT_MODELS=` (rỗng), `FPT_API_KEY` comment lại (giữ giá trị), `GEMINI_GENERATION_MODELS=gemini-3.5-flash-lite,
+  gemini-3.5-flash`, `GEMINI_JUDGE_MODELS=gemini-3.5-flash-lite`, `EMBEDDING_MODEL=gemini-embedding-001`,
+  `CHROMA_COLLECTION=documind_legal_gemini001` (1249 đoạn, ingest 09/11, fingerprint `5ce81d96ccb9` = đúng
+  nội dung index FPT), `ENABLE_RERANKER=false`. Vì sao: `gemini-3.5-flash` lúc đó 15–36 s/lời gọi (flash-lite
+  0.7 s; 3.8-flash 504); reranker local `bge-reranker-v2-m3` (đã tải vào `data/hf_cache`, 2.2 GB, git-ignore)
+  mất 73–120 s/câu trên CPU máy này ⇒ tắt, truy hồi = BM25 + dense + RRF, grader dùng `_COSINE_GATES` của
+  gemini-embedding-001. Embedding cũ là FPT ⇒ khi FPT chết, nhánh dense tắt âm thầm (chỉ BM25) — eval không
+  lộ vì `--embed-cache`. **Production (Render + Qdrant `documind_legal_fpt`) CHƯA đổi**, vẫn trỏ FPT.
+  Quay lại FPT: bỏ `#` ở `FPT_API_KEY`, đặt lại `FPT_MODELS`, `EMBEDDING_MODEL=Vietnamese_Embedding`,
+  `CHROMA_COLLECTION=documind_legal_fpt`, `ENABLE_RERANKER=true`.
+  Đo trên Gemini 2026-11-10 (đầu cuối, so với FPT+rerank 09/11): legal_qa_200 pre_filter **0.933** (FPT 0.990),
+  agentic **0.947** (+5/−2), gold trong prompt 0.986 → 0.995; multi-hop pre_filter 0.826, agentic 0.913 (+3/−1),
+  gold 0.870 → 1.000. p50 đầu cuối 3.0 s (pre_filter) / 4.3 s (agentic). 8/208 câu rơi về trích nguyên văn vì
+  Gemini 429 hết quota / 503 quá tải. Kém FPT ~5 điểm: flash-lite + không reranker — chưa tách được phần nào.
 - Corpus lao động/BHXH: 20 văn bản tại `data/raw/lao_dong/` (+ `_versions/` cho bản sửa đổi
   cấp khoản). Index có **19** `doc_id`: `18-VBHN-VPQH` là bản hợp nhất, nạp làm nội dung của `45-2019-QH14`
   (`consolidated_from`) — `/documents` hiện 19 là đúng. Corpus ngân hàng cũ đã bỏ — `data/raw/banking_docs/` không còn tồn tại.
@@ -62,6 +77,12 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   `--embed-cache` chỉ dùng cho CI (latency khi đó không phải số thật). Kết quả: README mục Đánh giá —
   chỉ trích nguyên `summary` của report, không tính tay trên tập con (test chặn); report ghi
   `meta.index` (provider/collection/model/số chunk/hash nội dung) + `meta.git_sha`.
+  `context_gold` = gold trong danh sách truy hồi; `llm_context_gold` = gold trong đúng các đoạn vào prompt
+  (`generator._budget`, ngân sách 24.000 ký tự) — hai số lệch nhau khi đoạn cuối danh sách bị cắt.
+- Bộ multi-hop `data/eval/multihop_questions.json` (23 câu, 2026-10-19, Claude soạn, `reviewed: false`): mỗi câu cần
+  đoạn dẫn chiếu A + điều được dẫn tới B (`source_clauses: [A, B]`, `temporal_kind: multi_hop`); ứng viên là mẫu
+  ngẫu nhiên seed 7 trong 738 cặp "Điều N của <Luật…>" ghi đích danh, đọc tay — dạng extractor bắt tốt, nên bộ
+  này thuận lợi cho đồ thị. Không chứa lh_b02a/g2_b031/g2_b033 (đã dùng để chọn cách xếp hạng).
 - Nguyên liệu câu hỏi tổng hợp (CHƯA DUYỆT, không phải gold): `data/eval/synthetic/doc2query_questions.jsonl` —
   4.992 câu đời thường FPT sinh cho 1.249 đoạn (2026-10-18), mỗi dòng mang `text_sha1` của đoạn để biết dòng nào cũ.
   Sinh tiếp cho đoạn mới/đổi: `python scripts/generate_doc2query.py`. Xem README trong thư mục trước khi dùng.
@@ -78,7 +99,14 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   Report nào ghi rerank phải xem `meta.reranker_active`, không tin `ENABLE_RERANKER`.
   torch/sentence-transformers/transformers **không** còn trong `requirements.txt` (2026-09-27,
   image production không cài ~1.3GB này) — muốn chạy reranker: `pip install -r requirements-rerank.txt`.
-- Test suite: 687 passed (đo 2026-10-18). Test không gửi trace ra Langfuse/LangSmith
+- **QA agents + MCP server (2026-11-10)** — `src/qa/`, `src/mcp_server.py`, tài liệu `docs/qa-agents.md`: regression
+  scope (đồ thị import + tên file dữ liệu + văn bản → câu gold, chạy lại bằng `temporal_eval.py --ids`), phân tích defect
+  theo tầng hỏng (oos_leak/stale_law/wrong_verdict = critical), release scorecard GO/NO-GO (dùng ngưỡng `ci_gate`),
+  sinh test case bằng LLM + kiểm hallucination tất định + hàng đợi người duyệt (`data/qa/review_queue.jsonl`), adapter
+  Jira/GitLab/GitHub/TestRail (thiếu credential = dry-run; **chưa thử instance thật**). MCP đăng ký ở `.mcp.json` và
+  `.kiro/settings/mcp.json`. `mcp==1.12.4` ở requirements-dev — bản mới hơn kéo starlette 1.x, vỡ pin FastAPI;
+  `src/mcp_server.py` không được có `from __future__ import annotations`. CI job `eval` comment scorecard lên PR.
+- Test suite: 739 passed (đo 2026-11-10; conftest ghim cả `fpt_models` về default). Test không gửi trace ra Langfuse/LangSmith
   (`conftest.py::patch_settings` xoá key).
 
 **Stack:**
@@ -114,7 +142,46 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   sửa g2_b033/g2_b036, mỗi câu ghi `clause_review`; `reviewed` vẫn false — người duyệt chấm nhãn điều khoản, chưa
   duyệt cả câu). Phần B (30 câu trả lời để hiệu chỉnh judge) chưa ai chấm. `ci_gate` in bảng thắng/thua theo câu;
   câu nhiều điều khoản đo bằng `multi_coverage_at_k` (recall@1 của chúng luôn = 0 theo định nghĩa).
-- LLM: **chỉ FPT AI Marketplace** (2026-10-18): `GEMINI_GENERATION_MODELS`, `GEMINI_GENERATION_MODELS_COMPLEX`,
+- **Agentic RAG — BẬT, `AGENT_RESEARCH_ROUNDS=1`** (`src/agent/research.py`, 2026-11-09): sau truy hồi + lọc hiệu
+  lực, nếu các đoạn dẫn tới điều chưa có, MỘT lời gọi LLM (`agent-research`) trả JSON: `enough` / `fetch` (chọn
+  mã R* trong danh sách ứng viên do đồ thị dẫn chiếu giải sẵn — kèm tiêu đề điều + câu dẫn gốc; LLM không tự viết
+  số hiệu) / `search` (1 câu con → `retrieve_with_context` cùng ctx, ≤3 đoạn mới). Không có ứng viên ⇒ không gọi
+  (giữ ngân sách 1 lời gọi của `test_llm_budget`); lỗi LLM/JSON ⇒ fail open. Đoạn thêm mang `graph_via`
+  (fetch) / `agent_query` (search) ⇒ `_budget` xếp chỗ trước. Chạy ở cả REST (`research_node` giữa
+  `do_temporal_filter` và `do_grade`, chỉ lượt đầu) và WS (bước UI "Tìm thêm" / "Đánh giá đủ thông tin").
+  Đo: `temporal_eval.py --arms agentic`. Multi-hop: gold trong prompt 0.913 → 1.000, mh_01 (Điều 23 → Điều 67)
+  được sửa, p50 truy hồi 0.6 → 3.3 s. **legal_qa_200 chưa đo xong: FPT key trả 401 từ 20:49 09/11** (LLM lẫn
+  rerank) — chạy lại khi có key. Đã thấy: agent đi tìm thừa vì tưởng phần trích 500 ký tự là thiếu nội dung
+  (lh_m02) → prompt đã nói rõ toàn văn có trong prompt trả lời; CHƯA đo lại sau sửa.
+- **Knowledge graph dẫn chiếu — BẬT, `GRAPH_EXPAND=1`** (`src/rag/legal_graph.py`, bật lại 2026-11-09): nút là
+  điều (doc_id, Điều), cạnh là "Điều N của <văn bản>" trích bằng quy tắc từ văn bản chunk (corpus hiện tại: 1017
+  điều, 1125 cạnh, 537 khác văn bản). Dựng từ node BM25 + vector lúc khởi động VÀ sau upload/reload
+  (`main.build_legal_graph`). Tên văn bản giải theo thời kỳ ("Luật Bảo hiểm xã hội" năm 2015 → 58/2014, năm 2025 →
+  41/2024); văn bản ngoài corpus bỏ qua. Mỗi câu: top-8 → các điều chúng dẫn tới (chưa có mặt, đúng phiên bản hiệu
+  lực/ACL) → xếp RRF(số phiếu × IDF in-degree, cosine câu hỏi) → nối `graph_expand` điều, mang `graph_via` lên
+  trace. `generator._budget` xếp chỗ cho đoạn đồ thị TRƯỚC (đoạn truy hồi hạng thấp nhất nhường chỗ) và
+  `_build_context` ghi "(Điều được dẫn chiếu từ đoạn [j])". Vì sao từng tắt (10-19): đoạn đồ thị nối cuối bị ngân
+  sách prompt cắt trước tiên. Đo lại 2026-11-09 (đầu cuối FPT, arm pre_filter, k=0→1): legal_qa_200 0.962→0.990
+  (+6/−0; thật 3 — lh_b02a/b, g2_b031; 3 còn lại là bộ chấm so chuỗi chê "0,5 tháng"), multi-hop 0.913→0.957 (+1
+  cũng do bộ chấm); k=2 không hơn. Chưa giải: mh_01 — Điều 23 dẫn 5 điều, đúng là Điều 67 nhưng xếp hạng 3 (thử
+  cross-encoder: hạng 4, không dùng). Audit cạnh (chấm tay 10-19): precision 49/50, recall 32/32 với đích trong
+  corpus. Xem quan hệ: `python scripts/export_legal_graph.py --out <file>`.
+- **GraphRAG + agentic nhiều tool (2026-11-10)** — `src/rag/graphrag.py`, dựng offline `python scripts/build_graphrag.py`
+  → `data/graph/{article_lineage,communities}.json` (commit, Dockerfile chép vào image; runtime không phụ thuộc model
+  embedding). (1) **Phả hệ phiên bản**: cặp văn bản thay thế lấy từ manifest (`thay_the`/`bi_thay_the_boi`), cặp điều =
+  mutual best 0.5·cosine + 0.5·Jaccard tiêu đề ≥ 0.70 → 169 cạnh / 6 cặp văn bản; chấm tay 40 cặp ~37 đúng ⇒ chỉ là ỨNG
+  VIÊN cho agent chọn. (2) **Cụm chủ đề**: Louvain (resolution 4.0) trên cạnh dẫn chiếu + phả hệ + điều liền kề cùng
+  chương → 67 cụm (55 xuyên văn bản), nhãn/tóm tắt Gemini viết từ tiêu đề, kiểm số bịa; tóm tắt KHÔNG vào prompt trả lời.
+  Agent (`src/agent/research.py`) thêm tool `versions` (chỉ khi `_CHANGE_RE`: lấy phiên bản trước/sau, bỏ qua lọc hiệu
+  lực, giữ tenant/ACL; prompt ghi "KHÔNG áp dụng tại ngày tra cứu") và `overview` (global search; **TẮT**,
+  `AGENT_OVERVIEW=false`: 5 câu tổng quát không thắng câu nào, gr_g01 độ phủ 0.75→0.50). Mỗi vòng tính lại ứng viên;
+  `enough` kèm mã hành động vẫn thực hiện; `_budget` giữ chỗ cho điều đang được so (`lineage_of`); lỗi LLM của agent gắn
+  cờ `agent_research_failed`. Gold `data/eval/graphrag_questions.json` (11 câu thay đổi + 5 tổng quát, Claude soạn từ
+  nguyên văn, `reviewed: false`). Đo Gemini local (chỉ câu `n_degraded`-sạch; quota Gemini làm hỏng 4–13/16 câu mỗi lượt —
+  dùng `--pace 30`): 16 câu: pre_filter 8, agentic cũ 6, agentic mới 12; 6 câu thay đổi sạch ở lượt cuối: mới 6/6 (gold
+  trong prompt 1.0) vs pre_filter 2/6. p50 truy hồi agentic 3–8 s (Gemini). **Production (FPT) CHƯA đo**; legal_qa_200
+  chưa đo lại (trigger regex chỉ khớp 0 câu CHANGE / 9 câu BROAD trong 231 câu gold cũ).
+- LLM (production; local đã sang Gemini 2026-11-09, xem đầu mục): **chỉ FPT AI Marketplace** (2026-10-18): `GEMINI_GENERATION_MODELS`, `GEMINI_GENERATION_MODELS_COMPLEX`,
   `GEMINI_JUDGE_MODELS` để TRỐNG ở `.env` và Render ⇒ không còn cặp Gemini; FPT hỏng cả hai model thì trích
   nguyên văn nguồn (`used_llm=extractive_fallback`). Bật lại Gemini = điền lại 3 biến (code giữ nguyên;
   test ép default qua `conftest.py`). Mô tả cơ chế khi còn Gemini (2026-10-17): `_gemini_pairs` đặt các
@@ -132,12 +199,16 @@ từ chối khi câu hỏi ngoài phạm vi tài liệu đã nạp, và tra cứ
   UI web đi WebSocket → `stream_answer`, eval đi `generate_answer`: từ 2026-10-18 hai đường cùng gắn
   `_as_of_block` (trước đó đường stream không có ngày tra cứu). Sửa prompt thì sửa `_SYSTEM_PROMPT` —
   dùng chung cho cả hai.
-  **Câu Có/Không — phân tích trước, trả lời sau** (`_analysis_block`, 2026-10-18): câu khớp `_YES_NO_RE`
-  (30/208 câu gold) gọi thêm một lượt `analyze-conditions` (trích điều kiện kèm [N] → áp vào dữ kiện →
-  kết luận) rồi nối phân tích vào ngữ cảnh của lượt trả lời; cả `generate_answer` lẫn `stream_answer`
-  (stream vẫn stream — phân tích xong mới bắt đầu). Lỗi thì bỏ qua. Lý do: rule 8 BLUF + suy luận tắt ⇒
-  Qwen chốt Có/Không theo luật cũ nó nhớ — `lh_m05b` (16 năm đóng, Luật 41/2024 chỉ cần 15) đúng 10/24 →
-  12/12; `lh_c02b`, `g2_d028` 6/6; +2.0s p50, max 5.6s. Đã đo và loại: rule "trí nhớ có thể là luật cũ"
+  **Phân tích trước, trả lời sau** (`_analysis_block`, 2026-10-18): câu Có/Không (`_YES_NO_RE`) HOẶC câu
+  tình huống dài (`_is_complex_query`) — 76/208 câu gold — gọi thêm một lượt `analyze-conditions` (xác định
+  đúng trường hợp → trích quy định kèm [N], trường hợp riêng ưu tiên hơn quy định chung → áp vào dữ kiện →
+  kết luận; không có quy định cho đúng trường hợp thì ghi "không có", không suy từ trường hợp khác) rồi nối
+  phân tích vào ngữ cảnh của lượt trả lời; cả `generate_answer` lẫn `stream_answer` (stream vẫn stream —
+  phân tích xong mới bắt đầu). Lỗi thì bỏ qua. Lý do: rule 8 BLUF + suy luận tắt ⇒ Qwen chốt đáp án trước
+  khi xét quy định nào áp dụng — `lh_m05b` (16 năm đóng, Luật 41/2024 chỉ cần 15) 10/24 → 12/12; `g3_cv06`
+  (vợ sinh con thứ hai → điểm c 10 ngày, model chọn điểm a 05 ngày) 10/12 → 12/12; phân tích p50 ~1.9s.
+  `g2_b031` sai vì truy hồi (Luật BHXH 2024 Điều 98 hạng 28, người duyệt gắn `truy_hoi_khac`) — giờ trả lời
+  "chưa tìm thấy" thay vì suy "20 năm" từ quy định chuyển tiếp. Đã đo và loại: rule "trí nhớ có thể là luật cũ"
   5/12; BLUF "điều kiện trước" 5/12, 4/12; bỏ BLUF 11/12 nhưng 208 câu thêm 2 lỗi thật; DeepSeek trước Qwen
   thua 6 (`lh_o02` trả lời câu ngoài phạm vi); `enable_thinking` cho câu phức tạp p95 sinh 61s; kiểm SAU
   bản nháp (verifier) 10/12 — model tự phân tích đúng nhưng so với bản nháp lại ghi "GIỮ". So phương án đổi

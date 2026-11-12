@@ -52,6 +52,9 @@ COPY ingest.py ./
 # Tong cong ~72KB.
 COPY docs/corpus/ ./docs/corpus/
 COPY data/compliance/ ./data/compliance/
+#   data/graph/ -> phả hệ phiên bản điều luật + cụm chủ đề (src/rag/graphrag.py, ~300KB). Thiếu thì agent mất tool
+#                  versions/overview (log WARNING), không crash.
+COPY data/graph/ ./data/graph/
 
 # Cache dirs
 ENV HOME=/app

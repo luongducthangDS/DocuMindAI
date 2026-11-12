@@ -80,7 +80,8 @@ from src import langfuse_otel  # noqa: E402 — đọc _index_version lúc dựn
 from src.ingestion.manifest import corpus_earliest_point_in_time  # noqa: E402
 from src.rag.temporal import is_out_of_range, versions_in_force  # noqa: E402
 
-ARMS = ("no_temporal", "prompt_only", "temporal_filter", "pre_filter")
+# ⑤ agentic = pre_filter + vòng tìm thêm của src/agent/research.py (đường production REST/WS)
+ARMS = ("no_temporal", "prompt_only", "temporal_filter", "pre_filter", "agentic")
 DEFAULT_GOLD = _REPO_ROOT / "data" / "eval" / "temporal_questions.json"
 DEFAULT_OUTPUT = _REPO_ROOT / "reports" / "temporal_eval.json"
 RECALL_KS = (1, 3, 5, 8)  # 8 = top_n the generator actually receives
@@ -105,7 +106,9 @@ def _norm(text: str) -> str:
     """
     text = (text or "").replace(" ", " ")
     text = re.sub(r"[*_`]+", "", text)
-    return re.sub(r"\s+", " ", text).strip().lower()
+    text = re.sub(r"\s+", " ", text).strip().lower()
+    # "60 %" (gpt-oss đặt khoảng trắng hẹp U+202F trước %) là "60%" — câu đúng bị chấm sai (2026-10-19).
+    return re.sub(r"(\d) %", r"\1%", text)
 
 
 def score_answer(answer: str, question: dict) -> dict:
@@ -347,9 +350,10 @@ def run(
     arms: tuple[str, ...],
     retrieval_only: bool,
     judge_arms: tuple[str, ...] = (),
+    pace: float = 0.0,
 ) -> dict[str, Any]:
     from src.rag.context import RetrievalContext, degraded_flags, reset_degraded, start_degraded
-    from src.rag.generator import generate_answer
+    from src.rag.generator import _budget, generate_answer
     from src.rag.retriever import nodes_to_chunks, retrieve_with_context
 
     retriever = _build_retriever()
@@ -362,8 +366,10 @@ def run(
 
     # pre_filter tự truy hồi (retrieve_with_context); lượt chung chỉ phục vụ các arm còn
     # lại — chạy riêng pre_filter mà vẫn gọi nó là gấp đôi embed + rerank vô ích.
-    needs_shared = any(a != "pre_filter" for a in arms)
+    needs_shared = any(a not in ("pre_filter", "agentic") for a in arms)
     for i, q in enumerate(questions, 1):
+        if pace and i > 1:
+            time.sleep(pace)  # hạn mức lời gọi/phút (Gemini free tier): câu agentic tốn 2–4 lời gọi
         degraded = start_degraded()
         t0 = time.time()
         chunks = nodes_to_chunks(retriever.retrieve(q["question"])) if needs_shared else []
@@ -387,22 +393,29 @@ def run(
         }
 
         for arm in arms:
-            if arm == "pre_filter":
+            if arm in ("pre_filter", "agentic"):
                 t_pf = time.time()
-                used = retrieve_with_context(
-                    q["question"], RetrievalContext(as_of_date=q["as_of_date"])
-                )
+                rctx = RetrievalContext(as_of_date=q["as_of_date"])
+                used = retrieve_with_context(q["question"], rctx)
                 oor = is_out_of_range(q["as_of_date"], earliest)
                 if oor:
                     used = []
+                elif arm == "agentic":
+                    from src.agent.research import research
+
+                    used, agent_steps = research(q["question"], used, rctx)
                 prompt_as_of = q["as_of_date"]
                 pre_filter_ms = int((time.time() - t_pf) * 1000)
             else:
                 used, oor, prompt_as_of = apply_arm(arm, chunks, q["as_of_date"], earliest)
                 pre_filter_ms = None
-            entry: dict[str, Any] = {"context": score_context(used, q)}
+            entry: dict[str, Any] = {"context": score_context(used, q),
+                                     # cùng câu hỏi trên đúng các đoạn vào prompt (ngân sách ký tự)
+                                     "context_llm": score_context([c for _, c, _ in _budget(used)], q)}
             if pre_filter_ms is not None:
                 entry["retrieve_ms"] = pre_filter_ms
+            if arm == "agentic" and not oor:
+                entry["agent_steps"] = agent_steps
 
             if not retrieval_only:
                 t1 = time.time()
@@ -473,6 +486,10 @@ def summarise(rows: list[dict], arms: tuple[str, ...], retrieval_only: bool) -> 
             "context_clean": sum(c["clean"] for c in ctx) / n,
             "avg_chunks": sum(c["n_chunks"] for c in ctx) / n,
         }
+        llm = [r["arms"][arm].get("context_llm") for r in subset]
+        if all(llm):  # report cũ không có trường này
+            agg["llm_context_gold"] = sum(c["gold"] for c in llm) / n
+            agg["llm_context_gold_coverage"] = sum(c.get("gold_coverage", float(c["gold"])) for c in llm) / n
         # recall@k / MRR only over questions that HAVE a gold clause: a refusal
         # question has nothing to recall, counting it would dilute or inflate.
         ranked = [r["arms"][arm]["context"].get("gold_rank") for r in subset if r.get("has_gold")]
@@ -662,6 +679,8 @@ def main() -> None:
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--arms", nargs="+", choices=ARMS, default=list(ARMS))
     parser.add_argument("--limit", type=int, default=0, help="chỉ chạy N câu đầu (smoke test)")
+    parser.add_argument("--ids", nargs="+", default=None, help="chỉ chạy các câu có id này (regression scope)")
+    parser.add_argument("--pace", type=float, default=0.0, help="giây nghỉ giữa hai câu (tránh 429 → extractive_fallback)")
     parser.add_argument(
         "--retrieval-only",
         action="store_true",
@@ -699,13 +718,15 @@ def main() -> None:
         use_query_embedding_cache(args.embed_cache)
 
     questions = json.loads(args.gold.read_text(encoding="utf-8"))
+    if args.ids:
+        questions = [q for q in questions if q["id"] in set(args.ids)]
     if args.limit:
         questions = questions[: args.limit]
 
     if args.rescore:
         report = rescore(json.loads(args.rescore.read_text(encoding="utf-8")), questions)
     else:
-        report = run(questions, tuple(args.arms), args.retrieval_only, judge_arms=tuple(args.judge))
+        report = run(questions, tuple(args.arms), args.retrieval_only, judge_arms=tuple(args.judge), pace=args.pace)
     # run() chỉ biết DEFAULT_GOLD — ghi đè bằng file thực sự chạy (--gold)
     gold = args.gold.resolve()
     report["meta"]["gold_set"] = (

@@ -389,6 +389,8 @@ Tài liệu API (Swagger) tương tác: **`http://localhost:8081/docs`**.
 
 ## 🧪 Kiểm thử & xác minh
 
+> Agent QA (regression scope, defect, release scorecard, sinh test case có người duyệt) và MCP server: xem [docs/qa-agents.md](docs/qa-agents.md).
+
 Chạy toàn bộ test tự động:
 ```powershell
 # Chạy tất cả test kèm báo cáo coverage
@@ -397,9 +399,14 @@ pytest -v
 # Chạy riêng test đơn vị của bộ kiểm tra tuân thủ
 pytest tests/test_compliance.py -v
 
+# Chạy API regression tests (SQLite tạm, không cần API key)
+pytest tests/test_metrics_api.py tests/test_health.py -v
+
 # Chạy benchmark truy hồi (smoke test)
 python eval/run_evals.py --strategies dense rerank --retrieval-only --limit 5
 ```
+
+Hồ sơ Quality Engineering, API test cases và defect đã tái hiện/sửa: [`docs/quality-engineering.md`](docs/quality-engineering.md).
 
 ---
 

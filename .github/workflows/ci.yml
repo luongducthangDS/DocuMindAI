@@ -32,6 +32,9 @@ jobs:
   eval:
     runs-on: ubuntu-latest
     needs: test
+    permissions:
+      contents: read
+      pull-requests: write
     # Fork PRs get no secrets — skip instead of failing red for reasons unrelated to the diff.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     env:
@@ -72,6 +75,16 @@ jobs:
 
       - name: Gate vs baseline
         run: python eval/ci_gate.py reports/ci_eval.json --baseline reports/eval_baseline.json
+
+      # Release scorecard (GO/NO-GO + defect theo từng câu) comment lên PR — người review thấy câu nào
+      # thoái lui, loại hỏng nào, lệnh tái hiện, không phải mở artifact.
+      - name: Release scorecard → PR comment
+        if: always() && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python -m src.qa.release reports/ci_eval.json --baseline reports/eval_baseline.json > scorecard.md || true
+          gh pr comment ${{ github.event.pull_request.number }} --body-file scorecard.md --edit-last             || gh pr comment ${{ github.event.pull_request.number }} --body-file scorecard.md
 
       - uses: actions/upload-artifact@v4
         if: always()
